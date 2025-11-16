@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mê Cung Trí Tuệ - Toán 9: Góc ở tâm, góc nội tiếp</title>
+    <title>Cuộc Xâm Lăng - Toán 9: Tiếp tuyến</title>
     <!-- Tải Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Tải Tone.js cho âm thanh -->
@@ -12,8 +12,10 @@
         /* CSS cho font và giao diện chung */
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: #333;
+            background: #0f0c29; /* Nền trời đêm */
+            background: -webkit-linear-gradient(to top, #24243e, #302b63, #0f0c29);
+            background: linear-gradient(to top, #24243e, #302b63, #0f0c29);
+            color: #f0f2f5;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -24,109 +26,157 @@
         /* Container chính của trò chơi */
         #game-container {
             width: 100%;
-            max-width: 900px;
-            background-color: rgba(255, 255, 255, 0.98);
+            max-width: 700px; /* Thu hẹp lại cho game 1 người */
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         /* Tiêu đề */
         header {
-            background-color: #5a67d8;
-            color: white;
+            background-color: rgba(0, 0, 0, 0.2);
             padding: 1.5rem 2rem;
             text-align: center;
-            border-bottom: 5px solid #434190;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         header h1 {
             font-size: 2rem;
             font-weight: 700;
             margin: 0;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            color: #ff5e5e; /* Màu đỏ báo động */
+            text-shadow: 0 0 10px #ff5e5e;
         }
 
         header p {
             font-size: 1rem;
-            opacity: 0.9;
+            opacity: 0.8;
             margin-top: 0.25rem;
         }
 
-        /* Nội dung chính (Mê cung + Câu hỏi) */
-        main {
-            display: flex;
-            flex-direction: column;
-            md:flex-direction: row;
-            flex-grow: 1;
-        }
-
-        /* Mê cung */
-        #maze-grid {
-            width: 100%;
-            md:width: 40%;
-            background: #f4f5f7; /* Màu nền đá */
-            border-right: 2px solid #e2e8f0;
+        /* Khu vực hiển thị game (tàu, lá chắn) */
+        #game-area {
             padding: 1.5rem;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 cột cho 15 câu */
-            gap: 1rem;
-            align-content: start;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             min-height: 200px;
-            order: 2; /* Đảo thứ tự trên mobile */
-            md:order: 1;
-        }
-
-        /* Cánh cửa trong mê cung */
-        .maze-door {
-            aspect-ratio: 1 / 1;
-            background-color: #cbd5e1;
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2.5rem;
-            color: #4a5568;
-            border: 2px solid #a0aec0;
-            transition: all 0.5s ease;
-        }
-
-        .maze-door.unlocked {
-            background-color: #c6f6d5;
-            color: #2f855a;
-            border-color: #68d391;
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-        }
-
-        /* Khu vực câu hỏi */
-        #quiz-area {
-            width: 100%;
-            md:width: 60%;
-            padding: 2rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            order: 1; /* Đảo thứ tự trên mobile */
-            md:order: 2;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g fill="%23fff" fill-opacity="0.1"><circle cx="25" cy="25" r="1.5"/><circle cx="50" cy="50" r="1.5"/><circle cx="75" cy="75" r="1.5"/><circle cx="10" cy="90" r="1.5"/><circle cx="90" cy="10" r="1.5"/></g></svg>') 0 0 / 50px 50px;
+        }
+
+        /* Hạm đội UFO */
+        #ufo-fleet {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+        }
+
+        .ufo {
+            font-size: 2.5rem;
+            text-align: center;
+            opacity: 1;
+            transform: scale(1);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            filter: drop-shadow(0 0 5px #00f2ff);
+        }
+
+        .ufo.destroyed {
+            opacity: 0;
+            transform: scale(0) rotate(180deg);
+        }
+
+        /* Lá chắn Trái Đất */
+        #shield-status {
+            margin-top: 1.5rem;
+        }
+        
+        #shield-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #00f2ff;
+        }
+
+        #shield-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 1px solid #00f2ff;
+            overflow: hidden;
+        }
+
+        #shield-bar {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #00f2ff 0%, #00c6ff 100%);
+            border-radius: 8px;
+            transition: width 0.5s ease-out;
+            box-shadow: 0 0 10px #00f2ff;
+        }
+        
+        /* Hiệu ứng rung lắc khi bị tấn công */
+        @keyframes shake-wrong {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-10px); }
+            80% { transform: translateX(10px); }
+        }
+        .shake {
+            animation: shake-wrong 0.4s;
+        }
+
+
+        /* Khu vực câu hỏi */
+        #quiz-area {
+            padding: 2rem;
+            background-color: rgba(0, 0, 0, 0.1);
         }
 
         #question-container {
             margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        /* Hiệu ứng phản hồi (nổ, vỗ tay) */
+        #feedback-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .feedback-effect {
+            font-size: 6rem;
+            opacity: 0;
+            animation: fade-out-zoom 1s ease-out;
+        }
+        
+        @keyframes fade-out-zoom {
+            0% { opacity: 1; transform: scale(0.5); }
+            100% { opacity: 0; transform: scale(2); }
         }
 
         /* Hiển thị mức độ câu hỏi */
         #question-level {
             font-size: 0.875rem;
             font-weight: 600;
-            color: #5a67d8;
-            background-color: #e0e7ff;
+            color: #ffae42; /* Màu cam */
+            background-color: rgba(255, 174, 66, 0.1);
             padding: 0.25rem 0.75rem;
             border-radius: 9999px;
             display: inline-block;
             margin-bottom: 0.75rem;
+            border: 1px solid #ffae42;
         }
 
         /* Nội dung câu hỏi */
@@ -147,46 +197,38 @@
         /* Nút lựa chọn */
         .option-btn {
             width: 100%;
-            background-color: #fff;
-            border: 2px solid #d1d5db;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 12px;
             padding: 1rem;
             text-align: left;
             font-size: 1rem;
             font-weight: 500;
-            color: #374151;
+            color: #f0f2f5;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
         .option-btn:not(:disabled):hover {
-            border-color: #7f5af0;
-            background-color: #f0f5ff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
+            border-color: #00f2ff;
+            background-color: rgba(0, 242, 255, 0.1);
         }
-
         .option-btn.selected {
-            border-color: #5a67d8;
-            background-color: #e0e7ff;
-            color: #312e81;
+            border-color: #ffae42;
+            background-color: rgba(255, 174, 66, 0.2);
         }
 
+        /* Trả lời đúng/sai */
         .option-btn.correct {
-            background-color: #dcfce7;
+            background-color: rgba(74, 222, 128, 0.2);
             border-color: #4ade80;
-            color: #166534;
-            animation: pulse-correct 0.5s;
+            color: #f0fdf4;
         }
-
         .option-btn.wrong {
-            background-color: #fee2e2;
+            background-color: rgba(248, 113, 113, 0.2);
             border-color: #f87171;
-            color: #991b1b;
-            animation: shake-wrong 0.5s;
+            color: #fef2f2;
         }
-
         .option-btn:disabled {
             cursor: not-allowed;
             opacity: 0.7;
@@ -195,19 +237,12 @@
         /* Nút điều khiển (Kiểm tra / Câu tiếp) */
         #controls {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: flex-end;
             margin-top: 1rem;
         }
 
-        #progress-text {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #4a5568;
-        }
-
         #control-btn {
-            background-color: #5a67d8;
+            background-color: #ff5e5e;
             color: white;
             font-weight: 600;
             font-size: 1rem;
@@ -216,17 +251,19 @@
             border: none;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(90, 103, 216, 0.3);
+            text-shadow: 0 0 5px #ff5e5e;
+            box-shadow: 0 4px 10px rgba(255, 94, 94, 0.3);
         }
 
         #control-btn:disabled {
             background-color: #9ca3af;
             cursor: not-allowed;
             box-shadow: none;
+            text-shadow: none;
         }
 
         #control-btn:not(:disabled):hover {
-            background-color: #4c51bf;
+            background-color: #ff4747;
             transform: translateY(-2px);
         }
 
@@ -240,74 +277,43 @@
         #end-screen h2 {
             font-size: 2.5rem;
             font-weight: 700;
-            color: #4c51bf;
             margin-bottom: 1rem;
         }
-
+        #end-screen.victory h2 {
+            color: #4ade80;
+            text-shadow: 0 0 10px #4ade80;
+        }
+        #end-screen.defeat h2 {
+            color: #f87171;
+            text-shadow: 0 0 10px #f87171;
+        }
         #end-score {
             font-size: 1.5rem;
             margin-bottom: 2rem;
         }
 
-        /* Hiệu ứng cho câu trả lời */
-        @keyframes pulse-correct {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes shake-wrong {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-        }
-
-        /* Biểu tượng tung hoa (hiệu ứng khi đúng) */
-        .feedback-effect {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 5rem;
-            opacity: 0;
-            animation: fade-out-up 1s ease-out;
-            z-index: 100;
-        }
-
-        @keyframes fade-out-up {
-            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
-            100% { opacity: 0; transform: translate(-50%, -150%) scale(1.5); }
-        }
-        
         /* CSS cho responsive */
-        @media (max-width: 768px) {
+        @media (max-width: 640px) {
             body {
                 padding: 0.5rem;
-            }
-            main {
-                flex-direction: column;
-            }
-            #maze-grid {
-                order: 2; /* Mê cung xuống dưới */
-                width: 100%;
-                border-right: none;
-                border-top: 2px solid #e2e8f0;
-            }
-            #quiz-area {
-                order: 1; /* Câu hỏi lên trên */
-                width: 100%;
-                padding: 1.5rem;
             }
             header h1 {
                 font-size: 1.5rem;
             }
+            #quiz-area {
+                padding: 1.5rem;
+            }
             #question-text {
                 font-size: 1.125rem;
             }
-            .maze-door {
+            #game-area {
+                padding: 1rem;
+            }
+            .ufo {
                 font-size: 1.8rem;
+            }
+            #ufo-fleet {
+                gap: 0.5rem;
             }
         }
     </style>
@@ -315,214 +321,163 @@
 <body>
     <div id="game-container">
         <header>
-            <h1>Mê Cung Trí Tuệ</h1>
-            <p>Bài 3: Góc ở tâm, góc nội tiếp - Toán 9</p>
+            <h1>Cuộc Xâm Lăng</h1>
+            <p>Bài 2: Tiếp tuyến của đường tròn - Toán 9</p>
         </header>
 
-        <main>
-            <!-- Mê Cung -->
-            <div id="maze-grid">
-                <!-- 15 cánh cửa -->
-                <div id="door-1" class="maze-door">🚪</div>
-                <div id="door-2" class="maze-door">🚪</div>
-                <div id="door-3" class="maze-door">🚪</div>
-                <div id="door-4" class="maze-door">🚪</div>
-                <div id="door-5" class="maze-door">🚪</div>
-                <div id="door-6" class="maze-door">🚪</div>
-                <div id="door-7" class="maze-door">🚪</div>
-                <div id="door-8" class="maze-door">🚪</div>
-                <div id="door-9" class="maze-door">🚪</div>
-                <div id="door-10" class="maze-door">🚪</div>
-                <div id="door-11" class="maze-door">🚪</div>
-                <div id="door-12" class="maze-door">🚪</div>
-                <div id="door-13" class="maze-door">🚪</div>
-                <div id="door-14" class="maze-door">🚪</div>
-                <div id="door-15" class="maze-door">🏆</div>
+        <!-- Khu vực hiển thị Game -->
+        <div id="game-area">
+            <!-- Hạm đội UFO -->
+            <div id="ufo-fleet">
+                <div id="ufo-1" class="ufo">🛸</div>
+                <div id="ufo-2" class="ufo">🛸</div>
+                <div id="ufo-3" class="ufo">🛸</div>
+                <div id="ufo-4" class="ufo">🛸</div>
+                <div id="ufo-5" class="ufo">🛸</div>
+                <div id="ufo-6" class="ufo">🛸</div>
+                <div id="ufo-7" class="ufo">🛸</div>
+                <div id="ufo-8" class="ufo">🛸</div>
+                <div id="ufo-9" class="ufo">🛸</div>
+                <div id="ufo-10" class="ufo">🛸</div>
             </div>
-
-            <!-- Khu Vực Câu Hỏi -->
-            <div id="quiz-area">
-                <div id="question-container">
-                    <span id="question-level">Mức độ 1/4</span>
-                    <div id="question-text">Đây là nội dung câu hỏi...</div>
-                    <div id="options-container">
-                        <!-- Các lựa chọn sẽ được tạo bằng JS -->
-                    </div>
-                </div>
-
-                <div id="controls">
-                    <span id="progress-text">Cửa 1/15</span>
-                    <button id="control-btn" disabled>Mở cửa</button>
-                </div>
-                
-                <!-- Hiệu ứng phản hồi -->
-                <div id="feedback-container" class="relative w-full h-0"></div>
-
-                <!-- Màn hình kết thúc -->
-                <div id="end-screen">
-                    <h2>Chúc mừng! Bạn đã tìm thấy kho báu!</h2>
-                    <p id="end-score">Bạn đã mở đúng 13/15 cánh cửa!</p>
-                    <button id="restart-btn" class="mt-4 bg-blue-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-blue-600 transition">Chơi lại</button>
+            <!-- Lá chắn Trái Đất -->
+            <div id="shield-status">
+                <div id="shield-label">NĂNG LƯỢNG LÁ CHẮN</div>
+                <div id="shield-bar-container">
+                    <div id="shield-bar"></div>
                 </div>
             </div>
-        </main>
+        </div>
+
+        <!-- Khu Vực Câu Hỏi -->
+        <div id="quiz-area">
+            <div id="question-container">
+                <div id="feedback-container"></div> <!-- Đặt ở đây để nằm trên câu hỏi -->
+                <span id="question-level">Mức độ</span>
+                <div id="question-text">Đây là nội dung câu hỏi...</div>
+                <div id="options-container">
+                    <!-- Các lựa chọn sẽ được tạo bằng JS -->
+                </div>
+            </div>
+
+            <div id="controls">
+                <button id="control-btn" disabled>BẮN HẠ</button>
+            </div>
+            
+            <!-- Màn hình kết thúc -->
+            <div id="end-screen">
+                <h2 id="end-title">CHIẾN THẮNG!</h2>
+                <p id="end-score">Trái Đất đã an toàn!</p>
+                <button id="restart-btn" class="mt-4 bg-blue-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-blue-600 transition">Chơi lại</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // --- Dữ liệu câu hỏi (Bài 3: Góc ở tâm, góc nội tiếp) ---
+        // --- Dữ liệu câu hỏi (Bài 2: Tiếp tuyến) ---
         const questions = [
-            // Mức 1: Nhận biết (6 câu)
+            // Mức 1: Nhận biết
             {
                 level: "Nhận biết",
-                text: "Góc ở tâm là góc có đỉnh:",
+                text: "Đường thẳng a và đường tròn (O; R) có d = R (d là khoảng cách từ O đến a). Vị trí của a và (O) là:",
                 options: [
-                    { text: "Nằm trên đường tròn.", correct: false },
-                    { text: "Trùng với tâm đường tròn.", correct: true },
-                    { text: "Nằm bên trong đường tròn.", correct: false },
-                    { text: "Nằm bên ngoài đường tròn.", correct: false }
+                    { text: "Cắt nhau", correct: false },
+                    { text: "Tiếp xúc", correct: true },
+                    { text: "Không giao nhau", correct: false },
+                    { text: "Trùng nhau", correct: false }
                 ]
             },
             {
                 level: "Nhận biết",
-                text: "Góc nội tiếp là góc có:",
+                text: "Đường thẳng a là tiếp tuyến của (O; R) tại tiếp điểm A nếu:",
                 options: [
-                    { text: "Đỉnh nằm trên đường tròn và hai cạnh là hai bán kính.", correct: false },
-                    { text: "Đỉnh ở tâm và hai cạnh là hai dây cung.", correct: false },
-                    { text: "Đỉnh nằm trên đường tròn và hai cạnh chứa hai dây cung.", correct: true },
-                    { text: "Đỉnh ở trong đường tròn.", correct: false }
+                    { text: "a đi qua A", correct: false },
+                    { text: "a vuông góc với OA", correct: false },
+                    { text: "a đi qua A và a song song với OA", correct: false },
+                    { text: "a đi qua A và a vuông góc với OA tại A", correct: true }
                 ]
             },
             {
                 level: "Nhận biết",
-                text: "Số đo của cung nhỏ bằng:",
+                text: "Cho MA và MB là hai tiếp tuyến của (O) cắt nhau tại M (A, B là tiếp điểm). Khẳng định nào sau đây là SAI?",
                 options: [
-                    { text: "Số đo của góc nội tiếp chắn cung đó.", correct: false },
-                    { text: "Số đo của góc ở tâm chắn cung đó.", correct: true },
-                    { text: "Nửa số đo góc ở tâm chắn cung đó.", correct: false },
-                    { text: "180°.", correct: false }
+                    { text: "MA = MB", correct: false },
+                    { text: "MO là phân giác góc AMB", correct: false },
+                    { text: "OM = AB", correct: true },
+                    { text: "MO là phân giác góc AOB", correct: false }
                 ]
             },
-            {
-                level: "Nhận biết",
-                text: "Nếu cung nhỏ AnB có số đo 70°, thì cung lớn AmB có số đo là:",
-                options: [
-                    { text: "70°", correct: false },
-                    { text: "110°", correct: false },
-                    { text: "290°", correct: true },
-                    { text: "140°", correct: false }
-                ]
-            },
-            {
-                level: "Nhận biết",
-                text: "Trong một đường tròn, số đo của góc nội tiếp bằng:",
-                options: [
-                    { text: "Số đo của cung bị chắn.", correct: false },
-                    { text: "Hai lần số đo cung bị chắn.", correct: false },
-                    { text: "Số đo của góc ở tâm cùng chắn cung đó.", correct: false },
-                    { text: "Nửa số đo của cung bị chắn.", correct: true }
-                ]
-            },
-            {
-                level: "Nhận biết",
-                text: "Góc nội tiếp chắn nửa đường tròn có số đo bằng:",
-                options: [
-                    { text: "45°", correct: false },
-                    { text: "90°", correct: true },
-                    { text: "180°", correct: false },
-                    { text: "60°", correct: false }
-                ]
-            },
-            // Mức 2: Thông hiểu (5 câu)
+            // Mức 2: Thông hiểu
             {
                 level: "Thông hiểu",
-                text: "Trên đường tròn (O), góc ở tâm AOB chắn cung AB. Nếu số đo cung AB = 80°, thì số đo góc AOB là:",
+                text: "Cho đường tròn (O; 6 cm) và đường thẳng a. Khoảng cách d từ O đến a là 5 cm. Số điểm chung của a và (O) là:",
                 options: [
-                    { text: "40°", correct: false },
-                    { text: "80°", correct: true },
-                    { text: "160°", correct: false },
-                    { text: "280°", correct: false }
+                    { text: "0", correct: false },
+                    { text: "1", correct: false },
+                    { text: "2", correct: true },
+                    { text: "Vô số", correct: false }
                 ]
             },
             {
                 level: "Thông hiểu",
-                text: "Trên đường tròn (O), góc nội tiếp ACB chắn cung AB. Nếu số đo cung AB = 120°, thì số đo góc ACB là:",
+                text: "MA, MB là hai tiếp tuyến của (O) tại A, B. Biết góc AMB = 50°. Tính số đo góc AOM.",
                 options: [
-                    { text: "120°", correct: false },
-                    { text: "240°", correct: false },
-                    { text: "60°", correct: true },
-                    { text: "90°", correct: false }
-                ]
-            },
-            {
-                level: "Thông hiểu",
-                text: "Trên đường tròn (O), góc nội tiếp MPN = 55°. Số đo cung bị chắn MN là:",
-                options: [
-                    { text: "55°", correct: false },
-                    { text: "27,5°", correct: false },
-                    { text: "110°", correct: true },
-                    { text: "250°", correct: false }
-                ]
-            },
-            {
-                level: "Thông hiểu",
-                text: "Trên đường tròn (O), hai góc nội tiếp MAN và MBN cùng chắn cung MN. Nếu góc MAN = 45°, thì góc MBN bằng:",
-                options: [
-                    { text: "22,5°", correct: false },
-                    { text: "45°", correct: true },
-                    { text: "90°", correct: false },
-                    { text: "Không xác định được.", correct: false }
-                ]
-            },
-            {
-                level: "Thông hiểu",
-                text: "Trên (O), AOB là góc ở tâm và ACB là góc nội tiếp cùng chắn cung AB. Nếu góc ACB = 35°, thì góc AOB bằng:",
-                options: [
-                    { text: "35°", correct: false },
-                    { text: "17,5°", correct: false },
-                    { text: "70°", correct: true },
-                    { text: "145°", correct: false }
-                ]
-            },
-            // Mức 3: Vận dụng (3 câu)
-            {
-                level: "Vận dụng",
-                text: "Cho tam giác ABC nội tiếp đường tròn (O) sao cho góc A = 65°, góc B = 80°. Hỏi số đo cung nhỏ AB bằng:",
-                options: [
-                    { text: "35°", correct: false },
-                    { text: "70°", correct: true },
-                    { text: "130°", correct: false },
-                    { text: "160°", correct: false }
-                ]
-            },
-            {
-                level: "Vận dụng",
-                text: "Trên (O), lấy 4 điểm A, B, C, D theo thứ tự. Biết số đo cung AB = 50°, cung BC = 100°, cung CD = 70°. Tính số đo góc nội tiếp ADC.",
-                options: [
-                    { text: "150°", correct: false },
+                    { text: "25°", correct: false },
                     { text: "50°", correct: false },
-                    { text: "75°", correct: true },
-                    { text: "85°", correct: false }
+                    { text: "65°", correct: true },
+                    { text: "40°", correct: false }
+                ]
+            },
+            {
+                level: "Thông hiểu",
+                text: "Một diễn viên xiếc đi xe đạp một bánh trên dây cáp. Nếu đường kính bánh xe là 60 cm, khoảng cách từ trục bánh xe (tâm) đến dây cáp là bao nhiêu?",
+                options: [
+                    { text: "60 cm", correct: false },
+                    { text: "120 cm", correct: false },
+                    { text: "30 cm", correct: true },
+                    { text: "15 cm", correct: false }
+                ]
+            },
+            // Mức 3: Vận dụng
+            {
+                level: "Vận dụng",
+                text: "Cho đường tròn (O; 5 cm). Từ điểm M ở ngoài (O) vẽ tiếp tuyến MA (A là tiếp điểm). Biết OM = 13 cm. Tính độ dài MA.",
+                options: [
+                    { text: "12 cm", correct: true },
+                    { text: "18 cm", correct: false },
+                    { text: "8 cm", correct: false },
+                    { text: "√194 cm", correct: false }
                 ]
             },
             {
                 level: "Vận dụng (Thực tế)",
-                text: "Một cầu thủ sút bóng vào cầu môn MN từ vị trí A. Góc sút là góc MAN. Nếu cầu thủ di chuyển trên một cung tròn đi qua M, N và A thì góc sút sẽ:",
+                text: "Một vệ tinh ở độ cao h = 300 km so với mặt đất. Bán kính Trái Đất R ≈ 6400 km. Tầm nhìn xa tối đa mà vệ tinh có thể quan sát được trên mặt đất (đoạn AC trong Hình 7, SGK) là bao nhiêu?",
                 options: [
-                    { text: "Tăng lên.", correct: false },
-                    { text: "Giảm đi.", correct: false },
-                    { text: "Không đổi.", correct: true },
-                    { text: "Tăng rồi giảm.", correct: false }
+                    { text: "≈ 1982 km", correct: true },
+                    { text: "≈ 1960 km", correct: false },
+                    { text: "≈ 2100 km", correct: false },
+                    { text: "≈ 300 km", correct: false }
                 ]
             },
-            // Mức 4: Vận dụng cao (1 câu)
+            {
+                level: "Vận dụng",
+                text: "Cho MA, MB là hai tiếp tuyến của (O) tại A, B. Biết góc AOB = 120°. Số đo góc AMB là:",
+                options: [
+                    { text: "120°", correct: false },
+                    { text: "90°", correct: false },
+                    { text: "60°", correct: true },
+                    { text: "30°", correct: false }
+                ]
+            },
+            // Mức 4: Vận dụng cao
             {
                 level: "Vận dụng cao",
-                text: "Cho (O) có đường kính AB, C là một điểm trên (O). CH vuông góc AB (H thuộc AB). M là một điểm trên cung nhỏ AC. I là giao điểm của AM và CH. Khẳng định nào sau đây đúng?",
+                text: "Cho đường tròn (O; R) và điểm M sao cho OM = 2R. Từ M vẽ hai tiếp tuyến MA, MB. Tam giác MAB là tam giác gì?",
                 options: [
-                    { text: "IC = IH (tam giác ICH cân tại I).", correct: true },
-                    { text: "IC = IA.", correct: false },
-                    { text: "IA = IM.", correct: false },
-                    { text: "Tam giác ICH vuông tại C.", correct: false }
+                    { text: "Tam giác vuông", correct: false },
+                    { text: "Tam giác tù", correct: false },
+                    { text: "Tam giác cân (không đều)", correct: false },
+                    { text: "Tam giác đều", correct: true }
                 ]
             }
         ];
@@ -530,23 +485,27 @@
         // --- Biến trạng thái trò chơi ---
         let currentQuestionIndex = 0;
         let score = 0;
+        let health = 5; // 5 mạng
+        const MAX_HEALTH = 5;
         let selectedOption = null;
         let soundReady = false;
 
         // --- Đối tượng âm thanh ---
-        let correctSound, wrongSound;
+        let correctSound, wrongSound, explosionSound;
 
         // --- Các phần tử DOM ---
+        const gameContainer = document.getElementById('game-container');
         const questionContainer = document.getElementById('question-container');
         const questionLevelEl = document.getElementById('question-level');
         const questionTextEl = document.getElementById('question-text');
         const optionsContainer = document.getElementById('options-container');
         const controlBtn = document.getElementById('control-btn');
-        const progressText = document.getElementById('progress-text');
         const feedbackContainer = document.getElementById('feedback-container');
         const endScreen = document.getElementById('end-screen');
+        const endTitleEl = document.getElementById('end-title');
         const endScoreEl = document.getElementById('end-score');
         const restartBtn = document.getElementById('restart-btn');
+        const shieldBar = document.getElementById('shield-bar');
         const controls = document.getElementById('controls');
 
         // --- Hàm khởi tạo ---
@@ -558,34 +517,40 @@
 
             currentQuestionIndex = 0;
             score = 0;
+            health = MAX_HEALTH;
             
             // Đặt lại UI
             endScreen.style.display = 'none';
             questionContainer.style.display = 'block';
             controls.style.display = 'flex';
+            updateShieldBar();
             
-            // Đặt lại các cánh cửa
-            for (let i = 1; i <= 15; i++) {
-                const door = document.getElementById(`door-${i}`);
-                door.classList.remove('unlocked');
-                door.textContent = (i === 15) ? '🏆' : '🚪';
+            // Đặt lại UFO
+            for (let i = 1; i <= 10; i++) {
+                const ufo = document.getElementById(`ufo-${i}`);
+                if (ufo) ufo.classList.remove('destroyed');
             }
-            
+
             loadQuestion();
         }
 
         function initAudio() {
             if (soundReady) return;
             Tone.start();
-            // Âm thanh mở cửa (đúng)
+            // Âm thanh bắn laser (đúng)
             correctSound = new Tone.Synth({
-                oscillator: { type: "triangle" },
-                envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.2 }
+                oscillator: { type: "sawtooth" },
+                envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
             }).toDestination();
-            // Âm thanh sai
-            wrongSound = new Tone.Synth({
-                oscillator: { type: "square" },
-                envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2 }
+            // Âm thanh bị bắn trúng (sai)
+            wrongSound = new Tone.NoiseSynth({
+                noise: { type: "brown" },
+                envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.1 }
+            }).toDestination();
+            // Âm thanh nổ (phá hủy UFO)
+            explosionSound = new Tone.NoiseSynth({
+                noise: { type: "white" },
+                envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
             }).toDestination();
             soundReady = true;
         }
@@ -595,16 +560,15 @@
             selectedOption = null;
             optionsContainer.innerHTML = '';
 
-            if (currentQuestionIndex >= questions.length) {
+            if (currentQuestionIndex >= questions.length || health <= 0) {
                 endGame();
                 return;
             }
 
             const q = questions[currentQuestionIndex];
 
-            questionLevelEl.textContent = `Mức độ: ${q.level}`;
+            questionLevelEl.textContent = `Đợt tấn công: ${currentQuestionIndex + 1}/10 - ${q.level}`;
             questionTextEl.innerHTML = q.text;
-            progressText.textContent = `Cửa ${currentQuestionIndex + 1}/15`;
             
             q.options.forEach((option, index) => {
                 const button = document.createElement('button');
@@ -615,12 +579,8 @@
                 optionsContainer.appendChild(button);
             });
 
-            controlBtn.textContent = 'Mở cửa';
+            controlBtn.textContent = 'BẮN HẠ';
             controlBtn.disabled = true;
-
-            if (window.MathJax) {
-                MathJax.typesetPromise([questionTextEl, optionsContainer]);
-            }
         }
 
         // --- Xử lý logic trò chơi ---
@@ -633,7 +593,7 @@
         }
 
         controlBtn.addEventListener('click', () => {
-            if (controlBtn.textContent === 'Mở cửa') {
+            if (controlBtn.textContent === 'BẮN HẠ') {
                 checkAnswer();
             } else {
                 nextQuestion();
@@ -646,19 +606,21 @@
             const allOptions = document.querySelectorAll('.option-btn');
 
             allOptions.forEach(btn => btn.disabled = true);
-            controlBtn.textContent = 'Cửa tiếp theo';
+            controlBtn.textContent = 'Tiếp tục';
             controlBtn.disabled = false;
 
             if (selectedOption == correctIndex) {
                 // TRẢ LỜI ĐÚNG
                 score++;
                 allOptions[selectedOption].classList.add('correct');
-                unlockDoor(currentQuestionIndex + 1);
+                destroyUFO(currentQuestionIndex + 1);
                 playEffect('correct');
             } else {
                 // TRẢ LỜI SAI
+                health--;
                 allOptions[selectedOption].classList.add('wrong');
                 allOptions[correctIndex].classList.add('correct');
+                updateShieldBar();
                 playEffect('wrong');
             }
         }
@@ -672,23 +634,35 @@
             questionContainer.style.display = 'none';
             controls.style.display = 'none';
             endScreen.style.display = 'block';
-            endScoreEl.innerHTML = `Bạn đã mở đúng ${score}/15 cánh cửa!`;
-            
-            // Hiển thị kho báu
-            const finalDoor = document.getElementById('door-15');
-            finalDoor.classList.add('unlocked');
-            finalDoor.textContent = '🏆';
+
+            if (health > 0) {
+                endScreen.classList.add('victory');
+                endScreen.classList.remove('defeat');
+                endTitleEl.textContent = 'CHIẾN THẮNG!';
+                endScoreEl.innerHTML = `Bạn đã bắn hạ ${score} tàu địch. Trái Đất đã an toàn!`;
+            } else {
+                endScreen.classList.add('defeat');
+                endScreen.classList.remove('victory');
+                endTitleEl.textContent = 'THẤT BẠI!';
+                endScoreEl.innerHTML = `Lá chắn đã bị phá hủy! Bạn bắn hạ được ${score} tàu địch.`;
+            }
         }
 
         restartBtn.addEventListener('click', startGame);
 
         // --- Hiệu ứng & Cập nhật UI ---
-        function unlockDoor(index) {
-            const door = document.getElementById(`door-${index}`);
-            if (door) {
-                door.classList.add('unlocked');
-                door.textContent = '✔️'; // Biểu tượng đã mở
-                if (index === 15) door.textContent = '🏆';
+        function destroyUFO(index) {
+            const ufo = document.getElementById(`ufo-${index}`);
+            if (ufo) ufo.classList.add('destroyed');
+        }
+
+        function updateShieldBar() {
+            const shieldPercentage = (health / MAX_HEALTH) * 100;
+            shieldBar.style.width = `${shieldPercentage}%`;
+            if (shieldPercentage < 30) {
+                shieldBar.style.background = "#ff5e5e"; // Chuyển màu đỏ khi yếu
+            } else {
+                shieldBar.style.background = "linear-gradient(90deg, #00f2ff 0%, #00c6ff 100%)";
             }
         }
 
@@ -696,11 +670,10 @@
             // 1. Âm thanh
             if (soundReady) {
                 if (type === 'correct') {
-                    correctSound.triggerAttackRelease("C5", "0.1", Tone.now());
-                    correctSound.triggerAttackRelease("E5", "0.1", Tone.now() + 0.1);
-                    correctSound.triggerAttackRelease("G5", "0.1", Tone.now() + 0.2);
+                    correctSound.triggerAttackRelease("G5", "0.1", Tone.now());
+                    explosionSound.triggerAttackRelease("0.1", Tone.now() + 0.1);
                 } else {
-                    wrongSound.triggerAttackRelease("C3", "0.2", Tone.now());
+                    wrongSound.triggerAttackRelease("0.2", Tone.now());
                 }
             }
 
@@ -708,9 +681,11 @@
             const effect = document.createElement('div');
             effect.classList.add('feedback-effect');
             if (type === 'correct') {
-                effect.textContent = '🎉'; // Tung hoa
+                effect.textContent = '🎉'; // Biểu tượng chiến thắng
             } else {
-                effect.textContent = '😢'; // Mặt mếu
+                effect.textContent = '💥'; // Biểu tượng bị bắn trúng
+                gameContainer.classList.add('shake');
+                setTimeout(() => gameContainer.classList.remove('shake'), 400);
             }
             feedbackContainer.appendChild(effect);
 
@@ -718,10 +693,5 @@
         }
 
     </script>
-    
-    <!-- Tải MathJax (giữ lại cũng không sao, dù hiện tại không còn công thức LaTeX) -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
 </body>
 </html>
