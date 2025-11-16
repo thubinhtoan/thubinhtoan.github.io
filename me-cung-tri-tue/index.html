@@ -4,477 +4,356 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mê Cung Trí Tuệ - Toán 9: Góc ở tâm, góc nội tiếp</title>
-    <!-- Tải Tailwind CSS -->
+
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tải Tone.js cho âm thanh -->
+    <!-- Tone.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
     <style>
-        /* CSS cho font và giao diện chung */
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
             padding: 1rem;
-        }
-
-        /* Container chính của trò chơi */
-        #game-container {
-            width: 100%;
-            max-width: 900px;
-            background-color: rgba(255, 255, 255, 0.98);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Tiêu đề */
-        header {
-            background-color: #5a67d8;
-            color: white;
-            padding: 1.5rem 2rem;
-            text-align: center;
-            border-bottom: 5px solid #434190;
-        }
-
-        header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin: 0;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        header p {
-            font-size: 1rem;
-            opacity: 0.9;
-            margin-top: 0.25rem;
-        }
-
-        /* Nội dung chính (Mê cung + Câu hỏi) */
-        main {
-            display: flex;
-            flex-direction: column;
-            md:flex-direction: row;
-            flex-grow: 1;
-        }
-
-        /* Mê cung */
-        #maze-grid {
-            width: 100%;
-            md:width: 40%;
-            background: #f4f5f7; /* Màu nền đá */
-            border-right: 2px solid #e2e8f0;
-            padding: 1.5rem;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 cột cho 15 câu */
-            gap: 1rem;
-            align-content: start;
-            min-height: 200px;
-            order: 2; /* Đảo thứ tự trên mobile */
-            md:order: 1;
-        }
-
-        /* Cánh cửa trong mê cung */
-        .maze-door {
-            aspect-ratio: 1 / 1;
-            background-color: #cbd5e1;
-            border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2.5rem;
-            color: #4a5568;
-            border: 2px solid #a0aec0;
-            transition: all 0.5s ease;
         }
-
-        .maze-door.unlocked {
-            background-color: #c6f6d5;
-            color: #2f855a;
-            border-color: #68d391;
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-        }
-
-        /* Khu vực câu hỏi */
-        #quiz-area {
+        #game-container {
             width: 100%;
-            md:width: 60%;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            order: 1; /* Đảo thứ tự trên mobile */
-            md:order: 2;
+            max-width: 950px;
+            background: rgba(255,255,255,0.97);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
         }
-
-        #question-container {
-            margin-bottom: 1.5rem;
-        }
-
-        /* Hiển thị mức độ câu hỏi */
-        #question-level {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #5a67d8;
-            background-color: #e0e7ff;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            display: inline-block;
-            margin-bottom: 0.75rem;
-        }
-
-        /* Nội dung câu hỏi */
-        #question-text {
-            font-size: 1.25rem;
-            font-weight: 500;
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-
-        /* Các lựa chọn trả lời */
-        #options-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-        }
-
-        /* Nút lựa chọn */
-        .option-btn {
-            width: 100%;
-            background-color: #fff;
-            border: 2px solid #d1d5db;
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: left;
-            font-size: 1rem;
-            font-weight: 500;
-            color: #374151;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .option-btn:not(:disabled):hover {
-            border-color: #7f5af0;
-            background-color: #f0f5ff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        .option-btn.selected {
-            border-color: #5a67d8;
-            background-color: #e0e7ff;
-            color: #312e81;
-        }
-
-        .option-btn.correct {
-            background-color: #dcfce7;
-            border-color: #4ade80;
-            color: #166534;
-            animation: pulse-correct 0.5s;
-        }
-
-        .option-btn.wrong {
-            background-color: #fee2e2;
-            border-color: #f87171;
-            color: #991b1b;
-            animation: shake-wrong 0.5s;
-        }
-
-        .option-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        /* Nút điều khiển (Kiểm tra / Câu tiếp) */
-        #controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1rem;
-        }
-
-        #progress-text {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #4a5568;
-        }
-
-        #control-btn {
-            background-color: #5a67d8;
+        header {
+            background: #1e3a8a;
             color: white;
-            font-weight: 600;
-            font-size: 1rem;
-            padding: 0.75rem 2rem;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(90, 103, 216, 0.3);
-        }
-
-        #control-btn:disabled {
-            background-color: #9ca3af;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        #control-btn:not(:disabled):hover {
-            background-color: #4c51bf;
-            transform: translateY(-2px);
-        }
-
-        /* Màn hình kết thúc */
-        #end-screen {
-            display: none; /* Ẩn ban đầu */
+            padding: 1.5rem;
             text-align: center;
-            padding: 3rem 2rem;
+            border-bottom: 4px solid #172554;
         }
-
-        #end-screen h2 {
+        #maze-grid {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 1rem;
+            padding: 1.5rem;
+        }
+        .maze-door {
+            aspect-ratio: 1/1;
+            background: #e5e7eb;
+            border-radius: 12px;
             font-size: 2.5rem;
-            font-weight: 700;
-            color: #4c51bf;
-            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #cbd5e1;
+            transition: .4s;
         }
-
-        #end-score {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
+        .maze-door.unlocked {
+            background: #bbf7d0;
+            border-color: #4ade80;
+            transform: scale(1.08);
         }
-
-        /* Hiệu ứng cho câu trả lời */
-        @keyframes pulse-correct {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        #options-container button {
+            box-shadow: 0 3px 6px rgba(0,0,0,0.08);
         }
-
-        @keyframes shake-wrong {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
+        .option-btn.correct {
+            background: #dcfce7 !important;
+            border-color: #4ade80 !important;
         }
-
-        /* Biểu tượng tung hoa (hiệu ứng khi đúng) */
+        .option-btn.wrong {
+            background: #fee2e2 !important;
+            border-color: #f87171 !important;
+        }
         .feedback-effect {
             position: absolute;
-            top: 50%;
+            font-size: 4rem;
+            animation: fadeUp 1s forwards;
             left: 50%;
+            top: 50%;
             transform: translate(-50%, -50%);
-            font-size: 5rem;
-            opacity: 0;
-            animation: fade-out-up 1s ease-out;
-            z-index: 100;
         }
-
-        @keyframes fade-out-up {
-            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
-            100% { opacity: 0; transform: translate(-50%, -150%) scale(1.5); }
-        }
-        
-        /* CSS cho responsive */
-        @media (max-width: 768px) {
-            body {
-                padding: 0.5rem;
-            }
-            main {
-                flex-direction: column;
-            }
-            #maze-grid {
-                order: 2; /* Mê cung xuống dưới */
-                width: 100%;
-                border-right: none;
-                border-top: 2px solid #e2e8f0;
-            }
-            #quiz-area {
-                order: 1; /* Câu hỏi lên trên */
-                width: 100%;
-                padding: 1.5rem;
-            }
-            header h1 {
-                font-size: 1.5rem;
-            }
-            #question-text {
-                font-size: 1.125rem;
-            }
-            .maze-door {
-                font-size: 1.8rem;
-            }
+        @keyframes fadeUp {
+            from { opacity: 1; transform: translate(-50%, -50%) scale(0.6); }
+            to { opacity: 0; transform: translate(-50%, -120%) scale(1.2); }
         }
     </style>
 </head>
+
 <body>
-    <div id="game-container">
-        <header>
-            <h1>Mê Cung Trí Tuệ</h1>
-            <p>Bài 3: Góc ở tâm, góc nội tiếp - Toán 9</p>
-        </header>
+<div id="game-container">
 
-        <main>
-            <!-- Mê Cung -->
-            <div id="maze-grid">
-                <!-- 15 cánh cửa -->
-                <div id="door-1" class="maze-door">🚪</div>
-                <div id="door-2" class="maze-door">🚪</div>
-                <div id="door-3" class="maze-door">🚪</div>
-                <div id="door-4" class="maze-door">🚪</div>
-                <div id="door-5" class="maze-door">🚪</div>
-                <div id="door-6" class="maze-door">🚪</div>
-                <div id="door-7" class="maze-door">🚪</div>
-                <div id="door-8" class="maze-door">🚪</div>
-                <div id="door-9" class="maze-door">🚪</div>
-                <div id="door-10" class="maze-door">🚪</div>
-                <div id="door-11" class="maze-door">🚪</div>
-                <div id="door-12" class="maze-door">🚪</div>
-                <div id="door-13" class="maze-door">🚪</div>
-                <div id="door-14" class="maze-door">🚪</div>
-                <div id="door-15" class="maze-door">🏆</div>
+    <header>
+        <h1 class="text-3xl font-bold">Mê Cung Trí Tuệ</h1>
+        <p>Bài 3: Góc ở tâm, góc nội tiếp - Toán 9</p>
+    </header>
+
+    <main class="md:flex">
+
+        <!-- MÊ CUNG -->
+        <div id="maze-grid" class="md:w-2/5 bg-gray-100 border-r">
+            <!-- 15 cửa -->
+            <script>
+                for (let i = 1; i <= 15; i++) {
+                    document.write(`<div id="door-${i}" class="maze-door">${i === 15 ? "🏆" : "🚪"}</div>`);
+                }
+            </script>
+        </div>
+
+        <!-- CÂU HỎI -->
+        <div id="quiz-area" class="md:w-3/5 p-6 relative">
+
+            <div id="question-container">
+                <div id="question-level" class="text-sm font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full inline-block mb-3">
+                    Mức độ
+                </div>
+                <div id="question-text" class="text-lg font-medium mb-4">Đây là câu hỏi...</div>
+
+                <div id="options-container" class="grid gap-3"></div>
             </div>
 
-            <!-- Khu Vực Câu Hỏi -->
-            <div id="quiz-area">
-                <div id="question-container">
-                    <span id="question-level">Mức độ 1/4</span>
-                    <div id="question-text">Đây là nội dung câu hỏi...</div>
-                    <div id="options-container">
-                        <!-- Các lựa chọn sẽ được tạo bằng JS -->
-                    </div>
-                </div>
-
-                <div id="controls">
-                    <span id="progress-text">Cửa 1/15</span>
-                    <button id="control-btn" disabled>Mở cửa</button>
-                </div>
-                
-                <!-- Hiệu ứng phản hồi -->
-                <div id="feedback-container" class="relative w-full h-0"></div>
-
-                <!-- Màn hình kết thúc -->
-                <div id="end-screen">
-                    <h2>Chúc mừng! Bạn đã tìm thấy kho báu!</h2>
-                    <p id="end-score">Bạn đã mở đúng 13/15 cánh cửa!</p>
-                    <button id="restart-btn" class="mt-4 bg-blue-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-blue-600 transition">Chơi lại</button>
-                </div>
+            <div id="controls" class="flex justify-between items-center mt-4">
+                <span id="progress-text" class="text-sm font-semibold text-gray-700">Cửa 1/15</span>
+                <button id="control-btn"
+                        class="bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg"
+                        disabled>Mở cửa</button>
             </div>
-        </main>
-    </div>
 
-    <script>
-        // --- Dữ liệu câu hỏi (Bài 3: Góc ở tâm, góc nội tiếp) ---
-        const questions = [
-            // Mức 1: Nhận biết (6 câu)
-            {
-                level: "Nhận biết",
-                text: "Góc ở tâm là góc có đỉnh:",
-                options: [
-                    { text: "Nằm trên đường tròn.", correct: false },
-                    { text: "Trùng với tâm đường tròn.", correct: true },
-                    { text: "Nằm bên trong đường tròn.", correct: false },
-                    { text: "Nằm bên ngoài đường tròn.", correct: false }
-                ]
-            },
-            {
-                level: "Nhận biết",
-                text: "Góc nội tiếp là góc có:",
-                options: [
-                    { text: "Đỉnh nằm trên đường tròn và hai cạnh là hai bán kính.", correct: false },
-                    { text: "Đỉnh ở tâm và hai cạnh là hai dây cung.", correct: false },
-                    { text: "Đỉnh nằm trên đường tròn và hai cạnh chứa hai dây cung.", correct: true },
-                    { text: "Đỉnh ở trong đường tròn.", correct: false }
-                ]
-            },
-            {
-                level: "Nhận biết",
-                text: "Số đo của cung nhỏ bằng:",
-                options: [
-                    { text: "Số đo của góc nội tiếp chắn cung đó.", correct: false },
-                    { text: "Số đo của góc ở tâm chắn cung đó.", correct: true },
-                    { text: "Nửa số đo góc ở tâm chắn cung đó.", correct: false },
-                    { text: "180°.", correct: false }
-                ]
-            },
-            {
-                level: "Nhận biết",
-                text: "Nếu cung nhỏ AnB có số đo 70°, thì cung lớn AmB có số đo là:",
-                options: [
-                    { text: "70°", correct: false },
-                    { text: "110°", correct: false },
-                    { text: "290°", correct: true },
-                    { text: "140°", correct: false }
-                ]
-            },
-            {
-                level: "Nhận biết",
-                text: "Trong một đường tròn, số đo của góc nội tiếp bằng:",
-                options: [
-                    { text: "Số đo của cung bị chắn.", correct: false },
-                    { text: "Hai lần số đo cung bị chắn.", correct: false },
-                    { text: "Số đo của góc ở tâm cùng chắn cung đó.", correct: false },
-                    { text: "Nửa số đo của cung bị chắn.", correct: true }
-                ]
-            },
-            {
-                level: "Nhận biết",
-                text: "Góc nội tiếp chắn nửa đường tròn có số đo bằng:",
-                options: [
-                    { text: "45°", correct: false },
-                    { text: "90°", correct: true },
-                    { text: "180°", correct: false },
-                    { text: "60°", correct: false }
-                ]
-            },
-            // Mức 2: Thông hiểu (5 câu)
-            {
-                level: "Thông hiểu",
-                text: "Trên đường tròn (O), góc ở tâm AOB chắn cung AB. Nếu số đo cung AB = 80°, thì số đo góc AOB là:",
-                options: [
-                    { text: "40°", correct: false },
-                    { text: "80°", correct: true },
-                    { text: "160°", correct: false },
-                    { text: "280°", correct: false }
-                ]
-            },
-            {
-                level: "Thông hiểu",
-                text: "Trên đường tròn (O), góc nội tiếp ACB chắn cung AB. Nếu số đo cung AB = 120°, thì số đo góc ACB là:",
-                options: [
-                    { text: "120°", correct: false },
-                    { text: "240°", correct: false },
-                    { text: "60°", correct: true },
-                    { text: "90°", correct: false }
-                ]
-            },
-            {
-                level: "Thông hiểu",
-                text: "Trên đường tròn (O), góc nội tiếp MPN = 55°. Số đo cung bị chắn MN là:",
-                options: [
-                    { text: "55°", correct: false },
-                    { text: "27,5°", correct: false },
-                    { text: "110°", correct: true },
-                    { text: "250°", correct: false }
-                ]
-            },
-            {
-                level: "Thông hiểu",
-                text: "Trên đường tròn (O), hai góc nội tiếp MAN và MBN cùng chắn cung MN. Nếu góc MAN = 45°, thì góc MBN bằng:",
-                options: [
-                    { text: "22,5°", correct: false },
-                    { text: "45°", correct: true },
-                    { text: "90°", correct: false },
-                    { text: "Không xác định được.", correct: false }
-                ]
-            },
-            {
-                level: "Thông hiểu",
-                text: "Trên (O), AOB là góc ở tâm và ACB là góc nội tiếp cùng chắn cung AB. Nếu góc ACB = 35°, thì góc AOB bằng:",
-                options: [
-                    { text:
+            <div id="feedback-container"></div>
+
+            <div id="end-screen" class="hidden text-center mt-10">
+                <h2 class="text-3xl font-bold text-blue-700 mb-4">Chúc mừng!</h2>
+                <p id="end-score" class="text-xl mb-4"></p>
+                <button id="restart-btn"
+                        class="bg-blue-500 text-white py-2 px-6 rounded-lg font-semibold">Chơi lại</button>
+            </div>
+        </div>
+    </main>
+
+</div>
+
+<script>
+/* ============================
+   DANH SÁCH CÂU HỎI (ĐÃ BỎ $)
+   ============================ */
+const questions = [
+    { level: "Nhận biết", text: "Góc ở tâm là góc có đỉnh trùng với tâm đường tròn.",
+      options: [
+        {text:"Đúng", correct:true},
+        {text:"Sai", correct:false}
+      ]},
+
+    { level:"Nhận biết", text:"Góc nội tiếp là góc có đỉnh nằm trên đường tròn và hai cạnh chứa hai dây cung.",
+      options:[
+          {text:"Đúng", correct:true},
+          {text:"Sai", correct:false}
+      ]},
+
+    { level:"Nhận biết", text:"Số đo góc nội tiếp bằng nửa số đo cung bị chắn.",
+      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
+    },
+
+    { level:"Nhận biết", text:"Cung nhỏ 70°, thì cung lớn cùng chắn là 290°.",
+      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
+    },
+
+    { level:"Nhận biết", text:"Góc nội tiếp chắn nửa đường tròn bằng 90°.",
+      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
+    },
+
+    { level:"Thông hiểu",
+      text:"Góc nội tiếp chắn cung 120° có số đo 60°.",
+      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
+    },
+
+    { level:"Thông hiểu",
+      text:"Góc ở tâm chắn cung 80° có số đo 80°.",
+      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
+    },
+
+    { level:"Thông hiểu",
+      text:"Góc nội tiếp 55° chắn cung 110°.",
+      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
+    },
+
+    { level:"Thông hiểu",
+      text:"Hai góc nội tiếp cùng chắn một cung thì bằng nhau.",
+      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
+    },
+
+    { level:"Vận dụng",
+      text:"Tam giác ABC nội tiếp, góc A=65°, B=80°. Số đo cung AB bằng 70°.",
+      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
+    },
+
+    { level:"Vận dụng",
+      text:"Trên đường tròn, góc nội tiếp ADC chắn cung 150° thì góc ADC = 75°.",
+      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
+    },
+
+    { level:"Vận dụng",
+      text:"Một cầu thủ di chuyển trên cung tròn đi qua M, N, A thì góc MAN không đổi.",
+      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
+    },
+
+    { level:"Vận dụng cao",
+      text:"Trong cấu hình ABC, CH ⟂ AB, M trên cung nhỏ AC. Khi đó IC = IH.",
+      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
+    }
+];
+
+/* ============================
+   BIẾN TRẠNG THÁI
+   ============================ */
+let current = 0, score = 0;
+let selected = null;
+let correctSound, wrongSound, soundReady = false;
+
+/* ============================
+   DOM
+   ============================ */
+const questionContainer = document.getElementById("question-container");
+const questionLevelEl = document.getElementById("question-level");
+const questionTextEl = document.getElementById("question-text");
+const optionsContainer = document.getElementById("options-container");
+const progressText = document.getElementById("progress-text");
+const controlBtn = document.getElementById("control-btn");
+const feedbackContainer = document.getElementById("feedback-container");
+const endScreen = document.getElementById("end-screen");
+const endScoreEl = document.getElementById("end-score");
+const restartBtn = document.getElementById("restart-btn");
+const controls = document.getElementById("controls");   /* FIX LỖI QUAN TRỌNG */
+
+/* ============================
+   KHỞI ĐỘNG GAME
+   ============================ */
+document.addEventListener("DOMContentLoaded", startGame);
+
+function startGame() {
+    document.body.addEventListener("click", initAudio, {once:true});
+    current = 0;
+    score = 0;
+
+    endScreen.classList.add("hidden");
+    questionContainer.classList.remove("hidden");
+    controls.classList.remove("hidden");
+
+    for (let i = 1; i <= 15; i++) {
+        const d = document.getElementById(`door-${i}`);
+        d.classList.remove("unlocked");
+        d.textContent = i === 15 ? "🏆" : "🚪";
+    }
+
+    loadQuestion();
+}
+
+function initAudio() {
+    if (soundReady) return;
+    Tone.start();
+
+    correctSound = new Tone.Synth().toDestination();
+    wrongSound = new Tone.Synth({oscillator:{type:"square"}}).toDestination();
+
+    soundReady = true;
+}
+
+/* ============================
+   HIỂN THỊ CÂU HỎI
+   ============================ */
+function loadQuestion() {
+    if (current >= questions.length) return endGame();
+
+    const q = questions[current];
+    questionLevelEl.textContent = "Mức độ: " + q.level;
+    questionTextEl.textContent = q.text;
+
+    progressText.textContent = `Cửa ${current+1}/15`;
+
+    optionsContainer.innerHTML = "";
+    selected = null;
+
+    q.options.forEach((opt, idx)=>{
+        const btn = document.createElement("button");
+        btn.className = "option-btn w-full border px-4 py-2 rounded-lg bg-white text-left";
+        btn.textContent = opt.text;
+
+        btn.onclick = ()=>{
+            document.querySelectorAll(".option-btn").forEach(b=>b.classList.remove("selected"));
+            btn.classList.add("selected");
+            selected = idx;
+            controlBtn.disabled = false;
+        };
+
+        optionsContainer.appendChild(btn);
+    });
+
+    controlBtn.textContent = "Mở cửa";
+    controlBtn.disabled = true;
+}
+
+controlBtn.onclick = ()=>{
+    if (controlBtn.textContent === "Mở cửa") checkAnswer();
+    else nextQuestion();
+};
+
+function checkAnswer() {
+    const q = questions[current];
+    const correctIndex = q.options.findIndex(o=>o.correct);
+
+    const btns = document.querySelectorAll(".option-btn");
+    btns.forEach(b=>b.disabled=true);
+
+    if (selected === correctIndex) {
+        score++;
+        btns[selected].classList.add("correct");
+        unlockDoor(current+1);
+        playEffect("✔️");
+    } else {
+        btns[selected].classList.add("wrong");
+        btns[correctIndex].classList.add("correct");
+        playEffect("😢");
+    }
+
+    controlBtn.textContent = "Tiếp tục";
+}
+
+function nextQuestion() {
+    current++;
+    loadQuestion();
+}
+
+function endGame() {
+    questionContainer.classList.add("hidden");
+    controls.classList.add("hidden");
+    endScreen.classList.remove("hidden");
+    endScoreEl.textContent = `Bạn đã mở đúng ${score}/15 cánh cửa!`;
+
+    const d = document.getElementById("door-15");
+    d.classList.add("unlocked");
+}
+
+restartBtn.onclick = startGame;
+
+/* ============================
+   HIỆU ỨNG
+   ============================ */
+function unlockDoor(i) {
+    const d = document.getElementById(`door-${i}`);
+    d.classList.add("unlocked");
+    d.textContent = "✔️";
+}
+
+function playEffect(icon) {
+    const eff = document.createElement("div");
+    eff.className = "feedback-effect";
+    eff.textContent = icon;
+    feedbackContainer.appendChild(eff);
+    setTimeout(()=>eff.remove(),1000);
+}
+</script>
+
+</body>
+</html>
