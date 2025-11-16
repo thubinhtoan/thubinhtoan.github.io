@@ -62,6 +62,10 @@
     // ==========================
     // 👉 Khi thêm game mới, cô chỉ cần thêm 1 object giống như hai cái dưới đây.
     const games = [
+     { ...trò 1... },
+  { ...trò 2... },
+  { ...trò 3 mới thêm... }   // không quên dấu phẩy giữa các object
+];
       {
         id: 1,
         folder: "khu-vuon-bi-mat",              // tên thư mục game (đã có file index.html bên trong)
@@ -85,18 +89,17 @@
           "Trả lời đúng để bắn hạ tàu UFO, bảo vệ Trái Đất. Ôn tập kiến thức về tiếp tuyến của đường tròn qua các tình huống thú vị."
       }
 
-      // ==== THÊM GAME MỚI Ở ĐÂY ====
-      // Ví dụ game 3:
-      // {
-      //   id: 3,
-      //   folder: "ten-thu-muc-game-3",
-      //   icon: "📐",
-      //   color: "sky",
-      //   label: "Trò chơi 3",
-      //   grade: "Lớp 9 – Hình học",
-      //   title: "Tên trò chơi 3",
-      //   description: "Mô tả ngắn cho trò chơi 3."
-      // }
+     {
+  id: 3,
+  folder: "me-cung-tri-tue",   // trùng tên thư mục cô vừa tạo
+  icon: "🧩",
+  color: "indigo",             // dùng theme indigo cho hợp nền tím-xanh
+  label: "Trò chơi 3",
+  grade: "Lớp 9 – Góc ở tâm, góc nội tiếp",
+  title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp (Toán 9)",
+  description: "Trả lời đúng để mở từng cánh cửa, vượt qua mê cung và chạm đến kho báu kiến thức."
+}
+
     ];
 
     // ==========================
