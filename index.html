@@ -56,117 +56,106 @@
     </div>
   </div>
 
-  <script>
-    // ==========================
-    // DANH SÁCH CÁC TRÒ CHƠI
-    // ==========================
-    // 👉 Khi thêm game mới, cô chỉ cần thêm 1 object giống như hai cái dưới đây.
-   // 👉 Danh sách các game trên trang chủ
-const games = [
-  {
-    id: 1,
-    folder: "khu-vuon-bi-mat",  // thư mục game 1
-    icon: "🌸",
-    color: "emerald",
-    label: "Trò chơi 1",
-    grade: "Lớp 9 – Hình học",
-    title: "Khu Vườn Bí Mật – Đường tròn (Toán 9)",
-    description:
-      "Trò chơi ôn tập bài Đường tròn – Chân trời sáng tạo. Trả lời đúng để làm nở những bông hoa xinh trong khu vườn."
-  },
+ <script>
+  // Danh sách game trên trang chủ
+  const games = [
+    {
+      id: 1,
+      folder: "khu-vuon-bi-mat",
+      icon: "🌸",
+      color: "emerald",
+      label: "Trò chơi 1",
+      grade: "Lớp 9 – Hình học",
+      title: "Khu Vườn Bí Mật – Đường tròn (Toán 9)",
+      description:
+        "Trò chơi ôn tập bài Đường tròn – Chân trời sáng tạo. Trả lời đúng để làm nở những bông hoa xinh trong khu vườn."
+    },
+    {
+      id: 2,
+      folder: "cuoc-xam-lang",
+      icon: "🛸",
+      color: "indigo",
+      label: "Trò chơi 2",
+      grade: "Lớp 9 – Tiếp tuyến",
+      title: "Cuộc Xâm Lăng – Tiếp tuyến của đường tròn (Toán 9)",
+      description:
+        "Trả lời đúng để bắn hạ tàu UFO, bảo vệ Trái Đất. Ôn tập kiến thức về tiếp tuyến của đường tròn qua các tình huống thú vị."
+    },
+    {
+      id: 3,
+      folder: "me-cung-tri-tue",
+      icon: "🧩",
+      color: "indigo", // dùng lại bảng màu indigo cho hợp nền tím–xanh
+      label: "Trò chơi 3",
+      grade: "Lớp 9 – Góc ở tâm, góc nội tiếp",
+      title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp (Toán 9)",
+      description:
+        "Trả lời đúng để mở từng cánh cửa, vượt qua mê cung và chạm đến kho báu kiến thức."
+    }
+  ];
 
-  {
-    id: 2,
-    folder: "cuoc-xam-lang",    // thư mục game 2
-    icon: "🛸",
-    color: "indigo",
-    label: "Trò chơi 2",
-    grade: "Lớp 9 – Tiếp tuyến",
-    title: "Cuộc Xâm Lăng – Tiếp tuyến của đường tròn (Toán 9)",
-    description:
-      "Trả lời đúng để bắn hạ tàu UFO, bảo vệ Trái Đất. Ôn tập kiến thức về tiếp tuyến của đường tròn qua các tình huống thú vị."
-  },
+  // Các style màu cho thẻ game
+  const colorStyles = {
+    emerald: {
+      card: "border-emerald-500/40 bg-emerald-900/50 hover:bg-emerald-800/80",
+      badge: "bg-emerald-100 text-emerald-800",
+      button: "bg-emerald-500"
+    },
+    indigo: {
+      card: "border-indigo-500/40 bg-indigo-900/40 hover:bg-indigo-800/80",
+      badge: "bg-indigo-100 text-indigo-800",
+      button: "bg-indigo-500"
+    },
+    sky: {
+      card: "border-sky-500/40 bg-sky-900/40 hover:bg-sky-800/80",
+      badge: "bg-sky-100 text-sky-800",
+      button: "bg-sky-500"
+    },
+    rose: {
+      card: "border-rose-500/40 bg-rose-900/40 hover:bg-rose-800/80",
+      badge: "bg-rose-100 text-rose-800",
+      button: "bg-rose-500"
+    }
+  };
 
-  {
-    id: 3,
-    folder: "me-cung-tri-tue",  // đúng y tên thư mục game 3
-    icon: "🧠",
-    color: "indigo",            // dùng chung theme indigo, hoặc 'sky' nếu cô thích
-    label: "Trò chơi 3",
-    grade: "Lớp 9 – Góc ở tâm, góc nội tiếp",
-    title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp (Toán 9)",
-    description:
-      "Trả lời đúng để mở từng cánh cửa, vượt qua mê cung và chạm đến kho báu kiến thức."
-  }
-];
+  const gameListEl = document.getElementById("game-list");
 
+  // Tạo thẻ game cho từng trò chơi
+  games.forEach((game) => {
+    const styles = colorStyles[game.color] || colorStyles.emerald;
 
-    // ==========================
-    // HÀM SINH GIAO DIỆN TỪ DANH SÁCH GAMES
-    // ==========================
+    const a = document.createElement("a");
+    a.href = `./${game.folder}/index.html`;
+    a.className =
+      "block rounded-2xl border transition transform hover:-translate-y-0.5 hover:shadow-xl " +
+      styles.card;
 
-    const colorStyles = {
-      emerald: {
-        card: "border-emerald-500/40 bg-emerald-900/50 hover:bg-emerald-800/80",
-        badge: "bg-emerald-100 text-emerald-800",
-        button: "bg-emerald-500"
-      },
-      indigo: {
-        card: "border-indigo-500/40 bg-indigo-900/40 hover:bg-indigo-800/80",
-        badge: "bg-indigo-100 text-indigo-800",
-        button: "bg-indigo-500"
-      },
-      sky: {
-        card: "border-sky-500/40 bg-sky-900/40 hover:bg-sky-800/80",
-        badge: "bg-sky-100 text-sky-800",
-        button: "bg-sky-500"
-      },
-      rose: {
-        card: "border-rose-500/40 bg-rose-900/40 hover:bg-rose-800/80",
-        badge: "bg-rose-100 text-rose-800",
-        button: "bg-rose-500"
-      }
-    };
-
-    const gameListEl = document.getElementById("game-list");
-
-    games.forEach((game) => {
-      const styles = colorStyles[game.color] || colorStyles.emerald;
-
-      const a = document.createElement("a");
-      a.href = `./${game.folder}/index.html`;
-      a.className =
-        "block rounded-2xl border transition transform hover:-translate-y-0.5 hover:shadow-xl " +
-        styles.card;
-
-      a.innerHTML = `
-        <div class="flex items-center justify-between px-4 sm:px-6 py-4 gap-4">
-          <div class="flex items-start gap-3 sm:gap-4">
-            <div class="text-3xl sm:text-4xl">${game.icon}</div>
-            <div>
-              <div class="inline-flex flex-wrap items-center gap-2 px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold ${styles.badge} mb-1">
-                <span>${game.label}</span>
-                <span class="w-1 h-1 rounded-full bg-current opacity-80"></span>
-                <span>${game.grade}</span>
-              </div>
-              <h3 class="text-base sm:text-lg font-semibold text-slate-50">
-                ${game.title}
-              </h3>
-              <p class="text-xs sm:text-sm text-slate-200 mt-1">
-                ${game.description}
-              </p>
+    a.innerHTML = `
+      <div class="flex items-center justify-between px-4 sm:px-6 py-4 gap-4">
+        <div class="flex items-start gap-3 sm:gap-4">
+          <div class="text-3xl sm:text-4xl">${game.icon}</div>
+          <div>
+            <div class="inline-flex flex-wrap items-center gap-2 px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold ${styles.badge} mb-1">
+              <span>${game.label}</span>
+              <span class="w-1 h-1 rounded-full bg-current opacity-60"></span>
+              <span>${game.grade}</span>
             </div>
-          </div>
-          <div class="shrink-0">
-            <div class="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full ${styles.button} text-white shadow-md">
-              ➜
-            </div>
+            <h3 class="text-base sm:text-lg font-semibold text-white mb-1">
+              ${game.title}
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-200/80">
+              ${game.description}
+            </p>
           </div>
         </div>
-      `;
+        <div>
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white ${styles.button}">
+            <span class="text-lg sm:text-xl">➜</span>
+          </div>
+        </div>
+      </div>
+    `;
 
-      gameListEl.appendChild(a);
-    });
-  </script>
-</body>
-</html>
+    gameListEl.appendChild(a);
+  });
+</script>
