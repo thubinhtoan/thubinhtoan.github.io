@@ -78,7 +78,7 @@
         }
         @keyframes fadeUp {
             from { opacity: 1; transform: translate(-50%, -50%) scale(0.6); }
-            to { opacity: 0; transform: translate(-50%, -120%) scale(1.2); }
+            to   { opacity: 0; transform: translate(-50%, -120%) scale(1.2); }
         }
     </style>
 </head>
@@ -95,12 +95,7 @@
 
         <!-- MÊ CUNG -->
         <div id="maze-grid" class="md:w-2/5 bg-gray-100 border-r">
-            <!-- 15 cửa -->
-            <script>
-                for (let i = 1; i <= 15; i++) {
-                    document.write(`<div id="door-${i}" class="maze-door">${i === 15 ? "🏆" : "🚪"}</div>`);
-                }
-            </script>
+            <!-- Các cửa sẽ được tạo bằng JS -->
         </div>
 
         <!-- CÂU HỎI -->
@@ -116,7 +111,7 @@
             </div>
 
             <div id="controls" class="flex justify-between items-center mt-4">
-                <span id="progress-text" class="text-sm font-semibold text-gray-700">Cửa 1/15</span>
+                <span id="progress-text" class="text-sm font-semibold text-gray-700">Cửa 1/1</span>
                 <button id="control-btn"
                         class="bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg"
                         disabled>Mở cửa</button>
@@ -140,74 +135,114 @@
    DANH SÁCH CÂU HỎI (ĐÃ BỎ $)
    ============================ */
 const questions = [
-    { level: "Nhận biết", text: "Góc ở tâm là góc có đỉnh trùng với tâm đường tròn.",
-      options: [
-        {text:"Đúng", correct:true},
-        {text:"Sai", correct:false}
-      ]},
-
-    { level:"Nhận biết", text:"Góc nội tiếp là góc có đỉnh nằm trên đường tròn và hai cạnh chứa hai dây cung.",
-      options:[
-          {text:"Đúng", correct:true},
-          {text:"Sai", correct:false}
-      ]},
-
-    { level:"Nhận biết", text:"Số đo góc nội tiếp bằng nửa số đo cung bị chắn.",
-      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
-    },
-
-    { level:"Nhận biết", text:"Cung nhỏ 70°, thì cung lớn cùng chắn là 290°.",
-      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
-    },
-
-    { level:"Nhận biết", text:"Góc nội tiếp chắn nửa đường tròn bằng 90°.",
-      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
-    },
-
-    { level:"Thông hiểu",
-      text:"Góc nội tiếp chắn cung 120° có số đo 60°.",
-      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
-    },
-
-    { level:"Thông hiểu",
-      text:"Góc ở tâm chắn cung 80° có số đo 80°.",
-      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
-    },
-
-    { level:"Thông hiểu",
-      text:"Góc nội tiếp 55° chắn cung 110°.",
-      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
-    },
-
-    { level:"Thông hiểu",
-      text:"Hai góc nội tiếp cùng chắn một cung thì bằng nhau.",
-      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
-    },
-
-    { level:"Vận dụng",
-      text:"Tam giác ABC nội tiếp, góc A=65°, B=80°. Số đo cung AB bằng 70°.",
-      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
-    },
-
-    { level:"Vận dụng",
-      text:"Trên đường tròn, góc nội tiếp ADC chắn cung 150° thì góc ADC = 75°.",
-      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
-    },
-
-    { level:"Vận dụng",
-      text:"Một cầu thủ di chuyển trên cung tròn đi qua M, N, A thì góc MAN không đổi.",
-      options:[{text:"Đúng",correct:true},{text:"Sai",correct:false}]
-    },
-
-    { level:"Vận dụng cao",
-      {
-    level: "Vận dụng cao",
-    text: "Cho đường tròn (O) có đường kính AB. C là một điểm bất kỳ trên đường tròn. Kẻ CH vuông góc với AB tại H. Lấy điểm M trên cung nhỏ AC. Gọi I là giao điểm của AM với CH. Khi đó IC = IH. Khẳng định trên đúng hay sai?",
+  {
+    level: "Nhận biết",
+    text: "Góc ở tâm là góc có đỉnh trùng với tâm đường tròn.",
     options: [
-        { text: "Đúng", correct: true },
-        { text: "Sai", correct: false }
-      }
+      { text: "Đúng", correct: true },
+      { text: "Sai", correct: false }
+    ]
+  },
+  {
+    level: "Nhận biết",
+    text: "Góc nội tiếp là góc có đỉnh nằm trên đường tròn và hai cạnh chứa hai dây cung.",
+    options: [
+      { text: "Đúng", correct: true },
+      { text: "Sai", correct: false }
+    ]
+  },
+  {
+    level: "Nhận biết",
+    text: "Số đo góc nội tiếp bằng nửa số đo cung bị chắn.",
+    options: [
+      { text: "Đúng", correct: true },
+      { text: "Sai", correct: false }
+    ]
+  },
+  {
+    level: "Nhận biết",
+    text: "Cung nhỏ 70°, thì cung lớn cùng chắn là 290°.",
+    options: [
+      { text: "Đúng", correct: true },
+      { text: "Sai", correct: false }
+    ]
+  },
+  {
+    level: "Nhận biết",
+    text: "Góc nội tiếp chắn nửa đường tròn bằng 90°.",
+    options: [
+      { text: "Đúng", correct: true },
+      { text: "Sai", correct: false }
+    ]
+  },
+  {
+    level: "Thông hiểu",
+    text: "Góc nội tiếp chắn cung 120° có số đo 60°.",
+    options: [
+      { text: "Đúng", correct: true },
+      { text: "Sai", correct: false }
+    ]
+  },
+  {
+    level: "Thông hiểu",
+    text: "Góc ở tâm chắn cung 80° có số đo 80°.",
+    options: [
+      { text: "Đúng", correct: true },
+      { text: "Sai", correct: false }
+    ]
+  },
+  {
+    level: "Thông hiểu",
+    text: "Góc nội tiếp 55° chắn cung 110°.",
+    options: [
+      { text: "Đúng", correct: true },
+      { text: "Sai", correct: false }
+    ]
+  },
+  {
+    level: "Thông hiểu",
+    text: "Hai góc nội tiếp cùng chắn một cung thì bằng nhau.",
+    options: [
+      { text: "Đúng", correct: true },
+      { text: "Sai", correct: false }
+    ]
+  },
+  {
+    level: "Vận dụng",
+    text: "Tam giác ABC nội tiếp, góc A = 65°, góc B = 80°. Số đo cung AB bằng 70°.",
+    options: [
+      { text: "Đúng", correct: true },
+      { text: "Sai", correct: false }
+    ]
+  },
+  {
+    level: "Vận dụng",
+    text: "Trên đường tròn, góc nội tiếp chắn cung 150° thì góc nội tiếp đó bằng 75°.",
+    options: [
+      { text: "Đúng", correct: true },
+      { text: "Sai", correct: false }
+    ]
+  },
+  {
+    level: "Vận dụng",
+    text: "Một cầu thủ di chuyển trên cung tròn đi qua M, N, A thì góc sút MAN không đổi.",
+    options: [
+      { text: "Đúng", correct: true },
+      { text: "Sai", correct: false }
+    ]
+  },
+  {
+    level: "Vận dụng cao",
+    text: "Cho đường tròn (O) có đường kính AB. C là một điểm bất kỳ trên đường tròn. Kẻ CH vuông góc với AB tại H. Lấy điểm M trên cung nhỏ AC. Gọi I là giao điểm của AM với CH. Khẳng định IC = IH đúng hay sai?",
+    options: [
+      { text: "Đúng", correct: true },
+      { text: "Sai", correct: false }
+    ]
+  }
 ];
+
+// Tổng số cửa = số câu hỏi
+const TOTAL_DOORS = questions.length;
 
 /* ============================
    BIẾN TRẠNG THÁI
@@ -219,17 +254,27 @@ let correctSound, wrongSound, soundReady = false;
 /* ============================
    DOM
    ============================ */
+const mazeGrid        = document.getElementById("maze-grid");
 const questionContainer = document.getElementById("question-container");
 const questionLevelEl = document.getElementById("question-level");
-const questionTextEl = document.getElementById("question-text");
+const questionTextEl  = document.getElementById("question-text");
 const optionsContainer = document.getElementById("options-container");
-const progressText = document.getElementById("progress-text");
-const controlBtn = document.getElementById("control-btn");
+const progressText    = document.getElementById("progress-text");
+const controlBtn      = document.getElementById("control-btn");
 const feedbackContainer = document.getElementById("feedback-container");
-const endScreen = document.getElementById("end-screen");
-const endScoreEl = document.getElementById("end-score");
-const restartBtn = document.getElementById("restart-btn");
-const controls = document.getElementById("controls");   /* FIX LỖI QUAN TRỌNG */
+const endScreen       = document.getElementById("end-screen");
+const endScoreEl      = document.getElementById("end-score");
+const restartBtn      = document.getElementById("restart-btn");
+const controls        = document.getElementById("controls");
+
+/* Tạo các cửa của mê cung */
+for (let i = 1; i <= TOTAL_DOORS; i++) {
+  const door = document.createElement("div");
+  door.id = `door-${i}`;
+  door.className = "maze-door";
+  door.textContent = (i === TOTAL_DOORS) ? "🏆" : "🚪";
+  mazeGrid.appendChild(door);
+}
 
 /* ============================
    KHỞI ĐỘNG GAME
@@ -237,106 +282,104 @@ const controls = document.getElementById("controls");   /* FIX LỖI QUAN TRỌN
 document.addEventListener("DOMContentLoaded", startGame);
 
 function startGame() {
-    document.body.addEventListener("click", initAudio, {once:true});
-    current = 0;
-    score = 0;
+  document.body.addEventListener("click", initAudio, { once: true });
+  current = 0;
+  score = 0;
 
-    endScreen.classList.add("hidden");
-    questionContainer.classList.remove("hidden");
-    controls.classList.remove("hidden");
+  endScreen.classList.add("hidden");
+  questionContainer.classList.remove("hidden");
+  controls.classList.remove("hidden");
 
-    for (let i = 1; i <= 15; i++) {
-        const d = document.getElementById(`door-${i}`);
-        d.classList.remove("unlocked");
-        d.textContent = i === 15 ? "🏆" : "🚪";
-    }
+  for (let i = 1; i <= TOTAL_DOORS; i++) {
+    const d = document.getElementById(`door-${i}`);
+    d.classList.remove("unlocked");
+    d.textContent = (i === TOTAL_DOORS) ? "🏆" : "🚪";
+  }
 
-    loadQuestion();
+  loadQuestion();
 }
 
 function initAudio() {
-    if (soundReady) return;
-    Tone.start();
-
-    correctSound = new Tone.Synth().toDestination();
-    wrongSound = new Tone.Synth({oscillator:{type:"square"}}).toDestination();
-
-    soundReady = true;
+  if (soundReady) return;
+  Tone.start();
+  correctSound = new Tone.Synth().toDestination();
+  wrongSound   = new Tone.Synth({ oscillator: { type: "square" } }).toDestination();
+  soundReady = true;
 }
 
 /* ============================
    HIỂN THỊ CÂU HỎI
    ============================ */
 function loadQuestion() {
-    if (current >= questions.length) return endGame();
+  if (current >= questions.length) return endGame();
 
-    const q = questions[current];
-    questionLevelEl.textContent = "Mức độ: " + q.level;
-    questionTextEl.textContent = q.text;
+  const q = questions[current];
+  questionLevelEl.textContent = "Mức độ: " + q.level;
+  questionTextEl.textContent = q.text;
 
-    progressText.textContent = `Cửa ${current+1}/15`;
+  progressText.textContent = `Cửa ${current + 1}/${TOTAL_DOORS}`;
 
-    optionsContainer.innerHTML = "";
-    selected = null;
+  optionsContainer.innerHTML = "";
+  selected = null;
 
-    q.options.forEach((opt, idx)=>{
-        const btn = document.createElement("button");
-        btn.className = "option-btn w-full border px-4 py-2 rounded-lg bg-white text-left";
-        btn.textContent = opt.text;
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn w-full border px-4 py-2 rounded-lg bg-white text-left";
+    btn.textContent = opt.text;
 
-        btn.onclick = ()=>{
-            document.querySelectorAll(".option-btn").forEach(b=>b.classList.remove("selected"));
-            btn.classList.add("selected");
-            selected = idx;
-            controlBtn.disabled = false;
-        };
+    btn.onclick = () => {
+      document.querySelectorAll(".option-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      selected = idx;
+      controlBtn.disabled = false;
+    };
 
-        optionsContainer.appendChild(btn);
-    });
+    optionsContainer.appendChild(btn);
+  });
 
-    controlBtn.textContent = "Mở cửa";
-    controlBtn.disabled = true;
+  controlBtn.textContent = "Mở cửa";
+  controlBtn.disabled = true;
 }
 
-controlBtn.onclick = ()=>{
-    if (controlBtn.textContent === "Mở cửa") checkAnswer();
-    else nextQuestion();
+controlBtn.onclick = () => {
+  if (controlBtn.textContent === "Mở cửa") checkAnswer();
+  else nextQuestion();
 };
 
 function checkAnswer() {
-    const q = questions[current];
-    const correctIndex = q.options.findIndex(o=>o.correct);
+  const q = questions[current];
+  const correctIndex = q.options.findIndex(o => o.correct);
 
-    const btns = document.querySelectorAll(".option-btn");
-    btns.forEach(b=>b.disabled=true);
+  const btns = document.querySelectorAll(".option-btn");
+  btns.forEach(b => b.disabled = true);
 
-    if (selected === correctIndex) {
-        score++;
-        btns[selected].classList.add("correct");
-        unlockDoor(current+1);
-        playEffect("✔️");
-    } else {
-        btns[selected].classList.add("wrong");
-        btns[correctIndex].classList.add("correct");
-        playEffect("😢");
-    }
+  if (selected === correctIndex) {
+    score++;
+    btns[selected].classList.add("correct");
+    unlockDoor(current + 1);
+    playEffect("✔️");
+  } else {
+    btns[selected].classList.add("wrong");
+    btns[correctIndex].classList.add("correct");
+    playEffect("😢");
+  }
 
-    controlBtn.textContent = "Tiếp tục";
+  controlBtn.textContent = "Tiếp tục";
 }
 
 function nextQuestion() {
-    current++;
-    loadQuestion();
+  current++;
+  loadQuestion();
 }
 
 function endGame() {
-    questionContainer.classList.add("hidden");
-    controls.classList.add("hidden");
-    endScreen.classList.remove("hidden");
-    endScoreEl.textContent = `Bạn đã mở đúng ${score}/15 cánh cửa!`;
+  questionContainer.classList.add("hidden");
+  controls.classList.add("hidden");
+  endScreen.classList.remove("hidden");
+  endScoreEl.textContent = `Bạn đã mở đúng ${score}/${TOTAL_DOORS} cánh cửa!`;
 
-    const d = document.getElementById("door-15");
-    d.classList.add("unlocked");
+  const d = document.getElementById(`door-${TOTAL_DOORS}`);
+  d.classList.add("unlocked");
 }
 
 restartBtn.onclick = startGame;
@@ -345,17 +388,18 @@ restartBtn.onclick = startGame;
    HIỆU ỨNG
    ============================ */
 function unlockDoor(i) {
-    const d = document.getElementById(`door-${i}`);
-    d.classList.add("unlocked");
-    d.textContent = "✔️";
+  const d = document.getElementById(`door-${i}`);
+  if (!d) return;
+  d.classList.add("unlocked");
+  d.textContent = "✔️";
 }
 
 function playEffect(icon) {
-    const eff = document.createElement("div");
-    eff.className = "feedback-effect";
-    eff.textContent = icon;
-    feedbackContainer.appendChild(eff);
-    setTimeout(()=>eff.remove(),1000);
+  const eff = document.createElement("div");
+  eff.className = "feedback-effect";
+  eff.textContent = icon;
+  feedbackContainer.appendChild(eff);
+  setTimeout(() => eff.remove(), 1000);
 }
 </script>
 
