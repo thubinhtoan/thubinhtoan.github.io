@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuộc Xâm Lăng - Toán 9: Tiếp tuyến</title>
+    <title>Khu Vườn Bí Mật - Toán 9: Đường tròn</title>
     <!-- Tải Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Tải Tone.js cho âm thanh -->
@@ -12,10 +12,8 @@
         /* CSS cho font và giao diện chung */
         body {
             font-family: 'Inter', sans-serif;
-            background: #0f0c29; /* Nền trời đêm */
-            background: -webkit-linear-gradient(to top, #24243e, #302b63, #0f0c29);
-            background: linear-gradient(to top, #24243e, #302b63, #0f0c29);
-            color: #f0f2f5;
+            background: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%);
+            color: #333;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -26,157 +24,111 @@
         /* Container chính của trò chơi */
         #game-container {
             width: 100%;
-            max-width: 700px; /* Thu hẹp lại cho game 1 người */
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 900px;
+            background-color: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
         }
 
         /* Tiêu đề */
         header {
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: #68b984;
+            color: white;
             padding: 1.5rem 2rem;
             text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 5px solid #4a9c6d;
         }
 
         header h1 {
             font-size: 2rem;
             font-weight: 700;
             margin: 0;
-            color: #ff5e5e; /* Màu đỏ báo động */
-            text-shadow: 0 0 10px #ff5e5e;
         }
 
         header p {
             font-size: 1rem;
-            opacity: 0.8;
+            opacity: 0.9;
             margin-top: 0.25rem;
         }
 
-        /* Khu vực hiển thị game (tàu, lá chắn) */
-        #game-area {
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            min-height: 200px;
+        /* Nội dung chính (Vườn + Câu hỏi) */
+        main {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g fill="%23fff" fill-opacity="0.1"><circle cx="25" cy="25" r="1.5"/><circle cx="50" cy="50" r="1.5"/><circle cx="75" cy="75" r="1.5"/><circle cx="10" cy="90" r="1.5"/><circle cx="90" cy="10" r="1.5"/></g></svg>') 0 0 / 50px 50px;
+            md:flex-direction: row;
+            flex-grow: 1;
         }
 
-        /* Hạm đội UFO */
-        #ufo-fleet {
+        /* Khu vườn bí mật */
+        #secret-garden {
+            width: 100%;
+            md:width: 40%;
+            background: #f0fdf4; /* Màu nền cỏ nhạt */
+            border-right: 2px solid #d1fae5;
+            padding: 1.5rem;
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 1rem;
+            align-content: start;
+            min-height: 200px;
+            order: 2; /* Đảo thứ tự trên mobile */
+            md:order: 1;
         }
 
-        .ufo {
+        /* Bông hoa */
+        .flower-pot {
+            aspect-ratio: 1 / 1;
+            background-color: #e0f2e9;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: #a0aec0;
+            border: 2px dashed #bbf7d0;
+        }
+
+        .flower {
             font-size: 2.5rem;
-            text-align: center;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .flower.grown {
             opacity: 1;
             transform: scale(1);
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            filter: drop-shadow(0 0 5px #00f2ff);
         }
-
-        .ufo.destroyed {
-            opacity: 0;
-            transform: scale(0) rotate(180deg);
-        }
-
-        /* Lá chắn Trái Đất */
-        #shield-status {
-            margin-top: 1.5rem;
-        }
-        
-        #shield-label {
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #00f2ff;
-        }
-
-        #shield-bar-container {
-            width: 100%;
-            height: 20px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            border: 1px solid #00f2ff;
-            overflow: hidden;
-        }
-
-        #shield-bar {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #00f2ff 0%, #00c6ff 100%);
-            border-radius: 8px;
-            transition: width 0.5s ease-out;
-            box-shadow: 0 0 10px #00f2ff;
-        }
-        
-        /* Hiệu ứng rung lắc khi bị tấn công */
-        @keyframes shake-wrong {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-10px); }
-            40% { transform: translateX(10px); }
-            60% { transform: translateX(-10px); }
-            80% { transform: translateX(10px); }
-        }
-        .shake {
-            animation: shake-wrong 0.4s;
-        }
-
 
         /* Khu vực câu hỏi */
         #quiz-area {
+            width: 100%;
+            md:width: 60%;
             padding: 2rem;
-            background-color: rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            order: 1; /* Đảo thứ tự trên mobile */
+            md:order: 2;
         }
 
         #question-container {
             margin-bottom: 1.5rem;
-            position: relative;
-        }
-        
-        /* Hiệu ứng phản hồi (nổ, vỗ tay) */
-        #feedback-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-        }
-
-        .feedback-effect {
-            font-size: 6rem;
-            opacity: 0;
-            animation: fade-out-zoom 1s ease-out;
-        }
-        
-        @keyframes fade-out-zoom {
-            0% { opacity: 1; transform: scale(0.5); }
-            100% { opacity: 0; transform: scale(2); }
         }
 
         /* Hiển thị mức độ câu hỏi */
         #question-level {
             font-size: 0.875rem;
             font-weight: 600;
-            color: #ffae42; /* Màu cam */
-            background-color: rgba(255, 174, 66, 0.1);
+            color: #56ab2f;
+            background-color: #dcfce7;
             padding: 0.25rem 0.75rem;
             border-radius: 9999px;
             display: inline-block;
             margin-bottom: 0.75rem;
-            border: 1px solid #ffae42;
         }
 
         /* Nội dung câu hỏi */
@@ -197,38 +149,50 @@
         /* Nút lựa chọn */
         .option-btn {
             width: 100%;
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            background-color: #fff;
+            border: 2px solid #d1d5db;
             border-radius: 12px;
             padding: 1rem;
             text-align: left;
             font-size: 1rem;
             font-weight: 500;
-            color: #f0f2f5;
+            color: #374151;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
+        /* Hiệu ứng khi di chuột vào nút */
         .option-btn:not(:disabled):hover {
-            border-color: #00f2ff;
-            background-color: rgba(0, 242, 255, 0.1);
-        }
-        .option-btn.selected {
-            border-color: #ffae42;
-            background-color: rgba(255, 174, 66, 0.2);
+            border-color: #68b984;
+            background-color: #f0fdf4;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
         }
 
-        /* Trả lời đúng/sai */
+        /* Nút khi được chọn */
+        .option-btn.selected {
+            border-color: #4a9c6d;
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        /* Nút khi trả lời đúng */
         .option-btn.correct {
-            background-color: rgba(74, 222, 128, 0.2);
+            background-color: #dcfce7;
             border-color: #4ade80;
-            color: #f0fdf4;
+            color: #166534;
+            animation: pulse-correct 0.5s;
         }
+
+        /* Nút khi trả lời sai */
         .option-btn.wrong {
-            background-color: rgba(248, 113, 113, 0.2);
+            background-color: #fee2e2;
             border-color: #f87171;
-            color: #fef2f2;
+            color: #991b1b;
+            animation: shake-wrong 0.5s;
         }
+
         .option-btn:disabled {
             cursor: not-allowed;
             opacity: 0.7;
@@ -242,7 +206,7 @@
         }
 
         #control-btn {
-            background-color: #ff5e5e;
+            background-color: #56ab2f;
             color: white;
             font-weight: 600;
             font-size: 1rem;
@@ -251,20 +215,19 @@
             border: none;
             cursor: pointer;
             transition: all 0.2s ease;
-            text-shadow: 0 0 5px #ff5e5e;
-            box-shadow: 0 4px 10px rgba(255, 94, 94, 0.3);
+            box-shadow: 0 4px 10px rgba(86, 171, 47, 0.3);
         }
 
         #control-btn:disabled {
             background-color: #9ca3af;
             cursor: not-allowed;
             box-shadow: none;
-            text-shadow: none;
         }
 
         #control-btn:not(:disabled):hover {
-            background-color: #ff4747;
+            background-color: #4a9c6d;
             transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(86, 171, 47, 0.4);
         }
 
         /* Màn hình kết thúc */
@@ -277,43 +240,77 @@
         #end-screen h2 {
             font-size: 2.5rem;
             font-weight: 700;
+            color: #4a9c6d;
             margin-bottom: 1rem;
         }
-        #end-screen.victory h2 {
-            color: #4ade80;
-            text-shadow: 0 0 10px #4ade80;
-        }
-        #end-screen.defeat h2 {
-            color: #f87171;
-            text-shadow: 0 0 10px #f87171;
-        }
+
         #end-score {
             font-size: 1.5rem;
             margin-bottom: 2rem;
         }
 
+        /* Hiệu ứng cho câu trả lời */
+        @keyframes pulse-correct {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake-wrong {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Biểu tượng tung hoa (hiệu ứng khi đúng) */
+        .feedback-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            opacity: 0;
+            animation: fade-out-up 1s ease-out;
+        }
+
+        @keyframes fade-out-up {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+            100% { opacity: 0; transform: translate(-50%, -150%) scale(1.5); }
+        }
+        
         /* CSS cho responsive */
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
             body {
                 padding: 0.5rem;
+            }
+            main {
+                flex-direction: column;
+            }
+            #secret-garden {
+                order: 2; /* Vườn xuống dưới */
+                width: 100%;
+                border-right: none;
+                border-top: 2px solid #d1fae5;
+                grid-template-columns: repeat(5, 1fr); /* Giữ 5 cột cho 10 câu */
+            }
+            #quiz-area {
+                order: 1; /* Câu hỏi lên trên */
+                width: 100%;
+                padding: 1.5rem;
             }
             header h1 {
                 font-size: 1.5rem;
             }
-            #quiz-area {
-                padding: 1.5rem;
-            }
             #question-text {
                 font-size: 1.125rem;
             }
-            #game-area {
-                padding: 1rem;
+            .flower-pot {
+                font-size: 1rem;
             }
-            .ufo {
+            .flower {
                 font-size: 1.8rem;
-            }
-            #ufo-fleet {
-                gap: 0.5rem;
             }
         }
     </style>
@@ -321,163 +318,158 @@
 <body>
     <div id="game-container">
         <header>
-            <h1>Cuộc Xâm Lăng</h1>
-            <p>Bài 2: Tiếp tuyến của đường tròn - Toán 9</p>
+            <h1>Khu Vườn Bí Mật</h1>
+            <p>Bài 1: Đường tròn - Toán lớp 9 (Chân trời sáng tạo)</p>
         </header>
 
-        <!-- Khu vực hiển thị Game -->
-        <div id="game-area">
-            <!-- Hạm đội UFO -->
-            <div id="ufo-fleet">
-                <div id="ufo-1" class="ufo">🛸</div>
-                <div id="ufo-2" class="ufo">🛸</div>
-                <div id="ufo-3" class="ufo">🛸</div>
-                <div id="ufo-4" class="ufo">🛸</div>
-                <div id="ufo-5" class="ufo">🛸</div>
-                <div id="ufo-6" class="ufo">🛸</div>
-                <div id="ufo-7" class="ufo">🛸</div>
-                <div id="ufo-8" class="ufo">🛸</div>
-                <div id="ufo-9" class="ufo">🛸</div>
-                <div id="ufo-10" class="ufo">🛸</div>
-            </div>
-            <!-- Lá chắn Trái Đất -->
-            <div id="shield-status">
-                <div id="shield-label">NĂNG LƯỢNG LÁ CHẮN</div>
-                <div id="shield-bar-container">
-                    <div id="shield-bar"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Khu Vực Câu Hỏi -->
-        <div id="quiz-area">
-            <div id="question-container">
-                <div id="feedback-container"></div> <!-- Đặt ở đây để nằm trên câu hỏi -->
-                <span id="question-level">Mức độ</span>
-                <div id="question-text">Đây là nội dung câu hỏi...</div>
-                <div id="options-container">
-                    <!-- Các lựa chọn sẽ được tạo bằng JS -->
-                </div>
+        <main>
+            <!-- Khu Vườn -->
+            <div id="secret-garden">
+                <!-- 10 vị trí trồng hoa -->
+                <div class="flower-pot"><span id="flower-1" class="flower"></span></div>
+                <div class="flower-pot"><span id="flower-2" class="flower"></span></div>
+                <div class="flower-pot"><span id="flower-3" class="flower"></span></div>
+                <div class="flower-pot"><span id="flower-4" class="flower"></span></div>
+                <div class="flower-pot"><span id="flower-5" class="flower"></span></div>
+                <div class="flower-pot"><span id="flower-6" class="flower"></span></div>
+                <div class="flower-pot"><span id="flower-7" class="flower"></span></div>
+                <div class="flower-pot"><span id="flower-8" class="flower"></span></div>
+                <div class="flower-pot"><span id="flower-9" class="flower"></span></div>
+                <div class="flower-pot"><span id="flower-10" class="flower"></span></div>
             </div>
 
-            <div id="controls">
-                <button id="control-btn" disabled>BẮN HẠ</button>
+            <!-- Khu Vực Câu Hỏi -->
+            <div id="quiz-area">
+                <div id="question-container">
+                    <span id="question-level">Mức độ 1/4</span>
+                    <div id="question-text">Đây là nội dung câu hỏi...</div>
+                    <div id="options-container">
+                        <!-- Các lựa chọn sẽ được tạo bằng JS -->
+                    </div>
+                </div>
+
+                <div id="controls">
+                    <button id="control-btn" disabled>Kiểm tra</button>
+                </div>
+                
+                <!-- Hiệu ứng phản hồi -->
+                <div id="feedback-container" class="relative w-full h-0"></div>
+
+                <!-- Màn hình kết thúc -->
+                <div id="end-screen">
+                    <h2>Chúc mừng bạn đã hoàn thành!</h2>
+                    <p id="end-score">Khu vườn của bạn đã nở 8/10 bông hoa!</p>
+                    <button id="restart-btn" class="mt-4 bg-blue-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-blue-600 transition">Chơi lại</button>
+                </div>
             </div>
-            
-            <!-- Màn hình kết thúc -->
-            <div id="end-screen">
-                <h2 id="end-title">CHIẾN THẮNG!</h2>
-                <p id="end-score">Trái Đất đã an toàn!</p>
-                <button id="restart-btn" class="mt-4 bg-blue-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-blue-600 transition">Chơi lại</button>
-            </div>
-        </div>
+        </main>
     </div>
 
     <script>
-        // --- Dữ liệu câu hỏi (Bài 2: Tiếp tuyến) ---
+        // --- Dữ liệu câu hỏi ---
         const questions = [
             // Mức 1: Nhận biết
             {
                 level: "Nhận biết",
-                text: "Đường thẳng $a$ và đường tròn $(O; R)$ có $d = R$ ($d$ là khoảng cách từ $O$ đến $a$). Vị trí của $a$ và $(O)$ là:",
+                text: "Đường tròn (O; R) là hình gồm các điểm M trong mặt phẳng sao cho:",
                 options: [
-                    { text: "Cắt nhau", correct: false },
-                    { text: "Tiếp xúc", correct: true },
-                    { text: "Không giao nhau", correct: false },
-                    { text: "Trùng nhau", correct: false }
+                    { text: "OM < R", correct: false },
+                    { text: "OM > R", correct: false },
+                    { text: "OM = R", correct: true },
+                    { text: "OM ≤ R", correct: false }
                 ]
             },
             {
                 level: "Nhận biết",
-                text: "Đường thẳng $a$ là tiếp tuyến của $(O; R)$ tại tiếp điểm $A$ nếu:",
+                text: "Đối tượng nào sau đây là tâm đối xứng của đường tròn (O)?",
                 options: [
-                    { text: "$a$ đi qua $A$", correct: false },
-                    { text: "$a$ vuông góc với $OA$", correct: false },
-                    { text: "$a$ đi qua $A$ và $a$ song song với $OA$", correct: false },
-                    { text: "$a$ đi qua $A$ và $a$ vuông góc với $OA$ tại $A$", correct: true }
+                    { text: "Một điểm M bất kì trên đường tròn", correct: false },
+                    { text: "Tâm O", correct: true },
+                    { text: "Một bán kính bất kì", correct: false },
+                    { text: "Một đường kính bất kì", correct: false }
                 ]
             },
             {
                 level: "Nhận biết",
-                text: "Cho $MA$ và $MB$ là hai tiếp tuyến của $(O)$ cắt nhau tại $M$ ($A, B$ là tiếp điểm). Khẳng định nào sau đây là **SAI**?",
+                text: "Trong một đường tròn, dây cung lớn nhất được gọi là gì?",
                 options: [
-                    { text: "$MA = MB$", correct: false },
-                    { text: "$MO$ là phân giác $\\angle AMB$", correct: false },
-                    { text: "$OM = AB$", correct: true },
-                    { text: "$MO$ là phân giác $\\angle AOB$", correct: false }
+                    { text: "Bán kính", correct: false },
+                    { text: "Đường kính", correct: true },
+                    { text: "Cát tuyến", correct: false },
+                    { text: "Tiếp tuyến", correct: false }
                 ]
             },
             // Mức 2: Thông hiểu
             {
                 level: "Thông hiểu",
-                text: "Cho đường tròn $(O; 6 \\text{ cm})$ và đường thẳng $a$. Khoảng cách $d$ từ $O$ đến $a$ là $5 \\text{ cm}$. Số điểm chung của $a$ và $(O)$ là:",
+                text: "Cho đường tròn (O; 5 cm). Điểm A có OA = 6 cm. Vị trí của điểm A so với đường tròn (O) là:",
                 options: [
-                    { text: "0", correct: false },
-                    { text: "1", correct: false },
-                    { text: "2", correct: true },
-                    { text: "Vô số", correct: false }
+                    { text: "Nằm trong đường tròn", correct: false },
+                    { text: "Nằm trên đường tròn", correct: false },
+                    { text: "Nằm ngoài đường tròn", correct: true },
+                    { text: "Trùng với tâm O", correct: false }
                 ]
             },
             {
                 level: "Thông hiểu",
-                text: "$MA, MB$ là hai tiếp tuyến của $(O)$ tại $A, B$. Biết $\\angle AMB = 50^\\circ$. Tính số đo $\\angle AOM$.",
+                text: "Hai đường tròn (O; R) và (O'; R') (với R > R') tiếp xúc trong với nhau. Hệ thức nào sau đây là đúng?",
                 options: [
-                    { text: "$25^\\circ$", correct: false },
-                    { text: "$50^\\circ$", correct: false },
-                    { text: "$65^\\circ$", correct: true },
-                    { text: "$40^\\circ$", correct: false }
+                    { text: "OO' = R + R'", correct: false },
+                    { text: "OO' = R - R'", correct: true },
+                    { text: "OO' > R + R'", correct: false },
+                    { text: "OO' < R - R'", correct: false }
                 ]
             },
             {
                 level: "Thông hiểu",
-                text: "Một diễn viên xiếc đi xe đạp một bánh trên dây cáp. Nếu đường kính bánh xe là $60 \\text{ cm}$, khoảng cách từ trục bánh xe (tâm) đến dây cáp là bao nhiêu?",
+                text: "Cho đường tròn (I; 8 cm). Một dây cung MN có độ dài 17 cm. Hỏi dây MN có phải là đường kính không?",
                 options: [
-                    { text: "$60 \\text{ cm}$", correct: false },
-                    { text: "$120 \\text{ cm}$", correct: false },
-                    { text: "$30 \\text{ cm}$", correct: true },
-                    { text: "$15 \\text{ cm}$", correct: false }
+                    { text: "Có, vì 17 > 8", correct: false },
+                    { text: "Không, vì độ dài đường kính là 16 cm, 17 > 16 là vô lý", correct: true },
+                    { text: "Không, vì nó không đi qua tâm", correct: false },
+                    { text: "Có, vì nó là dây cung lớn nhất", correct: false }
                 ]
             },
             // Mức 3: Vận dụng
             {
                 level: "Vận dụng",
-                text: "Cho đường tròn $(O; 5 \\text{ cm})$. Từ điểm $M$ ở ngoài $(O)$ vẽ tiếp tuyến $MA$ ($A$ là tiếp điểm). Biết $OM = 13 \\text{ cm}$. Tính độ dài $MA$.",
+                text: "Cho hai đường tròn (O; 5 cm) và (O'; 3 cm). Biết OO' = 8 cm. Vị trí tương đối của hai đường tròn là:",
                 options: [
-                    { text: "$12 \\text{ cm}$", correct: true },
-                    { text: "$18 \\text{ cm}$", correct: false },
-                    { text: "$8 \\text{ cm}$", correct: false },
-                    { text: "$\\sqrt{194} \\text{ cm}$", correct: false }
-                ]
-            },
-            {
-                level: "Vận dụng (Thực tế)",
-                text: "Một vệ tinh ở độ cao $h = 300 \\text{ km}$ so với mặt đất. Bán kính Trái Đất $R \\approx 6400 \\text{ km}$. Tầm nhìn xa tối đa mà vệ tinh có thể quan sát được trên mặt đất (đoạn $AC$ trong Hình 7, SGK) là bao nhiêu?",
-                options: [
-                    { text: "$\\approx 1982 \\text{ km}$", correct: true },
-                    { text: "$\\approx 1960 \\text{ km}$", correct: false },
-                    { text: "$\\approx 2100 \\text{ km}$", correct: false },
-                    { text: "$\\approx 300 \\text{ km}$", correct: false }
+                    { text: "Cắt nhau", correct: false },
+                    { text: "Tiếp xúc ngoài", correct: true },
+                    { text: "Ở ngoài nhau", correct: false },
+                    { text: "Đựng nhau", correct: false }
                 ]
             },
             {
                 level: "Vận dụng",
-                text: "Cho $MA, MB$ là hai tiếp tuyến của $(O)$ tại $A, B$. Biết $\\angle AOB = 120^\\circ$. Số đo $\\angle AMB$ là:",
+                text: "Một cái bánh xe đạp có bán kính là 33 cm. Hỏi, nếu một con kiến đậu trên vành bánh xe, nó cách trục bánh xe (tâm đường tròn) bao nhiêu cm?",
                 options: [
-                    { text: "$120^\\circ$", correct: false },
-                    { text: "$90^\\circ$", correct: false },
-                    { text: "$60^\\circ$", correct: true },
-                    { text: "$30^\\circ$", correct: false }
+                    { text: "33 cm", correct: true },
+                    { text: "66 cm", correct: false },
+                    { text: "16,5 cm", correct: false },
+                    { text: "Không xác định được", correct: false }
+                ]
+            },
+            {
+                level: "Vận dụng",
+                text: "Cho hai đường tròn (A; 10 cm) và (B; 4 cm). Để hai đường tròn này cắt nhau, độ dài đoạn nối tâm AB phải thỏa mãn:",
+                options: [
+                    { text: "AB = 14 cm", correct: false },
+                    { text: "AB = 6 cm", correct: false },
+                    { text: "AB > 14 cm", correct: false },
+                    { text: "6 < AB < 14 cm", correct: true }
                 ]
             },
             // Mức 4: Vận dụng cao
             {
                 level: "Vận dụng cao",
-                text: "Cho đường tròn $(O; R)$ và điểm $M$ sao cho $OM = 2R$. Từ $M$ vẽ hai tiếp tuyến $MA, MB$. Tam giác $MAB$ là tam giác gì?",
+                text: "Cho hình chữ nhật ABCD có AB = 16 cm, AD = 12 cm. Bốn điểm A, B, C, D cùng thuộc một đường tròn. Bán kính của đường tròn đó là:",
                 options: [
-                    { text: "Tam giác vuông", correct: false },
-                    { text: "Tam giác tù", correct: false },
-                    { text: "Tam giác cân (không đều)", correct: false },
-                    { text: "Tam giác đều", correct: true }
+                    { text: "8 cm", correct: false },
+                    { text: "6 cm", correct: false },
+                    { text: "10 cm", correct: true },
+                    { text: "14 cm", correct: false }
                 ]
             }
         ];
@@ -485,16 +477,13 @@
         // --- Biến trạng thái trò chơi ---
         let currentQuestionIndex = 0;
         let score = 0;
-        let health = 5; // 5 mạng
-        const MAX_HEALTH = 5;
         let selectedOption = null;
         let soundReady = false;
 
         // --- Đối tượng âm thanh ---
-        let correctSound, wrongSound, explosionSound;
+        let correctSound, wrongSound;
 
         // --- Các phần tử DOM ---
-        const gameContainer = document.getElementById('game-container');
         const questionContainer = document.getElementById('question-container');
         const questionLevelEl = document.getElementById('question-level');
         const questionTextEl = document.getElementById('question-text');
@@ -502,33 +491,35 @@
         const controlBtn = document.getElementById('control-btn');
         const feedbackContainer = document.getElementById('feedback-container');
         const endScreen = document.getElementById('end-screen');
-        const endTitleEl = document.getElementById('end-title');
         const endScoreEl = document.getElementById('end-score');
         const restartBtn = document.getElementById('restart-btn');
-        const shieldBar = document.getElementById('shield-bar');
         const controls = document.getElementById('controls');
+        const flowerEmojis = ['🌸', '🌹', '🌻', '🌷', '🌼', '🌺', '💐', '💮', '🏵️', 'G'];
+
         // --- Hàm khởi tạo ---
         document.addEventListener('DOMContentLoaded', startGame);
 
         function startGame() {
-            // Khởi tạo âm thanh
+            // Khởi tạo âm thanh khi người dùng tương tác
             document.body.addEventListener('click', initAudio, { once: true });
 
             currentQuestionIndex = 0;
             score = 0;
-            health = MAX_HEALTH;
-            
-            // Đặt lại UI
             endScreen.style.display = 'none';
             questionContainer.style.display = 'block';
             controls.style.display = 'flex';
-            updateShieldBar();
             
-            // Đặt lại UFO
+            // Đặt lại các bông hoa
             for (let i = 1; i <= 10; i++) {
-                const ufo = document.getElementById(`ufo-${i}`);
-                if (ufo) ufo.classList.remove('destroyed');
+                const flower = document.getElementById(`flower-${i}`);
+                flower.classList.remove('grown');
+                flower.textContent = '';
+                // Hiển thị lại chậu hoa rỗng
+                flower.parentElement.style.display = 'flex'; 
             }
+            
+            // Xáo trộn các vị trí hoa
+            flowerEmojis.sort(() => Math.random() - 0.5);
 
             loadQuestion();
         }
@@ -536,39 +527,36 @@
         function initAudio() {
             if (soundReady) return;
             Tone.start();
-            // Âm thanh bắn laser (đúng)
             correctSound = new Tone.Synth({
-                oscillator: { type: "sawtooth" },
-                envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
+                oscillator: { type: "sine" },
+                envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.2 }
             }).toDestination();
-            // Âm thanh bị bắn trúng (sai)
-            wrongSound = new Tone.NoiseSynth({
-                noise: { type: "brown" },
-                envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.1 }
-            }).toDestination();
-            // Âm thanh nổ (phá hủy UFO)
-            explosionSound = new Tone.NoiseSynth({
-                noise: { type: "white" },
-                envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
+
+            wrongSound = new Tone.Synth({
+                oscillator: { type: "square" },
+                envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2 }
             }).toDestination();
             soundReady = true;
         }
 
         // --- Tải câu hỏi ---
         function loadQuestion() {
+            // Đặt lại trạng thái
             selectedOption = null;
             optionsContainer.innerHTML = '';
 
-            if (currentQuestionIndex >= questions.length || health <= 0) {
+            if (currentQuestionIndex >= questions.length) {
                 endGame();
                 return;
             }
 
             const q = questions[currentQuestionIndex];
 
-            questionLevelEl.textContent = `Đợt tấn công: ${currentQuestionIndex + 1}/10 - ${q.level}`;
+            // Cập nhật nội dung câu hỏi
+            questionLevelEl.textContent = `Mức độ: ${q.level}`;
             questionTextEl.innerHTML = q.text;
             
+            // Tạo các nút lựa chọn
             q.options.forEach((option, index) => {
                 const button = document.createElement('button');
                 button.innerHTML = option.text;
@@ -578,25 +566,27 @@
                 optionsContainer.appendChild(button);
             });
 
-            controlBtn.textContent = 'BẮN HẠ';
+            // Cập nhật nút điều khiển
+            controlBtn.textContent = 'Kiểm tra';
             controlBtn.disabled = true;
-
-            if (window.MathJax) {
-                MathJax.typesetPromise([questionTextEl, optionsContainer]);
-            }
         }
 
         // --- Xử lý logic trò chơi ---
         function selectOption(button, index) {
+            // Bỏ chọn cái cũ
             const allOptions = document.querySelectorAll('.option-btn');
             allOptions.forEach(btn => btn.classList.remove('selected'));
+
+            // Chọn cái mới
             button.classList.add('selected');
             selectedOption = index;
+            
+            // Kích hoạt nút kiểm tra
             controlBtn.disabled = false;
         }
 
         controlBtn.addEventListener('click', () => {
-            if (controlBtn.textContent === 'BẮN HẠ') {
+            if (controlBtn.textContent === 'Kiểm tra') {
                 checkAnswer();
             } else {
                 nextQuestion();
@@ -608,22 +598,21 @@
             const correctIndex = q.options.findIndex(opt => opt.correct);
             const allOptions = document.querySelectorAll('.option-btn');
 
+            // Vô hiệu hóa các nút
             allOptions.forEach(btn => btn.disabled = true);
-            controlBtn.textContent = 'Tiếp tục';
+            controlBtn.textContent = 'Câu tiếp theo';
             controlBtn.disabled = false;
 
             if (selectedOption == correctIndex) {
                 // TRẢ LỜI ĐÚNG
                 score++;
                 allOptions[selectedOption].classList.add('correct');
-                destroyUFO(currentQuestionIndex + 1);
+                growFlower();
                 playEffect('correct');
             } else {
                 // TRẢ LỜI SAI
-                health--;
                 allOptions[selectedOption].classList.add('wrong');
                 allOptions[correctIndex].classList.add('correct');
-                updateShieldBar();
                 playEffect('wrong');
             }
         }
@@ -637,35 +626,17 @@
             questionContainer.style.display = 'none';
             controls.style.display = 'none';
             endScreen.style.display = 'block';
-
-            if (health > 0) {
-                endScreen.classList.add('victory');
-                endScreen.classList.remove('defeat');
-                endTitleEl.textContent = 'CHIẾN THẮNG!';
-                endScoreEl.innerHTML = `Bạn đã bắn hạ ${score} tàu địch. Trái Đất đã an toàn!`;
-            } else {
-                endScreen.classList.add('defeat');
-                endScreen.classList.remove('victory');
-                endTitleEl.textContent = 'THẤT BẠI!';
-                endScoreEl.innerHTML = `Lá chắn đã bị phá hủy! Bạn bắn hạ được ${score} tàu địch.`;
-            }
+            endScoreEl.innerHTML = `Khu vườn của bạn đã nở ${score}/10 bông hoa!`;
         }
 
         restartBtn.addEventListener('click', startGame);
 
-        // --- Hiệu ứng & Cập nhật UI ---
-        function destroyUFO(index) {
-            const ufo = document.getElementById(`ufo-${index}`);
-            if (ufo) ufo.classList.add('destroyed');
-        }
-
-        function updateShieldBar() {
-            const shieldPercentage = (health / MAX_HEALTH) * 100;
-            shieldBar.style.width = `${shieldPercentage}%`;
-            if(shieldPercentage < 30) {
-                shieldBar.style.background = "#ff5e5e"; // Chuyển màu đỏ khi yếu
-            } else {
-                shieldBar.style.background = "linear-gradient(90deg, #00f2ff 0%, #00c6ff 100%)";
+        // --- Hiệu ứng ---
+        function growFlower() {
+            const flower = document.getElementById(`flower-${currentQuestionIndex + 1}`);
+            if (flower) {
+                flower.textContent = flowerEmojis[currentQuestionIndex % flowerEmojis.length];
+                flower.classList.add('grown');
             }
         }
 
@@ -673,10 +644,10 @@
             // 1. Âm thanh
             if (soundReady) {
                 if (type === 'correct') {
-                    correctSound.triggerAttackRelease("G5", "0.1", Tone.now());
-                    explosionSound.triggerAttackRelease("0.1", Tone.now() + 0.1);
+                    correctSound.triggerAttackRelease("C5", "0.2", Tone.now());
+                    correctSound.triggerAttackRelease("G5", "0.2", Tone.now() + 0.1);
                 } else {
-                    wrongSound.triggerAttackRelease("0.2", Tone.now());
+                    wrongSound.triggerAttackRelease("C3", "0.3", Tone.now());
                 }
             }
 
@@ -684,22 +655,19 @@
             const effect = document.createElement('div');
             effect.classList.add('feedback-effect');
             if (type === 'correct') {
-                effect.textContent = '🎉'; // Biểu tượng chiến thắng
+                effect.textContent = '🎉'; // Tung hoa
             } else {
-                effect.textContent = '💥'; // Biểu tượng bị bắn trúng
-                gameContainer.classList.add('shake');
-                setTimeout(() => gameContainer.classList.remove('shake'), 400);
+                effect.textContent = '😢'; // Mặt mếu
             }
             feedbackContainer.appendChild(effect);
 
-            effect.addEventListener('animationend', () => effect.remove());
+            // Tự xóa sau khi animation kết thúc
+            effect.addEventListener('animationend', () => {
+                effect.remove();
+            });
         }
 
     </script>
-    
-    <!-- Tải MathJax để hiển thị LaTeX đẹp -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 </body>
 </html>
