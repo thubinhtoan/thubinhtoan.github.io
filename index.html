@@ -61,46 +61,45 @@
     // DANH SÁCH CÁC TRÒ CHƠI
     // ==========================
     // 👉 Khi thêm game mới, cô chỉ cần thêm 1 object giống như hai cái dưới đây.
-    const games = [
-     { ...trò 1... },
-  { ...trò 2... },
-  { ...trò 3 mới thêm... }   // không quên dấu phẩy giữa các object
+   // 👉 Danh sách các game trên trang chủ
+const games = [
+  {
+    id: 1,
+    folder: "khu-vuon-bi-mat",  // thư mục game 1
+    icon: "🌸",
+    color: "emerald",
+    label: "Trò chơi 1",
+    grade: "Lớp 9 – Hình học",
+    title: "Khu Vườn Bí Mật – Đường tròn (Toán 9)",
+    description:
+      "Trò chơi ôn tập bài Đường tròn – Chân trời sáng tạo. Trả lời đúng để làm nở những bông hoa xinh trong khu vườn."
+  },
+
+  {
+    id: 2,
+    folder: "cuoc-xam-lang",    // thư mục game 2
+    icon: "🛸",
+    color: "indigo",
+    label: "Trò chơi 2",
+    grade: "Lớp 9 – Tiếp tuyến",
+    title: "Cuộc Xâm Lăng – Tiếp tuyến của đường tròn (Toán 9)",
+    description:
+      "Trả lời đúng để bắn hạ tàu UFO, bảo vệ Trái Đất. Ôn tập kiến thức về tiếp tuyến của đường tròn qua các tình huống thú vị."
+  },
+
+  {
+    id: 3,
+    folder: "me-cung-tri-tue",  // đúng y tên thư mục game 3
+    icon: "🧠",
+    color: "indigo",            // dùng chung theme indigo, hoặc 'sky' nếu cô thích
+    label: "Trò chơi 3",
+    grade: "Lớp 9 – Góc ở tâm, góc nội tiếp",
+    title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp (Toán 9)",
+    description:
+      "Trả lời đúng để mở từng cánh cửa, vượt qua mê cung và chạm đến kho báu kiến thức."
+  }
 ];
-      {
-        id: 1,
-        folder: "khu-vuon-bi-mat",              // tên thư mục game (đã có file index.html bên trong)
-        icon: "🌸",
-        color: "emerald",                       // màu chủ đạo: emerald | indigo | sky | rose ...
-        label: "Trò chơi 1",
-        grade: "Lớp 9 – Hình học",
-        title: "Khu Vườn Bí Mật – Đường tròn (Toán 9)",
-        description:
-          "Trò chơi ôn tập bài Đường tròn – Chân trời sáng tạo. Trả lời đúng để làm nở những bông hoa xinh trong khu vườn."
-      },
-      {
-        id: 2,
-        folder: "cuoc-xam-lang",
-        icon: "🛸",
-        color: "indigo",
-        label: "Trò chơi 2",
-        grade: "Lớp 9 – Tiếp tuyến",
-        title: "Cuộc Xâm Lăng – Tiếp tuyến của đường tròn (Toán 9)",
-        description:
-          "Trả lời đúng để bắn hạ tàu UFO, bảo vệ Trái Đất. Ôn tập kiến thức về tiếp tuyến của đường tròn qua các tình huống thú vị."
-      }
 
-     {
-  id: 3,
-  folder: "me-cung-tri-tue",   // trùng tên thư mục cô vừa tạo
-  icon: "🧩",
-  color: "indigo",             // dùng theme indigo cho hợp nền tím-xanh
-  label: "Trò chơi 3",
-  grade: "Lớp 9 – Góc ở tâm, góc nội tiếp",
-  title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp (Toán 9)",
-  description: "Trả lời đúng để mở từng cánh cửa, vượt qua mê cung và chạm đến kho báu kiến thức."
-}
-
-    ];
 
     // ==========================
     // HÀM SINH GIAO DIỆN TỪ DANH SÁCH GAMES
