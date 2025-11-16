@@ -58,41 +58,38 @@
 
  <script>
   // Danh sách game trên trang chủ
-  const games = [
+ const games = [
     {
-      id: 1,
-      folder: "khu-vuon-bi-mat",
-      icon: "🌸",
-      color: "emerald",
-      label: "Trò chơi 1",
-      grade: "Lớp 9 – Hình học",
-      title: "Khu Vườn Bí Mật – Đường tròn (Toán 9)",
-      description:
-        "Trò chơi ôn tập bài Đường tròn – Chân trời sáng tạo. Trả lời đúng để làm nở những bông hoa xinh trong khu vườn."
+        id: 1,
+        folder: "khu-vuon-bi-mat",
+        icon: "🌸",
+        color: "emerald",
+        label: "Trò chơi 1",
+        grade: "Lớp 9 – Hình học",
+        title: "Khu Vườn Bí Mật – Đường tròn (Toán 9)",
+        description: "Trò chơi ôn tập bài Đường tròn – Chân trời sáng tạo. Trả lời đúng để làm nở những bông hoa xinh trong khu vườn."
     },
     {
-      id: 2,
-      folder: "cuoc-xam-lang",
-      icon: "🛸",
-      color: "indigo",
-      label: "Trò chơi 2",
-      grade: "Lớp 9 – Tiếp tuyến",
-      title: "Cuộc Xâm Lăng – Tiếp tuyến của đường tròn (Toán 9)",
-      description:
-        "Trả lời đúng để bắn hạ tàu UFO, bảo vệ Trái Đất. Ôn tập kiến thức về tiếp tuyến của đường tròn qua các tình huống thú vị."
+        id: 2,
+        folder: "cuoc-xam-lang",
+        icon: "🛸",
+        color: "indigo",
+        label: "Trò chơi 2",
+        grade: "Lớp 9 – Tiếp tuyến",
+        title: "Cuộc Xâm Lăng – Tiếp tuyến của đường tròn (Toán 9)",
+        description: "Trả lời đúng để bắn hạ tàu UFO, bảo vệ Trái Đất. Ôn tập kiến thức về tiếp tuyến của đường tròn qua các tình huống thú vị."
     },
     {
-      id: 3,
-      folder: "me-cung-tri-tue",
-      icon: "🧩",
-      color: "indigo", // dùng lại bảng màu indigo cho hợp nền tím–xanh
-      label: "Trò chơi 3",
-      grade: "Lớp 9 – Góc ở tâm, góc nội tiếp",
-      title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp (Toán 9)",
-      description:
-        "Trả lời đúng để mở từng cánh cửa, vượt qua mê cung và chạm đến kho báu kiến thức."
+        id: 3,
+        folder: "me-cung-tri-tue",
+        icon: "🧠",
+        color: "sky",
+        label: "Trò chơi 3",
+        grade: "Lớp 9 – Góc ở tâm, góc nội tiếp",
+        title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp (Toán 9)",
+        description: "Trả lời đúng để mở từng cánh cửa và vượt qua mê cung kiến thức."
     }
-  ];
+];
 
   // Các style màu cho thẻ game
   const colorStyles = {
@@ -123,9 +120,8 @@
   // Tạo thẻ game cho từng trò chơi
   games.forEach((game) => {
     const styles = colorStyles[game.color] || colorStyles.emerald;
-
-    const a = document.createElement("a");
-    a.href = `./${game.folder}/index.html`;
+const a = document.createElement("a");
+a.href = `./${game.folder}/index.html`;
     a.className =
       "block rounded-2xl border transition transform hover:-translate-y-0.5 hover:shadow-xl " +
       styles.card;
