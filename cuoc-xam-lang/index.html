@@ -375,6 +375,7 @@
 
     <script>
         // --- Dữ liệu câu hỏi (Bài 2: Tiếp tuyến) ---
+              // --- Dữ liệu câu hỏi (Bài 2: Tiếp tuyến) ---
         const questions = [
             // Mức 1: Nhận biết
             {
@@ -407,6 +408,39 @@
                     { text: "MO là phân giác góc AOB", correct: false }
                 ]
             },
+
+            // Thêm 3 câu NHẬN BIẾT mới
+            {
+                level: "Nhận biết",
+                text: "Mệnh đề nào sau đây là đúng về tiếp tuyến của đường tròn (O)?",
+                options: [
+                    { text: "Tiếp tuyến có hai điểm chung với đường tròn", correct: false },
+                    { text: "Tiếp tuyến không có điểm chung nào với đường tròn", correct: false },
+                    { text: "Tiếp tuyến có đúng một điểm chung với đường tròn", correct: true },
+                    { text: "Tiếp tuyến có vô số điểm chung với đường tròn", correct: false }
+                ]
+            },
+            {
+                level: "Nhận biết",
+                text: "Mệnh đề nào sau đây là đúng?",
+                options: [
+                    { text: "Khoảng cách từ tâm O đến tiếp tuyến luôn lớn hơn bán kính", correct: false },
+                    { text: "Khoảng cách từ tâm O đến tiếp tuyến luôn nhỏ hơn bán kính", correct: false },
+                    { text: "Khoảng cách từ tâm O đến tiếp tuyến luôn bằng bán kính", correct: true },
+                    { text: "Khoảng cách từ tâm O đến tiếp tuyến có thể bất kì", correct: false }
+                ]
+            },
+            {
+                level: "Nhận biết",
+                text: "Qua một điểm M nằm ngoài đường tròn (O) vẽ được:",
+                options: [
+                    { text: "Không có tiếp tuyến nào đến (O)", correct: false },
+                    { text: "Chỉ vẽ được một tiếp tuyến đến (O)", correct: false },
+                    { text: "Vẽ được đúng hai tiếp tuyến đến (O)", correct: true },
+                    { text: "Vẽ được vô số tiếp tuyến đến (O)", correct: false }
+                ]
+            },
+
             // Mức 2: Thông hiểu
             {
                 level: "Thông hiểu",
@@ -438,6 +472,29 @@
                     { text: "15 cm", correct: false }
                 ]
             },
+
+            // Thêm 2 câu THÔNG HIỂU mới
+            {
+                level: "Thông hiểu",
+                text: "Từ điểm M nằm ngoài đường tròn (O) vẽ hai tiếp tuyến MA và MB. Biết MA = 7 cm. Khi đó MB bằng:",
+                options: [
+                    { text: "5 cm", correct: false },
+                    { text: "7 cm", correct: true },
+                    { text: "14 cm", correct: false },
+                    { text: "Không xác định được", correct: false }
+                ]
+            },
+            {
+                level: "Thông hiểu",
+                text: "Cho hai tiếp tuyến MA, MB của đường tròn (O) tại A, B. Biết góc AMB = 80°. Khi đó góc ở tâm AOB có số đo là:",
+                options: [
+                    { text: "80°", correct: false },
+                    { text: "90°", correct: false },
+                    { text: "100°", correct: true },
+                    { text: "40°", correct: false }
+                ]
+            },
+
             // Mức 3: Vận dụng
             {
                 level: "Vận dụng",
@@ -469,6 +526,7 @@
                     { text: "30°", correct: false }
                 ]
             },
+
             // Mức 4: Vận dụng cao
             {
                 level: "Vận dụng cao",
@@ -556,10 +614,12 @@
         }
 
         // --- Tải câu hỏi ---
+               // --- Tải câu hỏi ---
         function loadQuestion() {
             selectedOption = null;
             optionsContainer.innerHTML = '';
 
+            // Hết câu hỏi hoặc hết máu → kết thúc game
             if (currentQuestionIndex >= questions.length || health <= 0) {
                 endGame();
                 return;
@@ -567,9 +627,11 @@
 
             const q = questions[currentQuestionIndex];
 
-            questionLevelEl.textContent = `Đợt tấn công: ${currentQuestionIndex + 1}/10 - ${q.level}`;
+            // Hiển thị đợt tấn công theo tổng số câu
+            questionLevelEl.textContent = `Đợt tấn công: ${currentQuestionIndex + 1}/${questions.length} - ${q.level}`;
             questionTextEl.innerHTML = q.text;
             
+            // Tạo các nút lựa chọn
             q.options.forEach((option, index) => {
                 const button = document.createElement('button');
                 button.innerHTML = option.text;
@@ -581,7 +643,7 @@
 
             controlBtn.textContent = 'BẮN HẠ';
             controlBtn.disabled = true;
-        }
+              }
 
         // --- Xử lý logic trò chơi ---
         function selectOption(button, index) {
