@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiến Binh Rồng - Toán 9 (Bài 4)</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải Tone.js để tạo âm thanh -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+        
+        #game-container {
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hp-bar-inner {
+            transition: width 0.5s ease-in-out;
+        }
+
+        .option-btn {
+            transition: all 0.3s ease;
+        }
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            transform: translate3d(0, 0, 0);
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .flash-correct {
+            animation: flash 0.5s ease;
+        }
+
+        @keyframes flash {
+            0% { box-shadow: 0 0 20px 10px rgba(76, 175, 80, 0.7); }
+            100% { box-shadow: none; }
+        }
+        
+        #feedback-icon {
+            position: absolute;
+            font-size: 3rem;
+            animation: burst 0.8s ease-out forwards;
+            opacity: 0;
+            z-index: 100;
+        }
+
+        @keyframes burst {
+            0% { transform: scale(0.1); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; top: -100px; }
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+            animation: fall 3s ease-out forwards;
+        }
+
+        @keyframes fall {
+            0% { opacity: 1; transform: translateY(0) rotateZ(0); }
+            100% { opacity: 0; transform: translateY(400px) rotateZ(360deg); }
+        }
+        
+        #end-screen {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        
+        .attack-player {
+            animation: attackPlayer 0.5s ease;
+        }
+        @keyframes attackPlayer {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-30px); }
+            100% { transform: translateX(0); }
+        }
+        .attack-monster {
+            animation: attackMonster 0.5s ease;
+        }
+        @keyframes attackMonster {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(30px); }
+            100% { transform: translateX(0); }
+        }
+
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <div id="game-container" class="min-h-screen w-full flex flex-col items-center justify-center p-4 relative">
+        
+        <!-- Màn hình bắt đầu -->
+        <div id="start-screen" class="text-center">
+            <h1 class="text-5xl font-bold mb-4 text-yellow-300">Chiến Binh Rồng</h1>
+            <p class="text-xl mb-8 text-gray-200">Giúp chiến binh tiêu diệt quái vật bằng kiến thức Toán 9!</p>
+            <button id="start-btn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg text-2xl shadow-lg transition duration-300">
+                Bắt đầu!
+            </button>
+        </div>
+
+        <!-- Màn hình trò chơi -->
+        <div id="game-screen" class="hidden w-full max-w-4xl">
+            
+            <!-- Thanh HP -->
+            <div class="flex justify-between items-center mb-6 px-4">
+                <!-- Chiến binh -->
+                <div class="w-2/5 text-center">
+                    <span id="player-sprite" class="text-6xl">⚔️</span>
+                    <h2 class="text-xl font-bold text-blue-300">Chiến Binh</h2>
+                    <div class="bg-gray-700 rounded-full h-4 overflow-hidden shadow-inner">
+                        <div id="player-hp-bar" class="hp-bar-inner bg-green-500 h-4" style="width: 100%;"></div>
+                    </div>
+                    <span id="player-hp-text" class="text-sm">100/100</span>
+                </div>
+                
+                <div class="text-2xl font-bold text-red-500">VS</div>
+                
+                <!-- Quái vật -->
+                <div class="w-2/5 text-center">
+                    <span id="monster-sprite" class="text-6xl">🐲</span>
+                    <h2 class="text-xl font-bold text-red-300">Quái Vật</h2>
+                    <div class="bg-gray-700 rounded-full h-4 overflow-hidden shadow-inner">
+                        <div id="monster-hp-bar" class="hp-bar-inner bg-red-500 h-4" style="width: 100%;"></div>
+                    </div>
+                    <span id="monster-hp-text" class="text-sm">100/100</span>
+                </div>
+            </div>
+
+            <!-- Câu hỏi -->
+            <div class="bg-gray-800 bg-opacity-70 p-6 rounded-lg shadow-2xl text-center mb-6">
+                <p class="text-gray-400 text-sm mb-2">
+                    Câu <span id="question-number">1</span> / 15
+                </p>
+                <p id="question-text" class="text-xl md:text-2xl font-semibold min-h-[100px]">
+                    Nội dung câu hỏi sẽ ở đây...
+                </p>
+            </div>
+
+            <!-- Đáp án -->
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- JS chèn vào đây -->
+            </div>
+            
+            <!-- Icon phản hồi -->
+            <div id="feedback-icon-container" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                <div id="feedback-icon"></div>
+            </div>
+            
+            <!-- Pháo hoa -->
+            <div id="confetti-container" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
+
+        </div>
+
+        <!-- Màn hình kết thúc -->
+        <div id="end-screen" class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-8 z-50">
+            <h2 id="end-title" class="text-5xl font-bold mb-4">Chúc mừng!</h2>
+            <p id="end-message" class="text-2xl mb-8">Bạn đã tiêu diệt quái vật!</p>
+            <p id="end-score" class="text-3xl mb-10">Điểm của bạn: <span id="score-text">0</span></p>
+            <button id="restart-btn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-2xl shadow-lg transition duration-300">
+                Chơi lại
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. DANH SÁCH CÂU HỎI – 15 CÂU
+        const questions = [
+            // Mức 1: Nhận biết (6 câu)
+            {
+                level: 1,
+                question: "Hình quạt tròn là một phần hình tròn được giới hạn bởi hai bán kính và...",
+                options: ["...cung tròn tương ứng.", "...một dây cung.", "...đường kính.", "...một tiếp tuyến."],
+                answer: 0
+            },
+            {
+                level: 1,
+                question: "Công thức tính độ dài cung tròn n độ, bán kính R là:",
+                options: ["l = (pi * R * n) / 180", "l = (pi * R^2 * n) / 180", "l = (pi * R * n) / 360", "l = 2 * pi * R * n"],
+                answer: 0
+            },
+            {
+                level: 1,
+                question: "Công thức tính diện tích hình quạt tròn bán kính R, cung n độ là:",
+                options: ["S = (pi * R * n) / 360", "S = (pi * R^2 * n) / 180", "S = (pi * R^2 * n) / 360", "S = (pi * R^2 * n) / 120"],
+                answer: 2
+            },
+            {
+                level: 1,
+                question: "Nếu biết độ dài cung là l và bán kính là R, diện tích hình quạt tròn (S) còn được tính bằng công thức:",
+                options: ["S = l * R", "S = (l * R) / 2", "S = (l * R^2) / 2", "S = 2 * l * R"],
+                answer: 1
+            },
+            {
+                level: 1,
+                question: "Hình vành khuyên là phần mặt phẳng nằm giữa hai hình tròn...",
+                options: ["...có cùng tâm (đồng tâm).", "...cắt nhau tại hai điểm.", "...tiếp xúc ngoài.", "...không giao nhau."],
+                answer: 0
+            },
+            {
+                level: 1,
+                question: "Công thức tính diện tích hình vành khuyên với bán kính vòng ngoài R, bán kính vòng trong r là:",
+                options: ["S = pi * (R^2 + r^2)", "S = pi * (R - r)^2", "S = pi * (R^2 - r^2)", "S = pi * R^2 - pi * r"],
+                answer: 2
+            },
+            // Mức 2: Thông hiểu (5 câu)
+            {
+                level: 2,
+                question: "Tính độ dài cung 60 độ của một đường tròn có bán kính 6 cm.",
+                options: ["2*pi cm", "pi cm", "3*pi cm", "6*pi cm"],
+                answer: 0
+            },
+            {
+                level: 2,
+                question: "Tính diện tích hình quạt tròn có bán kính 10 cm, số đo cung là 90 độ.",
+                options: ["100*pi cm^2", "50*pi cm^2", "25*pi cm^2", "10*pi cm^2"],
+                answer: 2
+            },
+            {
+                level: 2,
+                question: "Một hình quạt tròn có bán kính 8 cm và độ dài cung tương ứng là 4*pi cm. Diện tích của nó là:",
+                options: ["16*pi cm^2", "32*pi cm^2", "8*pi cm^2", "64*pi cm^2"],
+                answer: 0
+            },
+            {
+                level: 2,
+                question: "Tính diện tích hình vành khuyên giới hạn bởi hai đường tròn đồng tâm có bán kính lần lượt là 5 cm và 3 cm.",
+                options: ["4*pi cm^2", "16*pi cm^2", "34*pi cm^2", "8*pi cm^2"],
+                answer: 1
+            },
+            {
+                level: 2,
+                question: "Một hình quạt tròn có diện tích là 36*pi cm^2 và bán kính là 12 cm. Số đo n của cung tròn đó là:",
+                options: ["n = 60 độ", "n = 120 độ", "n = 90 độ", "n = 30 độ"],
+                answer: 2
+            },
+            // Mức 3: Vận dụng (3 câu)
+            {
+                level: 3,
+                question: "Một bánh xe lăn 100 vòng thì đi được quãng đường 188,4 m. Tính bán kính của bánh xe (lấy pi = 3,14).",
+                options: ["R = 0,3 m", "R = 0,6 m", "R = 3 m", "R = 6 m"],
+                answer: 0
+            },
+            {
+                level: 3,
+                question: "Diện tích hình vành khuyên là 64*pi cm^2. Tỉ số giữa bán kính ngoài (R) và bán kính trong (r) là R/r = 5/3. Tính bán kính ngoài R.",
+                options: ["R = 8 cm", "R = 10 cm", "R = 12 cm", "R = 15 cm"],
+                answer: 1
+            },
+            {
+                level: 3,
+                question: "Một cái bàn tròn có bán kính 1 m. Người ta muốn phủ một khăn trải bàn hình vành khuyên sao cho khăn rủ xuống khỏi mép bàn 0,2 m. Diện tích khăn trải bàn là:",
+                options: ["0,44*pi m^2", "0,40*pi m^2", "1*pi m^2", "1,44*pi m^2"],
+                answer: 0
+            },
+            // Mức 4: Vận dụng cao (1 câu)
+            {
+                level: 4,
+                question: "Cho đường tròn (O; 6 cm) và một hình quạt tròn AOB từ đường tròn đó với số đo cung là 60 độ. Diện tích của phần hình vành khuyên tạo bởi cung AB và cung CD (C, D thuộc OA, OB và OC = OD = 2 cm) là:",
+                options: ["32*pi/3 cm^2", "16*pi/3 cm^2", "16*pi cm^2", "8*pi cm^2"],
+                answer: 1
+            }
+        ];
+
+        const TOTAL_QUESTIONS = questions.length; // = 15
+
+        // 2. BIẾN TRẠNG THÁI
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let playerHP = 100;
+        let monsterHP = 100;
+        let questionsPerMonster = 5;
+        let monsterIndex = 1;
+        let audioContextStarted = false;
+
+        // 3. DOM
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+        
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+
+        const questionNumber = document.getElementById('question-number');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        
+        const playerHPBar = document.getElementById('player-hp-bar');
+        const playerHPText = document.getElementById('player-hp-text');
+        const monsterHPBar = document.getElementById('monster-hp-bar');
+        const monsterHPText = document.getElementById('monster-hp-text');
+        const playerSprite = document.getElementById('player-sprite');
+        const monsterSprite = document.getElementById('monster-sprite');
+        
+        const feedbackIconContainer = document.getElementById('feedback-icon-container');
+        const confettiContainer = document.getElementById('confetti-container');
+
+        const endTitle = document.getElementById('end-title');
+        const endMessage = document.getElementById('end-message');
+        const scoreText = document.getElementById('score-text');
+
+        // 4. ÂM THANH
+        let correctSynth, wrongSynth;
+
+        async function setupAudio() {
+            if (audioContextStarted) return;
+            await Tone.start();
+            
+            correctSynth = new Tone.PolySynth(Tone.Synth, {
+                volume: -10,
+                oscillator: { type: "sine" },
+                envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.4 }
+            }).toDestination();
+
+            wrongSynth = new Tone.PolySynth(Tone.Synth, {
+                volume: -10,
+                oscillator: { type: "square" },
+                envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.2 }
+            }).toDestination();
+            
+            audioContextStarted = true;
+        }
+
+        function playCorrectSound() {
+            if (!audioContextStarted) return;
+            const now = Tone.now();
+            correctSynth.triggerAttackRelease("C4", "8n", now);
+            correctSynth.triggerAttackRelease("E4", "8n", now + 0.1);
+            correctSynth.triggerAttackRelease("G4", "8n", now + 0.2);
+        }
+
+        function playWrongSound() {
+            if (!audioContextStarted) return;
+            const now = Tone.now();
+            wrongSynth.triggerAttackRelease("C3", "8n", now);
+            wrongSynth.triggerAttackRelease("B2", "8n", now + 0.1);
+        }
+        
+        // 5. HIỆU ỨNG HÌNH ẢNH
+        function showFeedback(isCorrect) {
+            const icon = document.getElementById('feedback-icon');
+            icon.innerText = isCorrect ? '😄' : '😵';
+            icon.style.animation = 'none';
+            icon.offsetHeight;
+            icon.style.animation = 'burst 0.8s ease-out forwards';
+
+            if (isCorrect) {
+                createConfetti();
+            }
+        }
+        
+        function createConfetti() {
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = `${Math.random() * 50 + 25}%`;
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.animationDelay = `${Math.random() * 0.2}s`;
+                confettiContainer.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+
+        // 6. LOGIC TRÒ CHƠI
+        function startGame() {
+            if (!audioContextStarted) {
+                setupAudio();
+            }
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            playerHP = 100;
+            monsterHP = 100;
+            monsterIndex = 1;
+            
+            startScreen.classList.add('hidden');
+            endScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            
+            updateHPBars();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                endGame(true);
+                return;
+            }
+
+            const q = questions[currentQuestionIndex];
+            
+            monsterIndex = Math.floor(currentQuestionIndex / questionsPerMonster) + 1;
+            monsterSprite.innerText = ['🐲', '👹', '🔥'][monsterIndex - 1] || '🐲';
+
+            questionNumber.innerText = `${currentQuestionIndex + 1}`;
+            questionText.innerText = q.question;
+            
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.innerText = option;
+                button.classList.add(
+                    'option-btn',
+                    'w-full',
+                    'bg-blue-600',
+                    'hover:bg-blue-800',
+                    'text-white',
+                    'font-semibold',
+                    'py-3',
+                    'px-4',
+                    'rounded-lg',
+                    'shadow-md'
+                );
+                button.onclick = () => handleAnswer(index);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function handleAnswer(selectedIndex) {
+            const q = questions[currentQuestionIndex];
+            const isCorrect = selectedIndex === q.answer;
+            
+            optionsContainer.style.pointerEvents = 'none';
+            const selectedButton = optionsContainer.children[selectedIndex];
+
+            if (isCorrect) {
+                score++;
+                playCorrectSound();
+                showFeedback(true);
+                selectedButton.classList.remove('bg-blue-600', 'hover:bg-blue-800');
+                selectedButton.classList.add('bg-green-500', 'flash-correct');
+                
+                const damage = 20;
+                monsterHP -= damage;
+                monsterSprite.classList.add('attack-monster');
+                
+            } else {
+                playWrongSound();
+                showFeedback(false);
+                selectedButton.classList.remove('bg-blue-600', 'hover:bg-blue-800');
+                selectedButton.classList.add('bg-red-500', 'shake');
+                
+                const correctButton = optionsContainer.children[q.answer];
+                correctButton.classList.remove('bg-blue-600', 'hover:bg-blue-800');
+                correctButton.classList.add('bg-green-500');
+                
+                const damage = 10;
+                playerHP -= damage;
+                playerSprite.classList.add('attack-player');
+            }
+
+            updateHPBars();
+
+            setTimeout(() => {
+                playerSprite.classList.remove('attack-player');
+                monsterSprite.classList.remove('attack-monster');
+            }, 500);
+
+            setTimeout(() => {
+                if (playerHP <= 0) {
+                    endGame(false);
+                    return;
+                }
+                
+                if (monsterHP <= 0) {
+                    if (currentQuestionIndex < questions.length - 1) {
+                        monsterHP = 100;
+                        updateHPBars();
+                    } else if (currentQuestionIndex === questions.length - 1) {
+                        updateHPBars();
+                        setTimeout(() => endGame(true), 500);
+                        return;
+                    }
+                }
+
+                currentQuestionIndex++;
+                optionsContainer.style.pointerEvents = 'auto';
+                loadQuestion();
+                
+            }, 1500);
+        }
+
+        function updateHPBars() {
+            playerHP = Math.max(0, playerHP);
+            monsterHP = Math.max(0, monsterHP);
+
+            playerHPBar.style.width = `${playerHP}%`;
+            playerHPText.innerText = `${playerHP}/100`;
+
+            monsterHPBar.style.width = `${monsterHP}%`;
+            monsterHPText.innerText = `${monsterHP}/100`;
+        }
+
+        function endGame(isWin) {
+            gameScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            
+            if (isWin) {
+                endTitle.innerText = "Chiến thắng!";
+                endTitle.classList.remove('text-red-500');
+                endTitle.classList.add('text-yellow-300');
+                endMessage.innerText = "Bạn đã tiêu diệt tất cả quái vật và bảo vệ vương quốc!";
+            } else {
+                endTitle.innerText = "Thất bại!";
+                endTitle.classList.remove('text-yellow-300');
+                endTitle.classList.add('text-red-500');
+                endMessage.innerText = "Bạn đã bị quái vật đánh bại. Hãy thử lại!";
+            }
+            
+            scoreText.innerText = `${score} / 15`;
+        }
+
+        // 7. GẮN SỰ KIỆN
+        startBtn.onclick = startGame;
+        restartBtn.onclick = startGame;
+    </script>
+</body>
+</html>
