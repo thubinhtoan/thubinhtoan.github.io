@@ -1,86 +1,111 @@
-index.html
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thu Bình Toán - Kho Game Toán Học</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
-    <style>
-        body {
-            background: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%);
-            font-family: "Inter", sans-serif;
-        }
-        .game-card {
-            transition: transform .2s ease, box-shadow .2s ease;
-        }
-        .game-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thu Bình Toán – Khu trò chơi toán học</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-6">
-
-    <!-- Header -->
-    <header class="text-center mb-10">
-        <h1 class="text-4xl font-extrabold text-white drop-shadow-lg">
-            🎮 Thu Bình Toán
+<body>
+  <div class="w-full max-w-4xl mx-auto">
+    <!-- Khung trắng -->
+    <div class="bg-white/95 rounded-3xl shadow-2xl overflow-hidden border border-green-200">
+      <!-- Tiêu đề -->
+      <div class="px-6 sm:px-10 py-6 border-b border-green-200 bg-gradient-to-r from-green-500 to-green-400 text-white text-center">
+        <div class="text-sm opacity-80 mb-1">index.html</div>
+        <h1 class="text-3xl font-extrabold tracking-wide mb-1">
+          🎮 Thu Bình Toán
         </h1>
-        <p class="text-white text-lg mt-2 opacity-90">
-            Khu trò chơi toán học sáng tạo – vui mà học!
+        <p class="text-base sm:text-lg opacity-95">
+          Khu trò chơi toán học sáng tạo – vui mà học!
         </p>
-    </header>
+      </div>
 
-    <!-- Main content -->
-    <main class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl p-6">
-
-        <h2 class="text-2xl font-bold text-green-700 mb-4">
-            🌟 Danh sách trò chơi
+      <!-- Danh sách trò chơi -->
+      <div class="px-6 sm:px-10 py-8 bg-gradient-to-b from-white to-green-50">
+        <h2 class="text-xl font-semibold flex items-center gap-2 mb-4 text-green-800">
+          <span>🌼</span>
+          <span>Danh sách trò chơi</span>
         </h2>
-
-        <p class="text-gray-600 mb-6">
-            Chọn một trò chơi để bắt đầu hành trình khám phá toán học thật vui nhé!
+        <p class="text-sm text-gray-600 mb-6">
+          Chọn một trò chơi để bắt đầu hành trình khám phá toán học thật vui nhé!
         </p>
 
-        <!-- Danh sách game -->
         <div class="space-y-4">
-
-            <!-- GAME 1 -->
-            <a href="./khu-vuon-bi-mat/index.html" class="block">
-                <div class="game-card bg-green-50 border border-green-200 rounded-xl p-4 flex justify-between items-center">
-                    <div>
-                        <h3 class="text-lg font-semibold text-green-800">
-                            🌸 Khu Vườn Bí Mật – Đường tròn (Toán 9)
-                        </h3>
-                        <p class="text-sm text-gray-600">Trò chơi giúp ôn tập bài Đường tròn – Chân trời sáng tạo.</p>
-                    </div>
-                    <span class="text-2xl">➡️</span>
+          <!-- Game 1: Khu Vườn Bí Mật -->
+          <a href="./khu-vuon-bi-mat/index.html"
+             class="block rounded-2xl border border-green-200 bg-green-50/80 hover:bg-green-100 transition transform hover:-translate-y-0.5 hover:shadow-md">
+            <div class="flex items-center justify-between px-4 sm:px-6 py-4 gap-4">
+              <div class="flex items-start gap-3">
+                <div class="text-3xl sm:text-4xl">🌸</div>
+                <div>
+                  <div class="inline-flex items-center gap-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 mb-1">
+                    <span>Trò chơi 1</span>
+                    <span class="w-1 h-1 rounded-full bg-green-500"></span>
+                    <span>Lớp 9 – Hình học</span>
+                  </div>
+                  <h3 class="text-base sm:text-lg font-semibold text-gray-900">
+                    Khu Vườn Bí Mật – Đường tròn (Toán 9)
+                  </h3>
+                  <p class="text-sm text-gray-600 mt-1">
+                    Trò chơi ôn tập bài Đường tròn – Chân trời sáng tạo. Trả lời đúng để làm nở những bông hoa xinh trong khu vườn.
+                  </p>
                 </div>
-            </a>
-
-            <!-- Sau này bạn thêm game mới ở đây -->
-            <!-- Mẫu thêm game:
-            <a href="./ten-folder-game/index.html" class="block">
-                <div class="game-card bg-green-50 border border-green-200 rounded-xl p-4 flex justify-between items-center">
-                    <div>
-                        <h3 class="text-lg font-semibold text-green-800">
-                            🎯 Tên Game Mới
-                        </h3>
-                        <p class="text-sm text-gray-600">Mô tả ngắn gọn.</p>
-                    </div>
-                    <span class="text-2xl">➡️</span>
+              </div>
+              <div class="shrink-0">
+                <div class="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-green-500 text-white shadow-md">
+                  ➜
                 </div>
-            </a>
-            -->
+              </div>
+            </div>
+          </a>
 
+          <!-- Game 2: Cuộc Xâm Lăng -->
+          <a href="./cuoc-xam-lang/index.html"
+             class="block rounded-2xl border border-indigo-200 bg-indigo-50/80 hover:bg-indigo-100 transition transform hover:-translate-y-0.5 hover:shadow-md">
+            <div class="flex items-center justify-between px-4 sm:px-6 py-4 gap-4">
+              <div class="flex items-start gap-3">
+                <div class="text-3xl sm:text-4xl">🛸</div>
+                <div>
+                  <div class="inline-flex items-center gap-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700 mb-1">
+                    <span>Trò chơi 2</span>
+                    <span class="w-1 h-1 rounded-full bg-indigo-500"></span>
+                    <span>Lớp 9 – Tiếp tuyến</span>
+                  </div>
+                  <h3 class="text-base sm:text-lg font-semibold text-gray-900">
+                    Cuộc Xâm Lăng – Tiếp tuyến của đường tròn (Toán 9)
+                  </h3>
+                  <p class="text-sm text-gray-600 mt-1">
+                    Trả lời đúng để bắn hạ tàu UFO, bảo vệ Trái Đất. Ôn tập kiến thức về tiếp tuyến của đường tròn qua các tình huống thú vị.
+                  </p>
+                </div>
+              </div>
+              <div class="shrink-0">
+                <div class="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-indigo-500 text-white shadow-md">
+                  ➜
+                </div>
+              </div>
+            </div>
+          </a>
         </div>
-    </main>
+      </div>
 
-    <!-- Footer -->
-    <footer class="mt-10 text-white text-center opacity-80">
+      <!-- Footer -->
+      <div class="px-6 sm:px-10 py-4 text-center text-xs text-gray-500 bg-white/90 border-t border-green-100">
         © 2025 Thu Bình Toán – Học vui mỗi ngày!
-    </footer>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
