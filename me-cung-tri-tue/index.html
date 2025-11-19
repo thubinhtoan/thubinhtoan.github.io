@@ -13,7 +13,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: radial-gradient(circle at top, #312e81 0%, #1e293b 40%, #020617 100%);
             min-height: 100vh;
             padding: 1rem;
             display: flex;
@@ -26,104 +26,211 @@
             background: rgba(255,255,255,0.97);
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            box-shadow: 0 20px 40px rgba(15,23,42,0.8);
+            transition: background 0.6s ease, transform 0.4s ease;
         }
+        #game-container.stage-2 {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #22c55e 100%);
+            transform: translateY(-3px);
+        }
+
         header {
-            background: #1e3a8a;
+            background: linear-gradient(90deg, #4f46e5, #22c55e);
             color: white;
             padding: 1.5rem;
             text-align: center;
-            border-bottom: 4px solid #172554;
+            border-bottom: 4px solid rgba(15,23,42,0.6);
         }
+
+        header h1 {
+            text-shadow: 0 3px 10px rgba(15,23,42,0.7);
+        }
+
+        /* MÊ CUNG */
         #maze-grid {
             display: grid;
             grid-template-columns: repeat(3,1fr);
             gap: 1rem;
             padding: 1.5rem;
+            background: #e5e7eb;
+            border-right: 2px solid #cbd5e1;
+            transition: background 0.6s ease;
         }
+        #maze-grid.stage-2 {
+            background: radial-gradient(circle at top, #bbf7d0 0%, #e5e7eb 40%, #d1fae5 100%);
+        }
+
         .maze-door {
             aspect-ratio: 1/1;
-            background: #e5e7eb;
-            border-radius: 12px;
-            font-size: 2.5rem;
+            background: #f3f4f6;
+            border-radius: 16px;
+            font-size: 2.4rem;
             display: flex;
             justify-content: center;
             align-items: center;
             border: 2px solid #cbd5e1;
-            transition: .4s;
+            transition: .35s;
+            box-shadow: 0 4px 8px rgba(148,163,184,0.4);
         }
         .maze-door.unlocked {
             background: #bbf7d0;
-            border-color: #4ade80;
-            transform: scale(1.08);
+            border-color: #22c55e;
+            transform: scale(1.08) rotate(-1deg);
+            box-shadow: 0 6px 14px rgba(34,197,94,0.6);
         }
+        #maze-grid.stage-2 .maze-door.unlocked {
+            background: #fef3c7;
+            border-color: #facc15;
+            box-shadow: 0 6px 14px rgba(250,204,21,0.6);
+        }
+
+        /* CÂU HỎI & NÚT */
         #options-container button {
-            box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+            box-shadow: 0 3px 6px rgba(15,23,42,0.15);
+        }
+        .option-btn {
+            transition: all 0.25s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+        .option-btn.selected {
+            border-color: #4f46e5 !important;
+            background: #e0e7ff !important;
         }
         .option-btn.correct {
             background: #dcfce7 !important;
-            border-color: #4ade80 !important;
+            border-color: #22c55e !important;
+            color: #14532d !important;
         }
         .option-btn.wrong {
             background: #fee2e2 !important;
-            border-color: #f87171 !important;
+            border-color: #ef4444 !important;
+            color: #7f1d1d !important;
         }
+
         .feedback-effect {
             position: absolute;
             font-size: 4rem;
-            animation: fadeUp 1s forwards;
+            animation: fadeUp 0.9s forwards;
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
+            pointer-events: none;
         }
         @keyframes fadeUp {
             from { opacity: 1; transform: translate(-50%, -50%) scale(0.6); }
-            to   { opacity: 0; transform: translate(-50%, -120%) scale(1.2); }
+            to   { opacity: 0; transform: translate(-50%, -130%) scale(1.3); }
+        }
+
+        /* HIỆU ỨNG LẮC */
+        .shake {
+            animation: shake 0.45s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* MÀN CHUYỂN STAGE */
+        #stage-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15,23,42,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 40;
+        }
+        #stage-overlay.active {
+            display: flex;
+        }
+
+        /* MÀN KẾT */
+        #end-screen {
+            background-color: rgba(15,23,42,0.9);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 0.5rem; }
+            main { flex-direction: column; }
+            #maze-grid {
+                border-right: none;
+                border-bottom: 2px solid #cbd5e1;
+            }
         }
     </style>
 </head>
 
 <body>
-<div id="game-container">
+<div id="game-container" class="relative">
+
+    <!-- Overlay chuyển màn -->
+    <div id="stage-overlay">
+        <div class="text-center text-white px-6">
+            <div class="text-4xl mb-3">🎉</div>
+            <h2 class="text-2xl font-bold mb-2">Bạn đã vượt qua Màn 1!</h2>
+            <p class="mb-4 text-sm sm:text-base">
+                Chào mừng đến <span class="font-semibold text-emerald-300">Màn 2 – Mê cung nâng cấp</span> với thử thách khó hơn!
+            </p>
+            <button id="stage-continue-btn"
+                    class="bg-emerald-500 hover:bg-emerald-600 text-sm sm:text-base font-semibold px-5 py-2 rounded-full shadow">
+                Bắt đầu Màn 2
+            </button>
+        </div>
+    </div>
 
     <header>
         <h1 class="text-3xl font-bold">Mê Cung Trí Tuệ</h1>
-        <p>Bài 3: Góc ở tâm, góc nội tiếp - Toán 9</p>
+        <p class="opacity-90">Bài 3: Góc ở tâm, góc nội tiếp – Toán 9</p>
     </header>
 
     <main class="md:flex">
 
         <!-- MÊ CUNG -->
-        <div id="maze-grid" class="md:w-2/5 bg-gray-100 border-r">
-            <!-- Các cửa sẽ được tạo bằng JS -->
+        <div id="maze-grid" class="md:w-2/5">
+            <script>
+                for (let i = 1; i <= 15; i++) {
+                    document.write(`<div id="door-${i}" class="maze-door">${i === 15 ? "🏆" : "🚪"}</div>`);
+                }
+            </script>
         </div>
 
         <!-- CÂU HỎI -->
-        <div id="quiz-area" class="md:w-3/5 p-6 relative">
+        <div id="quiz-area" class="md:w-3/5 p-6 relative bg-slate-50">
 
             <div id="question-container">
-                <div id="question-level" class="text-sm font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full inline-block mb-3">
+                <div id="question-level"
+                     class="text-sm font-semibold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full inline-block mb-3">
                     Mức độ
                 </div>
-                <div id="question-text" class="text-lg font-medium mb-4">Đây là câu hỏi...</div>
+                <div id="question-text" class="text-lg font-medium mb-4 min-h-[70px]">
+                    Đây là câu hỏi...
+                </div>
 
                 <div id="options-container" class="grid gap-3"></div>
             </div>
 
             <div id="controls" class="flex justify-between items-center mt-4">
-                <span id="progress-text" class="text-sm font-semibold text-gray-700">Cửa 1/1</span>
+                <span id="progress-text" class="text-sm font-semibold text-gray-700">
+                    Màn 1 – Cửa 1/15
+                </span>
                 <button id="control-btn"
-                        class="bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg"
+                        class="bg-indigo-600 text-white font-semibold px-6 py-2 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed"
                         disabled>Mở cửa</button>
             </div>
 
             <div id="feedback-container"></div>
 
-            <div id="end-screen" class="hidden text-center mt-10">
-                <h2 class="text-3xl font-bold text-blue-700 mb-4">Chúc mừng!</h2>
+            <div id="end-screen" class="hidden text-center mt-10 text-white rounded-xl p-6">
+                <h2 class="text-3xl font-bold text-emerald-300 mb-4">Chúc mừng!</h2>
                 <p id="end-score" class="text-xl mb-4"></p>
                 <button id="restart-btn"
-                        class="bg-blue-500 text-white py-2 px-6 rounded-lg font-semibold">Chơi lại</button>
+                        class="bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-6 rounded-lg font-semibold">
+                    Chơi lại
+                </button>
             </div>
         </div>
     </main>
@@ -132,141 +239,137 @@
 
 <script>
 /* ============================
-   DANH SÁCH CÂU HỎI (ĐÃ BỎ $)
+   1. DANH SÁCH CÂU HỎI – 4 ĐÁP ÁN
    ============================ */
 const questions = [
-    // ------------------- MỨC 1 – NHẬN BIẾT -------------------
+    // ----- MỨC 1: NHẬN BIẾT -----
     {
         level: "Nhận biết",
-        text: "Góc ở tâm là gì?",
+        text: "Góc ở tâm là góc như thế nào trong các phát biểu sau?",
         options: [
-            { text: "Góc có đỉnh tại tâm đường tròn.", correct: true },
+            { text: "Góc có đỉnh trùng với tâm đường tròn.", correct: true },
             { text: "Góc có đỉnh nằm trên đường tròn.", correct: false },
-            { text: "Góc có hai cạnh là dây cung.", correct: false },
-            { text: "Góc có đỉnh nằm ngoài đường tròn.", correct: false }
+            { text: "Góc có đỉnh nằm ngoài đường tròn.", correct: false },
+            { text: "Góc có đỉnh bất kì trong mặt phẳng.", correct: false }
         ]
     },
     {
         level: "Nhận biết",
-        text: "Góc nội tiếp là gì?",
+        text: "Góc nội tiếp là góc có:",
         options: [
-            { text: "Góc có đỉnh tại tâm đường tròn.", correct: false },
-            { text: "Góc có đỉnh nằm trên đường tròn.", correct: true },
-            { text: "Góc có hai cạnh là tiếp tuyến.", correct: false },
-            { text: "Góc có đỉnh nằm ngoài đường tròn.", correct: false }
+            { text: "Đỉnh ở tâm đường tròn, hai cạnh là hai bán kính.", correct: false },
+            { text: "Đỉnh nằm trên đường tròn, hai cạnh chứa hai dây cung.", correct: true },
+            { text: "Đỉnh nằm ngoài đường tròn, hai cạnh là hai tiếp tuyến.", correct: false },
+            { text: "Đỉnh bất kì, hai cạnh là hai đường thẳng bất kì.", correct: false }
         ]
     },
     {
         level: "Nhận biết",
-        text: "Số đo góc ở tâm chắn cung bao nhiêu?",
+        text: "Trong một đường tròn, số đo của góc ở tâm chắn cung bằng:",
         options: [
-            { text: "Bằng nửa số đo cung.", correct: false },
-            { text: "Bằng số đo cung.", correct: true },
-            { text: "Gấp đôi số đo cung.", correct: false },
-            { text: "Không liên quan đến cung.", correct: false }
+            { text: "Nửa số đo cung bị chắn.", correct: false },
+            { text: "Bằng số đo cung bị chắn.", correct: true },
+            { text: "Gấp đôi số đo cung bị chắn.", correct: false },
+            { text: "Bằng 180° trừ đi số đo cung.", correct: false }
         ]
     },
     {
         level: "Nhận biết",
-        text: "Số đo góc nội tiếp chắn cung bằng bao nhiêu?",
+        text: "Trong một đường tròn, số đo của góc nội tiếp chắn cung bằng:",
         options: [
-            { text: "Bằng số đo cung.", correct: false },
-            { text: "Bằng nửa số đo cung.", correct: true },
-            { text: "Gấp đôi số đo cung.", correct: false },
-            { text: "Không xác định.", correct: false }
+            { text: "Bằng số đo cung bị chắn.", correct: false },
+            { text: "Gấp đôi số đo cung bị chắn.", correct: false },
+            { text: "Nửa số đo cung bị chắn.", correct: true },
+            { text: "Không phụ thuộc vào cung.", correct: false }
         ]
     },
 
-    // ------------------- MỨC 2 – THÔNG HIỂU -------------------
+    // ----- MỨC 2: THÔNG HIỂU -----
     {
         level: "Thông hiểu",
-        text: "Góc ở tâm bằng 120°. Góc nội tiếp cùng chắn cung đó bằng:",
+        text: "Trong đường tròn (O), góc ở tâm ∠AOB = 120°. Số đo cung AB bằng:",
         options: [
-            { text: "120°", correct: false },
+            { text: "60°", correct: false },
             { text: "90°", correct: false },
-            { text: "60°", correct: true },
-            { text: "30°", correct: false }
+            { text: "120°", correct: true },
+            { text: "240°", correct: false }
         ]
     },
     {
         level: "Thông hiểu",
-        text: "Góc nội tiếp bằng 40°. Góc ở tâm cùng chắn cung đó bằng:",
+        text: "Trong đường tròn (O), cung CD có số đo 80°. Góc nội tiếp ∠CED chắn cung CD có số đo:",
         options: [
-            { text: "40°", correct: false },
+            { text: "80°", correct: false },
+            { text: "40°", correct: true },
+            { text: "160°", correct: false },
+            { text: "20°", correct: false }
+        ]
+    },
+    {
+        level: "Thông hiểu",
+        text: "Trong đường tròn (O), góc nội tiếp ∠ABC = 35°. Số đo cung AC bị chắn bằng:",
+        options: [
+            { text: "35°", correct: false },
+            { text: "70°", correct: true },
+            { text: "140°", correct: false },
+            { text: "110°", correct: false }
+        ]
+    },
+    {
+        level: "Thông hiểu",
+        text: "Trên đường tròn (O), hai góc nội tiếp ∠AMN và ∠ABN cùng chắn cung AN. Kết quả nào sau đây đúng?",
+        options: [
+            { text: "∠AMN = 2∠ABN", correct: false },
+            { text: "∠AMN = ∠ABN", correct: true },
+            { text: "∠AMN + ∠ABN = 180°", correct: false },
+            { text: "∠AMN – ∠ABN = 90°", correct: false }
+        ]
+    },
+    {
+        level: "Thông hiểu",
+        text: "Góc nội tiếp chắn nửa đường tròn luôn có số đo:",
+        options: [
+            { text: "45°", correct: false },
             { text: "60°", correct: false },
-            { text: "80°", correct: true },
+            { text: "90°", correct: true },
             { text: "120°", correct: false }
         ]
     },
-    {
-        level: "Thông hiểu",
-        text: "Cung AB có số đo 100°. Số đo góc nội tiếp chắn cung AB bằng:",
-        options: [
-            { text: "50°", correct: true },
-            { text: "100°", correct: false },
-            { text: "25°", correct: false },
-            { text: "200°", correct: false }
-        ]
-    },
-    {
-        level: "Thông hiểu",
-        text: "Cung CD có số đo 140°. Số đo góc ở tâm chắn cung CD bằng:",
-        options: [
-            { text: "70°", correct: false },
-            { text: "140°", correct: true },
-            { text: "280°", correct: false },
-            { text: "35°", correct: false }
-        ]
-    },
 
-    // ------------------- MỨC 3 – VẬN DỤNG -------------------
+    // ----- MỨC 3: VẬN DỤNG -----
     {
         level: "Vận dụng",
-        text: "Trong đường tròn (O), góc nội tiếp ABC chắn cung AC. Biết ∠ABC = 32°. Số đo cung AC bằng:",
+        text: "Trong đường tròn (O), ∠ACB là góc nội tiếp chắn cung AB và ∠ACB = 28°. Số đo góc ở tâm ∠AOB chắn cung AB là:",
         options: [
-            { text: "32°", correct: false },
-            { text: "64°", correct: true },
-            { text: "16°", correct: false },
-            { text: "96°", correct: false }
-        ]
-    },
-    {
-        level: "Vận dụng",
-        text: "Trong đường tròn (O), ∠AOC = 150°. Tính số đo góc nội tiếp ABC chắn cung AC.",
-        options: [
-            { text: "75°", correct: false },
-            { text: "150°", correct: false },
-            { text: "50°", correct: false },
-            { text: "75°", correct: false },
-            { text: "75°", correct: false },
-            { text: "75°", correct: false }
-        ]
-    },
-    {
-        level: "Vận dụng",
-        text: "Trong đường tròn (O), ∠AOC = 150°. Tính góc nội tiếp ABC chắn cung AC.",
-        options: [
-            { text: "75°", correct: false },
-            { text: "150°", correct: false },
-            { text: "50°", correct: false },
-            { text: "75°", correct: false }
-        ]
-    },
-    {
-        level: "Vận dụng",
-        text: "Trong đường tròn (O), ∠ACB = 28°. Tính ∠AOB chắn cung AB.",
-        options: [
+            { text: "14°", correct: false },
             { text: "28°", correct: false },
             { text: "56°", correct: true },
-            { text: "14°", correct: false },
             { text: "84°", correct: false }
         ]
     },
-
-    // ------------------- MỨC 4 – VẬN DỤNG CAO -------------------
     {
-        level: "Vận dụng cao",
-        text: "Trong đường tròn (O), điểm D nằm trên cung lớn AC. Biết ∠ADC = 40°, ∠ABC (cùng chắn cung AC) bằng:",
+        level: "Vận dụng",
+        text: "Trong đường tròn (O), góc ở tâm ∠AOB = 150°. Góc nội tiếp ∠ACB cùng chắn cung AB có số đo:",
+        options: [
+            { text: "50°", correct: false },
+            { text: "75°", correct: true },
+            { text: "100°", correct: false },
+            { text: "150°", correct: false }
+        ]
+    },
+    {
+        level: "Vận dụng",
+        text: "Cho tam giác ABC nội tiếp đường tròn (O). Biết ∠A = 60°, ∠B = 50°. Số đo cung AB (cung đối diện với đỉnh C) bằng:",
+        options: [
+            { text: "60°", correct: false },
+            { text: "70°", correct: false },
+            { text: "120°", correct: false },
+            { text: "140°", correct: true } // C = 70°, cung AB = 2·70° = 140°
+        ]
+    },
+    {
+        level: "Vận dụng",
+        text: "Trong đường tròn (O), điểm D nằm trên cung lớn AC. Biết ∠ADC = 40°. Góc nội tiếp ∠ABC cùng chắn cung nhỏ AC có số đo:",
         options: [
             { text: "20°", correct: true },
             { text: "40°", correct: false },
@@ -274,187 +377,226 @@ const questions = [
             { text: "80°", correct: false }
         ]
     },
+
+    // ----- MỨC 4: VẬN DỤNG CAO -----
     {
         level: "Vận dụng cao",
-        text: "Cho tam giác ABC nội tiếp đường tròn (O), ∠BAC = 70°. Số đo cung BC bằng:",
+        text: "Cho đường tròn (O), đường kính AB. Điểm C nằm trên đường tròn (khác A, B). Khẳng định nào sau đây đúng?",
         options: [
-            { text: "35°", correct: false },
-            { text: "70°", correct: false },
-            { text: "140°", correct: true },
-            { text: "210°", correct: false }
+            { text: "∠ACB = 45°", correct: false },
+            { text: "∠ACB = 60°", correct: false },
+            { text: "∠ACB = 90°", correct: true },
+            { text: "∠ACB = 180°", correct: false }
         ]
     },
     {
         level: "Vận dụng cao",
-        text: "Điểm E thuộc cung nhỏ AB. Biết ∠AEB = 45°. Góc AOB chắn cung AB bằng:",
+        text: "Cho đường tròn (O). Điểm E thuộc cung nhỏ AB. Nếu ∠AEB = 45° thì số đo góc ở tâm ∠AOB là:",
         options: [
+            { text: "22,5°", correct: false },
             { text: "45°", correct: false },
-            { text: "90°", correct: true },
-            { text: "135°", correct: false },
-            { text: "22.5°", correct: false }
+            { text: "60°", correct: false },
+            { text: "90°", correct: true }
         ]
     }
 ];
 
-// Tổng số cửa = số câu hỏi
-const TOTAL_DOORS = questions.length;
-
 /* ============================
-   BIẾN TRẠNG THÁI
+   2. BIẾN TRẠNG THÁI & DOM
    ============================ */
-let current = 0, score = 0;
+let current = 0;
+let score = 0;
 let selected = null;
 let correctSound, wrongSound, soundReady = false;
+let stage = 1;
+const STAGE_BREAK = 8; // từ câu 9 trở đi là Màn 2
 
-/* ============================
-   DOM
-   ============================ */
-const mazeGrid        = document.getElementById("maze-grid");
 const questionContainer = document.getElementById("question-container");
 const questionLevelEl = document.getElementById("question-level");
-const questionTextEl  = document.getElementById("question-text");
+const questionTextEl = document.getElementById("question-text");
 const optionsContainer = document.getElementById("options-container");
-const progressText    = document.getElementById("progress-text");
-const controlBtn      = document.getElementById("control-btn");
+const progressText = document.getElementById("progress-text");
+const controlBtn = document.getElementById("control-btn");
 const feedbackContainer = document.getElementById("feedback-container");
-const endScreen       = document.getElementById("end-screen");
-const endScoreEl      = document.getElementById("end-score");
-const restartBtn      = document.getElementById("restart-btn");
-const controls        = document.getElementById("controls");
+const endScreen = document.getElementById("end-screen");
+const endScoreEl = document.getElementById("end-score");
+const restartBtn = document.getElementById("restart-btn");
+const controls = document.getElementById("controls");
+const gameContainer = document.getElementById("game-container");
+const mazeGrid = document.getElementById("maze-grid");
 
-/* Tạo các cửa của mê cung */
-for (let i = 1; i <= TOTAL_DOORS; i++) {
-  const door = document.createElement("div");
-  door.id = `door-${i}`;
-  door.className = "maze-door";
-  door.textContent = (i === TOTAL_DOORS) ? "🏆" : "🚪";
-  mazeGrid.appendChild(door);
-}
+const stageOverlay = document.getElementById("stage-overlay");
+const stageContinueBtn = document.getElementById("stage-continue-btn");
 
 /* ============================
-   KHỞI ĐỘNG GAME
+   3. KHỞI ĐỘNG GAME
    ============================ */
 document.addEventListener("DOMContentLoaded", startGame);
 
 function startGame() {
-  document.body.addEventListener("click", initAudio, { once: true });
-  current = 0;
-  score = 0;
+    document.body.addEventListener("click", initAudio, {once:true});
+    current = 0;
+    score = 0;
+    stage = 1;
 
-  endScreen.classList.add("hidden");
-  questionContainer.classList.remove("hidden");
-  controls.classList.remove("hidden");
+    endScreen.classList.add("hidden");
+    questionContainer.classList.remove("hidden");
+    controls.classList.remove("hidden");
+    gameContainer.classList.remove("stage-2");
+    mazeGrid.classList.remove("stage-2");
+    stageOverlay.classList.remove("active");
 
-  for (let i = 1; i <= TOTAL_DOORS; i++) {
-    const d = document.getElementById(`door-${i}`);
-    d.classList.remove("unlocked");
-    d.textContent = (i === TOTAL_DOORS) ? "🏆" : "🚪";
-  }
+    for (let i = 1; i <= 15; i++) {
+        const d = document.getElementById(`door-${i}`);
+        d.classList.remove("unlocked");
+        d.textContent = i === 15 ? "🏆" : "🚪";
+    }
 
-  loadQuestion();
+    loadQuestion();
 }
 
 function initAudio() {
-  if (soundReady) return;
-  Tone.start();
-  correctSound = new Tone.Synth().toDestination();
-  wrongSound   = new Tone.Synth({ oscillator: { type: "square" } }).toDestination();
-  soundReady = true;
+    if (soundReady) return;
+    Tone.start();
+    correctSound = new Tone.Synth().toDestination();
+    wrongSound = new Tone.Synth({oscillator:{type:"square"}}).toDestination();
+    soundReady = true;
 }
 
 /* ============================
-   HIỂN THỊ CÂU HỎI
+   4. HIỂN THỊ CÂU HỎI + MÀN
    ============================ */
+function updateStageIfNeeded() {
+    const newStage = current < STAGE_BREAK ? 1 : 2;
+    if (newStage !== stage) {
+        stage = newStage;
+        // Bật overlay thông báo chuyển màn
+        stageOverlay.classList.add("active");
+        gameContainer.classList.add("stage-2");
+        mazeGrid.classList.add("stage-2");
+    }
+}
+
+stageContinueBtn.addEventListener("click", () => {
+    stageOverlay.classList.remove("active");
+});
+
 function loadQuestion() {
-  if (current >= questions.length) return endGame();
+    if (current >= questions.length) return endGame();
 
-  const q = questions[current];
-  questionLevelEl.textContent = "Mức độ: " + q.level;
-  questionTextEl.textContent = q.text;
+    updateStageIfNeeded();
 
-  progressText.textContent = `Cửa ${current + 1}/${TOTAL_DOORS}`;
+    const q = questions[current];
+    questionLevelEl.textContent = `Mức độ: ${q.level}`;
+    questionTextEl.textContent = q.text;
 
-  optionsContainer.innerHTML = "";
-  selected = null;
+    const stageLabel = stage === 1 ? "Màn 1" : "Màn 2";
+    progressText.textContent = `${stageLabel} – Cửa ${current + 1}/15`;
 
-  q.options.forEach((opt, idx) => {
-    const btn = document.createElement("button");
-    btn.className = "option-btn w-full border px-4 py-2 rounded-lg bg-white text-left";
-    btn.textContent = opt.text;
+    optionsContainer.innerHTML = "";
+    selected = null;
 
-    btn.onclick = () => {
-      document.querySelectorAll(".option-btn").forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-      selected = idx;
-      controlBtn.disabled = false;
-    };
+    q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn w-full border px-4 py-2 rounded-lg bg-white text-left";
+        btn.textContent = opt.text;
 
-    optionsContainer.appendChild(btn);
-  });
+        btn.onclick = () => {
+            document.querySelectorAll(".option-btn").forEach(b => b.classList.remove("selected"));
+            btn.classList.add("selected");
+            selected = idx;
+            controlBtn.disabled = false;
+        };
 
-  controlBtn.textContent = "Mở cửa";
-  controlBtn.disabled = true;
+        optionsContainer.appendChild(btn);
+    });
+
+    controlBtn.textContent = "Mở cửa";
+    controlBtn.disabled = true;
 }
 
 controlBtn.onclick = () => {
-  if (controlBtn.textContent === "Mở cửa") checkAnswer();
-  else nextQuestion();
+    if (controlBtn.textContent === "Mở cửa") checkAnswer();
+    else nextQuestion();
 };
 
+/* ============================
+   5. KIỂM TRA & CHUYỂN CÂU
+   ============================ */
 function checkAnswer() {
-  const q = questions[current];
-  const correctIndex = q.options.findIndex(o => o.correct);
+    const q = questions[current];
+    const correctIndex = q.options.findIndex(o => o.correct);
+    const btns = document.querySelectorAll(".option-btn");
+    btns.forEach(b => b.disabled = true);
 
-  const btns = document.querySelectorAll(".option-btn");
-  btns.forEach(b => b.disabled = true);
+    if (selected === correctIndex) {
+        score++;
+        btns[selected].classList.add("correct");
+        unlockDoor(current + 1);
+        playEffect(true);
+    } else {
+        if (selected !== null) {
+            btns[selected].classList.add("wrong");
+        }
+        btns[correctIndex].classList.add("correct");
+        playEffect(false);
+        gameContainer.classList.add("shake");
+        setTimeout(() => gameContainer.classList.remove("shake"), 450);
+    }
 
-  if (selected === correctIndex) {
-    score++;
-    btns[selected].classList.add("correct");
-    unlockDoor(current + 1);
-    playEffect("✔️");
-  } else {
-    btns[selected].classList.add("wrong");
-    btns[correctIndex].classList.add("correct");
-    playEffect("😢");
-  }
-
-  controlBtn.textContent = "Tiếp tục";
+    controlBtn.textContent = current === questions.length - 1 ? "Xem kết quả" : "Tiếp tục";
 }
 
 function nextQuestion() {
-  current++;
-  loadQuestion();
+    current++;
+    if (current >= questions.length) {
+        endGame();
+    } else {
+        loadQuestion();
+    }
 }
 
+/* ============================
+   6. KẾT THÚC GAME
+   ============================ */
 function endGame() {
-  questionContainer.classList.add("hidden");
-  controls.classList.add("hidden");
-  endScreen.classList.remove("hidden");
-  endScoreEl.textContent = `Bạn đã mở đúng ${score}/${TOTAL_DOORS} cánh cửa!`;
+    questionContainer.classList.add("hidden");
+    controls.classList.add("hidden");
+    endScreen.classList.remove("hidden");
+    endScoreEl.textContent = `Bạn đã mở đúng ${score}/15 cánh cửa!`;
 
-  const d = document.getElementById(`door-${TOTAL_DOORS}`);
-  d.classList.add("unlocked");
+    const d = document.getElementById("door-15");
+    if (d) d.classList.add("unlocked");
 }
 
 restartBtn.onclick = startGame;
 
 /* ============================
-   HIỆU ỨNG
+   7. HIỆU ỨNG
    ============================ */
 function unlockDoor(i) {
-  const d = document.getElementById(`door-${i}`);
-  if (!d) return;
-  d.classList.add("unlocked");
-  d.textContent = "✔️";
+    const d = document.getElementById(`door-${i}`);
+    if (!d) return;
+    d.classList.add("unlocked");
+    d.textContent = i === 15 ? "🏆" : "✔️";
 }
 
-function playEffect(icon) {
-  const eff = document.createElement("div");
-  eff.className = "feedback-effect";
-  eff.textContent = icon;
-  feedbackContainer.appendChild(eff);
-  setTimeout(() => eff.remove(), 1000);
+function playEffect(isCorrect) {
+    if (soundReady) {
+        if (isCorrect) {
+            correctSound.triggerAttackRelease("C5", "0.12", Tone.now());
+            correctSound.triggerAttackRelease("E5", "0.12", Tone.now() + 0.12);
+            correctSound.triggerAttackRelease("G5", "0.12", Tone.now() + 0.24);
+        } else {
+            wrongSound.triggerAttackRelease("C3", "0.25", Tone.now());
+        }
+    }
+
+    const eff = document.createElement("div");
+    eff.className = "feedback-effect";
+    eff.textContent = isCorrect ? "🎉" : "😢";
+    feedbackContainer.appendChild(eff);
+    setTimeout(() => eff.remove(), 900);
 }
 </script>
 
