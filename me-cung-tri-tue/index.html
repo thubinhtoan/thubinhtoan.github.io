@@ -135,110 +135,165 @@
    DANH SÁCH CÂU HỎI (ĐÃ BỎ $)
    ============================ */
 const questions = [
-  {
-    level: "Nhận biết",
-    text: "Góc ở tâm là góc có đỉnh trùng với tâm đường tròn.",
-    options: [
-      { text: "Đúng", correct: true },
-      { text: "Sai", correct: false }
-    ]
-  },
-  {
-    level: "Nhận biết",
-    text: "Góc nội tiếp là góc có đỉnh nằm trên đường tròn và hai cạnh chứa hai dây cung.",
-    options: [
-      { text: "Đúng", correct: true },
-      { text: "Sai", correct: false }
-    ]
-  },
-  {
-    level: "Nhận biết",
-    text: "Số đo góc nội tiếp bằng nửa số đo cung bị chắn.",
-    options: [
-      { text: "Đúng", correct: true },
-      { text: "Sai", correct: false }
-    ]
-  },
-  {
-    level: "Nhận biết",
-    text: "Cung nhỏ 70°, thì cung lớn cùng chắn là 290°.",
-    options: [
-      { text: "Đúng", correct: true },
-      { text: "Sai", correct: false }
-    ]
-  },
-  {
-    level: "Nhận biết",
-    text: "Góc nội tiếp chắn nửa đường tròn bằng 90°.",
-    options: [
-      { text: "Đúng", correct: true },
-      { text: "Sai", correct: false }
-    ]
-  },
-  {
-    level: "Thông hiểu",
-    text: "Góc nội tiếp chắn cung 120° có số đo 60°.",
-    options: [
-      { text: "Đúng", correct: true },
-      { text: "Sai", correct: false }
-    ]
-  },
-  {
-    level: "Thông hiểu",
-    text: "Góc ở tâm chắn cung 80° có số đo 80°.",
-    options: [
-      { text: "Đúng", correct: true },
-      { text: "Sai", correct: false }
-    ]
-  },
-  {
-    level: "Thông hiểu",
-    text: "Góc nội tiếp 55° chắn cung 110°.",
-    options: [
-      { text: "Đúng", correct: true },
-      { text: "Sai", correct: false }
-    ]
-  },
-  {
-    level: "Thông hiểu",
-    text: "Hai góc nội tiếp cùng chắn một cung thì bằng nhau.",
-    options: [
-      { text: "Đúng", correct: true },
-      { text: "Sai", correct: false }
-    ]
-  },
-  {
-    level: "Vận dụng",
-    text: "Tam giác ABC nội tiếp, góc A = 65°, góc B = 80°. Số đo cung AB bằng 70°.",
-    options: [
-      { text: "Đúng", correct: true },
-      { text: "Sai", correct: false }
-    ]
-  },
-  {
-    level: "Vận dụng",
-    text: "Trên đường tròn, góc nội tiếp chắn cung 150° thì góc nội tiếp đó bằng 75°.",
-    options: [
-      { text: "Đúng", correct: true },
-      { text: "Sai", correct: false }
-    ]
-  },
-  {
-    level: "Vận dụng",
-    text: "Một cầu thủ di chuyển trên cung tròn đi qua M, N, A thì góc sút MAN không đổi.",
-    options: [
-      { text: "Đúng", correct: true },
-      { text: "Sai", correct: false }
-    ]
-  },
-  {
-    level: "Vận dụng cao",
-    text: "Cho đường tròn (O) có đường kính AB. C là một điểm bất kỳ trên đường tròn. Kẻ CH vuông góc với AB tại H. Lấy điểm M trên cung nhỏ AC. Gọi I là giao điểm của AM với CH. Khẳng định IC = IH đúng hay sai?",
-    options: [
-      { text: "Đúng", correct: true },
-      { text: "Sai", correct: false }
-    ]
-  }
+    // ------------------- MỨC 1 – NHẬN BIẾT -------------------
+    {
+        level: "Nhận biết",
+        text: "Góc ở tâm là gì?",
+        options: [
+            { text: "Góc có đỉnh tại tâm đường tròn.", correct: true },
+            { text: "Góc có đỉnh nằm trên đường tròn.", correct: false },
+            { text: "Góc có hai cạnh là dây cung.", correct: false },
+            { text: "Góc có đỉnh nằm ngoài đường tròn.", correct: false }
+        ]
+    },
+    {
+        level: "Nhận biết",
+        text: "Góc nội tiếp là gì?",
+        options: [
+            { text: "Góc có đỉnh tại tâm đường tròn.", correct: false },
+            { text: "Góc có đỉnh nằm trên đường tròn.", correct: true },
+            { text: "Góc có hai cạnh là tiếp tuyến.", correct: false },
+            { text: "Góc có đỉnh nằm ngoài đường tròn.", correct: false }
+        ]
+    },
+    {
+        level: "Nhận biết",
+        text: "Số đo góc ở tâm chắn cung bao nhiêu?",
+        options: [
+            { text: "Bằng nửa số đo cung.", correct: false },
+            { text: "Bằng số đo cung.", correct: true },
+            { text: "Gấp đôi số đo cung.", correct: false },
+            { text: "Không liên quan đến cung.", correct: false }
+        ]
+    },
+    {
+        level: "Nhận biết",
+        text: "Số đo góc nội tiếp chắn cung bằng bao nhiêu?",
+        options: [
+            { text: "Bằng số đo cung.", correct: false },
+            { text: "Bằng nửa số đo cung.", correct: true },
+            { text: "Gấp đôi số đo cung.", correct: false },
+            { text: "Không xác định.", correct: false }
+        ]
+    },
+
+    // ------------------- MỨC 2 – THÔNG HIỂU -------------------
+    {
+        level: "Thông hiểu",
+        text: "Góc ở tâm bằng 120°. Góc nội tiếp cùng chắn cung đó bằng:",
+        options: [
+            { text: "120°", correct: false },
+            { text: "90°", correct: false },
+            { text: "60°", correct: true },
+            { text: "30°", correct: false }
+        ]
+    },
+    {
+        level: "Thông hiểu",
+        text: "Góc nội tiếp bằng 40°. Góc ở tâm cùng chắn cung đó bằng:",
+        options: [
+            { text: "40°", correct: false },
+            { text: "60°", correct: false },
+            { text: "80°", correct: true },
+            { text: "120°", correct: false }
+        ]
+    },
+    {
+        level: "Thông hiểu",
+        text: "Cung AB có số đo 100°. Số đo góc nội tiếp chắn cung AB bằng:",
+        options: [
+            { text: "50°", correct: true },
+            { text: "100°", correct: false },
+            { text: "25°", correct: false },
+            { text: "200°", correct: false }
+        ]
+    },
+    {
+        level: "Thông hiểu",
+        text: "Cung CD có số đo 140°. Số đo góc ở tâm chắn cung CD bằng:",
+        options: [
+            { text: "70°", correct: false },
+            { text: "140°", correct: true },
+            { text: "280°", correct: false },
+            { text: "35°", correct: false }
+        ]
+    },
+
+    // ------------------- MỨC 3 – VẬN DỤNG -------------------
+    {
+        level: "Vận dụng",
+        text: "Trong đường tròn (O), góc nội tiếp ABC chắn cung AC. Biết ∠ABC = 32°. Số đo cung AC bằng:",
+        options: [
+            { text: "32°", correct: false },
+            { text: "64°", correct: true },
+            { text: "16°", correct: false },
+            { text: "96°", correct: false }
+        ]
+    },
+    {
+        level: "Vận dụng",
+        text: "Trong đường tròn (O), ∠AOC = 150°. Tính số đo góc nội tiếp ABC chắn cung AC.",
+        options: [
+            { text: "75°", correct: false },
+            { text: "150°", correct: false },
+            { text: "50°", correct: false },
+            { text: "75°", correct: false },
+            { text: "75°", correct: false },
+            { text: "75°", correct: false }
+        ]
+    },
+    {
+        level: "Vận dụng",
+        text: "Trong đường tròn (O), ∠AOC = 150°. Tính góc nội tiếp ABC chắn cung AC.",
+        options: [
+            { text: "75°", correct: false },
+            { text: "150°", correct: false },
+            { text: "50°", correct: false },
+            { text: "75°", correct: false }
+        ]
+    },
+    {
+        level: "Vận dụng",
+        text: "Trong đường tròn (O), ∠ACB = 28°. Tính ∠AOB chắn cung AB.",
+        options: [
+            { text: "28°", correct: false },
+            { text: "56°", correct: true },
+            { text: "14°", correct: false },
+            { text: "84°", correct: false }
+        ]
+    },
+
+    // ------------------- MỨC 4 – VẬN DỤNG CAO -------------------
+    {
+        level: "Vận dụng cao",
+        text: "Trong đường tròn (O), điểm D nằm trên cung lớn AC. Biết ∠ADC = 40°, ∠ABC (cùng chắn cung AC) bằng:",
+        options: [
+            { text: "20°", correct: true },
+            { text: "40°", correct: false },
+            { text: "60°", correct: false },
+            { text: "80°", correct: false }
+        ]
+    },
+    {
+        level: "Vận dụng cao",
+        text: "Cho tam giác ABC nội tiếp đường tròn (O), ∠BAC = 70°. Số đo cung BC bằng:",
+        options: [
+            { text: "35°", correct: false },
+            { text: "70°", correct: false },
+            { text: "140°", correct: true },
+            { text: "210°", correct: false }
+        ]
+    },
+    {
+        level: "Vận dụng cao",
+        text: "Điểm E thuộc cung nhỏ AB. Biết ∠AEB = 45°. Góc AOB chắn cung AB bằng:",
+        options: [
+            { text: "45°", correct: false },
+            { text: "90°", correct: true },
+            { text: "135°", correct: false },
+            { text: "22.5°", correct: false }
+        ]
+    }
 ];
 
 // Tổng số cửa = số câu hỏi
