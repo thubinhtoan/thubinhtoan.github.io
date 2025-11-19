@@ -61,7 +61,13 @@
             md:flex-direction: row;
             flex-grow: 1;
         }
-
+        <!-- Hiển thị thông tin học sinh (ở trên cùng) -->
+<div id="student-info-bar"
+     class="w-full text-right text-sm text-gray-200 opacity-90 py-1 pr-4">
+    Học sinh: <span id="info-name"></span> – 
+    Lớp <span id="info-class"></span> – 
+    <span id="info-school"></span>
+</div>
         /* Khu vườn bí mật */
         #secret-garden {
             width: 100%;
@@ -316,6 +322,33 @@
     </style>
 </head>
 <body>
+    <!-- Màn hình nhập thông tin học sinh (chỉ xuất hiện nếu chưa có dữ liệu) -->
+<div id="student-screen" 
+     class="fixed inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center text-white z-50 hidden">
+    <div class="bg-slate-800 p-8 rounded-2xl w-96 shadow-2xl border border-slate-600">
+        <h2 class="text-2xl font-bold mb-4 text-center text-emerald-300">Thông tin học sinh</h2>
+
+        <label class="block mb-3">
+            Họ và tên:
+            <input id="student-name" class="mt-1 w-full p-2 rounded bg-slate-700 border border-slate-500" required>
+        </label>
+
+        <label class="block mb-3">
+            Lớp:
+            <input id="student-class" class="mt-1 w-full p-2 rounded bg-slate-700 border border-slate-500" required>
+        </label>
+
+        <label class="block mb-5">
+            Trường:
+            <input id="student-school" class="mt-1 w-full p-2 rounded bg-slate-700 border border-slate-500" required>
+        </label>
+
+        <button id="save-student-btn"
+                class="w-full bg-emerald-500 hover:bg-emerald-600 py-2 rounded-lg font-semibold text-white transition">
+            Bắt đầu chơi
+        </button>
+    </div>
+</div>
     <div id="game-container">
         <header>
             <h1>Khu Vườn Bí Mật</h1>
@@ -366,6 +399,55 @@
     </div>
 
     <script>
+        // ========================
+//  THÔNG TIN HỌC SINH DÙNG CHUNG CHO TẤT CẢ GAME
+// ========================
+
+function loadStudentInfo() {
+    const name = localStorage.getItem("studentName");
+    const lop = localStorage.getItem("studentClass");
+    const school = localStorage.getItem("studentSchool");
+
+    const bar = document.getElementById("student-info-bar");
+    const form = document.getElementById("student-screen");
+
+    if (name && lop && school) {
+        // Đã có dữ liệu → Hiển thị trên thanh info
+        document.getElementById("info-name").textContent = name;
+        document.getElementById("info-class").textContent = lop;
+        document.getElementById("info-school").textContent = school;
+        form.classList.add("hidden");
+    } else {
+        // Chưa có dữ liệu → bật form nhập
+        form.classList.remove("hidden");
+    }
+}
+
+// Khi bấm nút lưu
+const saveBtn = document.getElementById("save-student-btn");
+if (saveBtn) {
+    saveBtn.addEventListener("click", () => {
+        const name = document.getElementById("student-name").value.trim();
+        const lop = document.getElementById("student-class").value.trim();
+        const school = document.getElementById("student-school").value.trim();
+
+        if (!name || !lop || !school) {
+            alert("Vui lòng nhập đầy đủ thông tin!");
+            return;
+        }
+
+        // Lưu localStorage
+        localStorage.setItem("studentName", name);
+        localStorage.setItem("studentClass", lop);
+        localStorage.setItem("studentSchool", school);
+
+        // Ẩn form, hiện info
+        document.getElementById("student-screen").classList.add("hidden");
+        loadStudentInfo();
+    });
+}
+// Tự động tải khi vào game
+document.addEventListener("DOMContentLoaded", loadStudentInfo);
         // --- Dữ liệu câu hỏi ---
         const questions = [
             // Mức 1: Nhận biết
