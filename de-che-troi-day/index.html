@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Đế Chế Trỗi Dậy – Biến đổi căn bậc hai</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- React CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <!-- Babel để chạy JSX trực tiếp -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body class="m-0 p-0 bg-amber-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState } = React;
+
+      // --- DỮ LIỆU CÂU HỎI (15 Câu - 4 Mức độ) ---
+      const questions = [
+        // --- NHẬN BIẾT (6 Câu) ---
+        {
+          id: 1,
+          level: "Nhận biết",
+          question:
+            "Với a ≥ 0 và b ≥ 0, đưa thừa số ra ngoài dấu căn của √(a²b) ta được:",
+          options: ["a√b", "-a√b", "|a|b", "ab"],
+          correct: 0,
+        },
+        {
+          id: 2,
+          level: "Nhận biết",
+          question:
+            "Với a < 0 và b ≥ 0, kết quả của phép biến đổi √(a²b) là:",
+          options: ["a√b", "-a√b", "a²√b", "-√b"],
+          correct: 1,
+        },
+        {
+          id: 3,
+          level: "Nhận biết",
+          question: "Đưa thừa số vào trong dấu căn của 3√2 ta được:",
+          options: ["√6", "√12", "√18", "√36"],
+          correct: 2,
+        },
+        {
+          id: 4,
+          level: "Nhận biết",
+          question:
+            "Khẳng định nào sau đây đúng khi đưa thừa số dương A vào trong căn bậc hai?",
+          options: [
+            "A√B = √(A²B)",
+            "A√B = -√(A²B)",
+            "A√B = √(AB)",
+            "A√B = √(A + B)",
+          ],
+          correct: 0,
+        },
+        {
+          id: 5,
+          level: "Nhận biết",
+          question:
+            "Kết quả của phép tính đưa thừa số ra ngoài dấu căn của √12 là:",
+          options: ["3√2", "2√3", "4√3", "2√2"],
+          correct: 1,
+        },
+        {
+          id: 6,
+          level: "Nhận biết",
+          question:
+            "Với x ≥ 0, đưa thừa số x vào trong biểu thức √5 ta được:",
+          options: ["√(5x)", "√(5x²)", "√(x√5)", "5x"],
+          correct: 1,
+        },
+
+        // --- THÔNG HIỂU (5 Câu) ---
+        {
+          id: 7,
+          level: "Thông hiểu",
+          question: "Rút gọn biểu thức 2√3 + √27 - √12:",
+          options: ["3√3", "4√3", "2√3", "√3"],
+          correct: 0,
+        },
+        {
+          id: 8,
+          level: "Thông hiểu",
+          question:
+            "Đưa thừa số vào trong dấu căn của biểu thức: -4√2",
+          options: ["√32", "-√32", "√(-32)", "-√16"],
+          correct: 1,
+        },
+        {
+          id: 9,
+          level: "Thông hiểu",
+          question: "Với y < 0, rút gọn biểu thức √(4y²) ta được:",
+          options: ["2y", "-2y", "4y", "-4y"],
+          correct: 1,
+        },
+        {
+          id: 10,
+          level: "Thông hiểu",
+          question: "So sánh 3√2 và √15:",
+          options: [
+            "3√2 > √15",
+            "3√2 < √15",
+            "3√2 = √15",
+            "Không so sánh được",
+          ],
+          correct: 0,
+        },
+        {
+          id: 11,
+          level: "Thông hiểu",
+          question:
+            "Rút gọn biểu thức 5√a - 3√25a + 2√9a (với a ≥ 0):",
+          options: ["3√a", "-4√a", "5√a", "-5√a"],
+          correct: 1,
+        },
+
+        // --- VẬN DỤNG (3 Câu) ---
+        {
+          id: 12,
+          level: "Vận dụng",
+          question:
+            "Sắp xếp các số sau theo thứ tự tăng dần: 2√5, 3√2, √21, 4",
+          options: [
+            "3√2 < 4 < √21 < 2√5",
+            "4 < 3√2 < 2√5 < √21",
+            "3√2 < 4 < 2√5 < √21",
+            "√21 < 3√2 < 4 < 2√5",
+          ],
+          correct: 0,
+        },
+        {
+          id: 13,
+          level: "Vận dụng (Thực tế)",
+          question:
+            "Một mảnh đất hình vuông có diện tích 72 m². Độ dài cạnh của mảnh đất đó dạng a√b là:",
+          options: ["36√2 mét", "6√2 mét", "12√2 mét", "6√3 mét"],
+          correct: 1,
+        },
+        {
+          id: 14,
+          level: "Vận dụng",
+          question:
+            "Tìm x, biết √18x - 2√2x = 8 (với x ≥ 0):",
+          options: ["x = 4", "x = 16", "x = 64", "x = 32"],
+          correct: 2,
+        },
+
+        // --- VẬN DỤNG CAO (1 Câu) ---
+        {
+          id: 15,
+          level: "Vận dụng cao",
+          question:
+            "Rút gọn biểu thức A = √(4x² - 4x + 1) - 2x + 5 với x < 0,5:",
+          options: ["6", "4", "4 - 4x", "6 - 4x"],
+          correct: 0,
+        },
+      ];
+
+      // --- HỆ THỐNG ÂM THANH ---
+      const BrowserAudioContext =
+        window.AudioContext || window.webkitAudioContext || null;
+
+      const playSound = (type) => {
+        if (!BrowserAudioContext) return;
+        const ctx = new BrowserAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        const now = ctx.currentTime;
+
+        if (type === "correct") {
+          // Fanfare
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+          osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+          osc.start(now);
+          osc.stop(now + 0.5);
+        } else if (type === "wrong") {
+          // Thud
+          osc.type = "square";
+          osc.frequency.setValueAtTime(150, now);
+          osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.linearRampToValueAtTime(0, now + 0.3);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        } else if (type === "build") {
+          // Hammer
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(200, now);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        }
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+      };
+
+      // --- CONFETTI ---
+      const Confetti = () => (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-50">
+          {[...Array(30)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 rounded bg-yellow-400"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: -10,
+                backgroundColor: ["#FFD700", "#FFA500", "#32CD32", "#FF4500"][
+                  i % 4
+                ],
+                animation: `fall ${1 + Math.random()}s linear forwards`,
+              }}
+            />
+          ))}
+          <style>{`
+            @keyframes fall {
+              to { transform: translateY(100vh) rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      );
+
+      // --- TRẠNG THÁI ĐẾ CHẾ ---
+      const EmpireView = ({ score }) => {
+        const hasHut = score >= 10;
+        const hasFarm = score >= 40;
+        const hasHouse = score >= 70;
+        const hasMarket = score >= 100;
+        const hasCastle = score >= 130;
+        const hasWonder = score >= 150;
+
+        return (
+          <div className="relative w-full h-64 bg-green-100 rounded-xl border-4 border-yellow-700 overflow-hidden shadow-inner mb-4">
+            {/* Bầu trời */}
+            <div className="absolute inset-0 bg-gradient-to-b from-blue-300 to-blue-100 h-1/2" />
+            {/* Đất */}
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-[#8B4513]" />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-green-500 to-green-700 transform skew-y-2 origin-bottom-left" />
+
+            {/* Cảnh vật */}
+            <div className="absolute bottom-10 left-4 transition-all duration-700 transform translate-y-0">
+              {hasHut && <div className="text-4xl animate-bounce">⛺</div>}
+            </div>
+            <div className="absolute bottom-12 left-1/4 transition-all duration-700 delay-100">
+              {hasFarm && <div className="text-5xl">🏡</div>}
+            </div>
+            <div className="absolute bottom-20 right-1/4 transition-all duration-700 delay-200">
+              {hasHouse && <div className="text-5xl">🏠</div>}
+            </div>
+            <div className="absolute bottom-8 right-8 transition-all duration-700 delay-300">
+              {hasMarket && <div className="text-6xl">🛖</div>}
+            </div>
+
+            {/* Lâu đài chính */}
+            <div
+              className={`absolute bottom-16 left-1/2 transform -translate-x-1/2 transition-all duration-1000 ${
+                hasCastle ? "opacity-100 scale-100" : "opacity-0 scale-50"
+              }`}
+            >
+              <div className="text-8xl drop-shadow-2xl">🏰</div>
+            </div>
+
+            {/* Kỳ quan */}
+            {hasWonder && (
+              <div className="absolute top-4 right-4 animate-pulse">
+                <div className="text-6xl">🗿</div>
+              </div>
+            )}
+
+            {/* Mây */}
+            <div className="absolute top-4 left-10 text-white opacity-80 animate-pulse">
+              ☁️
+            </div>
+            <div className="absolute top-8 right-20 text-white opacity-60">
+              ☁️
+            </div>
+          </div>
+        );
+      };
+
+      function EmpireRise() {
+        const [gameState, setGameState] = useState("start"); // start, playing, end
+        const [currentQ, setCurrentQ] = useState(0);
+        const [score, setScore] = useState(0);
+        const [resources, setResources] = useState({
+          gold: 0,
+          wood: 0,
+          stone: 0,
+        });
+        const [feedback, setFeedback] = useState(null); // null, correct, wrong
+        const [showConfetti, setShowConfetti] = useState(false);
+
+        const startGame = () => {
+          setGameState("playing");
+          setCurrentQ(0);
+          setScore(0);
+          setResources({ gold: 0, wood: 0, stone: 0 });
+          setFeedback(null);
+        };
+
+        const handleAnswer = (index) => {
+          if (feedback) return;
+
+          const isCorrect = index === questions[currentQ].correct;
+
+          if (isCorrect) {
+            playSound("correct");
+            playSound("build");
+            setFeedback("correct");
+            setShowConfetti(true);
+
+            const points = 10;
+            setScore((s) => s + points);
+            setResources((prev) => ({
+              gold: prev.gold + 50,
+              wood: prev.wood + 30,
+              stone: prev.stone + 20,
+            }));
+          } else {
+            playSound("wrong");
+            setFeedback("wrong");
+          }
+
+          setTimeout(() => {
+            setShowConfetti(false);
+            setFeedback(null);
+            if (currentQ < questions.length - 1) {
+              setCurrentQ((c) => c + 1);
+            } else {
+              setGameState("end");
+            }
+          }, 2000);
+        };
+
+        return (
+          <div className="min-h-screen bg-amber-50 font-serif text-slate-800 flex items-center justify-center p-4">
+            <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl border-4 border-yellow-600 overflow-hidden relative">
+              {/* Header tài nguyên */}
+              {gameState !== "start" && (
+                <div className="bg-slate-800 text-white p-3 flex justify-between items-center border-b-4 border-yellow-600">
+                  <div className="flex space-x-6 font-bold text-sm md:text-base">
+                    <div className="flex items-center text-yellow-400">
+                      <span className="mr-1">🪙</span> {resources.gold}
+                    </div>
+                    <div className="flex items-center text-orange-400">
+                      <span className="mr-1">🌲</span> {resources.wood}
+                    </div>
+                    <div className="flex items-center text-gray-400">
+                      <span className="mr-1">🔨</span> {resources.stone}
+                    </div>
+                  </div>
+                  <div className="flex items-center font-bold text-yellow-500">
+                    <span className="mr-2">👑</span>
+                    Điểm: {score}
+                  </div>
+                </div>
+              )}
+
+              {/* START SCREEN */}
+              {gameState === "start" && (
+                <div className="p-12 text-center space-y-6 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]">
+                  <div className="text-6xl mx-auto">🏰</div>
+                  <h1 className="text-5xl font-bold text-yellow-800 tracking-wider uppercase drop-shadow-sm">
+                    Đế Chế Trỗi Dậy
+                  </h1>
+                  <p className="text-xl text-slate-600 font-medium">
+                    Chủ đề: Biến đổi đơn giản biểu thức chứa căn bậc hai
+                    <br />
+                    (Toán 9 - Chân trời sáng tạo)
+                  </p>
+                  <div className="p-6 bg-yellow-50 rounded-xl border-2 border-yellow-200 max-w-md mx-auto">
+                    <p className="mb-2">
+                      📜 <strong>Nhiệm vụ:</strong> Trả lời đúng để thu thập
+                      tài nguyên và xây dựng vương quốc.
+                    </p>
+                    <p>
+                      🏆 <strong>Mục tiêu:</strong> Xây dựng Kỳ Quan Thế Giới.
+                    </p>
+                  </div>
+                  <button
+                    onClick={startGame}
+                    className="px-8 py-4 bg-red-700 text-white text-xl font-bold rounded-lg shadow-[0_4px_0_rgb(153,27,27)] active:shadow-none active:translate-y-1 hover:bg-red-600 transition-all uppercase"
+                  >
+                    Khởi Tạo Thế Giới
+                  </button>
+                </div>
+              )}
+
+              {/* GAMEPLAY SCREEN */}
+              {gameState === "playing" && (
+                <div className="p-6 bg-slate-50">
+                  <EmpireView score={score} />
+                  {showConfetti && <Confetti />}
+
+                  <div className="bg-white p-6 rounded-xl border-2 border-slate-200 shadow-lg relative">
+                    <div className="absolute -top-3 left-6 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-sm">
+                      {questions[currentQ].level}
+                    </div>
+
+                    <div className="mt-4 mb-8">
+                      <h2 className="text-2xl font-bold text-slate-800 text-center">
+                        {questions[currentQ].question}
+                      </h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {questions[currentQ].options.map((opt, idx) => {
+                        let btnStyle =
+                          "bg-slate-100 hover:bg-yellow-50 border-slate-300 text-slate-700";
+                        let icon = null;
+
+                        if (feedback) {
+                          if (idx === questions[currentQ].correct) {
+                            btnStyle =
+                              "bg-green-100 border-green-500 text-green-800 ring-2 ring-green-200";
+                            icon = (
+                              <span className="absolute right-4 text-2xl">
+                                ✅
+                              </span>
+                            );
+                          } else if (
+                            feedback === "wrong" &&
+                            idx !== questions[currentQ].correct
+                          ) {
+                            btnStyle = "opacity-50";
+                          }
+                        }
+
+                        return (
+                          <button
+                            key={idx}
+                            disabled={feedback !== null}
+                            onClick={() => handleAnswer(idx)}
+                            className={`relative p-4 rounded-lg border-2 font-bold text-lg text-left transition-all active:scale-[0.98] flex items-center ${btnStyle}`}
+                          >
+                            <span className="w-8 h-8 flex items-center justify-center bg-white rounded-full border border-slate-200 mr-3 text-sm font-black text-slate-500">
+                              {["A", "B", "C", "D"][idx]}
+                            </span>
+                            {opt}
+                            {icon}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* END SCREEN */}
+              {gameState === "end" && (
+                <div className="p-12 text-center bg-yellow-50">
+                  <div className="text-6xl mx-auto mb-4 animate-bounce">🏅</div>
+                  <h2 className="text-4xl font-bold text-slate-800 mb-2">
+                    Triều Đại Hưng Thịnh!
+                  </h2>
+                  <p className="text-slate-600 mb-8">
+                    Bạn đã hoàn thành sứ mệnh lịch sử.
+                  </p>
+
+                  <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto mb-8">
+                    <div className="bg-white p-4 rounded-lg shadow border border-slate-200">
+                      <div className="text-sm text-slate-500">Tổng Điểm</div>
+                      <div className="text-2xl font-bold text-slate-800">
+                        {score}
+                      </div>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow border border-slate-200">
+                      <div className="text-sm text-slate-500">Câu đúng</div>
+                      <div className="text-2xl font-bold text-green-600">
+                        {score / 10}/15
+                      </div>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow border border-slate-200">
+                      <div className="text-sm text-slate-500">Danh hiệu</div>
+                      <div className="text-xl font-bold text-purple-600">
+                        {score >= 130
+                          ? "Đại Đế"
+                          : score >= 80
+                          ? "Lãnh Chúa"
+                          : "Tộc Trưởng"}
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={startGame}
+                    className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-500 shadow-lg flex items-center justify-center mx-auto gap-2"
+                  >
+                    <span>🔄</span> Chơi lại từ đầu
+                  </button>
+                </div>
+              )}
+
+              {/* Footer */}
+              <div className="bg-slate-100 p-2 text-center text-xs text-slate-400 border-t border-slate-200">
+                Toán 9 - Chân trời sáng tạo - Bài 4
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(
+        <EmpireRise />
+      );
+    </script>
+  </body>
+</html>
