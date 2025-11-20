@@ -58,139 +58,98 @@
   <!-- TOÀN BỘ JS PHẢI NẰM TRONG THẺ <script> NÀY -->
   <script>
       // Danh sách game trên trang chủ
-  const games = [
-  {
-    id: 1,
-    folder: "khu-vuon-bi-mat",
-    icon: "🌸",
-    color: "emerald",
-    label: "Trò chơi 1",
-    grade: "Lớp 9 – Hình học",
-    title: "Khu Vườn Bí Mật – Đường tròn (Toán 9)",
-    description:
-      "Trò chơi ôn tập bài Đường tròn – Chân trời sáng tạo. Trả lời đúng để làm nở những bông hoa xinh trong khu vườn."
-  },
-  {
-    id: 2,
-    folder: "cuoc-xam-lang",
-    icon: "🛸",
-    color: "indigo",
-    label: "Trò chơi 2",
-    grade: "Lớp 9 – Tiếp tuyến",
-    title: "Cuộc Xâm Lăng – Tiếp tuyến của đường tròn (Toán 9)",
-    description:
-      "Trả lời đúng để bắn hạ tàu UFO, bảo vệ Trái Đất. Ôn tập kiến thức về tiếp tuyến của đường tròn qua các tình huống thú vị."
-  },
-  {
-    id: 3,
-    folder: "me-cung-tri-tue",
-    icon: "🧠",
-    color: "sky",
-    label: "Trò chơi 3",
-    grade: "Lớp 9 – Góc ở tâm, góc nội tiếp",
-    title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp (Toán 9)",
-    description:
-      "Trả lời đúng để mở từng cánh cửa và vượt qua mê cung kiến thức."
-  },
-  {
-    id: 4,
-    folder: "chien-binh-rong",
-    icon: "🐉",
-    color: "rose",
-    label: "Trò chơi 4",
-    grade: "Lớp 9 – Hình quạt & vành khuyên",
-    title: "Chiến Binh Rồng – Đại Chiến Hình Quạt (Toán 9)",
-    description:
-      "Cùng chiến binh rồng tiêu diệt quái vật bằng kiến thức về hình quạt tròn và hình vành khuyên!"
-  },
-  {
-    id: 5,
-    folder: "du-hanh-vu-tru",
-    icon: "🚀",
-    color: "sky",
-    label: "Trò chơi 5",
-    grade: "Lớp 9 – Căn bậc hai",
-    title: "Du Hành Giữa Các Vì Sao – Căn bậc hai (Toán 9)",
-    description:
-      "Điều khiển tàu vũ trụ vượt qua 3 màn thử thách với các câu hỏi về căn bậc hai: Nhận biết – Thông hiểu – Vận dụng."
-  },
-  {
-    id: 6,
-    folder: "chien-binh-ngan-ha",   // tên thư mục game 6
-    icon: "🛰️",
-    color: "indigo",
-    label: "Trò chơi 6",
-    grade: "Lớp 9 – Căn bậc hai",
-    title: "Chiến Binh Ngân Hà – Tính chất phép khai phương (Toán 9)",
-    description:
-      "Hóa thân thành chiến binh vũ trụ, trả lời 15 câu hỏi về tính chất phép khai phương để bắn hạ hạm đội Alien."
-  }
-];
+   <script>
+    const games = [
+      {
+        id: 1,
+        folder: "khu-vuon-bi-mat",
+        icon: "🌸",
+        color: "emerald",
+        label: "Trò chơi 1",
+        grade: "Lớp 9 – Hình học",
+        title: "Khu Vườn Bí Mật – Đường tròn (Toán 9)",
+        description:
+          "Trò chơi ôn tập bài Đường tròn – Chân trời sáng tạo. Trả lời đúng để làm nở những bông hoa xinh trong khu vườn."
+      },
+      {
+        id: 2,
+        folder: "cuoc-xam-lang",
+        icon: "🛸",
+        color: "indigo",
+        label: "Trò chơi 2",
+        grade: "Lớp 9 – Tiếp tuyến",
+        title: "Cuộc Xâm Lăng – Tiếp tuyến của đường tròn (Toán 9)",
+        description:
+          "Trả lời đúng để bắn hạ tàu UFO, bảo vệ Trái Đất. Ôn tập kiến thức về tiếp tuyến của đường tròn qua các tình huống thú vị."
+      },
+      {
+        id: 3,
+        folder: "me-cung-tri-tue",
+        icon: "🧠",
+        color: "sky",
+        label: "Trò chơi 3",
+        grade: "Lớp 9 – Góc ở tâm, góc nội tiếp",
+        title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp (Toán 9)",
+        description:
+          "Trả lời đúng để mở từng cánh cửa và vượt qua mê cung kiến thức."
+      },
+      {
+        id: 4,
+        folder: "chien-binh-rong",
+        icon: "🐉",
+        color: "rose",
+        label: "Trò chơi 4",
+        grade: "Lớp 9 – Hình quạt & vành khuyên",
+        title: "Chiến Binh Rồng – Đại Chiến Hình Quạt (Toán 9)",
+        description:
+          "Cùng chiến binh rồng tiêu diệt quái vật bằng kiến thức về hình quạt tròn và hình vành khuyên!"
+      },
+      {
+        id: 5,
+        folder: "du-hanh-vu-tru",
+        icon: "🚀",
+        color: "sky",
+        label: "Trò chơi 5",
+        grade: "Lớp 9 – Căn bậc hai",
+        title: "Du Hành Giữa Các Vì Sao – Căn bậc hai (Toán 9)",
+        description:
+          "Điều khiển tàu vũ trụ vượt qua 3 màn thử thách với các câu hỏi về căn bậc hai: Nhận biết – Thông hiểu – Vận dụng."
+      },
+      {
+        id: 6,
+        folder: "chien-binh-ngan-ha",   // tên thư mục game 6
+        icon: "🛰️",
+        color: "indigo",
+        label: "Trò chơi 6",
+        grade: "Lớp 9 – Căn bậc hai",
+        title: "Chiến Binh Ngân Hà – Tính chất phép khai phương (Toán 9)",
+        description:
+          "Hóa thân thành chiến binh vũ trụ, trả lời 15 câu hỏi về tính chất phép khai phương để bắn hạ hạm đội Alien."
+      }
+    ];
 
-// Các style màu cho thẻ game
-const colorStyles = {
-  emerald: {
-    card: "border-emerald-500/40 bg-emerald-900/50 hover:bg-emerald-800/80",
-    badge: "bg-emerald-100 text-emerald-800",
-    button: "bg-emerald-500"
-  },
-  indigo: {
-    card: "border-indigo-500/40 bg-indigo-900/40 hover:bg-indigo-800/80",
-    badge: "bg-indigo-100 text-indigo-800",
-    button: "bg-indigo-500"
-  },
-  sky: {
-    card: "border-sky-500/40 bg-sky-900/40 hover:bg-sky-800/80",
-    badge: "bg-sky-100 text-sky-800",
-    button: "bg-sky-500"
-  },
-  rose: {
-    card: "border-rose-500/40 bg-rose-900/40 hover:bg-rose-800/80",
-    badge: "bg-rose-100 text-rose-800",
-    button: "bg-rose-500"
-  }
-};
-
-const gameListEl = document.getElementById("game-list");
-
-// Tạo thẻ game cho từng trò chơi
-games.forEach((game) => {
-  const styles = colorStyles[game.color] || colorStyles.emerald;
-  const a = document.createElement("a");
-  a.href = `./${game.folder}/index.html`;
-  a.className =
-    "block rounded-2xl border transition transform hover:-translate-y-0.5 hover:shadow-xl " +
-    styles.card;
-
-  a.innerHTML = `
-    <div class="flex items-center justify-between px-4 sm:px-6 py-4 gap-4">
-      <div class="flex items-start gap-3 sm:gap-4">
-        <div class="text-3xl sm:text-4xl">${game.icon}</div>
-        <div>
-          <div class="inline-flex flex-wrap items-center gap-2 px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold ${styles.badge} mb-1">
-            <span>${game.label}</span>
-            <span class="w-1 h-1 rounded-full bg-current opacity-60"></span>
-            <span>${game.grade}</span>
-          </div>
-          <h3 class="text-base sm:text-lg font-semibold text-white mb-1">
-            ${game.title}
-          </h3>
-          <p class="text-xs sm:text-sm text-slate-200/80">
-            ${game.description}
-          </p>
-        </div>
-      </div>
-      <div>
-        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white ${styles.button}">
-          <span class="text-lg sm:text-xl">➜</span>
-        </div>
-      </div>
-    </div>
-  `;
-
-  gameListEl.appendChild(a);
-});
-</script>
+    // Các style màu cho thẻ game
+    const colorStyles = {
+      emerald: {
+        card: "border-emerald-500/40 bg-emerald-900/50 hover:bg-emerald-800/80",
+        badge: "bg-emerald-100 text-emerald-800",
+        button: "bg-emerald-500"
+      },
+      indigo: {
+        card: "border-indigo-500/40 bg-indigo-900/40 hover:bg-indigo-800/80",
+        badge: "bg-indigo-100 text-indigo-800",
+        button: "bg-indigo-500"
+      },
+      sky: {
+        card: "border-sky-500/40 bg-sky-900/40 hover:bg-sky-800/80",
+        badge: "bg-sky-100 text-sky-800",
+        button: "bg-sky-500"
+      },
+      rose: {
+        card: "border-rose-500/40 bg-rose-900/40 hover:bg-rose-800/80",
+        badge: "bg-rose-100 text-rose-800",
+        button: "bg-rose-500"
+      }
     };
 
     const gameListEl = document.getElementById("game-list");
@@ -198,7 +157,6 @@ games.forEach((game) => {
     // Tạo thẻ game cho từng trò chơi
     games.forEach((game) => {
       const styles = colorStyles[game.color] || colorStyles.emerald;
-
       const a = document.createElement("a");
       a.href = `./${game.folder}/index.html`;
       a.className =
