@@ -189,47 +189,6 @@
         </div>
       </div>
     `;
-
-    gameListEl.appendChild(a);
-  });
-</script>
-    const gameListEl = document.getElementById("game-list");
-
-    // Tạo thẻ game cho từng trò chơi
-    games.forEach((game) => {
-      const styles = colorStyles[game.color] || colorStyles.emerald;
-      const a = document.createElement("a");
-      a.href = `./${game.folder}/index.html`;
-      a.className =
-        "block rounded-2xl border transition transform hover:-translate-y-0.5 hover:shadow-xl " +
-        styles.card;
-
-      a.innerHTML = `
-        <div class="flex items-center justify-between px-4 sm:px-6 py-4 gap-4">
-          <div class="flex items-start gap-3 sm:gap-4">
-            <div class="text-3xl sm:text-4xl">${game.icon}</div>
-            <div>
-              <div class="inline-flex flex-wrap items-center gap-2 px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold ${styles.badge} mb-1">
-                <span>${game.label}</span>
-                <span class="w-1 h-1 rounded-full bg-current opacity-60"></span>
-                <span>${game.grade}</span>
-              </div>
-              <h3 class="text-base sm:text-lg font-semibold text-white mb-1">
-                ${game.title}
-              </h3>
-              <p class="text-xs sm:text-sm text-slate-200/80">
-                ${game.description}
-              </p>
-            </div>
-          </div>
-          <div>
-            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white ${styles.button}">
-              <span class="text-lg sm:text-xl">➜</span>
-            </div>
-          </div>
-        </div>
-      `;
-
       gameListEl.appendChild(a);
     });
   </script>
