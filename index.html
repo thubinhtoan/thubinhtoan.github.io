@@ -55,89 +55,63 @@
       </footer>
     </div>
   </div>
-
- <script>
+   <script>
   // Danh sách game trên trang chủ
- const games = [
+  const games = [
     {
-        id: 1,
-        folder: "khu-vuon-bi-mat",
-        icon: "🌸",
-        color: "emerald",
-        label: "Trò chơi 1",
-        grade: "Lớp 9 – Hình học",
-        title: "Khu Vườn Bí Mật – Đường tròn (Toán 9)",
-        description: "Trò chơi ôn tập bài Đường tròn – Chân trời sáng tạo. Trả lời đúng để làm nở những bông hoa xinh trong khu vườn."
-    },
-    {
-        id: 2,
-        folder: "cuoc-xam-lang",
-        icon: "🛸",
-        color: "indigo",
-        label: "Trò chơi 2",
-        grade: "Lớp 9 – Tiếp tuyến",
-        title: "Cuộc Xâm Lăng – Tiếp tuyến của đường tròn (Toán 9)",
-        description: "Trả lời đúng để bắn hạ tàu UFO, bảo vệ Trái Đất. Ôn tập kiến thức về tiếp tuyến của đường tròn qua các tình huống thú vị."
+      id: 1,
+      folder: "khu-vuon-bi-mat",
+      icon: "🌸",
+      color: "emerald",
+      label: "Trò chơi 1",
+      grade: "Lớp 9 – Hình học",
+      title: "Khu Vườn Bí Mật – Đường tròn (Toán 9)",
+      description: "Trò chơi ôn tập bài Đường tròn – Chân trời sáng tạo. Trả lời đúng để làm nở những bông hoa xinh trong khu vườn."
     },
     {
-        id: 3,
-        folder: "me-cung-tri-tue",
-        icon: "🧠",
-        color: "sky",
-        label: "Trò chơi 3",
-        grade: "Lớp 9 – Góc ở tâm, góc nội tiếp",
-        title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp (Toán 9)",
-        description: "Trả lời đúng để mở từng cánh cửa và vượt qua mê cung kiến thức."
+      id: 2,
+      folder: "cuoc-xam-lang",
+      icon: "🛸",
+      color: "indigo",
+      label: "Trò chơi 2",
+      grade: "Lớp 9 – Tiếp tuyến",
+      title: "Cuộc Xâm Lăng – Tiếp tuyến của đường tròn (Toán 9)",
+      description: "Trả lời đúng để bắn hạ tàu UFO, bảo vệ Trái Đất. Ôn tập kiến thức về tiếp tuyến của đường tròn qua các tình huống thú vị."
     },
-   {
-    id: 4,
-    folder: "chien-binh-rong",
-    icon: "🐉",
-    color: "rose",
-    label: "Trò chơi 4",
-    grade: "Lớp 9 – Hình quạt & vành khuyên",
-    title: "Chiến Binh Rồng – Đại Chiến Hình Quạt (Toán 9)",
-    description: "Cùng chiến binh rồng tiêu diệt quái vật bằng kiến thức về hình quạt tròn và hình vành khuyên!"
-},
-   {
-    id: 5,
-    folder: "du-hanh-vu-tru",
-    icon: "🚀",
-    color: "sky",
-    label: "Trò chơi 5",
-    grade: "Lớp 9 – Căn bậc hai",
-    title: "Du Hành Giữa Các Vì Sao – Căn bậc hai (Toán 9)",
-    description: "Điều khiển tàu vũ trụ vượt qua 3 màn thử thách với các câu hỏi về căn bậc hai: Nhận biết – Thông hiểu – Vận dụng."
-}
-
-];
-
-  // Các style màu cho thẻ game
-  const colorStyles = {
-    emerald: {
-      card: "border-emerald-500/40 bg-emerald-900/50 hover:bg-emerald-800/80",
-      badge: "bg-emerald-100 text-emerald-800",
-      button: "bg-emerald-500"
+    {
+      id: 3,
+      folder: "me-cung-tri-tue",
+      icon: "🧠",
+      color: "sky",
+      label: "Trò chơi 3",
+      grade: "Lớp 9 – Góc ở tâm, góc nội tiếp",
+      title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp (Toán 9)",
+      description: "Trả lời đúng để mở từng cánh cửa và vượt qua mê cung kiến thức."
     },
-    indigo: {
-      card: "border-indigo-500/40 bg-indigo-900/40 hover:bg-indigo-800/80",
-      badge: "bg-indigo-100 text-indigo-800",
-      button: "bg-indigo-500"
+    {
+      id: 4,
+      folder: "chien-binh-rong",
+      icon: "🐲",
+      color: "rose",
+      label: "Trò chơi 4",
+      grade: "Lớp 9 – Hình quạt & vành khuyên",
+      title: "Chiến Binh Rồng – Đại Chiến Hình Quạt (Toán 9)",
+      description: "Cùng chiến binh rồng tiêu diệt quái vật bằng kiến thức về hình quạt tròn và hình vành khuyên!"
     },
-    sky: {
-      card: "border-sky-500/40 bg-sky-900/40 hover:bg-sky-800/80",
-      badge: "bg-sky-100 text-sky-800",
-      button: "bg-sky-500"
-    },
-    rose: {
-      card: "border-rose-500/40 bg-rose-900/40 hover:bg-rose-800/80",
-      badge: "bg-rose-100 text-rose-800",
-      button: "bg-rose-500"
+    {
+      id: 5,
+      folder: "du-hanh-vu-tru",
+      icon: "🚀",
+      color: "sky",
+      label: "Trò chơi 5",
+      grade: "Lớp 9 – Căn bậc hai",
+      title: "Du Hành Giữa Các Vì Sao – Căn bậc hai (Toán 9)",
+      description: "Điều khiển tàu vũ trụ vượt qua 3 màn thử thách với các câu hỏi về căn bậc hai: Nhận biết – Thông hiểu – Vận dụng."
     }
+  ];
+</script>
   };
-
   const gameListEl = document.getElementById("game-list");
-
   // Tạo thẻ game cho từng trò chơi
   games.forEach((game) => {
     const styles = colorStyles[game.color] || colorStyles.emerald;
