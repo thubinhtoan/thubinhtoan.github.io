@@ -3,543 +3,718 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chiến Binh Rồng - Toán 9 (Bài 4)</title>
-    <!-- Tải Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tải Tone.js để tạo âm thanh -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js"></script>
+    <title>Du Hành Giữa Các Vì Sao - Toán 9</title>
     <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #00cec9;
+            --accent-color: #fdcb6e;
+            --text-color: #ffffff;
+            --bg-dark: #0f0f1e;
+            --panel-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
-        }
-        
-        #game-container {
-            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            animation: starMove 100s linear infinite;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        @keyframes starMove {
+            from { background-position: 0 0, 40px 60px, 130px 270px; }
+            to { background-position: 550px 550px, 390px 410px, 380px 520px; }
         }
 
-        .hp-bar-inner {
-            transition: width 0.5s ease-in-out;
-        }
-
-        .option-btn {
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(108, 92, 231, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
             transition: all 0.3s ease;
         }
-        .option-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
+        /* Screens chính (start, game, end) */
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
         }
 
-        .shake {
-            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-            transform: translate3d(0, 0, 0);
+        .screen.active {
+            display: flex;
         }
 
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .flash-correct {
-            animation: flash 0.5s ease;
-        }
-
-        @keyframes flash {
-            0% { box-shadow: 0 0 20px 10px rgba(76, 175, 80, 0.7); }
-            100% { box-shadow: none; }
-        }
-        
-        #feedback-icon {
+        /* Màn chuyển cảnh giữa các màn chơi */
+        .stage-overlay {
             position: absolute;
-            font-size: 3rem;
-            animation: burst 0.8s ease-out forwards;
-            opacity: 0;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 50;
+            animation: fadeIn 0.5s ease;
+        }
+        .stage-overlay.active {
+            display: flex;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+            text-shadow: 0 0 10px var(--secondary-color);
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            font-weight: normal;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 206, 201, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Game UI */
+        .progress-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary-color);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .spaceship-marker {
+            font-size: 2rem;
+            position: absolute;
+            top: 15px;
+            transition: left 0.5s ease;
+            transform: translateX(-50%);
+        }
+
+        .question-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+            border-left: 5px solid var(--accent-color);
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .answer-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .answer-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.02);
+        }
+
+        .answer-btn.correct {
+            background: #00b894;
+            border-color: #00b894;
+            color: white;
+        }
+
+        .answer-btn.wrong {
+            background: #d63031;
+            border-color: #d63031;
+            color: white;
+            opacity: 0.6;
+        }
+
+        .score-display {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        /* Effects */
+        #canvas-confetti {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
             z-index: 100;
         }
 
-        @keyframes burst {
-            0% { transform: scale(0.1); opacity: 0; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); opacity: 0; top: -100px; }
-        }
-        
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            opacity: 0;
-            animation: fall 3s ease-out forwards;
+        .feedback-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes fall {
-            0% { opacity: 1; transform: translateY(0) rotateZ(0); }
-            100% { opacity: 0; transform: translateY(400px) rotateZ(360deg); }
-        }
-        
-        #end-screen {
-            background-color: rgba(0, 0, 0, 0.8);
-        }
-        
-        .attack-player {
-            animation: attackPlayer 0.5s ease;
-        }
-        @keyframes attackPlayer {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(-30px); }
-            100% { transform: translateX(0); }
-        }
-        .attack-monster {
-            animation: attackMonster 0.5s ease;
-        }
-        @keyframes attackMonster {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(30px); }
-            100% { transform: translateX(0); }
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
         }
 
+        .level-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .lvl-1 { background-color: #0984e3; } /* Nhận biết */
+        .lvl-2 { background-color: #00b894; } /* Thông hiểu */
+        .lvl-3 { background-color: #e17055; } /* Vận dụng */
+        .lvl-4 { background-color: #d63031; } /* Vận dụng cao */
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .answers-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 { font-size: 1.8rem; }
+            .question-box { font-size: 1.1rem; }
+        }
     </style>
 </head>
-<body class="bg-gray-900 text-white">
+<body>
 
-    <div id="game-container" class="min-h-screen w-full flex flex-col items-center justify-center p-4 relative">
-        
-        <!-- Màn hình bắt đầu -->
-        <div id="start-screen" class="text-center">
-            <h1 class="text-5xl font-bold mb-4 text-yellow-300">Chiến Binh Rồng</h1>
-            <p class="text-xl mb-8 text-gray-200">Giúp chiến binh tiêu diệt quái vật bằng kiến thức Toán 9!</p>
-            <button id="start-btn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg text-2xl shadow-lg transition duration-300">
-                Bắt đầu!
-            </button>
-        </div>
+<canvas id="canvas-confetti"></canvas>
 
-        <!-- Màn hình trò chơi -->
-        <div id="game-screen" class="hidden w-full max-w-4xl">
-            
-            <!-- Thanh HP -->
-            <div class="flex justify-between items-center mb-6 px-4">
-                <!-- Chiến binh -->
-                <div class="w-2/5 text-center">
-                    <span id="player-sprite" class="text-6xl">⚔️</span>
-                    <h2 class="text-xl font-bold text-blue-300">Chiến Binh</h2>
-                    <div class="bg-gray-700 rounded-full h-4 overflow-hidden shadow-inner">
-                        <div id="player-hp-bar" class="hp-bar-inner bg-green-500 h-4" style="width: 100%;"></div>
-                    </div>
-                    <span id="player-hp-text" class="text-sm">100/100</span>
-                </div>
-                
-                <div class="text-2xl font-bold text-red-500">VS</div>
-                
-                <!-- Quái vật -->
-                <div class="w-2/5 text-center">
-                    <span id="monster-sprite" class="text-6xl">🐲</span>
-                    <h2 class="text-xl font-bold text-red-300">Quái Vật</h2>
-                    <div class="bg-gray-700 rounded-full h-4 overflow-hidden shadow-inner">
-                        <div id="monster-hp-bar" class="hp-bar-inner bg-red-500 h-4" style="width: 100%;"></div>
-                    </div>
-                    <span id="monster-hp-text" class="text-sm">100/100</span>
-                </div>
-            </div>
-
-            <!-- Câu hỏi -->
-            <div class="bg-gray-800 bg-opacity-70 p-6 rounded-lg shadow-2xl text-center mb-6">
-                <p class="text-gray-400 text-sm mb-2">
-                    Câu <span id="question-number">1</span> / 15
-                </p>
-                <p id="question-text" class="text-xl md:text-2xl font-semibold min-h-[100px]">
-                    Nội dung câu hỏi sẽ ở đây...
-                </p>
-            </div>
-
-            <!-- Đáp án -->
-            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- JS chèn vào đây -->
-            </div>
-            
-            <!-- Icon phản hồi -->
-            <div id="feedback-icon-container" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                <div id="feedback-icon"></div>
-            </div>
-            
-            <!-- Pháo hoa -->
-            <div id="confetti-container" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
-
-        </div>
-
-        <!-- Màn hình kết thúc -->
-        <div id="end-screen" class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-8 z-50">
-            <h2 id="end-title" class="text-5xl font-bold mb-4">Chúc mừng!</h2>
-            <p id="end-message" class="text-2xl mb-8">Bạn đã tiêu diệt quái vật!</p>
-            <p id="end-score" class="text-3xl mb-10">Điểm của bạn: <span id="score-text">0</span></p>
-            <button id="restart-btn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-2xl shadow-lg transition duration-300">
-                Chơi lại
-            </button>
-        </div>
-
+<div class="container">
+    <!-- Màn hình Chào mừng -->
+    <div id="start-screen" class="screen active">
+        <h1>🚀 Du Hành Giữa Các Vì Sao</h1>
+        <h2>Chuyên đề: Căn Bậc Hai (Toán 9)</h2>
+        <p>Chào mừng phi hành gia! Hãy sử dụng kiến thức Toán học để điều khiển tàu vũ trụ vượt qua 15 thử thách.</p>
+        <p>Sẵn sàng chưa?</p>
+        <button class="btn" onclick="startGame()">Khởi Hành</button>
     </div>
 
-    <script>
-        // 1. DANH SÁCH CÂU HỎI – 15 CÂU
-        const questions = [
-            // Mức 1: Nhận biết (6 câu)
-            {
-                level: 1,
-                question: "Hình quạt tròn là một phần hình tròn được giới hạn bởi hai bán kính và...",
-                options: ["...cung tròn tương ứng.", "...một dây cung.", "...đường kính.", "...một tiếp tuyến."],
-                answer: 0
-            },
-            {
-                level: 1,
-                question: "Công thức tính độ dài cung tròn n độ, bán kính R là:",
-                options: ["l = (pi * R * n) / 180", "l = (pi * R^2 * n) / 180", "l = (pi * R * n) / 360", "l = 2 * pi * R * n"],
-                answer: 0
-            },
-            {
-                level: 1,
-                question: "Công thức tính diện tích hình quạt tròn bán kính R, cung n độ là:",
-                options: ["S = (pi * R * n) / 360", "S = (pi * R^2 * n) / 180", "S = (pi * R^2 * n) / 360", "S = (pi * R^2 * n) / 120"],
-                answer: 2
-            },
-            {
-                level: 1,
-                question: "Nếu biết độ dài cung là l và bán kính là R, diện tích hình quạt tròn (S) còn được tính bằng công thức:",
-                options: ["S = l * R", "S = (l * R) / 2", "S = (l * R^2) / 2", "S = 2 * l * R"],
-                answer: 1
-            },
-            {
-                level: 1,
-                question: "Hình vành khuyên là phần mặt phẳng nằm giữa hai hình tròn...",
-                options: ["...có cùng tâm (đồng tâm).", "...cắt nhau tại hai điểm.", "...tiếp xúc ngoài.", "...không giao nhau."],
-                answer: 0
-            },
-            {
-                level: 1,
-                question: "Công thức tính diện tích hình vành khuyên với bán kính vòng ngoài R, bán kính vòng trong r là:",
-                options: ["S = pi * (R^2 + r^2)", "S = pi * (R - r)^2", "S = pi * (R^2 - r^2)", "S = pi * R^2 - pi * r"],
-                answer: 2
-            },
-            // Mức 2: Thông hiểu (5 câu)
-            {
-                level: 2,
-                question: "Tính độ dài cung 60 độ của một đường tròn có bán kính 6 cm.",
-                options: ["2*pi cm", "pi cm", "3*pi cm", "6*pi cm"],
-                answer: 0
-            },
-            {
-                level: 2,
-                question: "Tính diện tích hình quạt tròn có bán kính 10 cm, số đo cung là 90 độ.",
-                options: ["100*pi cm^2", "50*pi cm^2", "25*pi cm^2", "10*pi cm^2"],
-                answer: 2
-            },
-            {
-                level: 2,
-                question: "Một hình quạt tròn có bán kính 8 cm và độ dài cung tương ứng là 4*pi cm. Diện tích của nó là:",
-                options: ["16*pi cm^2", "32*pi cm^2", "8*pi cm^2", "64*pi cm^2"],
-                answer: 0
-            },
-            {
-                level: 2,
-                question: "Tính diện tích hình vành khuyên giới hạn bởi hai đường tròn đồng tâm có bán kính lần lượt là 5 cm và 3 cm.",
-                options: ["4*pi cm^2", "16*pi cm^2", "34*pi cm^2", "8*pi cm^2"],
-                answer: 1
-            },
-            {
-                level: 2,
-                question: "Một hình quạt tròn có diện tích là 36*pi cm^2 và bán kính là 12 cm. Số đo n của cung tròn đó là:",
-                options: ["n = 60 độ", "n = 120 độ", "n = 90 độ", "n = 30 độ"],
-                answer: 2
-            },
-            // Mức 3: Vận dụng (3 câu)
-            {
-                level: 3,
-                question: "Một bánh xe lăn 100 vòng thì đi được quãng đường 188,4 m. Tính bán kính của bánh xe (lấy pi = 3,14).",
-                options: ["R = 0,3 m", "R = 0,6 m", "R = 3 m", "R = 6 m"],
-                answer: 0
-            },
-            {
-                level: 3,
-                question: "Diện tích hình vành khuyên là 64*pi cm^2. Tỉ số giữa bán kính ngoài (R) và bán kính trong (r) là R/r = 5/3. Tính bán kính ngoài R.",
-                options: ["R = 8 cm", "R = 10 cm", "R = 12 cm", "R = 15 cm"],
-                answer: 1
-            },
-            {
-                level: 3,
-                question: "Một cái bàn tròn có bán kính 1 m. Người ta muốn phủ một khăn trải bàn hình vành khuyên sao cho khăn rủ xuống khỏi mép bàn 0,2 m. Diện tích khăn trải bàn là:",
-                options: ["0,44*pi m^2", "0,40*pi m^2", "1*pi m^2", "1,44*pi m^2"],
-                answer: 0
-            },
-            // Mức 4: Vận dụng cao (1 câu)
-            {
-                level: 4,
-                question: "Cho đường tròn (O; 6 cm) và một hình quạt tròn AOB từ đường tròn đó với số đo cung là 60 độ. Diện tích của phần hình vành khuyên tạo bởi cung AB và cung CD (C, D thuộc OA, OB và OC = OD = 2 cm) là:",
-                options: ["32*pi/3 cm^2", "16*pi/3 cm^2", "16*pi cm^2", "8*pi cm^2"],
-                answer: 1
-            }
-        ];
-
-        const TOTAL_QUESTIONS = questions.length; // = 15
-
-        // 2. BIẾN TRẠNG THÁI
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let playerHP = 100;
-        let monsterHP = 100;
-        let questionsPerMonster = 5;
-        let monsterIndex = 1;
-        let audioContextStarted = false;
-
-        // 3. DOM
-        const startScreen = document.getElementById('start-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const endScreen = document.getElementById('end-screen');
+    <!-- Màn hình Game -->
+    <div id="game-screen" class="screen">
+        <div class="score-display">Điểm: <span id="score">0</span></div>
         
-        const startBtn = document.getElementById('start-btn');
-        const restartBtn = document.getElementById('restart-btn');
+        <div class="progress-container">
+            <div style="position: relative; height: 30px;">
+                <div id="spaceship" class="spaceship-marker" style="left: 0%;">🚀</div>
+            </div>
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+        </div>
 
-        const questionNumber = document.getElementById('question-number');
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        
-        const playerHPBar = document.getElementById('player-hp-bar');
-        const playerHPText = document.getElementById('player-hp-text');
-        const monsterHPBar = document.getElementById('monster-hp-bar');
-        const monsterHPText = document.getElementById('monster-hp-text');
-        const playerSprite = document.getElementById('player-sprite');
-        const monsterSprite = document.getElementById('monster-sprite');
-        
-        const feedbackIconContainer = document.getElementById('feedback-icon-container');
-        const confettiContainer = document.getElementById('confetti-container');
+        <!-- Tiêu đề 3 màn -->
+        <div id="stage-title" style="margin: 8px 0 10px; font-weight: 700; color: var(--accent-color);">
+            Màn 1 – Khởi động: Nhận biết
+        </div>
 
-        const endTitle = document.getElementById('end-title');
-        const endMessage = document.getElementById('end-message');
-        const scoreText = document.getElementById('score-text');
+        <div id="feedback-area" style="height: 60px; display: flex; align-items: center; justify-content: center;">
+            <!-- Feedback icons will appear here -->
+        </div>
 
-        // 4. ÂM THANH
-        let correctSynth, wrongSynth;
+        <div id="level-indicator" class="level-badge lvl-1">Mức độ: Nhận biết</div>
+        <div class="question-box" id="question-text">
+            Đang tải dữ liệu...
+        </div>
 
-        async function setupAudio() {
-            if (audioContextStarted) return;
-            await Tone.start();
-            
-            correctSynth = new Tone.PolySynth(Tone.Synth, {
-                volume: -10,
-                oscillator: { type: "sine" },
-                envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.4 }
-            }).toDestination();
+        <div class="answers-grid" id="answers-container">
+            <!-- Answers will be generated here -->
+        </div>
+    </div>
 
-            wrongSynth = new Tone.PolySynth(Tone.Synth, {
-                volume: -10,
-                oscillator: { type: "square" },
-                envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.2 }
-            }).toDestination();
-            
-            audioContextStarted = true;
+    <!-- Màn hình Kết thúc -->
+    <div id="end-screen" class="screen">
+        <h1>🎉 Nhiệm Vụ Hoàn Thành!</h1>
+        <div class="feedback-icon">🏆</div>
+        <p>Bạn đã hoàn thành chuyến du hành.</p>
+        <h2>Tổng điểm: <span id="final-score">0</span> / 150</h2>
+        <p id="final-message">Tuyệt vời!</p>
+        <button class="btn" onclick="restartGame()">Chơi Lại</button>
+    </div>
+
+    <!-- Màn chuyển cảnh giữa các màn (1→2, 2→3) -->
+    <div id="stage-overlay" class="stage-overlay">
+        <h1 id="stage-overlay-title">Màn 2 – Khám phá: Thông hiểu</h1>
+        <p id="stage-overlay-text" style="margin-bottom: 25px;">
+            Bạn đã vượt qua Màn 1! Hãy tiếp tục hành trình với các câu hỏi Thông hiểu nhé.
+        </p>
+        <button id="stage-continue-btn" class="btn">Tiếp tục</button>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu câu hỏi - Toán 9 Bài 1: Căn bậc hai
+    const questionsData = [
+        // --- Mức 1: Nhận biết (6 câu) ---
+        {
+            question: "Căn bậc hai số học của số a không âm được kí hiệu là:",
+            answers: ["√a", "-√a", "a²", "a"],
+            correct: 0,
+            level: "Nhận biết"
+        },
+        {
+            question: "Số nào sau đây không có căn bậc hai?",
+            answers: ["0", "1", "-9", "3"],
+            correct: 2,
+            level: "Nhận biết"
+        },
+        {
+            question: "Căn bậc hai của số 36 là:",
+            answers: ["6", "-6", "6 và -6", "36"],
+            correct: 2,
+            level: "Nhận biết"
+        },
+        {
+            question: "Điều kiện xác định của √a là:",
+            answers: ["a > 0", "a < 0", "a ≥ 0", "a ≠ 0"],
+            correct: 2,
+            level: "Nhận biết"
+        },
+        {
+            question: "Số 0 có bao nhiêu căn bậc hai?",
+            answers: ["0", "1", "2", "Vô số"],
+            correct: 1,
+            level: "Nhận biết"
+        },
+        {
+            question: "Khẳng định nào sau đây là đúng với hai số a, b không âm?",
+            answers: ["a < b thì √a < √b", "a < b thì √a > √b", "a > b thì √a < √b", "a = b thì √a > √b"],
+            correct: 0,
+            level: "Nhận biết"
+        },
+
+        // --- Mức 2: Thông hiểu (5 câu) ---
+        {
+            question: "Tính giá trị của √0,81:",
+            answers: ["0,09", "0,9", "9", "0,81"],
+            correct: 1,
+            level: "Thông hiểu"
+        },
+        {
+            question: "Tìm x biết x² = 49:",
+            answers: ["x = 7", "x = -7", "x = 7 hoặc x = -7", "x = 49"],
+            correct: 2,
+            level: "Thông hiểu"
+        },
+        {
+            question: "Kết quả của phép tính √(3)² là:",
+            answers: ["3", "-3", "9", "√3"],
+            correct: 0,
+            level: "Thông hiểu"
+        },
+        {
+            question: "So sánh 3 và √8:",
+            answers: ["3 > √8", "3 < √8", "3 = √8", "Không so sánh được"],
+            correct: 0,
+            level: "Thông hiểu"
+        },
+        {
+            question: "Giá trị của biểu thức √16 + √9 là:",
+            answers: ["7", "5", "√25", "25"],
+            correct: 0,
+            level: "Thông hiểu"
+        },
+
+        // --- Mức 3: Vận dụng (3 câu) ---
+        {
+            question: "Tìm số x không âm, biết √x = 5:",
+            answers: ["x = 5", "x = 10", "x = 25", "x = √5"],
+            correct: 2,
+            level: "Vận dụng"
+        },
+        {
+            question: "Giải phương trình √x < 2 (với x ≥ 0):",
+            answers: ["x < 2", "x < 4", "0 ≤ x < 2", "0 ≤ x < 4"],
+            correct: 3,
+            level: "Vận dụng"
+        },
+        {
+            question: "(Thực tế) Một mảnh vườn hình vuông có diện tích 144 mét vuông. Hỏi độ dài cạnh mảnh vườn là bao nhiêu?",
+            answers: ["12 m", "14 m", "72 m", "12 cm"],
+            correct: 0,
+            level: "Vận dụng"
+        },
+
+        // --- Mức 4: Vận dụng cao (xếp chung vào Màn 3) ---
+        {
+            question: "Tìm tất cả các số nguyên x thoả mãn: căn bậc hai số học của x nhỏ hơn 3 (biết x ≥ 0).",
+            answers: ["x ∈ {0; 1; 2; 3}", "x ∈ {1; 2; ...; 8}", "x ∈ {0; 1; 2; ...; 8}", "x ∈ {0; 1; ...; 9}"],
+            correct: 2,
+            level: "Vận dụng cao"
         }
+    ];
 
-        function playCorrectSound() {
-            if (!audioContextStarted) return;
-            const now = Tone.now();
-            correctSynth.triggerAttackRelease("C4", "8n", now);
-            correctSynth.triggerAttackRelease("E4", "8n", now + 0.1);
-            correctSynth.triggerAttackRelease("G4", "8n", now + 0.2);
+    // Chia 3 màn theo index (dựa theo thứ tự trên)
+    const stageInfo = [
+        {   // 0–5
+            name: "Màn 1 – Khởi động: Nhận biết",
+            start: 0,
+            end: 6
+        },
+        {   // 6–10
+            name: "Màn 2 – Khám phá: Thông hiểu",
+            start: 6,
+            end: 11
+        },
+        {   // 11–14
+            name: "Màn 3 – Chinh phục: Vận dụng",
+            start: 11,
+            end: questionsData.length
         }
+    ];
 
-        function playWrongSound() {
-            if (!audioContextStarted) return;
-            const now = Tone.now();
-            wrongSynth.triggerAttackRelease("C3", "8n", now);
-            wrongSynth.triggerAttackRelease("B2", "8n", now + 0.1);
+    function getStageIndexByQuestion(qIndex) {
+        for (let i = 0; i < stageInfo.length; i++) {
+            const s = stageInfo[i];
+            if (qIndex >= s.start && qIndex < s.end) return i;
         }
-        
-        // 5. HIỆU ỨNG HÌNH ẢNH
-        function showFeedback(isCorrect) {
-            const icon = document.getElementById('feedback-icon');
-            icon.innerText = isCorrect ? '😄' : '😵';
-            icon.style.animation = 'none';
-            icon.offsetHeight;
-            icon.style.animation = 'burst 0.8s ease-out forwards';
+        return stageInfo.length - 1;
+    }
 
-            if (isCorrect) {
-                createConfetti();
-            }
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let audioContext = null;
+
+    // --- Audio ---
+    function initAudio() {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
-        
-        function createConfetti() {
-            for (let i = 0; i < 30; i++) {
-                const confetti = document.createElement('div');
-                confetti.classList.add('confetti');
-                confetti.style.left = `${Math.random() * 100}%`;
-                confetti.style.top = `${Math.random() * 50 + 25}%`;
-                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                confetti.style.animationDelay = `${Math.random() * 0.2}s`;
-                confettiContainer.appendChild(confetti);
-                
-                setTimeout(() => confetti.remove(), 3000);
-            }
-        }
+    }
 
-        // 6. LOGIC TRÒ CHƠI
-        function startGame() {
-            if (!audioContextStarted) {
-                setupAudio();
-            }
-            
-            currentQuestionIndex = 0;
-            score = 0;
-            playerHP = 100;
-            monsterHP = 100;
-            monsterIndex = 1;
-            
-            startScreen.classList.add('hidden');
-            endScreen.classList.add('hidden');
-            gameScreen.classList.remove('hidden');
-            
-            updateHPBars();
-            loadQuestion();
-        }
+    function playSound(type) {
+        if (!audioContext) initAudio();
+        const osc = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioContext.destination);
 
-        function loadQuestion() {
-            if (currentQuestionIndex >= questions.length) {
-                endGame(true);
-                return;
-            }
-
-            const q = questions[currentQuestionIndex];
-            
-            monsterIndex = Math.floor(currentQuestionIndex / questionsPerMonster) + 1;
-            monsterSprite.innerText = ['🐲', '👹', '🔥'][monsterIndex - 1] || '🐲';
-
-            questionNumber.innerText = `${currentQuestionIndex + 1}`;
-            questionText.innerText = q.question;
-            
-            optionsContainer.innerHTML = '';
-            
-            q.options.forEach((option, index) => {
-                const button = document.createElement('button');
-                button.innerText = option;
-                button.classList.add(
-                    'option-btn',
-                    'w-full',
-                    'bg-blue-600',
-                    'hover:bg-blue-800',
-                    'text-white',
-                    'font-semibold',
-                    'py-3',
-                    'px-4',
-                    'rounded-lg',
-                    'shadow-md'
-                );
-                button.onclick = () => handleAnswer(index);
-                optionsContainer.appendChild(button);
+        if (type === 'correct') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(500, audioContext.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1000, audioContext.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            osc.start();
+            osc.stop(audioContext.currentTime + 0.5);
+        } else if (type === 'wrong') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioContext.currentTime);
+            osc.frequency.linearRampToValueAtTime(100, audioContext.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioContext.currentTime + 0.3);
+        } else if (type === 'win') {
+            osc.type = 'triangle';
+            const now = audioContext.currentTime;
+            [440, 554, 659, 880].forEach((freq, i) => {
+                const o = audioContext.createOscillator();
+                const g = audioContext.createGain();
+                o.connect(g);
+                g.connect(audioContext.destination);
+                o.frequency.value = freq;
+                g.gain.setValueAtTime(0.1, now + i * 0.1);
+                g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.5);
+                o.start(now + i * 0.1);
+                o.stop(now + i * 0.1 + 0.5);
             });
         }
+    }
 
-        function handleAnswer(selectedIndex) {
-            const q = questions[currentQuestionIndex];
-            const isCorrect = selectedIndex === q.answer;
+    // --- Confetti ---
+    const canvas = document.getElementById('canvas-confetti');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function createConfetti() {
+        for (let i = 0; i < 50; i++) {
+            particles.push({
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                vx: (Math.random() - 0.5) * 15,
+                vy: (Math.random() - 0.5) * 15,
+                color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                life: 100
+            });
+        }
+    }
+
+    function updateConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+            let p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.2;
+            p.life--;
+            p.vx *= 0.95;
+            p.vy *= 0.95;
             
-            optionsContainer.style.pointerEvents = 'none';
-            const selectedButton = optionsContainer.children[selectedIndex];
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+            ctx.fill();
 
-            if (isCorrect) {
-                score++;
-                playCorrectSound();
-                showFeedback(true);
-                selectedButton.classList.remove('bg-blue-600', 'hover:bg-blue-800');
-                selectedButton.classList.add('bg-green-500', 'flash-correct');
-                
-                const damage = 20;
-                monsterHP -= damage;
-                monsterSprite.classList.add('attack-monster');
-                
-            } else {
-                playWrongSound();
-                showFeedback(false);
-                selectedButton.classList.remove('bg-blue-600', 'hover:bg-blue-800');
-                selectedButton.classList.add('bg-red-500', 'shake');
-                
-                const correctButton = optionsContainer.children[q.answer];
-                correctButton.classList.remove('bg-blue-600', 'hover:bg-blue-800');
-                correctButton.classList.add('bg-green-500');
-                
-                const damage = 10;
-                playerHP -= damage;
-                playerSprite.classList.add('attack-player');
+            if (p.life <= 0) {
+                particles.splice(i, 1);
+                i--;
             }
+        }
+        requestAnimationFrame(updateConfetti);
+    }
+    updateConfetti();
 
-            updateHPBars();
+    // --- Game Logic ---
 
-            setTimeout(() => {
-                playerSprite.classList.remove('attack-player');
-                monsterSprite.classList.remove('attack-monster');
-            }, 500);
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
 
-            setTimeout(() => {
-                if (playerHP <= 0) {
-                    endGame(false);
-                    return;
-                }
-                
-                if (monsterHP <= 0) {
-                    if (currentQuestionIndex < questions.length - 1) {
-                        monsterHP = 100;
-                        updateHPBars();
-                    } else if (currentQuestionIndex === questions.length - 1) {
-                        updateHPBars();
-                        setTimeout(() => endGame(true), 500);
-                        return;
-                    }
-                }
+    function startGame() {
+        initAudio();
+        score = 0;
+        currentQuestionIndex = 0;
+        document.getElementById('score').innerText = score;
+        document.getElementById('progress-fill').style.width = '0%';
+        document.getElementById('spaceship').style.left = '0%';
+        document.getElementById('stage-title').innerText = stageInfo[0].name;
 
-                currentQuestionIndex++;
-                optionsContainer.style.pointerEvents = 'auto';
-                loadQuestion();
-                
-            }, 1500);
+        switchScreen('game-screen');
+        loadQuestion();
+    }
+
+    function updateStageTitle() {
+        const stageIdx = getStageIndexByQuestion(currentQuestionIndex);
+        document.getElementById('stage-title').innerText = stageInfo[stageIdx].name;
+    }
+
+    function loadQuestion() {
+        const qData = questionsData[currentQuestionIndex];
+        const questionEl = document.getElementById('question-text');
+        const answersEl = document.getElementById('answers-container');
+        const feedbackEl = document.getElementById('feedback-area');
+        const levelEl = document.getElementById('level-indicator');
+
+        updateStageTitle();
+
+        questionEl.innerText = `Câu ${currentQuestionIndex + 1}: ${qData.question}`;
+        feedbackEl.innerHTML = '';
+
+        levelEl.innerText = `Mức độ: ${qData.level}`;
+        levelEl.className = 'level-badge';
+        if (qData.level === "Nhận biết") levelEl.classList.add('lvl-1');
+        else if (qData.level === "Thông hiểu") levelEl.classList.add('lvl-2');
+        else if (qData.level.includes("Vận dụng cao")) levelEl.classList.add('lvl-4');
+        else levelEl.classList.add('lvl-3');
+
+        const progressPercent = (currentQuestionIndex / questionsData.length) * 100;
+        document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+        document.getElementById('spaceship').style.left = `${progressPercent}%`;
+
+        answersEl.innerHTML = '';
+        qData.answers.forEach((ans, index) => {
+            const btn = document.createElement('div');
+            btn.className = 'answer-btn';
+            btn.innerText = ans;
+            btn.onclick = () => checkAnswer(index, btn);
+            answersEl.appendChild(btn);
+        });
+    }
+
+    function showStageOverlay(newStageIndex) {
+        const overlay = document.getElementById('stage-overlay');
+        const title = document.getElementById('stage-overlay-title');
+        const text = document.getElementById('stage-overlay-text');
+
+        title.textContent = stageInfo[newStageIndex].name;
+        if (newStageIndex === 1) {
+            text.textContent = "Bạn đã vượt qua Màn 1! Tiếp theo là các câu hỏi Thông hiểu. Cố lên nhé!";
+        } else if (newStageIndex === 2) {
+            text.textContent = "Xuất sắc! Bạn đã hoàn thành Màn 2. Giờ là những thử thách Vận dụng và Vận dụng cao!";
         }
 
-        function updateHPBars() {
-            playerHP = Math.max(0, playerHP);
-            monsterHP = Math.max(0, monsterHP);
+        overlay.classList.add('active');
 
-            playerHPBar.style.width = `${playerHP}%`;
-            playerHPText.innerText = `${playerHP}/100`;
+        document.getElementById('stage-continue-btn').onclick = () => {
+            overlay.classList.remove('active');
+            loadQuestion();
+        };
+    }
 
-            monsterHPBar.style.width = `${monsterHP}%`;
-            monsterHPText.innerText = `${monsterHP}/100`;
+    function checkAnswer(selectedIndex, btnElement) {
+        const buttons = document.querySelectorAll('.answer-btn');
+        buttons.forEach(b => b.onclick = null);
+
+        const qData = questionsData[currentQuestionIndex];
+        const feedbackEl = document.getElementById('feedback-area');
+
+        if (selectedIndex === qData.correct) {
+            btnElement.classList.add('correct');
+            score += 10;
+            document.getElementById('score').innerText = score;
+            playSound('correct');
+            feedbackEl.innerHTML = '<span class="feedback-icon">🤩</span>';
+            createConfetti();
+        } else {
+            btnElement.classList.add('wrong');
+            buttons[qData.correct].classList.add('correct');
+            playSound('wrong');
+            feedbackEl.innerHTML = '<span class="feedback-icon">🤔</span>';
         }
 
-        function endGame(isWin) {
-            gameScreen.classList.add('hidden');
-            endScreen.classList.remove('hidden');
-            
-            if (isWin) {
-                endTitle.innerText = "Chiến thắng!";
-                endTitle.classList.remove('text-red-500');
-                endTitle.classList.add('text-yellow-300');
-                endMessage.innerText = "Bạn đã tiêu diệt tất cả quái vật và bảo vệ vương quốc!";
+        setTimeout(() => {
+            const prevStage = getStageIndexByQuestion(currentQuestionIndex);
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < questionsData.length) {
+                const newStage = getStageIndexByQuestion(currentQuestionIndex);
+                if (newStage !== prevStage) {
+                    showStageOverlay(newStage);
+                } else {
+                    loadQuestion();
+                }
             } else {
-                endTitle.innerText = "Thất bại!";
-                endTitle.classList.remove('text-yellow-300');
-                endTitle.classList.add('text-red-500');
-                endMessage.innerText = "Bạn đã bị quái vật đánh bại. Hãy thử lại!";
+                endGame();
             }
-            
-            scoreText.innerText = `${score} / 15`;
+        }, 2000);
+    }
+
+    function endGame() {
+        switchScreen('end-screen');
+        playSound('win');
+
+        document.getElementById('progress-fill').style.width = `100%`;
+        document.getElementById('spaceship').style.left = `100%`;
+
+        const finalScore = score;
+        document.getElementById('final-score').innerText = finalScore;
+
+        const msgEl = document.getElementById('final-message');
+        if (finalScore === 150) {
+            msgEl.innerText = "Tuyệt đối! Bạn là một thiên tài toán học vũ trụ! 🌟";
+        } else if (finalScore >= 120) {
+            msgEl.innerText = "Rất tốt! Kiến thức của bạn rất vững vàng! 🚀";
+        } else if (finalScore >= 80) {
+            msgEl.innerText = "Khá lắm! Hãy cố gắng hơn nữa nhé! ✨";
+        } else {
+            msgEl.innerText = "Đừng nản lòng! Hãy ôn lại bài Căn bậc hai và thử lại nhé! 📚";
         }
 
-        // 7. GẮN SỰ KIỆN
-        startBtn.onclick = startGame;
-        restartBtn.onclick = startGame;
-    </script>
+        createConfetti();
+        setTimeout(createConfetti, 500);
+        setTimeout(createConfetti, 1000);
+    }
+
+    function restartGame() {
+        startGame();
+    }
+</script>
+
 </body>
 </html>
