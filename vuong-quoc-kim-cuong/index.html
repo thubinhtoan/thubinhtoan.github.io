@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vương Quốc Kim Cương – Hình thoi (Toán 8)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React + ReactDOM UMD -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <!-- Babel để dùng JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="m-0 p-0 bg-slate-950">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // ===== CÂU HỎI GAME 8 – HÌNH THOI (TOÁN 8) =====
+    const questions = [
+      // Nhận biết (6 câu)
+      {
+        id: 1,
+        level: "Nhận biết",
+        question: "Hình thoi là tứ giác có:",
+        options: [
+          "Bốn cạnh bằng nhau",
+          "Bốn góc vuông",
+          "Hai cặp cạnh đối song song và bằng nhau",
+          "Hai góc kề bù nhau"
+        ],
+        correct: 0 // A
+      },
+      {
+        id: 2,
+        level: "Nhận biết",
+        question: "Phát biểu nào sau đây ĐÚNG về hình thoi?",
+        options: [
+          "Hình thoi là hình chữ nhật có bốn cạnh bằng nhau",
+          "Hình thoi là hình bình hành có bốn cạnh bằng nhau",
+          "Hình thoi là hình thang có hai đáy bằng nhau",
+          "Hình thoi là tứ giác có hai cạnh đối song song"
+        ],
+        correct: 1 // B
+      },
+      {
+        id: 3,
+        level: "Nhận biết",
+        question: "Tính chất ĐẶC BIỆT của đường chéo trong hình thoi (so với hình bình hành bất kì) là:",
+        options: [
+          "Hai đường chéo luôn bằng nhau",
+          "Hai đường chéo không cắt nhau",
+          "Hai đường chéo vuông góc với nhau",
+          "Hai đường chéo không đi qua trung điểm của nhau"
+        ],
+        correct: 2 // C
+      },
+      {
+        id: 4,
+        level: "Nhận biết",
+        question: "Trong hình thoi ABCD, hai đường chéo còn có tính chất nào sau đây?",
+        options: [
+          "Luôn là đường cao của hình thoi",
+          "Chỉ là trung tuyến của các cạnh",
+          "Không liên quan đến các góc của hình",
+          "Là các đường phân giác của bốn góc của hình thoi"
+        ],
+        correct: 3 // D
+      },
+      {
+        id: 5,
+        level: "Nhận biết",
+        question: "Trong các tứ giác sau, tứ giác nào CHẮC CHẮN là hình thoi?",
+        options: [
+          "Hình bình hành có bốn cạnh bằng nhau",
+          "Hình thang có hai đáy bằng nhau",
+          "Hình bình hành có hai góc vuông",
+          "Tứ giác có hai đường chéo bằng nhau"
+        ],
+        correct: 0 // A
+      },
+      {
+        id: 6,
+        level: "Nhận biết",
+        question: "Khẳng định nào sau đây đúng?",
+        options: [
+          "Mọi hình bình hành đều là hình thoi",
+          "Mọi hình vuông đều là hình thoi",
+          "Mọi hình thoi đều là hình vuông",
+          "Không có hình vuông nào là hình thoi"
+        ],
+        correct: 1 // B
+      },
+
+      // Thông hiểu (5 câu)
+      {
+        id: 7,
+        level: "Thông hiểu",
+        question: "Một hình thoi có độ dài cạnh là 5 cm. Chu vi hình thoi đó là:",
+        options: [
+          "10 cm",
+          "15 cm",
+          "20 cm",
+          "25 cm"
+        ],
+        correct: 2 // C (4·5 = 20)
+      },
+      {
+        id: 8,
+        level: "Thông hiểu",
+        question: "Một hình thoi có hai đường chéo lần lượt là 10 cm và 24 cm. Diện tích hình thoi là:",
+        options: [
+          "34 cm²",
+          "240 cm²",
+          "48 cm²",
+          "120 cm²"
+        ],
+        correct: 3 // D (S = d1·d2 / 2 = 10·24/2 = 120)
+      },
+      {
+        id: 9,
+        level: "Thông hiểu",
+        question: "Trong hình thoi ABCD, biết ∠A = 70°. Khi đó ∠B bằng:",
+        options: [
+          "110°",
+          "70°",
+          "90°",
+          "45°"
+        ],
+        correct: 0 // A (góc kề bù trong hình bình hành: 180 - 70 = 110)
+      },
+      {
+        id: 10,
+        level: "Thông hiểu",
+        question: "Trong hình thoi ABCD, hai đường chéo AC và BD cắt nhau tại O. Khẳng định nào sau đây đúng?",
+        options: [
+          "AO = AC",
+          "AO = OC",
+          "AO = BO = CO = DO = AC",
+          "AO ⟂ AC"
+        ],
+        correct: 1 // B (đường chéo bị cắt tại trung điểm)
+      },
+      {
+        id: 11,
+        level: "Thông hiểu",
+        question: "Trong thực tế, hình ♦ (ô rô) trên bộ bài tây là hình gì trong hình học phẳng?",
+        options: [
+          "Hình chữ nhật",
+          "Hình vuông",
+          "Hình thoi",
+          "Hình thang"
+        ],
+        correct: 2 // C
+      },
+
+      // Vận dụng (3 câu)
+      {
+        id: 12,
+        level: "Vận dụng",
+        question: "Một hình thoi có đường chéo d₁ = 12 cm, diện tích S = 72 cm². Độ dài đường chéo d₂ là:",
+        options: [
+          "6 cm",
+          "10 cm",
+          "24 cm",
+          "12 cm"
+        ],
+        correct: 3 // D (S = d1·d2/2 ⇒ 72 = 12·d2/2 = 6d2 ⇒ d2 = 12)
+      },
+      {
+        id: 13,
+        level: "Vận dụng",
+        question: "Một mảnh ruộng hình thoi có cạnh dài 20 m, chiều cao tương ứng là 12 m. Diện tích mảnh ruộng là:",
+        options: [
+          "240 m²",
+          "400 m²",
+          "32 m²",
+          "480 m²"
+        ],
+        correct: 0 // A (S = a·h = 20·12 = 240)
+      },
+      {
+        id: 14,
+        level: "Vận dụng",
+        question: "Dấu hiệu nào sau đây là ĐỦ để kết luận một hình bình hành là hình thoi?",
+        options: [
+          "Hình bình hành có hai đường chéo bằng nhau",
+          "Hình bình hành có hai cạnh kề bằng nhau",
+          "Hình bình hành có một góc vuông",
+          "Hình bình hành có hai góc kề bù nhau"
+        ],
+        correct: 1 // B
+      },
+
+      // Vận dụng cao (1 câu)
+      {
+        id: 15,
+        level: "Vận dụng cao",
+        question: "Trong hình thoi ABCD, hai đường chéo cắt nhau tại O. Tam giác AOB là:",
+        options: [
+          "Tam giác cân nhưng không vuông",
+          "Tam giác tù",
+          "Tam giác vuông cân",
+          "Tam giác nhọn"
+        ],
+        correct: 2 // C (AO = BO, ∠AOB = 90°)
+      }
+    ];
+
+    // ===== ÂM THANH ĐƠN GIẢN =====
+    const playSound = (type) => {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const now = ctx.currentTime;
+
+      if (type === 'correct') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(660, now + 0.1);
+        osc.frequency.setValueAtTime(880, now + 0.2);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      } else if (type === 'wrong') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.linearRampToValueAtTime(80, now + 0.25);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      }
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+    };
+
+    // ===== CONFETTI =====
+    const Confetti = () => (
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-40">
+        {[...Array(30)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 rounded-full"
+            style={{
+              backgroundColor: ['#e5e7eb', '#38bdf8', '#f97316', '#a855f7'][i % 4],
+              left: `${Math.random() * 100}%`,
+              top: `-10px`,
+              animation: `fall ${1 + Math.random() * 2}s linear forwards`,
+              animationDelay: `${Math.random() * 0.5}s`
+            }}
+          />
+        ))}
+        <style>{`
+          @keyframes fall {
+            to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+          }
+        `}</style>
+      </div>
+    );
+
+    // ===== MAIN GAME COMPONENT =====
+    function DiamondKingdom() {
+      const [gameState, setGameState] = useState("intro"); // intro, playing, end
+      const [currentQ, setCurrentQ] = useState(0);
+      const [score, setScore] = useState(0);
+      const [feedback, setFeedback] = useState(null); // 'correct' | 'wrong' | null
+      const [soundOn, setSoundOn] = useState(true);
+
+      const handleStart = () => {
+        setGameState("playing");
+        setCurrentQ(0);
+        setScore(0);
+        setFeedback(null);
+      };
+
+      const handleAnswer = (index) => {
+        if (feedback) return;
+
+        const isCorrect = index === questions[currentQ].correct;
+        if (isCorrect) {
+          setFeedback("correct");
+          setScore((s) => s + 10);
+          if (soundOn) playSound("correct");
+        } else {
+          setFeedback("wrong");
+          if (soundOn) playSound("wrong");
+        }
+
+        setTimeout(() => {
+          setFeedback(null);
+          if (currentQ < questions.length - 1) {
+            setCurrentQ((q) => q + 1);
+          } else {
+            setGameState("end");
+          }
+        }, 1800);
+      };
+
+      const correctCount = score / 10;
+
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white relative overflow-hidden">
+          {/* Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-sky-900 opacity-90" />
+          <div className="absolute inset-0 pointer-events-none opacity-30">
+            {[...Array(25)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-1 h-1 rounded-full bg-cyan-300"
+                style={{
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                  boxShadow: "0 0 8px rgba(56,189,248,0.8)"
+                }}
+              ></div>
+            ))}
+          </div>
+
+          {/* Sound toggle */}
+          <button
+            onClick={() => setSoundOn((v) => !v)}
+            className="absolute top-4 right-4 z-20 px-3 py-2 text-sm bg-white/10 hover:bg-white/20 rounded-full"
+          >
+            {soundOn ? "🔊 Âm thanh: BẬT" : "🔇 Âm thanh: TẮT"}
+          </button>
+
+          {/* MAIN CARD */}
+          <div className="relative z-10 w-full max-w-5xl mx-4 bg-slate-900/70 border border-cyan-500/40 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-xl">
+            {/* Header */}
+            <header className="px-6 sm:px-10 py-4 border-b border-cyan-500/40 bg-gradient-to-r from-cyan-500/40 to-sky-500/30 flex items-center justify-between">
+              <div>
+                <div className="text-xs uppercase tracking-wide text-cyan-200/80">Thu Bình Toán – Game 8</div>
+                <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                  <span className="text-2xl">💎</span>
+                  <span>Vương Quốc Kim Cương – Hình thoi</span>
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-200/80">
+                  Toán 8 – Ôn tập khái niệm, tính chất, diện tích hình thoi.
+                </p>
+              </div>
+              <div className="hidden sm:flex flex-col items-end text-xs text-cyan-100">
+                <span>Câu: {gameState === "playing" ? currentQ + 1 : 0}/{questions.length}</span>
+                <span>Điểm: {score}</span>
+              </div>
+            </header>
+
+            {/* BODY */}
+            <main className="p-4 sm:p-6 md:p-8">
+              {/* INTRO */}
+              {gameState === "intro" && (
+                <div className="flex flex-col items-center text-center gap-6 py-8">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-cyan-400 blur-3xl opacity-40 animate-pulse" />
+                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-3xl border border-cyan-400/60 flex items-center justify-center bg-slate-900/80 shadow-[0_0_40px_rgba(56,189,248,0.6)]">
+                      <span className="text-5xl sm:text-6xl">💎</span>
+                    </div>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-extrabold text-cyan-300 drop-shadow">
+                    Khai Mở Vương Quốc Kim Cương
+                  </h2>
+                  <p className="text-sm sm:text-base text-slate-200 max-w-xl">
+                    Mỗi câu trả lời đúng sẽ giúp bạn thu thập một viên kim cương kiến thức
+                    về <strong>hình thoi</strong>. Hoàn thành 15 câu hỏi để trở thành{" "}
+                    <span className="text-cyan-300 font-semibold">Thủ Lĩnh Kim Cương</span>!
+                  </p>
+                  <button
+                    onClick={handleStart}
+                    className="mt-2 px-8 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-lg shadow-lg shadow-cyan-500/40 transform hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                  >
+                    BẮT ĐẦU HÀNH TRÌNH 💎
+                  </button>
+                </div>
+              )}
+
+              {/* PLAYING */}
+              {gameState === "playing" && (
+                <div className="flex flex-col md:flex-row gap-6">
+                  {/* Cột trái: Thông tin */}
+                  <div className="md:w-1/3 flex flex-col items-center gap-4">
+                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-cyan-400 flex items-center justify-center bg-slate-900/80 shadow-[0_0_40px_rgba(56,189,248,0.8)]">
+                      <span className="text-5xl">💠</span>
+                      {feedback === "correct" && <Confetti />}
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm text-slate-200">
+                        Câu <span className="font-bold text-cyan-300">{currentQ + 1}</span> / {questions.length}
+                      </p>
+                      <p className="text-sm text-slate-200">
+                        Điểm: <span className="font-bold text-emerald-300">{score}</span>
+                      </p>
+                    </div>
+                    {/* Thanh tiến độ */}
+                    <div className="w-full max-w-xs">
+                      <div className="flex justify-between text-[11px] text-slate-300 mb-1">
+                        <span>Tiến độ</span>
+                        <span>{Math.round(((currentQ + 1) / questions.length) * 100)}%</span>
+                      </div>
+                      <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-cyan-400 via-sky-400 to-emerald-400 transition-all duration-500"
+                          style={{ width: `${((currentQ + 1) / questions.length) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                    {/* Mức độ */}
+                    <div className="mt-2 text-xs text-slate-300">
+                      Mức độ:{" "}
+                      <span className="font-semibold text-cyan-300">
+                        {questions[currentQ].level}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Cột phải: Câu hỏi */}
+                  <div className="md:w-2/3 bg-slate-900/70 border border-slate-700 rounded-2xl p-4 sm:p-6 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 rounded-bl-full pointer-events-none" />
+                    <h3 className="text-lg sm:text-xl font-semibold mb-4 text-slate-50">
+                      {questions[currentQ].question}
+                    </h3>
+                    <div className="grid grid-cols-1 gap-3 mt-2">
+                      {questions[currentQ].options.map((opt, idx) => {
+                        let base =
+                          "w-full text-left px-4 py-3 rounded-xl border text-sm sm:text-base transition-all";
+                        let style =
+                          "border-slate-600 bg-slate-800/80 hover:bg-slate-700/80 text-slate-100";
+
+                        if (feedback) {
+                          if (idx === questions[currentQ].correct) {
+                            style =
+                              "border-emerald-400 bg-emerald-900/50 text-emerald-100 shadow-[0_0_18px_rgba(52,211,153,0.6)]";
+                          } else if (feedback === "wrong") {
+                            style =
+                              "border-slate-700 bg-slate-900/70 text-slate-500 opacity-60";
+                          }
+                        }
+
+                        return (
+                          <button
+                            key={idx}
+                            disabled={!!feedback}
+                            onClick={() => handleAnswer(idx)}
+                            className={`${base} ${style}`}
+                          >
+                            <span className="font-semibold mr-2">
+                              {["A.", "B.", "C.", "D."][idx]}
+                            </span>
+                            {opt}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {feedback === "wrong" && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
+                        <div className="px-4 py-2 rounded-full bg-red-600 text-white text-sm font-semibold shadow-lg">
+                          Sai mất rồi, thử lại câu sau nhé! 😢
+                        </div>
+                      </div>
+                    )}
+                    {feedback === "correct" && (
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center pointer-events-none">
+                        <div className="px-4 py-2 rounded-full bg-emerald-500 text-slate-900 text-sm font-semibold shadow-lg">
+                          Chính xác! Bạn vừa nhận thêm một viên kim cương 💎
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* END */}
+              {gameState === "end" && (
+                <div className="flex flex-col items-center text-center gap-6 py-8">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-emerald-400 blur-3xl opacity-40 animate-pulse" />
+                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-3xl border border-emerald-400/60 flex items-center justify-center bg-slate-900/80 shadow-[0_0_40px_rgba(52,211,153,0.8)]">
+                      <span className="text-5xl sm:text-6xl">👑</span>
+                    </div>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-extrabold text-emerald-300 drop-shadow">
+                    Bạn Đã Chinh Phục Vương Quốc Kim Cương!
+                  </h2>
+                  <p className="text-sm sm:text-base text-slate-200 max-w-xl">
+                    Bạn trả lời đúng{" "}
+                    <span className="font-bold text-emerald-300">{correctCount}</span> /{" "}
+                    {questions.length} câu.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center text-sm sm:text-base">
+                    <div className="px-4 py-3 rounded-2xl bg-slate-900/80 border border-slate-700 min-w-[140px]">
+                      <div className="text-slate-300 text-xs uppercase mb-1">Tổng điểm</div>
+                      <div className="text-2xl font-bold text-emerald-400">{score}</div>
+                    </div>
+                    <div className="px-4 py-3 rounded-2xl bg-slate-900/80 border border-slate-700 min-w-[140px]">
+                      <div className="text-slate-300 text-xs uppercase mb-1">Danh hiệu</div>
+                      <div className="text-lg font-bold text-cyan-300">
+                        {score >= 130
+                          ? "Thủ Lĩnh Kim Cương"
+                          : score >= 100
+                          ? "Hiệp Sĩ Kim Cương"
+                          : "Nhà Thám Hiểm"}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setGameState("intro");
+                      setCurrentQ(0);
+                      setScore(0);
+                      setFeedback(null);
+                    }}
+                    className="mt-2 px-8 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-lg shadow-lg shadow-cyan-500/40 transform hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                  >
+                    CHƠI LẠI TỪ ĐẦU 🔁
+                  </button>
+                </div>
+              )}
+            </main>
+
+            <footer className="px-6 sm:px-10 py-3 text-[11px] text-slate-400 border-t border-slate-800 bg-slate-950/80 text-center">
+              Toán 8 – Hình thoi – Thu Bình Toán 💚
+            </footer>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<DiamondKingdom />);
+  </script>
+</body>
+</html>
