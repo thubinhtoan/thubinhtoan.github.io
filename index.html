@@ -88,184 +88,70 @@
   <script>
     // ===== DỮ LIỆU: 4 LỚP ➜ CHỦ ĐỀ ➜ GAME =====
     const grades = [
+     const grades = [
+  {
+    grade: "Lớp 6",
+    color: "emerald",
+    topics: [
       {
-        id: "9",
-        name: "Lớp 9",
-        short: "9",
-        color: "emerald",
-        description: "Hình học 9 – Đường tròn, tiếp tuyến, hình tròn & căn bậc hai.",
-        topics: [
-          {
-            id: "lop9-duong-tron",
-            name: "Đường tròn & Góc – Tiếp tuyến",
-            description: "Ôn tập đường tròn, góc ở tâm, góc nội tiếp, tiếp tuyến và ứng dụng.",
-            games: [
-              {
-                id: 1,
-                folder: "khu-vuon-bi-mat",
-                icon: "🌸",
-                label: "Trò chơi 1",
-                title: "Khu Vườn Bí Mật – Đường tròn",
-                grade: "Toán 9 – Đường tròn",
-                color: "emerald",
-                description: "Ôn tập bài Đường tròn – làm nở hoa trong khu vườn bí mật."
-              },
-              {
-                id: 2,
-                folder: "cuoc-xam-lang",
-                icon: "🛸",
-                label: "Trò chơi 2",
-                title: "Cuộc Xâm Lăng – Tiếp tuyến",
-                grade: "Toán 9 – Tiếp tuyến đường tròn",
-                color: "indigo",
-                description: "Bắn hạ tàu UFO bằng kiến thức tiếp tuyến."
-              },
-              {
-                id: 3,
-                folder: "me-cung-tri-tue",
-                icon: "🧠",
-                label: "Trò chơi 3",
-                title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp",
-                grade: "Toán 9 – Góc ở tâm & nội tiếp",
-                color: "sky",
-                description: "Vượt mê cung bằng cách giải các câu hỏi về góc ở tâm – góc nội tiếp."
-              },
-              {
-                id: 4,
-                folder: "chien-binh-rong",
-                icon: "🐉",
-                label: "Trò chơi 4",
-                title: "Chiến Binh Rồng – Hình quạt & vành khuyên",
-                grade: "Toán 9 – Hình quạt & vành khuyên",
-                color: "rose",
-                description: "Chiến đấu với quái vật bằng kiến thức về hình quạt tròn, vành khuyên."
-              }
-            ]
-          },
-          {
-            id: "lop9-can-bac-hai",
-            name: "Căn bậc hai – Biến đổi & tính chất",
-            description: "Nhận biết, biến đổi căn thức bậc hai và các tính chất khai phương.",
-            games: [
-              {
-                id: 5,
-                folder: "du-hanh-vu-tru",
-                icon: "🚀",
-                label: "Trò chơi 5",
-                title: "Du Hành Giữa Các Vì Sao – Căn bậc hai",
-                grade: "Toán 9 – Căn bậc hai",
-                color: "sky",
-                description: "Điều khiển tàu vũ trụ vượt qua 3 màn thử thách về căn bậc hai."
-              },
-              {
-                id: 6,
-                folder: "de-che-troi-day",
-                icon: "🏰",
-                label: "Trò chơi 6",
-                title: "Đế Chế Trỗi Dậy – Biến đổi căn bậc hai",
-                grade: "Toán 9 – Biến đổi căn bậc hai",
-                color: "yellow",
-                description: "Thu thập tài nguyên, xây đế chế bằng các phép biến đổi căn bậc hai."
-              }
-            ]
-          }
+        title: "Số học",
+        icon: "🔢",
+        games: [
+          { id: 1, title: "Khám phá phân số – Hành trình kỳ thú", folder: "phan-so" }
         ]
-      },
-    {
-  id: "8",
-  name: "Lớp 8",
-  short: "8",
-  color: "sky",
-  description: "Hình bình hành, hình thoi, hình chữ nhật và hình vuông.",
-  topics: [
-    {
-      id: "lop8-hinh-binh-hanh",
-      name: "Hình bình hành",
-      description: "Tính chất, dấu hiệu nhận biết và bài toán thực tế với hình bình hành.",
-      games: [
-        {
-          id: 7,
-          folder: "huyen-thoai-tai-sinh",
-          icon: "🔥",
-          label: "Trò chơi 7",
-          title: "Huyền Thoại Tái Sinh – Hình bình hành",
-          grade: "Toán 8 – Hình bình hành",
-          color: "rose",
-          description: "Đánh thức Thần Thú qua 15 câu hỏi về hình bình hành."
-        }
-      ]
-    },
-    {
-      id: "lop8-hinh-thoi",
-      name: "Hình thoi",
-      description: "Nhận biết, tính chất đường chéo, diện tích hình thoi…",
-      games: [
-        {
-          id: 8,
-          folder: "vuong-quoc-kim-cuong",
-          icon: "💎",
-          label: "Trò chơi 8",
-          title: "Vương Quốc Kim Cương – Hình thoi",
-          grade: "Toán 8 – Hình thoi",
-          color: "sky",
-          description: "Thu thập kim cương kiến thức về hình thoi qua 15 câu hỏi."
-        }
-      ]
-    },
-    {
-      id: "lop8-hinh-chu-nhat",
-      name: "Hình chữ nhật",
-      description: "Nhận biết, tính chất, chu vi, diện tích và bài toán thực tế với hình chữ nhật.",
-      games: [
-        {
-          id: 9,
-          folder: "phao-dai-hinh-chu-nhat",
-          icon: "🧱",
-          label: "Trò chơi 9",
-          title: "Pháo Đài Hình Chữ Nhật – Xây tường phòng thủ",
-          grade: "Toán 8 – Hình chữ nhật",
-          color: "emerald",
-          description: "Trả lời các câu hỏi về hình chữ nhật để xây pháo đài phòng thủ kiên cố."
-        }
-      ]
-    },
-    {
-      id: "lop8-hinh-vuong",
-      name: "Hình vuông",
-      description: "Tính chất, đường chéo, chu vi, diện tích và bài toán thực tế với hình vuông.",
-      games: [
-        {
-          id: 10,
-          folder: "lau-dai-hinh-vuong",
-          icon: "💎",
-          label: "Trò chơi 10",
-          title: "Lâu Đài Hình Vuông – Bảo vệ viên kim cương hoàn mỹ",
-          grade: "Toán 8 – Hình vuông",
-          color: "sky",
-          description: "Trả lời các câu hỏi về hình vuông để xây lâu đài vuông vắn, bảo vệ viên kim cương hoàn mỹ."
-        }
-      ]
-    }
-  ]
-},
-      {
-        id: "7",
-        name: "Lớp 7",
-        short: "7",
-        color: "indigo",
-        description: "Các chủ đề Toán 7 sẽ được Thu Bình Toán cập nhật dần.",
-        topics: []
-      },
-      {
-        id: "6",
-        name: "Lớp 6",
-        short: "6",
-        color: "rose",
-        description: "Các chủ đề Toán 6 sẽ được Thu Bình Toán xây dựng sau.",
-        topics: []
       }
-    ];
+    ]
+  },
 
+  {
+    grade: "Lớp 7",
+    color: "indigo",
+    topics: [
+      {
+        title: "Số học",
+        icon: "🔣",
+        games: []
+      }
+    ]
+  },
+
+  {
+    grade: "Lớp 8",
+    color: "sky",
+    topics: [
+      {
+        title: "Hình học",
+        icon: "📐",
+        games: [
+          { id: 9, title: "Pháo Đài Hình Chữ Nhật – Xây tường phòng thủ", folder: "phao-dai-hinh-chu-nhat" },
+          { id: 10, title: "Lâu Đài Hình Vuông – Bảo vệ viên kim cương hoàn mỹ", folder: "lau-dai-hinh-vuong" },
+          { id: 11, title: "Cầu Treo Hình Thang – Băng qua vực sâu", folder: "cau-treo-hinh-thang" }
+        ]
+      }
+    ]
+  },
+
+  {
+    grade: "Lớp 9",
+    color: "rose",
+    topics: [
+      {
+        title: "Đường tròn & Căn bậc hai",
+        icon: "⭕",
+        games: [
+          { id: 1, title: "Khu Vườn Bí Mật – Đường tròn", folder: "khu-vuon-bi-mat" },
+          { id: 2, title: "Cuộc Xâm Lăng – Tiếp tuyến đường tròn", folder: "cuoc-xam-lang" },
+          { id: 3, title: "Mê Cung Trí Tuệ – Góc ở tâm và góc nội tiếp", folder: "me-cung-tri-tue" },
+          { id: 4, title: "Chiến Binh Rồng – Hình quạt và vành khuyên", folder: "chien-binh-rong" },
+          { id: 5, title: "Du Hành Giữa Các Vì Sao – Căn bậc hai", folder: "du-hanh-vu-tru" },
+          { id: 6, title: "Đế Chế Trỗi Dậy – Biến đổi căn bậc hai", folder: "de-che-troi-day" },
+          { id: 7, title: "Huyền Thoại Tái Sinh – Hình bình hành", folder: "huyen-thoai-tai-sinh" },
+          { id: 8, title: "Pháo Đài Tối Thượng – Bài toán tổng hợp", folder: "phao-dai-toi-thuong" }
+        ]
+      }
+    ]
+  }
+];
     const colorStyles = {
       emerald: {
         card: "border-emerald-500/40 bg-emerald-900/40 hover:bg-emerald-800/80",
