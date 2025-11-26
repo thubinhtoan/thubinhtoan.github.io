@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hành Trình Vô Tận: Hình Thoi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #0f172a;
+            color: white;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        #game-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .answer-btn {
+            transition: all 0.2s;
+        }
+        .answer-btn:active {
+            transform: scale(0.95);
+        }
+
+        .hidden { display: none !important; }
+
+        /* Animation cho tung hoa/mặt cười */
+        @keyframes popUp {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        .emoji-feedback {
+            position: absolute;
+            font-size: 5rem;
+            animation: popUp 1s ease-out forwards;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* Thanh tiến trình */
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-center relative">
+
+    <!-- Canvas Background -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Màn hình Chào mừng -->
+    <div id="start-screen" class="absolute z-10 glass-panel p-8 rounded-2xl text-center max-w-md w-full mx-4 flex flex-col items-center">
+        <div class="text-6xl mb-4 text-yellow-400"><i class="fas fa-rocket"></i></div>
+        <h1 class="text-3xl font-bold mb-2 text-cyan-400">HÀNH TRÌNH VÔ TẬN</h1>
+        <h2 class="text-xl mb-4 text-purple-300">Chủ đề: Hình Thoi (Lớp 8)</h2>
+        <p class="mb-6 text-gray-300 text-sm">Vượt qua 15 câu hỏi để đưa tàu vũ trụ đến đích. Sẵn sàng chưa?</p>
+        <button onclick="startGame()" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105">
+            BẮT ĐẦU NGAY
+        </button>
+    </div>
+
+    <!-- Giao diện Gameplay -->
+    <div id="game-ui" class="absolute z-10 w-full max-w-3xl px-4 hidden flex flex-col h-full justify-center">
+        
+        <!-- Thông tin phía trên -->
+        <div class="flex justify-between items-center mb-4 glass-panel p-3 rounded-xl">
+            <div class="flex items-center gap-2">
+                <span class="text-yellow-400"><i class="fas fa-star"></i></span>
+                <span id="score-display" class="font-bold text-xl">0</span>
+            </div>
+            <div class="text-cyan-300 font-bold">Câu: <span id="question-count">1</span>/15</div>
+        </div>
+
+        <!-- Thanh năng lượng/tiến trình -->
+        <div class="w-full bg-gray-700 rounded-full h-2.5 mb-6 border border-gray-600">
+            <div id="progress-bar" class="bg-gradient-to-r from-cyan-400 to-blue-500 h-2.5 rounded-full progress-bar" style="width: 0%"></div>
+        </div>
+
+        <!-- Khung câu hỏi -->
+        <div id="question-box" class="glass-panel p-6 rounded-2xl mb-4 relative">
+            <div id="level-badge" class="absolute -top-3 left-6 bg-purple-600 text-xs px-3 py-1 rounded-full uppercase font-bold border border-purple-400">
+                Nhận biết
+            </div>
+            <h3 id="question-text" class="text-xl md:text-2xl font-bold mb-6 mt-2 leading-relaxed text-white">
+                Nội dung câu hỏi sẽ hiện ở đây?
+            </h3>
+            
+            <div id="answers-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Buttons will be injected here -->
+            </div>
+        </div>
+
+        <!-- Thông báo kết quả câu hỏi -->
+        <div id="feedback-msg" class="text-center font-bold text-xl h-8 opacity-0 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Màn hình Kết thúc -->
+    <div id="end-screen" class="absolute z-10 glass-panel p-8 rounded-2xl text-center max-w-md w-full mx-4 hidden flex flex-col items-center">
+        <div id="end-icon" class="text-6xl mb-4 text-yellow-400">🏆</div>
+        <h2 class="text-3xl font-bold mb-2 text-white">HOÀN THÀNH!</h2>
+        <p class="mb-4 text-gray-300">Bạn đã hoàn thành chuyến hành trình.</p>
+        
+        <div class="w-full bg-slate-700 p-4 rounded-xl mb-6">
+            <div class="flex justify-between mb-2">
+                <span>Điểm số:</span>
+                <span id="final-score" class="font-bold text-yellow-400">0</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Đúng:</span>
+                <span id="final-correct" class="font-bold text-green-400">0/15</span>
+            </div>
+        </div>
+
+        <button onclick="location.reload()" class="bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-bold py-3 px-8 rounded-full shadow-lg">
+            CHƠI LẠI
+        </button>
+    </div>
+
+    <script>
+        // --- Dữ liệu câu hỏi (Chuẩn chương trình 2018) ---
+        const questions = [
+            // Mức 1: Nhận biết (6 câu)
+            {
+                id: 1,
+                level: "Nhận biết",
+                question: "Hình thoi là tứ giác có:",
+                answers: [
+                    "Bốn góc bằng nhau",
+                    "Hai đường chéo bằng nhau",
+                    "Bốn cạnh bằng nhau",
+                    "Hai cạnh đối song song" // Đúng cho HBH nhưng định nghĩa Hình thoi là 4 cạnh bằng nhau
+                ],
+                correct: 2 // Index 2: Bốn cạnh bằng nhau
+            },
+            {
+                id: 2,
+                level: "Nhận biết",
+                question: "Trong hình thoi, hai đường chéo có tính chất nào sau đây?",
+                answers: [
+                    "Bằng nhau",
+                    "Vuông góc với nhau",
+                    "Song song với nhau",
+                    "Trùng nhau"
+                ],
+                correct: 1
+            },
+            {
+                id: 3,
+                level: "Nhận biết",
+                question: "Phát biểu nào sau đây là SAI về hình thoi?",
+                answers: [
+                    "Hình thoi có tất cả các tính chất của hình bình hành",
+                    "Giao điểm hai đường chéo là tâm đối xứng",
+                    "Hình thoi có 4 trục đối xứng",
+                    "Các cạnh đối song song với nhau"
+                ],
+                correct: 2 // Hình thoi chỉ có 2 trục đối xứng (2 đường chéo)
+            },
+            {
+                id: 4,
+                level: "Nhận biết",
+                question: "Hình bình hành có hai cạnh kề bằng nhau là hình gì?",
+                answers: [
+                    "Hình chữ nhật",
+                    "Hình vuông",
+                    "Hình thang cân",
+                    "Hình thoi"
+                ],
+                correct: 3
+            },
+            {
+                id: 5,
+                level: "Nhận biết",
+                question: "Hình bình hành có hai đường chéo vuông góc với nhau là hình gì?",
+                answers: [
+                    "Hình thoi",
+                    "Hình chữ nhật",
+                    "Hình thang",
+                    "Hình vuông"
+                ],
+                correct: 0
+            },
+            {
+                id: 6,
+                level: "Nhận biết",
+                question: "Hai đường chéo của hình thoi chia hình thoi thành mấy tam giác vuông bằng nhau?",
+                answers: [
+                    "2 tam giác",
+                    "4 tam giác",
+                    "6 tam giác",
+                    "8 tam giác"
+                ],
+                correct: 1
+            },
+            // Mức 2: Thông hiểu (5 câu)
+            {
+                id: 7,
+                level: "Thông hiểu",
+                question: "Một hình thoi có cạnh bằng 5cm. Chu vi của hình thoi đó là:",
+                answers: [
+                    "10cm",
+                    "15cm",
+                    "20cm",
+                    "25cm"
+                ],
+                correct: 2 // 5 * 4 = 20
+            },
+            {
+                id: 8,
+                level: "Thông hiểu",
+                question: "Cho hình thoi ABCD có góc A bằng 60 độ. Tam giác ABD là tam giác gì?",
+                answers: [
+                    "Tam giác vuông",
+                    "Tam giác cân",
+                    "Tam giác đều",
+                    "Tam giác vuông cân"
+                ],
+                correct: 2 // AB=AD và góc A = 60 => đều
+            },
+            {
+                id: 9,
+                level: "Thông hiểu",
+                question: "Hình thoi có chu vi là 32cm. Độ dài cạnh của hình thoi là:",
+                answers: [
+                    "4cm",
+                    "8cm",
+                    "16cm",
+                    "6cm"
+                ],
+                correct: 1 // 32 / 4 = 8
+            },
+            {
+                id: 10,
+                level: "Thông hiểu",
+                question: "Khẳng định nào sau đây là đúng?",
+                answers: [
+                    "Hình vuông là hình thoi đặc biệt",
+                    "Hình thoi là hình vuông đặc biệt",
+                    "Hình thang cân là hình thoi",
+                    "Hình chữ nhật có hai đường chéo vuông góc"
+                ],
+                correct: 0
+            },
+            {
+                id: 11,
+                level: "Thông hiểu",
+                question: "Cho hình thoi ABCD, góc A = 80 độ. Số đo góc B là:",
+                answers: [
+                    "80 độ",
+                    "100 độ",
+                    "90 độ",
+                    "120 độ"
+                ],
+                correct: 1 // A và B bù nhau trong HBH/Thoi: 180 - 80 = 100
+            },
+            // Mức 3: Vận dụng (3 câu)
+            {
+                id: 12,
+                level: "Vận dụng",
+                question: "Diện tích hình thoi có độ dài hai đường chéo là 6cm và 8cm là:",
+                answers: [
+                    "24 cm vuông",
+                    "48 cm vuông",
+                    "14 cm vuông",
+                    "12 cm vuông"
+                ],
+                correct: 0 // 1/2 * 6 * 8 = 24
+            },
+            {
+                id: 13,
+                level: "Vận dụng (Thực tế)",
+                question: "Một viên gạch lát nền có hình thoi với độ dài hai đường chéo là 30cm và 40cm. Diện tích của viên gạch đó là:",
+                answers: [
+                    "1200 cm vuông",
+                    "600 cm vuông",
+                    "300 cm vuông",
+                    "120 cm vuông"
+                ],
+                correct: 1 // 1/2 * 30 * 40 = 600
+            },
+            {
+                id: 14,
+                level: "Vận dụng",
+                question: "Hình thoi có diện tích 40 cm vuông, một đường chéo dài 8cm. Đường chéo còn lại dài bao nhiêu?",
+                answers: [
+                    "5cm",
+                    "10cm",
+                    "20cm",
+                    "4cm"
+                ],
+                correct: 1 // S = 1/2 d1 d2 => 40 = 1/2 * 8 * d2 => 40 = 4*d2 => d2=10
+            },
+            // Mức 4: Vận dụng cao (1 câu)
+            {
+                id: 15,
+                level: "Vận dụng cao",
+                question: "Hình thoi có hai đường chéo lần lượt là 6cm và 8cm. Độ dài cạnh của hình thoi là bao nhiêu?",
+                answers: [
+                    "5cm",
+                    "7cm",
+                    "10cm",
+                    "14cm"
+                ],
+                correct: 0 // Nửa đường chéo là 3 và 4. Pytago: 3^2 + 4^2 = 5^2. Cạnh = 5.
+            }
+        ];
+
+        // --- Logic Trò chơi ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctCount = 0;
+        let gameActive = false;
+
+        // Âm thanh (AudioContext để không cần file ngoài)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'correct') {
+                // Tiếng 'ting' cao vui tai
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.5);
+            } else if (type === 'wrong') {
+                // Tiếng trầm 'buzz'
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
+                oscillator.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.4);
+            } else if (type === 'bgm') {
+                // Giả lập tiếng động cơ tàu vũ trụ (tiếng ồn trắng thấp) - đơn giản hóa
+                // Chỉ dùng hiệu ứng hình ảnh để tránh đau đầu
+            }
+        }
+
+        // Khởi động Game
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-ui').classList.remove('hidden');
+            document.getElementById('game-ui').classList.add('flex');
+            gameActive = true;
+            currentQuestionIndex = 0;
+            score = 0;
+            correctCount = 0;
+            updateUI();
+            loadQuestion();
+            animateCanvas(); // Bắt đầu chạy hình nền
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                endGame();
+                return;
+            }
+
+            const q = questions[currentQuestionIndex];
+            document.getElementById('question-text').innerText = q.question;
+            document.getElementById('question-count').innerText = currentQuestionIndex + 1;
+            document.getElementById('level-badge').innerText = q.level;
+            
+            // Màu sắc badge theo mức độ
+            const badge = document.getElementById('level-badge');
+            if(q.level.includes("Nhận biết")) badge.className = "absolute -top-3 left-6 bg-green-600 text-xs px-3 py-1 rounded-full uppercase font-bold border border-green-400";
+            else if(q.level.includes("Thông hiểu")) badge.className = "absolute -top-3 left-6 bg-blue-600 text-xs px-3 py-1 rounded-full uppercase font-bold border border-blue-400";
+            else if(q.level.includes("Vận dụng")) badge.className = "absolute -top-3 left-6 bg-orange-600 text-xs px-3 py-1 rounded-full uppercase font-bold border border-orange-400";
+            else badge.className = "absolute -top-3 left-6 bg-red-600 text-xs px-3 py-1 rounded-full uppercase font-bold border border-red-400";
+
+            // Xóa đáp án cũ
+            const grid = document.getElementById('answers-grid');
+            grid.innerHTML = '';
+            
+            // Tạo nút đáp án
+            q.answers.forEach((ans, index) => {
+                const btn = document.createElement('button');
+                btn.className = "answer-btn bg-slate-700 hover:bg-slate-600 text-white p-4 rounded-xl text-left border-2 border-transparent focus:outline-none";
+                btn.innerHTML = `<span class="font-bold mr-2">${String.fromCharCode(65 + index)}.</span> ${ans}`;
+                btn.onclick = () => checkAnswer(index, q.correct, btn);
+                grid.appendChild(btn);
+            });
+
+            // Cập nhật thanh tiến trình
+            const progress = ((currentQuestionIndex) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        function checkAnswer(selected, correct, btnElement) {
+            if (!gameActive) return;
+
+            // Vô hiệu hóa tất cả các nút
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(b => b.disabled = true);
+
+            const feedback = document.getElementById('feedback-msg');
+            feedback.style.opacity = '1';
+
+            if (selected === correct) {
+                // Đúng
+                playSound('correct');
+                score += 10;
+                correctCount++;
+                btnElement.classList.remove('bg-slate-700');
+                btnElement.classList.add('bg-green-600', 'border-green-400');
+                feedback.innerHTML = '<span class="text-green-400"><i class="fas fa-check-circle"></i> Chính xác! Tuyệt vời!</span>';
+                
+                showConfetti();
+                showEmoji(true);
+                shipSpeed = 8; // Tăng tốc tàu
+            } else {
+                // Sai
+                playSound('wrong');
+                btnElement.classList.remove('bg-slate-700');
+                btnElement.classList.add('bg-red-600', 'border-red-400');
+                
+                // Highlight câu đúng
+                buttons[correct].classList.remove('bg-slate-700');
+                buttons[correct].classList.add('bg-green-600', 'border-green-400');
+                
+                feedback.innerHTML = '<span class="text-red-400"><i class="fas fa-times-circle"></i> Sai rồi! Cố lên nhé.</span>';
+                showEmoji(false);
+                shipSpeed = 1; // Giảm tốc tàu
+            }
+
+            updateUI();
+
+            setTimeout(() => {
+                feedback.style.opacity = '0';
+                currentQuestionIndex++;
+                shipSpeed = 2; // Tốc độ bình thường
+                loadQuestion();
+            }, 2000); // Đợi 2 giây để xem kết quả
+        }
+
+        function updateUI() {
+            document.getElementById('score-display').innerText = score;
+        }
+
+        function endGame() {
+            gameActive = false;
+            document.getElementById('game-ui').classList.add('hidden');
+            document.getElementById('game-ui').classList.remove('flex');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('end-screen').classList.add('flex');
+            
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-correct').innerText = `${correctCount}/15`;
+
+            // Thông báo kết quả
+            const msg = document.querySelector('#end-screen p');
+            if (correctCount >= 12) {
+                msg.innerText = "Bạn là thiên tài Hình học!";
+                document.getElementById('end-icon').innerText = "🚀";
+            } else if (correctCount >= 8) {
+                msg.innerText = "Kiến thức của bạn khá vững chắc!";
+                document.getElementById('end-icon').innerText = "⭐";
+            } else {
+                msg.innerText = "Hãy ôn lại bài Hình thoi nhé!";
+                document.getElementById('end-icon').innerText = "📚";
+            }
+        }
+
+        // --- Hiệu ứng Visual ---
+        
+        function showEmoji(isCorrect) {
+            const container = document.body;
+            const emoji = document.createElement('div');
+            emoji.className = 'emoji-feedback';
+            emoji.innerText = isCorrect ? '😎' : '😅';
+            
+            // Random vị trí
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 100);
+            
+            emoji.style.left = x + 'px';
+            emoji.style.top = y + 'px';
+            
+            container.appendChild(emoji);
+            setTimeout(() => emoji.remove(), 1000);
+        }
+
+        // Hiệu ứng pháo hoa đơn giản (Canvas 2D)
+        function showConfetti() {
+            const colors = ['#f43f5e', '#ec4899', '#d946ef', '#a855f7', '#8b5cf6', '#6366f1', '#3b82f6', '#0ea5e9', '#06b6d4', '#14b8a6', '#10b981', '#22c55e', '#84cc16', '#eab308', '#f59e0b', '#f97316'];
+            
+            for(let i=0; i<50; i++) {
+                createParticle(window.innerWidth/2, window.innerHeight/2, colors[Math.floor(Math.random()*colors.length)]);
+            }
+        }
+
+        const particles = [];
+        function createParticle(x, y, color) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 5 + 2;
+            particles.push({
+                x: x,
+                y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                life: 1.0,
+                color: color
+            });
+        }
+
+        // --- Canvas Game Loop (Tàu vũ trụ & Sao) ---
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let stars = [];
+        let shipSpeed = 2; // Tốc độ bay
+        let frameId;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initStars();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        function initStars() {
+            stars = [];
+            for (let i = 0; i < 150; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    speed: Math.random() * 3 + 0.5
+                });
+            }
+        }
+
+        function drawShip() {
+            const cx = canvas.width / 2;
+            const cy = canvas.height * 0.8;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            
+            // Lắc lư tàu
+            ctx.rotate(Math.sin(Date.now() / 200) * 0.05);
+
+            // Thân tàu
+            ctx.fillStyle = '#e2e8f0';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 15, 40, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Cánh
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath();
+            ctx.moveTo(-15, 10);
+            ctx.lineTo(-30, 40);
+            ctx.lineTo(-10, 30);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(15, 10);
+            ctx.lineTo(30, 40);
+            ctx.lineTo(10, 30);
+            ctx.fill();
+
+            // Cửa sổ
+            ctx.fillStyle = '#0ea5e9';
+            ctx.beginPath();
+            ctx.arc(0, -10, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Lửa động cơ
+            const fireHeight = Math.random() * 20 + 20 + (shipSpeed * 5);
+            const gradient = ctx.createLinearGradient(0, 30, 0, 30 + fireHeight);
+            gradient.addColorStop(0, '#fef08a'); // Vàng
+            gradient.addColorStop(0.5, '#f97316'); // Cam
+            gradient.addColorStop(1, 'transparent');
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.moveTo(-10, 35);
+            ctx.lineTo(0, 35 + fireHeight);
+            ctx.lineTo(10, 35);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function animateCanvas() {
+            ctx.fillStyle = '#0f172a'; // Xóa màn hình bằng màu nền
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Vẽ sao
+            ctx.fillStyle = 'white';
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Di chuyển sao xuống dưới (tạo cảm giác tàu bay lên)
+                star.y += star.speed * shipSpeed;
+
+                // Reset sao khi ra khỏi màn hình
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
+                }
+            });
+
+            // Vẽ pháo hoa (Particles)
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.02;
+
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+            ctx.globalAlpha = 1;
+
+            drawShip();
+
+            if (gameActive) {
+                requestAnimationFrame(animateCanvas);
+            }
+        }
+
+        // Init
+        resizeCanvas();
+
+    </script>
+</body>
+</html>
