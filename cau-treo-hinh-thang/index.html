@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cầu Treo Hình Thang – Thu Bình Toán (Game 11)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React + ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <!-- Babel để dùng JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="m-0 p-0 bg-slate-950">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    // ================== CÂU HỎI GAME 11 – HÌNH THANG ==================
+    // 15 câu – Hình thang, hình thang cân, hình thang vuông
+    // Chỉ số đáp án đúng: 0 = A, 1 = B, 2 = C, 3 = D
+    const questions = [
+      // --- NHẬN BIẾT (6 câu) ---
+      {
+        id: 1,
+        level: "Nhận biết",
+        question: "Hình thang là tứ giác có:",
+        options: [
+          "Hai cặp cạnh đối song song",
+          "Hai cặp cạnh kề song song",
+          "Một cặp cạnh đối song song",
+          "Bốn góc vuông"
+        ],
+        correct: 2 // C
+      },
+      {
+        id: 2,
+        level: "Nhận biết",
+        question: "Trong các tứ giác sau, tứ giác nào CHẮC CHẮN là hình thang?",
+        options: [
+          "Hình bình hành",
+          "Hình chữ nhật",
+          "Tứ giác có đúng một cặp cạnh đối song song",
+          "Hình vuông"
+        ],
+        correct: 2 // C
+      },
+      {
+        id: 3,
+        level: "Nhận biết",
+        question: "Hình thang cân là hình thang có:",
+        options: [
+          "Hai đáy bằng nhau",
+          "Hai cạnh bên bằng nhau",
+          "Một góc vuông",
+          "Hai đường chéo vuông góc"
+        ],
+        correct: 1 // B
+      },
+      {
+        id: 4,
+        level: "Nhận biết",
+        question: "Hình thang vuông là hình thang có:",
+        options: [
+          "Bốn góc vuông",
+          "Hai cạnh bên bằng nhau",
+          "Hai góc vuông kề một cạnh bên",
+          "Hai đường chéo bằng nhau"
+        ],
+        correct: 2 // C
+      },
+      {
+        id: 5,
+        level: "Nhận biết",
+        question: "Trong hình thang ABCD (AB ∥ CD), khẳng định nào sau đây đúng?",
+        options: [
+          "AB và CD gọi là hai cạnh bên",
+          "AD và BC là hai đáy",
+          "Hai góc kề cùng một cạnh bên bù nhau",
+          "Bốn cạnh đều bằng nhau"
+        ],
+        correct: 2 // C (hai góc kề cùng một cạnh bên bù nhau)
+      },
+      {
+        id: 6,
+        level: "Nhận biết",
+        question: "Trong hình thang ABCD (AB ∥ CD), các đoạn AB và CD được gọi là:",
+        options: [
+          "Hai cạnh bên",
+          "Đường chéo",
+          "Đường cao",
+          "Hai đáy"
+        ],
+        correct: 3 // D
+      },
+
+      // --- THÔNG HIỂU (5 câu) ---
+      {
+        id: 7,
+        level: "Thông hiểu",
+        question: "Một hình thang có hai đáy lần lượt là 6 cm và 10 cm, chiều cao là 4 cm. Diện tích hình thang là:",
+        options: [
+          "32 cm²",
+          "64 cm²",
+          "16 cm²",
+          "40 cm²"
+        ],
+        correct: 0 // A (S = (6+10)/2 · 4 = 32)
+      },
+      {
+        id: 8,
+        level: "Thông hiểu",
+        question: "Một hình thang cân có hai đáy lần lượt là 8 cm và 4 cm, mỗi cạnh bên dài 5 cm. Chu vi hình thang là:",
+        options: [
+          "22 cm",
+          "18 cm",
+          "26 cm",
+          "20 cm"
+        ],
+        correct: 0 // A (P = 8 + 4 + 5 + 5 = 22)
+      },
+      {
+        id: 9,
+        level: "Thông hiểu",
+        question: "Trong hình thang cân, khẳng định nào sau đây đúng?",
+        options: [
+          "Hai đáy bằng nhau",
+          "Hai cạnh bên song song",
+          "Hai góc kề cùng một đáy bằng nhau",
+          "Hai đường cao bằng nhau nhưng hai cạnh bên khác nhau"
+        ],
+        correct: 2 // C
+      },
+      {
+        id: 10,
+        level: "Thông hiểu",
+        question: "Trong hình thang cân, các đường chéo có tính chất:",
+        options: [
+          "Vuông góc với nhau",
+          "Bằng nhau",
+          "Không bằng nhau",
+          "Cắt nhau tại trung điểm mỗi đường"
+        ],
+        correct: 1 // B
+      },
+      {
+        id: 11,
+        level: "Thông hiểu",
+        question: "Một hình thang vuông có hai đáy là 5 cm và 9 cm, chiều cao là 3 cm. Diện tích của hình thang là:",
+        options: [
+          "21 cm²",
+          "14 cm²",
+          "42 cm²",
+          "28 cm²"
+        ],
+        correct: 0 // A (S = (5+9)/2 · 3 = 21)
+      },
+
+      // --- VẬN DỤNG (3 câu) ---
+      {
+        id: 12,
+        level: "Vận dụng",
+        question: "Một hình thang có diện tích 48 cm², hai đáy lần lượt là 10 cm và 14 cm. Chiều cao của hình thang là:",
+        options: [
+          "2 cm",
+          "3 cm",
+          "4 cm",
+          "6 cm"
+        ],
+        correct: 2 // C (48 = (10+14)/2 · h ⇒ 48 = 12h ⇒ h = 4)
+      },
+      {
+        id: 13,
+        level: "Vận dụng",
+        question: "Một hình thang cân có hai đáy lần lượt là 14 cm và 6 cm. Chu vi hình thang là 40 cm. Độ dài mỗi cạnh bên là:",
+        options: [
+          "8 cm",
+          "7 cm",
+          "10 cm",
+          "12 cm"
+        ],
+        correct: 2 // C (14 + 6 + 2a = 40 ⇒ a = 10)
+      },
+      {
+        id: 14,
+        level: "Vận dụng",
+        question: "Cho hình thang vuông ABCD (AB ∥ CD). Biết AB = 6 cm, CD = 10 cm, AD = 4 cm và AD ⟂ AB. Độ dài cạnh BC là:",
+        options: [
+          "4 cm",
+          "2√5 cm",
+          "4√2 cm",
+          "8 cm"
+        ],
+        correct: 2 // C (BC² = (10−6)² + 4² = 16+16 = 32 ⇒ BC = 4√2)
+      },
+
+      // --- VẬN DỤNG CAO (1 câu) ---
+      {
+        id: 15,
+        level: "Vận dụng cao",
+        question: "Cho hình thang ABCD (AB ∥ CD) với AB = 6 cm, CD = 14 cm. Gọi M và N lần lượt là trung điểm của hai cạnh bên AD và BC. Độ dài đoạn MN là:",
+        options: [
+          "5 cm",
+          "7 cm",
+          "10 cm",
+          "12 cm"
+        ],
+        correct: 2 // C (MN = (AB + CD) / 2 = (6+14)/2 = 10)
+      }
+    ];
+
+    // ================== ÂM THANH ==================
+    const playSound = (type) => {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const now = ctx.currentTime;
+
+      if (type === "correct") {
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(660, now + 0.1);
+        osc.frequency.setValueAtTime(880, now + 0.2);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      } else if (type === "wrong") {
+        osc.type = "square";
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.linearRampToValueAtTime(80, now + 0.25);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      }
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+    };
+
+    // ================== CONFETTI ==================
+    const Confetti = () => (
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-40">
+        {[...Array(30)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 rounded-full"
+            style={{
+              backgroundColor: ['#e5e7eb', '#22c55e', '#38bdf8', '#f97316'][i % 4],
+              left: `${Math.random() * 100}%`,
+              top: `-10px`,
+              animation: `fall ${1 + Math.random() * 2}s linear forwards`,
+              animationDelay: `${Math.random() * 0.5}s`
+            }}
+          />
+        ))}
+        <style>{`
+          @keyframes fall {
+            to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+          }
+        `}</style>
+      </div>
+    );
+
+    // ================== VIEW CẦU TREO HÌNH THANG ==================
+    const RopeBridgeView = ({ correctCount }) => {
+      const totalBoards = 10; // số tấm ván tối đa
+      const filledBoards = Math.min(totalBoards, Math.round((correctCount / questions.length) * totalBoards));
+
+      return (
+        <div className="w-full max-w-md mx-auto bg-slate-900/80 border border-emerald-400/60 rounded-2xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold text-emerald-300 mb-2 flex items-center gap-2">
+            <span>🌉</span>
+            <span>Tiến độ bắc Cầu Treo Hình Thang</span>
+          </h3>
+
+          <div className="relative h-40 sm:h-44 rounded-2xl overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900">
+            {/* Vách đá hai bên */}
+            <div className="absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-stone-700 to-stone-500" />
+            <div className="absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-stone-700 to-stone-500" />
+
+            {/* Vực sâu */}
+            <div className="absolute inset-x-10 bottom-0 h-24 bg-gradient-to-t from-slate-950 via-slate-900 to-slate-800" />
+
+            {/* Dây treo trên */}
+            <div className="absolute left-10 right-10 top-10 h-1 bg-amber-500/80 rounded-full shadow" />
+            {/* Dây treo dưới */}
+            <div className="absolute left-10 right-10 top-24 h-1 bg-amber-600/80 rounded-full shadow" />
+
+            {/* Các dây dọc + ván hình thang */}
+            {Array.from({ length: totalBoards }).map((_, i) => {
+              const xPercent = (i + 0.5) * (80 / totalBoards) + 10; // trong khoảng 10% - 90%
+              const isBuilt = i < filledBoards;
+              return (
+                <div key={i}>
+                  {/* Dây dọc */}
+                  <div
+                    className="absolute"
+                    style={{
+                      left: `${xPercent}%`,
+                      top: "10px",
+                      width: "2px",
+                      height: "56px",
+                      backgroundColor: isBuilt ? "#fbbf24" : "rgba(75,85,99,0.8)"
+                    }}
+                  />
+                  {/* Tấm ván (vẽ dạng hình thang) */}
+                  <div
+                    className={`absolute top-[72px] h-3 ${
+                      isBuilt ? "bg-amber-400" : "bg-slate-700"
+                    }`}
+                    style={{
+                      left: `${xPercent - 4}%`,
+                      width: "8%",
+                      borderRadius: "999px",
+                      boxShadow: isBuilt ? "0 0 10px rgba(251,191,36,0.8)" : "none"
+                    }}
+                  />
+                </div>
+              );
+            })}
+
+            {/* Nhân vật đi trên cầu */}
+            <div
+              className="absolute top-[60px] transition-all duration-500"
+              style={{
+                left: `${10 + (filledBoards / totalBoards) * 80}%`,
+                transform: "translateX(-50%)"
+              }}
+            >
+              <div className="text-2xl drop-shadow-[0_0_8px_rgba(248,250,252,0.9)]">
+                🧑‍🎓
+              </div>
+            </div>
+          </div>
+
+          {/* Thanh tiến độ */}
+          <div className="mt-3">
+            <div className="flex justify-between text-[11px] text-slate-300 mb-1">
+              <span>Độ an toàn của cầu treo</span>
+              <span>{Math.round((correctCount / questions.length) * 100)}%</span>
+            </div>
+            <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-emerald-400 via-sky-400 to-amber-300 transition-all duration-500"
+                style={{ width: `${(correctCount / questions.length) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          <p className="mt-2 text-[11px] text-slate-400">
+            Mỗi câu đúng sẽ thêm một tấm ván chắc chắn lên cầu treo hình thang, giúp học sinh băng qua vực sâu an toàn.
+          </p>
+        </div>
+      );
+    };
+
+    // ================== MAIN GAME COMPONENT ==================
+    function TrapezoidBridgeGame() {
+      const [gameState, setGameState] = useState("intro"); // intro, playing, end
+      const [currentQ, setCurrentQ] = useState(0);
+      const [score, setScore] = useState(0);
+      const [feedback, setFeedback] = useState(null); // 'correct' | 'wrong' | null
+      const [soundOn, setSoundOn] = useState(true);
+
+      const correctCount = score / 10;
+
+      const handleStart = () => {
+        setGameState("playing");
+        setCurrentQ(0);
+        setScore(0);
+        setFeedback(null);
+      };
+
+      const handleAnswer = (index) => {
+        if (feedback) return;
+
+        const isCorrect = index === questions[currentQ].correct;
+        if (isCorrect) {
+          setFeedback("correct");
+          setScore((s) => s + 10);
+          if (soundOn) playSound("correct");
+        } else {
+          setFeedback("wrong");
+          if (soundOn) playSound("wrong");
+        }
+
+        setTimeout(() => {
+          setFeedback(null);
+          if (currentQ < questions.length - 1) {
+            setCurrentQ((q) => q + 1);
+          } else {
+            setGameState("end");
+          }
+        }, 1800);
+      };
+
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white relative overflow-hidden">
+          {/* BG sao & sương mù */}
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-emerald-950 opacity-90" />
+          <div className="absolute inset-0 pointer-events-none opacity-30">
+            {[...Array(40)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-1 h-1 rounded-full bg-sky-300"
+                style={{
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                  boxShadow: "0 0 8px rgba(56,189,248,0.8)"
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Nút âm thanh */}
+          <button
+            onClick={() => setSoundOn((v) => !v)}
+            className="absolute top-4 right-4 z-20 px-3 py-2 text-xs sm:text-sm bg-white/10 hover:bg-white/20 rounded-full"
+          >
+            {soundOn ? "🔊 Âm thanh: BẬT" : "🔇 Âm thanh: TẮT"}
+          </button>
+
+          {/* MAIN CARD */}
+          <div className="relative z-10 w-full max-w-5xl mx-4 bg-slate-900/85 border border-emerald-400/60 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-xl">
+            {/* Header */}
+            <header className="px-6 sm:px-10 py-4 border-b border-emerald-400/60 bg-gradient-to-r from-emerald-500/40 to-sky-400/30 flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <div className="text-xs uppercase tracking-wide text-emerald-200/80 mb-1">
+                  Thu Bình Toán – Game 11
+                </div>
+                <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                  <span className="text-2xl">🌉</span>
+                  <span>Cầu Treo Hình Thang – Băng qua vực sâu</span>
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-200/90">
+                  Toán 8 – Hình thang, hình thang cân, hình thang vuông · Trả lời đúng để bắc đủ tấm ván, giúp học sinh băng qua cầu treo an toàn.
+                </p>
+              </div>
+              <div className="flex flex-col items-end text-[11px] sm:text-xs text-emerald-100">
+                <span>
+                  Câu:{" "}
+                  {gameState === "playing" ? currentQ + 1 : 0}/{questions.length}
+                </span>
+                <span>Điểm: {score}</span>
+              </div>
+            </header>
+
+            {/* BODY */}
+            <main className="p-4 sm:p-6 md:p-8">
+              {/* INTRO */}
+              {gameState === "intro" && (
+                <div className="flex flex-col items-center text-center gap-6 py-8">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-emerald-400 blur-3xl opacity-40 animate-pulse" />
+                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full border border-emerald-400/60 flex items-center justify-center bg-slate-900/90 shadow-[0_0_40px_rgba(52,211,153,0.9)]">
+                      <span className="text-5xl sm:text-6xl">🌉</span>
+                    </div>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-extrabold text-emerald-300 drop-shadow">
+                    Bắc Cầu Treo Hình Thang
+                  </h2>
+                  <p className="text-sm sm:text-base text-slate-200 max-w-xl">
+                    Mỗi câu trả lời đúng sẽ thêm một <strong>tấm ván chắc chắn</strong> lên cầu treo hình thang.
+                    Hoàn thành 15 câu hỏi để giúp học sinh <strong>vượt qua vực sâu an toàn</strong> nhé!
+                  </p>
+                  <button
+                    onClick={handleStart}
+                    className="mt-2 px-8 py-3 rounded-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold text-lg shadow-lg shadow-emerald-400/40 transform hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                  >
+                    BẮT ĐẦU BẮC CẦU 🌉
+                  </button>
+                </div>
+              )}
+
+              {/* PLAYING */}
+              {gameState === "playing" && (
+                <div className="flex flex-col md:flex-row gap-6">
+                  {/* Cột trái: Cầu treo */}
+                  <div className="md:w-1/3 flex flex-col items-center gap-4">
+                    <RopeBridgeView correctCount={correctCount} />
+                    <div className="text-center text-[11px] text-slate-300 mt-2">
+                      Câu đúng:{" "}
+                      <span className="font-semibold text-emerald-300">
+                        {correctCount}
+                      </span>{" "}
+                      / {questions.length}
+                    </div>
+                  </div>
+
+                  {/* Cột phải: Câu hỏi */}
+                  <div className="md:w-2/3 bg-slate-900/80 border border-slate-700 rounded-2xl p-4 sm:p-6 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-bl-full pointer-events-none" />
+                    <span className="absolute -top-3 -right-3 px-3 py-1 bg-emerald-600 text-xs font-bold rounded-full uppercase tracking-wider border border-emerald-300 shadow-lg">
+                      {questions[currentQ].level}
+                    </span>
+
+                    <h3 className="text-lg sm:text-xl font-semibold mb-4 text-slate-50">
+                      {questions[currentQ].question}
+                    </h3>
+
+                    <div className="grid grid-cols-1 gap-3 mt-2">
+                      {questions[currentQ].options.map((opt, idx) => {
+                        let base =
+                          "w-full text-left px-4 py-3 rounded-xl border text-sm sm:text-base transition-all";
+                        let style =
+                          "border-slate-600 bg-slate-800/80 hover:bg-slate-700/80 text-slate-100";
+
+                        if (feedback) {
+                          if (idx === questions[currentQ].correct) {
+                            style =
+                              "border-emerald-400 bg-emerald-900/60 text-emerald-100 shadow-[0_0_18px_rgba(52,211,153,0.7)]";
+                          } else if (feedback === "wrong") {
+                            style =
+                              "border-slate-700 bg-slate-900/70 text-slate-500 opacity-60";
+                          }
+                        }
+
+                        return (
+                          <button
+                            key={idx}
+                            disabled={!!feedback}
+                            onClick={() => handleAnswer(idx)}
+                            className={base + " " + style}
+                          >
+                            <span className="font-semibold mr-2">
+                              {["A.", "B.", "C.", "D."][idx]}
+                            </span>
+                            {opt}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {feedback === "wrong" && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
+                        <div className="px-4 py-2 rounded-full bg-red-600 text-white text-sm font-semibold shadow-lg">
+                          Sai mất rồi! Một tấm ván bị nứt, thử cẩn thận hơn ở câu sau nhé 😢
+                        </div>
+                      </div>
+                    )}
+                    {feedback === "correct" && (
+                      <>
+                        <Confetti />
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center pointer-events-none">
+                          <div className="px-4 py-2 rounded-full bg-emerald-400 text-slate-900 text-sm font-semibold shadow-lg">
+                            Chính xác! Cầu treo vừa được thêm một tấm ván vững chắc 🌉
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* END */}
+              {gameState === "end" && (
+                <div className="flex flex-col items-center text-center gap-6 py-8">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-emerald-400 blur-3xl opacity-40 animate-pulse" />
+                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full border border-emerald-400/60 flex items-center justify-center bg-slate-900/90 shadow-[0_0_40px_rgba(52,211,153,0.9)]">
+                      <span className="text-5xl sm:text-6xl">✅</span>
+                    </div>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-extrabold text-emerald-300 drop-shadow">
+                    Cầu Treo Đã Hoàn Thành!
+                  </h2>
+                  <p className="text-sm sm:text-base text-slate-200 max-w-xl">
+                    Bạn đã trả lời đúng{" "}
+                    <span className="font-bold text-emerald-300">
+                      {correctCount}
+                    </span>{" "}
+                    / {questions.length} câu.
+                    Học sinh đã băng qua vực sâu an toàn nhờ kiến thức về hình thang, hình thang cân và hình thang vuông! 🌉
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center text-sm sm:text-base">
+                    <div className="px-4 py-3 rounded-2xl bg-slate-900/80 border border-slate-700 min-w-[140px]">
+                      <div className="text-slate-300 text-xs uppercase mb-1">
+                        Tổng điểm
+                      </div>
+                      <div className="text-2xl font-bold text-emerald-400">
+                        {score}
+                      </div>
+                    </div>
+                    <div className="px-4 py-3 rounded-2xl bg-slate-900/80 border border-slate-700 min-w-[140px]">
+                      <div className="text-slate-300 text-xs uppercase mb-1">
+                        Danh hiệu
+                      </div>
+                      <div className="text-lg font-bold text-emerald-300">
+                        {score >= 130
+                          ? "Bậc Thầy Cầu Treo"
+                          : score >= 100
+                          ? "Kiến Trúc Sư Hình Thang"
+                          : "Thợ Xây Cầu Dũng Cảm"}
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setGameState("intro");
+                      setCurrentQ(0);
+                      setScore(0);
+                      setFeedback(null);
+                    }}
+                    className="mt-2 px-8 py-3 rounded-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold text-lg shadow-lg shadow-emerald-400/40 transform hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                  >
+                    CHƠI LẠI TỪ ĐẦU 🔁
+                  </button>
+                </div>
+              )}
+            </main>
+
+            <footer className="px-6 sm:px-10 py-3 text-[11px] text-slate-400 border-t border-slate-800 bg-slate-950/80 text-center">
+              Toán 8 – Hình thang, hình thang cân, hình thang vuông – Cầu Treo Hình Thang – Thu Bình Toán 💚
+            </footer>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<TrapezoidBridgeGame />);
+  </script>
+</body>
+</html>
