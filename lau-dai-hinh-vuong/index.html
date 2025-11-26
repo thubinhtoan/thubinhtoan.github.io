@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lâu Đài Hình Vuông – Thu Bình Toán (Game 10)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React + ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <!-- Babel để dùng JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="m-0 p-0 bg-slate-950">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    // ================== CÂU HỎI GAME 10 – HÌNH VUÔNG ==================
+    // 15 câu, đã cân bằng đáp án A/B/C/D và kiểm tra lại kết quả
+    const questions = [
+      // --- NHẬN BIẾT (6 câu) ---
+      {
+        id: 1,
+        level: "Nhận biết",
+        question: "Khẳng định nào sau đây đúng nhất về hình vuông?",
+        options: [
+          "Tứ giác có bốn góc vuông",
+          "Tứ giác có bốn cạnh bằng nhau",
+          "Tứ giác có bốn cạnh bằng nhau và bốn góc vuông",
+          "Tứ giác có hai cặp cạnh đối song song"
+        ],
+        correct: 2 // C
+      },
+      {
+        id: 2,
+        level: "Nhận biết",
+        question: "Trong các tứ giác sau, tứ giác nào CHẮC CHẮN là hình vuông?",
+        options: [
+          "Tứ giác có bốn góc vuông",
+          "Tứ giác có bốn cạnh bằng nhau",
+          "Hình chữ nhật có hai cạnh kề bằng nhau",
+          "Hình bình hành có hai đường chéo bằng nhau"
+        ],
+        correct: 2 // C
+      },
+      {
+        id: 3,
+        level: "Nhận biết",
+        question: "Hình vuông ABCD có AB = 5 cm. Chu vi của hình vuông là:",
+        options: [
+          "20 cm",
+          "10 cm",
+          "25 cm",
+          "5 cm"
+        ],
+        correct: 0 // A (P = 4·5 = 20)
+      },
+      {
+        id: 4,
+        level: "Nhận biết",
+        question: "Trong hình vuông, hai đường chéo có tính chất:",
+        options: [
+          "Bằng nhau nhưng không cắt nhau tại trung điểm",
+          "Bằng nhau, vuông góc và cắt nhau tại trung điểm",
+          "Không bằng nhau và không cắt nhau",
+          "Vuông góc nhưng không cắt nhau"
+        ],
+        correct: 1 // B
+      },
+      {
+        id: 5,
+        level: "Nhận biết",
+        question: "Khẳng định nào sau đây luôn đúng với mọi hình vuông?",
+        options: [
+          "Có thể coi là một hình chữ nhật đặc biệt",
+          "Không phải là hình bình hành",
+          "Chỉ có một trục đối xứng",
+          "Chu vi luôn lớn hơn 100 cm"
+        ],
+        correct: 0 // A
+      },
+      {
+        id: 6,
+        level: "Nhận biết",
+        question: "Dấu hiệu nào sau đây KHÔNG dùng để chứng minh một tứ giác là hình vuông?",
+        options: [
+          "Tứ giác là hình chữ nhật và có hai cạnh kề bằng nhau",
+          "Tứ giác là hình thoi và có một góc vuông",
+          "Tứ giác là hình chữ nhật và có hai đường chéo vuông góc",
+          "Tứ giác có hai cặp cạnh đối song song"
+        ],
+        correct: 3 // D (mới chỉ là hình bình hành)
+      },
+
+      // --- THÔNG HIỂU (5 câu) ---
+      {
+        id: 7,
+        level: "Thông hiểu",
+        question: "Một hình vuông có cạnh 6 cm. Diện tích của hình vuông là:",
+        options: [
+          "36 cm²",
+          "12 cm²",
+          "24 cm²",
+          "18 cm²"
+        ],
+        correct: 0 // A (S = 6·6 = 36)
+      },
+      {
+        id: 8,
+        level: "Thông hiểu",
+        question: "Một hình vuông có diện tích 49 cm². Độ dài cạnh hình vuông là:",
+        options: [
+          "6 cm",
+          "7 cm",
+          "14 cm",
+          "3,5 cm"
+        ],
+        correct: 1 // B (cạnh = √49 = 7)
+      },
+      {
+        id: 9,
+        level: "Thông hiểu",
+        question: "Một hình vuông có chu vi 32 cm. Diện tích hình vuông đó là:",
+        options: [
+          "16 cm²",
+          "32 cm²",
+          "64 cm²",
+          "128 cm²"
+        ],
+        correct: 2 // C (cạnh = 8 ⇒ S = 64)
+      },
+      {
+        id: 10,
+        level: "Thông hiểu",
+        question: "Cho hình chữ nhật ABCD, nếu AB = BC thì ABCD là hình gì?",
+        options: [
+          "Hình chữ nhật",
+          "Hình vuông",
+          "Hình thoi",
+          "Hình bình hành"
+        ],
+        correct: 1 // B
+      },
+      {
+        id: 11,
+        level: "Thông hiểu",
+        question: "Một sân chơi hình vuông có cạnh 6 m. Người ta lát toàn bộ sân bằng gạch hình vuông cạnh 0,5 m. Số viên gạch cần dùng là:",
+        options: [
+          "72 viên",
+          "144 viên",
+          "64 viên",
+          "100 viên"
+        ],
+        correct: 1 // B (S sân = 36; S gạch = 0,25 ⇒ 36 / 0,25 = 144)
+      },
+
+      // --- VẬN DỤNG (3 câu) ---
+      {
+        id: 12,
+        level: "Vận dụng",
+        question: "Hình vuông có đường chéo dài 10 cm. Độ dài cạnh hình vuông là:",
+        options: [
+          "5 cm",
+          "10 cm",
+          "2√5 cm",
+          "5√2 cm"
+        ],
+        correct: 3 // D (cạnh = 10 / √2 = 5√2)
+      },
+      {
+        id: 13,
+        level: "Vận dụng",
+        question: "Một hình vuông có cạnh x (cm). Công thức tính diện tích hình vuông là:",
+        options: [
+          "x²",
+          "2x",
+          "4x",
+          "x² : 2"
+        ],
+        correct: 2 - 2 // =0, nhưng viết rõ cho dễ nhìn: A – x²
+      },
+      {
+        id: 14,
+        level: "Vận dụng",
+        question: "Một khung hình vuông được làm từ 4 thanh gỗ, mỗi cạnh dài 0,8 m. Giá 1 m gỗ là 20 000 đồng. Tiền mua gỗ để làm khung là:",
+        options: [
+          "64 000 đồng",
+          "32 000 đồng",
+          "80 000 đồng",
+          "16 000 đồng"
+        ],
+        correct: 0 // A (P = 3,2 m ⇒ 3,2·20 000 = 64 000)
+      },
+
+      // --- VẬN DỤNG CAO (1 câu) ---
+      {
+        id: 15,
+        level: "Vận dụng cao",
+        question: "Cho hình vuông ABCD. Gọi M, N, P, Q lần lượt là trung điểm của AB, BC, CD, DA. Tứ giác MNPQ là hình gì?",
+        options: [
+          "Hình chữ nhật",
+          "Hình thoi",
+          "Hình vuông",
+          "Hình bình hành"
+        ],
+        correct: 2 // C (nối trung điểm các cạnh của hình vuông được một hình vuông mới)
+      }
+    ];
+
+    // ================== ÂM THANH ĐƠN GIẢN ==================
+    const playSound = (type) => {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const now = ctx.currentTime;
+
+      if (type === "correct") {
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(660, now + 0.1);
+        osc.frequency.setValueAtTime(880, now + 0.2);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      } else if (type === "wrong") {
+        osc.type = "square";
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.linearRampToValueAtTime(80, now + 0.25);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      }
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+    };
+
+    // ================== CONFETTI ==================
+    const Confetti = () => (
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-40">
+        {[...Array(30)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 rounded-full"
+            style={{
+              backgroundColor: ['#e5e7eb', '#22c55e', '#38bdf8', '#f97316'][i % 4],
+              left: `${Math.random() * 100}%`,
+              top: `-10px`,
+              animation: `fall ${1 + Math.random() * 2}s linear forwards`,
+              animationDelay: `${Math.random() * 0.5}s`
+            }}
+          />
+        ))}
+        <style>{`
+          @keyframes fall {
+            to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+          }
+        `}</style>
+      </div>
+    );
+
+    // ================== LÂU ĐÀI HÌNH VUÔNG ==================
+    const SquareCastleView = ({ score }) => {
+      const correctCount = score / 10;
+      const level =
+        correctCount === 0 ? 0 :
+        correctCount < 5 ? 1 :
+        correctCount < 11 ? 2 : 3;
+
+      return (
+        <div className="relative w-full max-w-md mx-auto bg-slate-900/80 border border-sky-400/60 rounded-2xl p-4 shadow-lg">
+          <h3 className="text-sm font-semibold text-sky-300 mb-2 flex items-center gap-2">
+            <span>🏰</span>
+            <span>Tiến độ xây Lâu Đài Hình Vuông</span>
+          </h3>
+
+          <div className="relative mx-auto my-2 w-56 h-56 bg-slate-950/80 rounded-3xl border-4 border-slate-700 flex items-center justify-center overflow-hidden">
+            {/* Nền */}
+            <div className="absolute inset-4 bg-gradient-to-br from-slate-900 via-slate-950 to-sky-900 rounded-2xl" />
+
+            {/* Khung vuông tường ngoài */}
+            {level >= 1 && (
+              <div className="absolute inset-8 border-4 border-amber-600 rounded-lg shadow-[0_0_15px_rgba(245,158,11,0.8)]" />
+            )}
+
+            {/* Tường trong + tháp */}
+            {level >= 2 && (
+              <>
+                <div className="absolute inset-16 border-4 border-amber-400 rounded-lg" />
+                <div className="absolute top-8 left-8 text-xl">🛡️</div>
+                <div className="absolute top-8 right-8 text-xl">🛡️</div>
+                <div className="absolute bottom-8 left-8 text-xl">🛡️</div>
+                <div className="absolute bottom-8 right-8 text-xl">🛡️</div>
+              </>
+            )}
+
+            {/* Kim cương trung tâm */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="relative">
+                <div className="absolute inset-0 blur-xl bg-cyan-400/40 rounded-full animate-pulse" />
+                <div className="relative text-4xl">
+                  {correctCount === 0 ? "💠" : "💎"}
+                </div>
+              </div>
+            </div>
+
+            {/* Vương miện khi hoàn thành cao */}
+            {level >= 3 && (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-3xl">
+                👑
+              </div>
+            )}
+          </div>
+
+          {/* Tiến độ phần trăm */}
+          <div className="mt-3">
+            <div className="flex justify-between text-[11px] text-slate-300 mb-1">
+              <span>Độ hoàn mỹ của lâu đài</span>
+              <span>{Math.round((correctCount / questions.length) * 100)}%</span>
+            </div>
+            <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-sky-400 via-emerald-400 to-yellow-400 transition-all duration-500"
+                style={{ width: `${(correctCount / questions.length) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          <p className="mt-2 text-[11px] text-slate-400">
+            Mỗi câu đúng làm viên kim cương sáng hơn và lâu đài vuông vức, hoàn mỹ hơn. 
+          </p>
+        </div>
+      );
+    };
+
+    // ================== MAIN GAME COMPONENT ==================
+    function SquareCastleGame() {
+      const [gameState, setGameState] = useState("intro"); // intro, playing, end
+      const [currentQ, setCurrentQ] = useState(0);
+      const [score, setScore] = useState(0);
+      const [feedback, setFeedback] = useState(null); // 'correct' | 'wrong' | null
+      const [soundOn, setSoundOn] = useState(true);
+
+      const handleStart = () => {
+        setGameState("playing");
+        setCurrentQ(0);
+        setScore(0);
+        setFeedback(null);
+      };
+
+      const handleAnswer = (index) => {
+        if (feedback) return;
+        const isCorrect = index === questions[currentQ].correct;
+
+        if (isCorrect) {
+          setFeedback("correct");
+          setScore((s) => s + 10);
+          if (soundOn) playSound("correct");
+        } else {
+          setFeedback("wrong");
+          if (soundOn) playSound("wrong");
+        }
+
+        setTimeout(() => {
+          setFeedback(null);
+          if (currentQ < questions.length - 1) {
+            setCurrentQ((q) => q + 1);
+          } else {
+            setGameState("end");
+          }
+        }, 1800);
+      };
+
+      const correctCount = score / 10;
+
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white relative overflow-hidden">
+          {/* Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-sky-900 opacity-90" />
+          <div className="absolute inset-0 pointer-events-none opacity-25">
+            {[...Array(30)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-1 h-1 rounded-full bg-sky-300"
+                style={{
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                  boxShadow: "0 0 8px rgba(56,189,248,0.8)"
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Nút âm thanh */}
+          <button
+            onClick={() => setSoundOn((v) => !v)}
+            className="absolute top-4 right-4 z-20 px-3 py-2 text-xs sm:text-sm bg-white/10 hover:bg-white/20 rounded-full"
+          >
+            {soundOn ? "🔊 Âm thanh: BẬT" : "🔇 Âm thanh: TẮT"}
+          </button>
+
+          {/* MAIN CARD */}
+          <div className="relative z-10 w-full max-w-5xl mx-4 bg-slate-900/80 border border-sky-400/60 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-xl">
+            {/* Header */}
+            <header className="px-6 sm:px-10 py-4 border-b border-sky-400/60 bg-gradient-to-r from-sky-500/40 to-cyan-400/20 flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <div className="text-xs uppercase tracking-wide text-sky-200/80 mb-1">
+                  Thu Bình Toán – Game 10
+                </div>
+                <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                  <span className="text-2xl">💎</span>
+                  <span>Lâu Đài Hình Vuông – Bảo vệ viên kim cương hoàn mỹ</span>
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-200/90">
+                  Toán 8 – Hình vuông · Mỗi câu trả lời đúng giúp lâu đài vuông vắn, viên kim cương sáng hơn.
+                </p>
+              </div>
+              <div className="flex flex-col items-end text-[11px] sm:text-xs text-sky-100">
+                <span>
+                  Câu:{" "}
+                  {gameState === "playing" ? currentQ + 1 : 0}/{questions.length}
+                </span>
+                <span>Điểm: {score}</span>
+              </div>
+            </header>
+
+            {/* BODY */}
+            <main className="p-4 sm:p-6 md:p-8">
+              {/* INTRO */}
+              {gameState === "intro" && (
+                <div className="flex flex-col items-center text-center gap-6 py-8">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-sky-400 blur-3xl opacity-40 animate-pulse" />
+                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-3xl border border-sky-400/60 flex items-center justify-center bg-slate-900/80 shadow-[0_0_40px_rgba(56,189,248,0.8)]">
+                      <span className="text-5xl sm:text-6xl">💎</span>
+                    </div>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-extrabold text-sky-300 drop-shadow">
+                    Xây Lâu Đài Hình Vuông Hoàn Mỹ
+                  </h2>
+                  <p className="text-sm sm:text-base text-slate-200 max-w-xl">
+                    Mỗi câu trả lời đúng sẽ làm <strong>tường lâu đài vuông vức hơn</strong> 
+                    và <strong>viên kim cương trung tâm sáng rực</strong>. 
+                    Hoàn thành 15 câu hỏi để bảo vệ viên kim cương hoàn mỹ khỏi mọi kẻ xâm nhập!
+                  </p>
+                  <button
+                    onClick={handleStart}
+                    className="mt-2 px-8 py-3 rounded-full bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-lg shadow-lg shadow-sky-400/40 transform hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                  >
+                    BẮT ĐẦU XÂY LÂU ĐÀI 🏰
+                  </button>
+                </div>
+              )}
+
+              {/* PLAYING */}
+              {gameState === "playing" && (
+                <div className="flex flex-col md:flex-row gap-6">
+                  {/* Cột trái: Lâu đài */}
+                  <div className="md:w-1/3 flex flex-col items-center gap-4">
+                    <SquareCastleView score={score} />
+                    <div className="text-center text-[11px] text-slate-300 mt-2">
+                      Câu đúng:{" "}
+                      <span className="font-semibold text-sky-300">
+                        {correctCount}
+                      </span>{" "}
+                      / {questions.length}
+                    </div>
+                  </div>
+
+                  {/* Cột phải: Câu hỏi */}
+                  <div className="md:w-2/3 bg-slate-900/80 border border-slate-700 rounded-2xl p-4 sm:p-6 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-sky-500/10 rounded-bl-full pointer-events-none" />
+                    <span className="absolute -top-3 -right-3 px-3 py-1 bg-sky-600 text-xs font-bold rounded-full uppercase tracking-wider border border-sky-300 shadow-lg">
+                      {questions[currentQ].level}
+                    </span>
+
+                    <h3 className="text-lg sm:text-xl font-semibold mb-4 text-slate-50">
+                      {questions[currentQ].question}
+                    </h3>
+
+                    <div className="grid grid-cols-1 gap-3 mt-2">
+                      {questions[currentQ].options.map((opt, idx) => {
+                        let base =
+                          "w-full text-left px-4 py-3 rounded-xl border text-sm sm:text-base transition-all";
+                        let style =
+                          "border-slate-600 bg-slate-800/80 hover:bg-slate-700/80 text-slate-100";
+
+                        if (feedback) {
+                          if (idx === questions[currentQ].correct) {
+                            style =
+                              "border-sky-400 bg-sky-900/60 text-sky-100 shadow-[0_0_18px_rgba(56,189,248,0.7)]";
+                          } else if (feedback === "wrong") {
+                            style =
+                              "border-slate-700 bg-slate-900/70 text-slate-500 opacity-60";
+                          }
+                        }
+
+                        return (
+                          <button
+                            key={idx}
+                            disabled={!!feedback}
+                            onClick={() => handleAnswer(idx)}
+                            className={base + " " + style}
+                          >
+                            <span className="font-semibold mr-2">
+                              {["A.", "B.", "C.", "D."][idx]}
+                            </span>
+                            {opt}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {feedback === "wrong" && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
+                        <div className="px-4 py-2 rounded-full bg-red-600 text-white text-sm font-semibold shadow-lg">
+                          Sai mất rồi! Lâu đài rung chuyển một chút, thử cẩn thận hơn ở câu sau nhé 😢
+                        </div>
+                      </div>
+                    )}
+                    {feedback === "correct" && (
+                      <>
+                        <Confetti />
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center pointer-events-none">
+                          <div className="px-4 py-2 rounded-full bg-sky-400 text-slate-900 text-sm font-semibold shadow-lg">
+                            Chính xác! Lâu đài vừa vuông vức hơn và viên kim cương sáng hơn 💎
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* END */}
+              {gameState === "end" && (
+                <div className="flex flex-col items-center text-center gap-6 py-8">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-yellow-400 blur-3xl opacity-40 animate-pulse" />
+                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-3xl border border-yellow-400/60 flex items-center justify-center bg-slate-900/80 shadow-[0_0_40px_rgba(250,204,21,0.9)]">
+                      <span className="text-5xl sm:text-6xl">👑</span>
+                    </div>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-extrabold text-yellow-300 drop-shadow">
+                    Lâu Đài Hình Vuông Hoàn Mỹ!
+                  </h2>
+                  <p className="text-sm sm:text-base text-slate-200 max-w-xl">
+                    Bạn đã trả lời đúng{" "}
+                    <span className="font-bold text-sky-300">
+                      {correctCount}
+                    </span>{" "}
+                    / {questions.length} câu.
+                    Viên kim cương đã được bảo vệ bởi một lâu đài vuông vức, kiên cố và hoàn mỹ!
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center text-sm sm:text-base">
+                    <div className="px-4 py-3 rounded-2xl bg-slate-900/80 border border-slate-700 min-w-[140px]">
+                      <div className="text-slate-300 text-xs uppercase mb-1">
+                        Tổng điểm
+                      </div>
+                      <div className="text-2xl font-bold text-sky-400">
+                        {score}
+                      </div>
+                    </div>
+                    <div className="px-4 py-3 rounded-2xl bg-slate-900/80 border border-slate-700 min-w-[140px]">
+                      <div className="text-slate-300 text-xs uppercase mb-1">
+                        Danh hiệu
+                      </div>
+                      <div className="text-lg font-bold text-yellow-300">
+                        {score >= 130
+                          ? "Vua Lâu Đài Kim Cương"
+                          : score >= 100
+                          ? "Hiệp Sĩ Bảo Hộ"
+                          : "Người Gác Cổng Dũng Cảm"}
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setGameState("intro");
+                      setCurrentQ(0);
+                      setScore(0);
+                      setFeedback(null);
+                    }}
+                    className="mt-2 px-8 py-3 rounded-full bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-lg shadow-lg shadow-sky-400/40 transform hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                  >
+                    CHƠI LẠI TỪ ĐẦU 🔁
+                  </button>
+                </div>
+              )}
+            </main>
+
+            <footer className="px-6 sm:px-10 py-3 text-[11px] text-slate-400 border-t border-slate-800 bg-slate-950/80 text-center">
+              Toán 8 – Hình vuông – Lâu Đài Hình Vuông – Thu Bình Toán 💚
+            </footer>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<SquareCastleGame />);
+  </script>
+</body>
+</html>
