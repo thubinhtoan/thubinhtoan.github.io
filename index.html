@@ -84,85 +84,191 @@
     </div>
   </div>
 
-  <!-- TOÀN BỘ JS -->
+   <!-- TOÀN BỘ JS -->
   <script>
-      // ===== DỮ LIỆU: 4 LỚP → CHỦ ĐỀ → GAME =====
-const grades = [
-  {
-    grade: "Lớp 6",
-    color: "emerald",
-    topics: [
+    // ===== DỮ LIỆU: 4 LỚP → CHỦ ĐỀ → GAME =====
+    const grades = [
       {
-        title: "Số học",
-        icon: "🔢",
-        games: [
-          { id: 1, title: "Khám phá phân số – Hành trình kỳ thú", folder: "phan-so" }
+        id: "lop6",
+        name: "Lớp 6",
+        color: "emerald",
+        topics: [
+          {
+            id: "lop6-so-hoc",
+            name: "Số học",
+            description: "Các game luyện tập phân số, số nguyên… cho học sinh lớp 6.",
+            games: [
+              {
+                id: 1,
+                folder: "phan-so",
+                icon: "🧮",
+                color: "emerald",
+                label: "Trò chơi 1",
+                grade: "Lớp 6 – Số học",
+                title: "Khám phá phân số – Hành trình kỳ thú",
+                description: "Ôn tập và luyện phân số qua một hành trình khám phá vui nhộn."
+              }
+            ]
+          }
         ]
-      }
-    ]
-  },
+      },
 
-  {
-    grade: "Lớp 7",
-    color: "indigo",
-    topics: [
       {
-        title: "Số học",
-        icon: "🔣",
-        games: []
-      }
-    ]
-  },
+        id: "lop7",
+        name: "Lớp 7",
+        color: "indigo",
+        topics: [
+          {
+            id: "lop7-so-hoc",
+            name: "Số học",
+            description: "Chủ đề đang được Thu Bình Toán xây dựng thêm cho lớp 7.",
+            games: []
+          }
+        ]
+      },
 
-  {
-    grade: "Lớp 8",
-    color: "sky",
-    topics: [
       {
-        title: "Hình học",
-        icon: "📐",
-        games: [
+        id: "lop8",
+        name: "Lớp 8",
+        color: "sky",
+        topics: [
           {
-            id: 9,
-            title: "Pháo Đài Hình Chữ Nhật – Xây tường phòng thủ",
-            folder: "phao-dai-hinh-chu-nhat"
-          },
+            id: "lop8-hinh-hoc",
+            name: "Hình học",
+            description: "Các game về hình chữ nhật, hình vuông, hình thang cho Toán 8.",
+            games: [
+              {
+                id: 9,
+                folder: "phao-dai-hinh-chu-nhat",
+                icon: "🧱",
+                color: "sky",
+                label: "Trò chơi 9",
+                grade: "Toán 8 – Hình chữ nhật",
+                title: "Pháo Đài Hình Chữ Nhật – Xây tường phòng thủ",
+                description: "Xây tường phòng thủ bằng cách giải các bài toán về hình chữ nhật."
+              },
+              {
+                id: 10,
+                folder: "lau-dai-hinh-vuong",
+                icon: "💎",
+                color: "emerald",
+                label: "Trò chơi 10",
+                grade: "Toán 8 – Hình vuông",
+                title: "Lâu Đài Hình Vuông – Bảo vệ viên kim cương hoàn mỹ",
+                description: "Bảo vệ viên kim cương bằng kiến thức về hình vuông và tính diện tích, chu vi."
+              },
+              {
+                id: 11,
+                folder: "cau-treo-hinh-thang",
+                icon: "🌉",
+                color: "indigo",
+                label: "Trò chơi 11",
+                grade: "Toán 8 – Hình thang",
+                title: "Cầu Treo Hình Thang – Băng qua vực sâu",
+                description: "Bắc cầu treo an toàn qua vực sâu bằng kiến thức về hình thang, hình thang cân, hình thang vuông."
+              }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: "lop9",
+        name: "Lớp 9",
+        color: "rose",
+        topics: [
           {
-            id: 10,
-            title: "Lâu Đài Hình Vuông – Bảo vệ viên kim cương hoàn mỹ",
-            folder: "lau-dai-hinh-vuong"
-          },
-          {
-            id: 11,
-            title: "Cầu Treo Hình Thang – Băng qua vực sâu",
-            folder: "cau-treo-hinh-thang"
+            id: "lop9-duong-tron-can-bac-hai",
+            name: "Đường tròn & Căn bậc hai",
+            description: "Các game ôn tập đường tròn, tiếp tuyến và căn bậc hai cho Toán 9.",
+            games: [
+              {
+                id: 1,
+                folder: "khu-vuon-bi-mat",
+                icon: "🌸",
+                color: "emerald",
+                label: "Trò chơi 1",
+                grade: "Toán 9 – Đường tròn",
+                title: "Khu Vườn Bí Mật – Đường tròn",
+                description: "Làm nở những bông hoa xinh trong khu vườn bằng cách trả lời câu hỏi về đường tròn."
+              },
+              {
+                id: 2,
+                folder: "cuoc-xam-lang",
+                icon: "🛸",
+                color: "indigo",
+                label: "Trò chơi 2",
+                grade: "Toán 9 – Tiếp tuyến",
+                title: "Cuộc Xâm Lăng – Tiếp tuyến đường tròn",
+                description: "Bắn hạ tàu UFO bằng kiến thức về tiếp tuyến của đường tròn."
+              },
+              {
+                id: 3,
+                folder: "me-cung-tri-tue",
+                icon: "🧠",
+                color: "sky",
+                label: "Trò chơi 3",
+                grade: "Toán 9 – Góc ở tâm & góc nội tiếp",
+                title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp",
+                description: "Vượt qua mê cung bằng cách giải các bài toán về góc ở tâm và góc nội tiếp."
+              },
+              {
+                id: 4,
+                folder: "chien-binh-rong",
+                icon: "🐉",
+                color: "rose",
+                label: "Trò chơi 4",
+                grade: "Toán 9 – Hình quạt & vành khuyên",
+                title: "Chiến Binh Rồng – Hình quạt và vành khuyên",
+                description: "Cùng chiến binh rồng tiêu diệt quái vật bằng kiến thức về hình quạt và hình vành khuyên."
+              },
+              {
+                id: 5,
+                folder: "du-hanh-vu-tru",
+                icon: "🚀",
+                color: "sky",
+                label: "Trò chơi 5",
+                grade: "Toán 9 – Căn bậc hai",
+                title: "Du Hành Giữa Các Vì Sao – Căn bậc hai",
+                description: "Điều khiển tàu vũ trụ vượt qua thử thách về căn bậc hai."
+              },
+              {
+                id: 6,
+                folder: "de-che-troi-day",
+                icon: "🏰",
+                color: "yellow",
+                label: "Trò chơi 6",
+                grade: "Toán 9 – Căn bậc hai",
+                title: "Đế Chế Trỗi Dậy – Biến đổi căn bậc hai",
+                description: "Thu thập tài nguyên xây dựng đế chế bằng các phép biến đổi căn bậc hai."
+              },
+              {
+                id: 7,
+                folder: "huyen-thoai-tai-sinh",
+                icon: "🔥",
+                color: "rose",
+                label: "Trò chơi 7",
+                grade: "Toán 8 – Hình bình hành",
+                title: "Huyền Thoại Tái Sinh – Hình bình hành",
+                description: "Đánh thức Phượng Hoàng Huyền Thoại qua 15 câu hỏi về hình bình hành."
+              },
+              {
+                id: 8,
+                folder: "phao-dai-toi-thuong",
+                icon: "🏰",
+                color: "indigo",
+                label: "Trò chơi 8",
+                grade: "Toán 9 – Tổng hợp",
+                title: "Pháo Đài Tối Thượng – Bài toán tổng hợp",
+                description: "Bảo vệ pháo đài bằng những bài toán tổng hợp về đường tròn và căn bậc hai."
+              }
+            ]
           }
         ]
       }
-    ]
-  },
+    ];
 
-  {
-    grade: "Lớp 9",
-    color: "rose",
-    topics: [
-      {
-        title: "Đường tròn & Căn bậc hai",
-        icon: "⭕",
-        games: [
-          { id: 1, title: "Khu Vườn Bí Mật – Đường tròn", folder: "khu-vuon-bi-mat" },
-          { id: 2, title: "Cuộc Xâm Lăng – Tiếp tuyến đường tròn", folder: "cuoc-xam-lang" },
-          { id: 3, title: "Mê Cung Trí Tuệ – Góc ở tâm và góc nội tiếp", folder: "me-cung-tri-tue" },
-          { id: 4, title: "Chiến Binh Rồng – Hình quạt và vành khuyên", folder: "chien-binh-rong" },
-          { id: 5, title: "Du Hành Giữa Các Vì Sao – Căn bậc hai", folder: "du-hanh-vu-tru" },
-          { id: 6, title: "Đế Chế Trỗi Dậy – Biến đổi căn bậc hai", folder: "de-che-troi-day" },
-          { id: 7, title: "Huyền Thoại Tái Sinh – Hình bình hành", folder: "huyen-thoai-tai-sinh" },
-          { id: 8, title: "Pháo Đài Tối Thượng – Bài toán tổng hợp", folder: "phao-dai-toi-thuong" }
-        ]
-      }
-    ]
-  }
-];
+    // ===== STYLE MÀU CHO THẺ GAME =====
     const colorStyles = {
       emerald: {
         card: "border-emerald-500/40 bg-emerald-900/40 hover:bg-emerald-800/80",
@@ -195,6 +301,7 @@ const grades = [
     const topicListEl = document.getElementById("topic-list");
     const gameListEl = document.getElementById("game-list");
 
+    // Lần đầu: chọn Lớp 6, chủ đề đầu tiên
     let activeGradeId = grades[0].id;
     let activeTopicId = grades[0].topics.length ? grades[0].topics[0].id : null;
 
@@ -226,7 +333,8 @@ const grades = [
 
       if (!grade.topics.length) {
         const div = document.createElement("div");
-        div.className = "text-xs sm:text-sm text-slate-300 bg-slate-900/70 border border-slate-700 rounded-2xl p-4";
+        div.className =
+          "text-xs sm:text-sm text-slate-300 bg-slate-900/70 border border-slate-700 rounded-2xl p-4";
         div.innerHTML =
           `<p class="mb-1"><strong>${grade.name}</strong> đang được Thu Bình Toán xây dựng thêm.</p>` +
           `<p>Các chủ đề và game sẽ được cập nhật sau 👩‍🏫💚</p>`;
@@ -277,7 +385,8 @@ const grades = [
 
       if (!topic || !topic.games.length) {
         const div = document.createElement("div");
-        div.className = "text-xs sm:text-sm text-slate-300 bg-slate-900/70 border border-slate-700 rounded-2xl p-4";
+        div.className =
+          "text-xs sm:text-sm text-slate-300 bg-slate-900/70 border border-slate-700 rounded-2xl p-4";
         div.innerHTML = `<p>Chọn một chủ đề ở bên trái để xem các game tương ứng nhé 💚</p>`;
         gameListEl.appendChild(div);
         return;
