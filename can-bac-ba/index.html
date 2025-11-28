@@ -204,15 +204,15 @@
       {
         id: 2,
         level: "Nhận biết",
-        question: "Giá trị của \\u221b27 là:",
+        question: "Giá trị của ∛27 là:",
         answers: ["2", "3", "4", "9"],
         correct: 1,
       },
       {
         id: 3,
         level: "Nhận biết",
-        question: "Căn bậc ba của 1.000 là:",
-        answers: ["10", "100", "5", "\\u221b10"],
+        question: "Căn bậc ba của 1 000 là:",
+        answers: ["10", "100", "5", "∛10"],
         correct: 0,
       },
       {
@@ -228,25 +228,24 @@
         level: "Thông hiểu",
         question: "Chọn khẳng định ĐÚNG:",
         answers: [
-          "\\u221b(a^3) = a với mọi số thực a",
-          "\\u221b(a^3) = |a| với mọi số thực a",
-          "\\u221b(a^3) = -a với mọi số thực a",
-          "\\u221b(a^3) chỉ có nghĩa với a > 0",
+          "∛(a³) = a với mọi số thực a",
+          "∛(a³) = |a| với mọi số thực a",
+          "∛(a³) = -a với mọi số thực a",
+          "∛(a³) chỉ có nghĩa với a > 0",
         ],
         correct: 0,
       },
       {
         id: 6,
         level: "Thông hiểu",
-        question: "Giá trị của \\u221b(64) là:",
+        question: "Giá trị của ∛64 là:",
         answers: ["4", "8", "-4", "16"],
         correct: 0,
       },
       {
         id: 7,
         level: "Thông hiểu",
-        question:
-          "Tính \\u221b(1/8):",
+        question: "Tính ∛(1/8):",
         answers: ["1/2", "1/4", "2", "4"],
         correct: 0,
       },
@@ -255,9 +254,9 @@
         level: "Thông hiểu",
         question: "Chọn đẳng thức ĐÚNG:",
         answers: [
-          "\\u221b(a\\u00b7b) = \\u221ba + \\u221bb",
-          "\\u221b(a\\u00b7b) = \\u221ba \\u00b7 \\u221bb với a, b \\u2265 0",
-          "\\u221b(a^3 b^3) = ab",
+          "∛(a·b) = ∛a + ∛b",
+          "∛(a·b) = ∛a · ∛b với a, b ≥ 0",
+          "∛(a³b³) = ab",
           "Cả B và C đều đúng",
         ],
         correct: 3,
@@ -266,29 +265,26 @@
       {
         id: 9,
         level: "Vận dụng",
-        question:
-          "Rút gọn: \\u221b(216x^3) với x là số thực bất kỳ:",
-        answers: ["6x", "\\u221b216 \\u00b7 x", "216x", "3x"],
+        question: "Rút gọn: ∛(216x³) với x là số thực bất kỳ:",
+        answers: ["6x", "∛216 · x", "216x", "3x"],
         correct: 0,
       },
       {
         id: 10,
         level: "Vận dụng",
-        question:
-          "So sánh \\u221b8 và \\u221b27:",
+        question: "So sánh ∛8 và ∛27:",
         answers: [
-          "\\u221b8 > \\u221b27",
-          "\\u221b8 = \\u221b27",
-          "\\u221b8 < \\u221b27",
-          Không so sánh được",
+          "∛8 > ∛27",
+          "∛8 = ∛27",
+          "∛8 < ∛27",
+          "Không so sánh được",
         ],
         correct: 2,
       },
       {
         id: 11,
         level: "Vận dụng",
-        question:
-          "Biết \\u221b(x^3) = -4. Khi đó x bằng:",
+        question: "Biết ∛(x³) = -4. Khi đó x bằng:",
         answers: ["4", "-4", "2", "-2"],
         correct: 1,
       },
@@ -349,7 +345,7 @@
       const q = questions[currentIndex];
       questionIndexEl.textContent = currentIndex + 1;
 
-      questionText.textContent = q.question.replace(/\\u221b/g, "∛");
+      questionText.textContent = q.question;
       levelBadge.textContent = q.level;
 
       // màu badge theo mức
