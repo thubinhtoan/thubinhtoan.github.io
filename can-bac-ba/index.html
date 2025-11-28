@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hành Trình Căn Bậc Ba – Toán 9</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #22c55e 0%, #052e16 45%, #020617 100%);
+      min-height: 100vh;
+      margin: 0;
+      color: #e5e7eb;
+      overflow: hidden;
+    }
+
+    .glass {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(16px);
+    }
+
+    .answer-btn {
+      transition: all 0.18s ease-out;
+    }
+    .answer-btn:active {
+      transform: scale(0.97);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Emoji phản hồi */
+    @keyframes popUp {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+      }
+    }
+
+    .emoji-feedback {
+      position: fixed;
+      left: 50%;
+      top: 40%;
+      font-size: 4rem;
+      pointer-events: none;
+      animation: popUp 0.9s ease-out forwards;
+      z-index: 50;
+    }
+
+    .progress-bar {
+      transition: width 0.4s ease-in-out;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center">
+
+  <!-- Start Screen -->
+  <div
+    id="start-screen"
+    class="glass rounded-3xl px-6 py-8 sm:px-10 sm:py-10 max-w-xl w-full mx-4 text-center"
+  >
+    <div class="text-4xl sm:text-5xl mb-4">📦</div>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-emerald-300 mb-2">
+      HÀNH TRÌNH CĂN BẬC BA
+    </h1>
+    <p class="text-sm sm:text-base text-slate-200 mb-4">
+      Toán 9 – Chân trời sáng tạo
+    </p>
+    <p class="text-sm sm:text-base text-slate-300 mb-6">
+      Vượt qua <span class="font-semibold text-emerald-300">12 câu hỏi</span>
+      về <span class="font-semibold">căn bậc ba</span> để nạp năng lượng cho
+      thành phố khối lập phương năng lượng xanh! 💡
+    </p>
+
+    <button
+      onclick="startGame()"
+      class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold px-8 py-3 rounded-full shadow-lg shadow-emerald-500/40 transition transform hover:-translate-y-0.5"
+    >
+      <span>BẮT ĐẦU NGAY</span>
+      <span>▶</span>
+    </button>
+  </div>
+
+  <!-- Game UI -->
+  <div
+    id="game-ui"
+    class="glass rounded-3xl max-w-4xl w-full mx-4 px-4 sm:px-8 py-5 sm:py-7 hidden flex-col gap-4"
+  >
+    <!-- Top bar -->
+    <div class="flex items-center justify-between gap-3 text-xs sm:text-sm">
+      <div class="flex items-center gap-2">
+        <span class="text-yellow-300 text-lg">⭐</span>
+        <span>Điểm: </span>
+        <span id="score-display" class="font-bold text-emerald-300 text-base sm:text-lg">0</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-sky-300">
+          Câu <span id="question-index">1</span> / <span id="total-questions">12</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="w-full bg-slate-800/70 rounded-full h-2 mt-1 mb-3">
+      <div
+        id="progress-bar"
+        class="bg-gradient-to-r from-emerald-400 to-sky-400 h-2 rounded-full progress-bar"
+        style="width: 0%"
+      ></div>
+    </div>
+
+    <!-- Question box -->
+    <div class="rounded-2xl border border-slate-600/70 bg-slate-900/80 px-4 sm:px-6 py-4 sm:py-5">
+      <div class="flex items-center justify-between mb-3">
+        <span
+          id="level-badge"
+          class="inline-flex items-center gap-1 text-[11px] sm:text-xs px-3 py-1 rounded-full bg-emerald-900/80 border border-emerald-500/60 text-emerald-200 uppercase tracking-wide font-semibold"
+        >
+          Nhận biết
+        </span>
+        <span class="text-[11px] sm:text-xs text-slate-400">
+          Chủ đề: Căn bậc ba – Toán 9
+        </span>
+      </div>
+      <h2
+        id="question-text"
+        class="text-base sm:text-lg md:text-xl font-semibold text-slate-50 leading-relaxed"
+      >
+        Nội dung câu hỏi sẽ hiển thị ở đây.
+      </h2>
+    </div>
+
+    <!-- Answers -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="answers-grid">
+      <!-- buttons injected -->
+    </div>
+
+    <!-- Feedback -->
+    <div
+      id="feedback"
+      class="h-6 text-center text-sm sm:text-base font-semibold text-emerald-300 opacity-0 transition-opacity duration-200"
+    ></div>
+  </div>
+
+  <!-- End Screen -->
+  <div
+    id="end-screen"
+    class="glass rounded-3xl px-6 py-8 sm:px-10 sm:py-10 max-w-xl w-full mx-4 text-center hidden"
+  >
+    <div id="end-icon" class="text-5xl mb-3">🏁</div>
+    <h2 class="text-2xl sm:text-3xl font-extrabold text-emerald-300 mb-2">
+      HOÀN THÀNH HÀNH TRÌNH!
+    </h2>
+    <p id="end-message" class="text-sm sm:text-base text-slate-200 mb-6">
+      Bạn đã nạp đủ năng lượng cho thành phố khối lập phương.
+    </p>
+
+    <div
+      class="bg-slate-900/80 border border-slate-700 rounded-2xl px-4 sm:px-6 py-4 text-left text-sm sm:text-base mb-5"
+    >
+      <div class="flex justify-between mb-2">
+        <span>Tổng điểm:</span>
+        <span id="final-score" class="font-bold text-yellow-300">0</span>
+      </div>
+      <div class="flex justify-between mb-1">
+        <span>Số câu đúng:</span>
+        <span id="final-correct" class="font-bold text-emerald-300">0/12</span>
+      </div>
+    </div>
+
+    <button
+      onclick="location.reload()"
+      class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold px-8 py-3 rounded-full shadow-lg shadow-emerald-500/40 transition transform hover:-translate-y-0.5"
+    >
+      <span>CHƠI LẠI</span>
+      <span>🔁</span>
+    </button>
+  </div>
+
+  <script>
+    // ===== DỮ LIỆU CÂU HỎI – CĂN BẬC BA TOÁN 9 =====
+    const questions = [
+      // Nhận biết
+      {
+        id: 1,
+        level: "Nhận biết",
+        question: "Căn bậc ba của 8 là:",
+        answers: ["2", "4", "-2", "3"],
+        correct: 0,
+      },
+      {
+        id: 2,
+        level: "Nhận biết",
+        question: "Giá trị của \\u221b27 là:",
+        answers: ["2", "3", "4", "9"],
+        correct: 1,
+      },
+      {
+        id: 3,
+        level: "Nhận biết",
+        question: "Căn bậc ba của 1.000 là:",
+        answers: ["10", "100", "5", "\\u221b10"],
+        correct: 0,
+      },
+      {
+        id: 4,
+        level: "Nhận biết",
+        question: "Số nào sau đây là căn bậc ba của -125?",
+        answers: ["-25", "5", "-5", "125"],
+        correct: 2,
+      },
+      // Thông hiểu
+      {
+        id: 5,
+        level: "Thông hiểu",
+        question: "Chọn khẳng định ĐÚNG:",
+        answers: [
+          "\\u221b(a^3) = a với mọi số thực a",
+          "\\u221b(a^3) = |a| với mọi số thực a",
+          "\\u221b(a^3) = -a với mọi số thực a",
+          "\\u221b(a^3) chỉ có nghĩa với a > 0",
+        ],
+        correct: 0,
+      },
+      {
+        id: 6,
+        level: "Thông hiểu",
+        question: "Giá trị của \\u221b(64) là:",
+        answers: ["4", "8", "-4", "16"],
+        correct: 0,
+      },
+      {
+        id: 7,
+        level: "Thông hiểu",
+        question:
+          "Tính \\u221b(1/8):",
+        answers: ["1/2", "1/4", "2", "4"],
+        correct: 0,
+      },
+      {
+        id: 8,
+        level: "Thông hiểu",
+        question: "Chọn đẳng thức ĐÚNG:",
+        answers: [
+          "\\u221b(a\\u00b7b) = \\u221ba + \\u221bb",
+          "\\u221b(a\\u00b7b) = \\u221ba \\u00b7 \\u221bb với a, b \\u2265 0",
+          "\\u221b(a^3 b^3) = ab",
+          "Cả B và C đều đúng",
+        ],
+        correct: 3,
+      },
+      // Vận dụng
+      {
+        id: 9,
+        level: "Vận dụng",
+        question:
+          "Rút gọn: \\u221b(216x^3) với x là số thực bất kỳ:",
+        answers: ["6x", "\\u221b216 \\u00b7 x", "216x", "3x"],
+        correct: 0,
+      },
+      {
+        id: 10,
+        level: "Vận dụng",
+        question:
+          "So sánh \\u221b8 và \\u221b27:",
+        answers: [
+          "\\u221b8 > \\u221b27",
+          "\\u221b8 = \\u221b27",
+          "\\u221b8 < \\u221b27",
+          Không so sánh được",
+        ],
+        correct: 2,
+      },
+      {
+        id: 11,
+        level: "Vận dụng",
+        question:
+          "Biết \\u221b(x^3) = -4. Khi đó x bằng:",
+        answers: ["4", "-4", "2", "-2"],
+        correct: 1,
+      },
+      // Vận dụng cao
+      {
+        id: 12,
+        level: "Vận dụng cao",
+        question:
+          "Một khối lập phương có thể tích 343 cm³. Độ dài cạnh khối lập phương là:",
+        answers: ["7 cm", "9 cm", "6 cm", "8 cm"],
+        correct: 0,
+      },
+    ];
+
+    // ===== LOGIC TRÒ CHƠI =====
+    let currentIndex = 0;
+    let score = 0;
+    let correctCount = 0;
+
+    const startScreen = document.getElementById("start-screen");
+    const gameUI = document.getElementById("game-ui");
+    const endScreen = document.getElementById("end-screen");
+
+    const questionText = document.getElementById("question-text");
+    const answersGrid = document.getElementById("answers-grid");
+    const feedbackEl = document.getElementById("feedback");
+    const levelBadge = document.getElementById("level-badge");
+    const scoreDisplay = document.getElementById("score-display");
+    const questionIndexEl = document.getElementById("question-index");
+    const totalQuestionsEl = document.getElementById("total-questions");
+    const progressBar = document.getElementById("progress-bar");
+    const finalScoreEl = document.getElementById("final-score");
+    const finalCorrectEl = document.getElementById("final-correct");
+    const endMessageEl = document.getElementById("end-message");
+    const endIconEl = document.getElementById("end-icon");
+
+    totalQuestionsEl.textContent = questions.length;
+
+    function startGame() {
+      startScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      gameUI.classList.remove("hidden");
+      gameUI.classList.add("flex");
+
+      currentIndex = 0;
+      score = 0;
+      correctCount = 0;
+      scoreDisplay.textContent = score;
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentIndex >= questions.length) {
+        endGame();
+        return;
+      }
+
+      const q = questions[currentIndex];
+      questionIndexEl.textContent = currentIndex + 1;
+
+      questionText.textContent = q.question.replace(/\\u221b/g, "∛");
+      levelBadge.textContent = q.level;
+
+      // màu badge theo mức
+      if (q.level === "Nhận biết") {
+        levelBadge.className =
+          "inline-flex items-center gap-1 text-[11px] sm:text-xs px-3 py-1 rounded-full bg-emerald-900/80 border border-emerald-500/60 text-emerald-200 uppercase tracking-wide font-semibold";
+      } else if (q.level === "Thông hiểu") {
+        levelBadge.className =
+          "inline-flex items-center gap-1 text-[11px] sm:text-xs px-3 py-1 rounded-full bg-sky-900/80 border border-sky-400/70 text-sky-200 uppercase tracking-wide font-semibold";
+      } else if (q.level === "Vận dụng") {
+        levelBadge.className =
+          "inline-flex items-center gap-1 text-[11px] sm:text-xs px-3 py-1 rounded-full bg-amber-900/80 border border-amber-400/70 text-amber-200 uppercase tracking-wide font-semibold";
+      } else {
+        levelBadge.className =
+          "inline-flex items-center gap-1 text-[11px] sm:text-xs px-3 py-1 rounded-full bg-rose-900/80 border border-rose-400/70 text-rose-200 uppercase tracking-wide font-semibold";
+      }
+
+      // progress
+      const progress = (currentIndex / questions.length) * 100;
+      progressBar.style.width = progress + "%";
+
+      // render answer buttons
+      answersGrid.innerHTML = "";
+      q.answers.forEach((ans, idx) => {
+        const btn = document.createElement("button");
+        btn.className =
+          "answer-btn rounded-2xl bg-slate-900/80 border border-slate-700 text-left px-4 py-3 text-sm sm:text-base hover:border-emerald-400/70 hover:bg-slate-800";
+        btn.innerHTML =
+          '<span class="font-semibold mr-2 text-emerald-300">' +
+          String.fromCharCode(65 + idx) +
+          ".</span> " +
+          ans;
+        btn.onclick = () => checkAnswer(idx);
+        answersGrid.appendChild(btn);
+      });
+
+      feedbackEl.style.opacity = 0;
+      feedbackEl.textContent = "";
+    }
+
+    function checkAnswer(selectedIndex) {
+      const q = questions[currentIndex];
+      const buttons = answersGrid.querySelectorAll("button");
+      buttons.forEach((b) => (b.disabled = true));
+
+      const correctIndex = q.correct;
+
+      if (selectedIndex === correctIndex) {
+        score += 10;
+        correctCount++;
+
+        buttons[selectedIndex].classList.remove("border-slate-700");
+        buttons[selectedIndex].classList.add(
+          "border-emerald-400",
+          "bg-emerald-900/60"
+        );
+        feedbackEl.textContent = "Chính xác! Tuyệt lắm! 🌟";
+        feedbackEl.classList.remove("text-rose-300");
+        feedbackEl.classList.add("text-emerald-300");
+        showEmoji(true);
+      } else {
+        buttons[selectedIndex].classList.remove("border-slate-700");
+        buttons[selectedIndex].classList.add(
+          "border-rose-400",
+          "bg-rose-900/40"
+        );
+        buttons[correctIndex].classList.remove("border-slate-700");
+        buttons[correctIndex].classList.add(
+          "border-emerald-400",
+          "bg-emerald-900/60"
+        );
+        feedbackEl.textContent = "Chưa đúng rồi, thử cố thêm nhé! 💪";
+        feedbackEl.classList.remove("text-emerald-300");
+        feedbackEl.classList.add("text-rose-300");
+        showEmoji(false);
+      }
+
+      scoreDisplay.textContent = score;
+      feedbackEl.style.opacity = 1;
+
+      setTimeout(() => {
+        currentIndex++;
+        loadQuestion();
+      }, 1500);
+    }
+
+    function endGame() {
+      gameUI.classList.add("hidden");
+      gameUI.classList.remove("flex");
+      endScreen.classList.remove("hidden");
+
+      finalScoreEl.textContent = score;
+      finalCorrectEl.textContent = correctCount + "/" + questions.length;
+
+      if (correctCount >= 10) {
+        endMessageEl.textContent =
+          "Xuất sắc! Bạn đã làm chủ căn bậc ba và nạp tràn năng lượng cho thành phố.";
+        endIconEl.textContent = "🌟";
+      } else if (correctCount >= 7) {
+        endMessageEl.textContent =
+          "Rất tốt! Kiến thức căn bậc ba của bạn khá vững. Hãy chơi lại để đạt điểm tối đa nhé!";
+        endIconEl.textContent = "⚡";
+      } else {
+        endMessageEl.textContent =
+          "Bạn cần ôn thêm về căn bậc ba. Hãy xem lại lý thuyết và thử chơi lại lần nữa nhé!";
+        endIconEl.textContent = "📚";
+      }
+    }
+
+    function showEmoji(isCorrect) {
+      const emoji = document.createElement("div");
+      emoji.className = "emoji-feedback";
+      emoji.textContent = isCorrect ? "🎉" : "😅";
+      document.body.appendChild(emoji);
+      setTimeout(() => emoji.remove(), 900);
+    }
+  </script>
+</body>
+</html>
