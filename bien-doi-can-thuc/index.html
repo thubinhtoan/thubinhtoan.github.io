@@ -622,24 +622,22 @@
         let particles = [];
         const colors = ['#fcd34d', '#22d3ee', '#f87171', '#a78bfa', '#34d399'];
 
-      function fireConfetti() {
-    for (let i = 0; i < 100; i++) {
-        particles.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height - canvas.height,
-            vx: Math.random() * 4 - 2,
-            vy: Math.random() * 4 + 2,
-            color: colors[Math.floor(Math.random() * colors.length)],
-            size: Math.random() * 10 + 5,
-            rotation: Math.random() * 360,
-            rotationSpeed: Math.random() * 10 - 5
-        });
-    }
-    if (!isConfettiRunning) {
-        isConfettiRunning = true;
-        requestAnimationFrame(updateConfetti);
-    }
-}
+        function fireConfetti() {
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    vx: Math.random() * 4 - 2,
+                    vy: Math.random() * 4 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 10 + 5,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 10 - 5
+                });
+            }
+            if (particles.length <= 100) requestAnimationFrame(updateConfetti);
+        }
+
         function updateConfetti() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
@@ -661,11 +659,10 @@
                     i--;
                 }
             }
-           if (particles.length > 0) {
-    requestAnimationFrame(updateConfetti);
-} else {
-    isConfettiRunning = false;
-}
+
+            if (particles.length > 0) {
+                requestAnimationFrame(updateConfetti);
+            }
         }
 
         window.addEventListener('resize', () => {
