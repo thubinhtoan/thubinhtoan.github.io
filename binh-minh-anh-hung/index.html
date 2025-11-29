@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bình Minh Anh Hùng - Toán 9 Chương 5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            overflow: hidden;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .hero-font {
+            font-family: 'Anton', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        /* --- Dynamic Sky Background --- */
+        #sky-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(to bottom, #0f172a, #312e81); /* Starting Night */
+            transition: background 1.5s ease;
+        }
+
+        /* Sky States */
+        .sky-stage-0 { background: linear-gradient(to bottom, #020617, #1e1b4b); } /* Deep Night */
+        .sky-stage-1 { background: linear-gradient(to bottom, #172554, #4338ca); } /* Early Twilight */
+        .sky-stage-2 { background: linear-gradient(to bottom, #1e3a8a, #6d28d9); } /* Purple Horizon */
+        .sky-stage-3 { background: linear-gradient(to bottom, #c2410c, #4c1d95); } /* Red Dawn */
+        .sky-stage-4 { background: linear-gradient(to bottom, #ea580c, #db2777); } /* Bright Sunrise */
+        .sky-stage-5 { background: linear-gradient(to bottom, #38bdf8, #facc15); } /* Full Day (Win) */
+
+        /* --- Sun Element --- */
+        #sun {
+            position: absolute;
+            bottom: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, #fef08a, #facc15, #f97316);
+            border-radius: 50%;
+            box-shadow: 0 0 50px #facc15;
+            transition: bottom 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.8;
+        }
+
+        /* --- Game Scene Elements --- */
+        #scene-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #hero {
+            font-size: 6rem;
+            position: absolute;
+            left: 20%;
+            bottom: 20px;
+            transition: transform 0.3s;
+            z-index: 10;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+        }
+
+        #monster {
+            font-size: 6rem;
+            position: absolute;
+            right: 20%;
+            bottom: 20px;
+            transition: all 0.5s;
+            z-index: 10;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)) grayscale(100%);
+            opacity: 0;
+            transform: translateX(100px);
+        }
+
+        #monster.active {
+            opacity: 1;
+            transform: translateX(0);
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)) grayscale(0%);
+        }
+
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 30px;
+            background: #1c1917;
+            border-top: 4px solid #4ade80;
+        }
+
+        /* --- Attack Animations --- */
+        @keyframes hero-attack {
+            0% { transform: translateX(0) rotate(0deg); }
+            50% { transform: translateX(100px) rotate(20deg); }
+            100% { transform: translateX(0) rotate(0deg); }
+        }
+        .hero-attacking { animation: hero-attack 0.5s ease-in-out; }
+
+        @keyframes monster-die {
+            0% { opacity: 1; transform: scale(1) rotate(0deg); }
+            100% { opacity: 0; transform: scale(0) rotate(180deg); }
+        }
+        .monster-defeated { animation: monster-die 0.8s forwards; }
+
+        @keyframes damage {
+            0% { transform: translateX(0); background-color: rgba(220, 38, 38, 0); }
+            25% { transform: translateX(-5px); background-color: rgba(220, 38, 38, 0.2); }
+            75% { transform: translateX(5px); background-color: rgba(220, 38, 38, 0.2); }
+            100% { transform: translateX(0); background-color: rgba(220, 38, 38, 0); }
+        }
+        .screen-shake { animation: damage 0.5s; }
+
+        /* --- UI Components --- */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-answer {
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px solid #475569;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-answer:hover {
+            border-color: #facc15;
+            background: rgba(51, 65, 85, 0.95);
+            transform: translateY(-2px);
+        }
+        .btn-answer:active { transform: scale(0.98); }
+
+        .btn-answer.correct {
+            background: #15803d;
+            border-color: #4ade80;
+            box-shadow: 0 0 15px #4ade80;
+        }
+        .btn-answer.wrong {
+            background: #991b1b;
+            border-color: #f87171;
+        }
+
+        /* Math Styling */
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 2px;
+            font-size: 0.9em;
+        }
+        .fraction > span { display: block; padding: 0.1em; }
+        .fraction span.numerator { border-bottom: 1px solid currentColor; }
+        .fraction span.denominator { border-top: 1px solid transparent; }
+
+        /* Feedback Emoji */
+        #feedback-overlay {
+            position: fixed; inset: 0; pointer-events: none;
+            display: flex; justify-content: center; align-items: center; z-index: 50;
+        }
+        .feedback-emoji {
+            font-size: 8rem; opacity: 0; transform: scale(0.5);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .feedback-emoji.show { opacity: 1; transform: scale(1.2); }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 text-white">
+
+    <div id="sky-container"></div>
+    <div id="sun"></div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="glass-panel p-10 rounded-3xl text-center max-w-3xl w-full z-10 border-t-4 border-yellow-500 shadow-2xl">
+        <h1 class="hero-font text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-orange-500 mb-4 drop-shadow-sm">
+            BÌNH MINH<br>ANH HÙNG
+        </h1>
+        <p class="text-xl text-blue-200 mb-8 font-light">
+            Bóng tối đang bao trùm Vương quốc Toán học. Hãy sử dụng kiến thức về <b>Đường Tròn</b> để đánh bại quái vật và gọi Mặt Trời thức giấc!
+        </p>
+        
+        <div class="grid grid-cols-2 gap-4 text-left bg-slate-900/60 p-6 rounded-xl mb-8 border border-slate-700">
+            <div class="flex items-center gap-3"><span class="text-2xl">🌱</span> <span>6 Câu Nhận Biết</span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">📘</span> <span>5 Câu Thông Hiểu</span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">⚔️</span> <span>3 Câu Vận Dụng</span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">👑</span> <span>1 Câu Vận Dụng Cao</span></div>
+        </div>
+
+        <button onclick="startGame()" class="group relative px-10 py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-full text-2xl shadow-[0_0_25px_rgba(234,88,12,0.6)] transition-all hover:scale-105">
+            <span class="relative z-10">CHIẾN ĐẤU NGAY ⚔️</span>
+            <div class="absolute inset-0 h-full w-full bg-orange-400 rounded-full blur opacity-0 group-hover:opacity-40 transition duration-200"></div>
+        </button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden w-full max-w-4xl flex-col z-10 h-screen py-4">
+        <!-- Header -->
+        <div class="flex justify-between items-end mb-2 glass-panel p-3 rounded-xl">
+            <div>
+                <div id="level-badge" class="text-xs font-bold px-2 py-1 bg-green-800 text-green-200 rounded uppercase tracking-wider mb-1 inline-block">Nhận Biết</div>
+                <div class="text-3xl font-bold text-white">Câu <span id="q-current">1</span><span class="text-slate-400 text-xl">/15</span></div>
+            </div>
+            <div class="text-right">
+                <div class="text-slate-400 text-sm uppercase">Năng Lượng</div>
+                <div class="text-3xl font-bold text-yellow-400 drop-shadow-md" id="score">0</div>
+            </div>
+        </div>
+
+        <!-- Battle Scene -->
+        <div id="scene-container" class="rounded-2xl border-2 border-slate-600/50 bg-black/20 backdrop-blur-sm">
+            <div id="hero">🛡️</div> <!-- Hero Avatar -->
+            <div id="monster" class="active">👻</div> <!-- Monster Avatar -->
+            <div class="ground"></div>
+        </div>
+
+        <!-- Question Box -->
+        <div class="glass-panel p-6 rounded-2xl mb-4 flex-grow flex flex-col justify-center relative min-h-[150px]">
+            <div id="question-text" class="text-xl md:text-2xl font-medium text-center leading-relaxed">
+                Loading...
+            </div>
+        </div>
+
+        <!-- Options -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 pb-4">
+            <!-- Buttons injected here -->
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden glass-panel p-10 rounded-3xl text-center max-w-2xl w-full z-20 border-4 border-yellow-500">
+        <div class="text-8xl mb-6 animate-bounce">☀️</div>
+        <h2 class="hero-font text-5xl text-yellow-400 mb-4">BÌNH MINH RỰC RỠ!</h2>
+        <p class="text-xl text-slate-200 mb-6">Bạn đã đánh bại bóng tối và mang ánh sáng trở lại!</p>
+        <div class="bg-slate-800/80 p-4 rounded-xl mb-8 inline-block">
+            <div class="text-sm text-slate-400 uppercase tracking-widest">Tổng Năng Lượng</div>
+            <div class="text-6xl font-bold text-white" id="final-score">0</div>
+        </div>
+        <div>
+            <button onclick="location.reload()" class="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg shadow-lg transition transform hover:scale-105">
+                Chơi Lại
+            </button>
+        </div>
+    </div>
+
+    <!-- Feedback -->
+    <div id="feedback-overlay">
+        <div id="feedback-emoji" class="feedback-emoji">😎</div>
+    </div>
+
+    <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+    <script>
+        // --- GAME DATA ---
+        // 15 Questions covering Chapter 5: Circles (Chân trời sáng tạo Math 9)
+        // Topics: Circle definition, symmetry, tangents, chords, central angles, inscribed angles, sector area.
+        const questions = [
+            // MỨC ĐỘ: NHẬN BIẾT (6 câu)
+            {
+                q: "Tập hợp các điểm cách điểm O cố định một khoảng bằng R không đổi là:",
+                a: ["Hình tròn tâm O bán kính R", "Đường tròn tâm O bán kính R", "Hình quạt tròn", "Dây cung"],
+                c: 1,
+                l: "NHẬN BIẾT"
+            },
+            {
+                q: "Số trục đối xứng của một đường tròn là:",
+                a: ["1", "2", "0", "Vô số"],
+                c: 3,
+                l: "NHẬN BIẾT"
+            },
+            {
+                q: "Góc nội tiếp chắn nửa đường tròn là:",
+                a: ["Góc nhọn", "Góc tù", "Góc vuông", "Góc bẹt"],
+                c: 2,
+                l: "NHẬN BIẾT"
+            },
+            {
+                q: "Nếu đường thẳng a là tiếp tuyến của đường tròn (O) tại tiếp điểm C thì:",
+                a: ["a // OC", "a &perp; OC", "a trùng OC", "a cắt OC tại điểm khác C"],
+                c: 1,
+                l: "NHẬN BIẾT"
+            },
+            {
+                q: "Công thức tính độ dài l của cung n&deg; trên đường tròn bán kính R là:",
+                a: ["l = <div class='fraction'><span class='numerator'>&pi;Rn</span><span class='denominator'>180</span></div>", 
+                    "l = <div class='fraction'><span class='numerator'>&pi;R<sup>2</sup>n</span><span class='denominator'>180</span></div>", 
+                    "l = <div class='fraction'><span class='numerator'>&pi;Rn</span><span class='denominator'>360</span></div>", 
+                    "l = 2&pi;R"],
+                c: 0,
+                l: "NHẬN BIẾT"
+            },
+            {
+                q: "Trong các dây của một đường tròn, dây lớn nhất là:",
+                a: ["Bán kính", "Cung", "Đường kính", "Tiếp tuyến"],
+                c: 2,
+                l: "NHẬN BIẾT"
+            },
+
+            // MỨC ĐỘ: THÔNG HIỂU (5 câu)
+            {
+                q: "Cho đường tròn (O), góc ở tâm AOB = 60&deg;. Số đo cung nhỏ AB là:",
+                a: ["30&deg;", "60&deg;", "120&deg;", "300&deg;"],
+                c: 1, // Số đo cung nhỏ bằng góc ở tâm chắn cung đó
+                l: "THÔNG HIỂU"
+            },
+            {
+                q: "Cho đường tròn (O; 5cm) và đường thẳng d. Khoảng cách từ O đến d là 3cm. Vị trí tương đối của d và (O) là:",
+                a: ["Cắt nhau", "Tiếp xúc nhau", "Không giao nhau", "Trùng nhau"],
+                c: 0, // d < R (3 < 5) => Cắt nhau
+                l: "THÔNG HIỂU"
+            },
+            {
+                q: "Hai tiếp tuyến tại A và B của đường tròn (O) cắt nhau tại M. Khẳng định nào sau đây SAI?",
+                a: ["MA = MB", "OM là phân giác của góc AOB", "MO là phân giác của góc AMB", "Tam giác MAB là tam giác đều"],
+                c: 3, // Chỉ cân tại M, chưa chắc đều
+                l: "THÔNG HIỂU"
+            },
+            {
+                q: "Tứ giác ABCD nội tiếp đường tròn (O) có góc A = 80&deg;. Số đo góc C là:",
+                a: ["80&deg;", "100&deg;", "90&deg;", "40&deg;"],
+                c: 1, // Góc đối bù nhau: 180 - 80 = 100
+                l: "THÔNG HIỂU"
+            },
+            {
+                q: "Diện tích hình quạt tròn bán kính R = 4cm, cung 90&deg; là:",
+                a: ["4&pi; cm<sup>2</sup>", "2&pi; cm<sup>2</sup>", "8&pi; cm<sup>2</sup>", "16&pi; cm<sup>2</sup>"],
+                c: 0, // (pi * 4^2 * 90) / 360 = 16pi/4 = 4pi
+                l: "THÔNG HIỂU"
+            },
+
+            // MỨC ĐỘ: VẬN DỤNG (3 câu)
+            {
+                q: "Cho đường tròn (O; 10cm), dây AB cách tâm 6cm. Độ dài dây AB là:",
+                a: ["8 cm", "16 cm", "4 cm", "12 cm"],
+                c: 1, // d=6, R=10 => nửa dây = sqrt(100-36)=8 => dây=16
+                l: "VẬN DỤNG"
+            },
+            {
+                q: "(Vận dụng thực tế) Một bánh xe đạp có đường kính 700mm. Khi bánh xe quay được 10 vòng thì xe đi được quãng đường bao nhiêu? (Lấy &pi; &approx; 3,14)",
+                a: ["~ 21980 mm", "~ 2198 mm", "~ 10990 mm", "~ 43960 mm"],
+                c: 0, // C = 700 * 3.14 = 2198 => 10 vòng = 21980
+                l: "VẬN DỤNG"
+            },
+            {
+                q: "Tam giác ABC đều nội tiếp đường tròn (O; R). Cạnh của tam giác theo R là:",
+                a: ["R", "R&radic;2", "R&radic;3", "R/2"],
+                c: 2, // a = R*sqrt(3)
+                l: "VẬN DỤNG"
+            },
+
+            // MỨC ĐỘ: VẬN DỤNG CAO (1 câu)
+            {
+                q: "Cho nửa đường tròn (O) đường kính AB. Lấy M thuộc nửa đường tròn. Tiếp tuyến tại M cắt các tiếp tuyến Ax, By lần lượt tại C và D. Biết AC = 4cm, BD = 9cm. Bán kính đường tròn là:",
+                a: ["6 cm", "12 cm", "6,5 cm", "5 cm"],
+                c: 0, // Tam giác COD vuông tại O, OM là đường cao. OM^2 = CM.MD = AC.BD = 4.9 = 36 => R = 6
+                l: "VẬN DỤNG CAO"
+            }
+        ];
+
+        // --- GAME LOGIC ---
+        let currentIdx = 0;
+        let score = 0;
+        const monsters = ['👻', '🦇', '👹', '🐉', '🧟', '🧛', '🕷️', '🦂', '🐍', '🦖', '🦍', '👾', '🤖', '👽', '💀'];
+        let currentMonsterIdx = 0;
+
+        // Audio Context
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playTone(freq, type, duration) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playAttackSound() {
+            // Swoosh sound
+            playTone(400, 'sawtooth', 0.1);
+            setTimeout(() => playTone(300, 'sawtooth', 0.1), 50);
+        }
+
+        function playCorrectSound() {
+            // Heroic fanfare
+            playTone(523.25, 'square', 0.1); // C5
+            setTimeout(() => playTone(659.25, 'square', 0.1), 100); // E5
+            setTimeout(() => playTone(783.99, 'square', 0.3), 200); // G5
+        }
+
+        function playWrongSound() {
+            // Damage sound
+            playTone(150, 'sawtooth', 0.3);
+            setTimeout(() => playTone(100, 'sawtooth', 0.3), 100);
+        }
+
+        function playWinSound() {
+            // Victory sequence
+            [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((f, i) => {
+                setTimeout(() => playTone(f, 'square', 0.3), i*150);
+            });
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+            
+            currentIdx = 0;
+            score = 0;
+            currentMonsterIdx = 0;
+            
+            updateUI();
+            updateSky(0);
+            loadQuestion();
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score;
+            document.getElementById('q-current').innerText = currentIdx + 1;
+        }
+
+        function loadQuestion() {
+            if (currentIdx >= questions.length) {
+                endGame();
+                return;
+            }
+
+            const q = questions[currentIdx];
+            document.getElementById('question-text').innerHTML = q.q;
+            
+            // Level Badge Color
+            const badge = document.getElementById('level-badge');
+            badge.innerText = q.l;
+            if (q.l === "NHẬN BIẾT") badge.className = "text-xs font-bold px-2 py-1 bg-green-800 text-green-200 rounded uppercase tracking-wider mb-1 inline-block";
+            else if (q.l === "THÔNG HIỂU") badge.className = "text-xs font-bold px-2 py-1 bg-blue-800 text-blue-200 rounded uppercase tracking-wider mb-1 inline-block";
+            else if (q.l === "VẬN DỤNG") badge.className = "text-xs font-bold px-2 py-1 bg-purple-800 text-purple-200 rounded uppercase tracking-wider mb-1 inline-block";
+            else badge.className = "text-xs font-bold px-2 py-1 bg-red-800 text-red-200 rounded uppercase tracking-wider mb-1 inline-block";
+
+            // Spawn Monster
+            const monsterEl = document.getElementById('monster');
+            monsterEl.innerText = monsters[currentMonsterIdx % monsters.length];
+            monsterEl.className = 'active'; // Reset monster animation
+
+            // Options
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            q.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-answer w-full p-4 rounded-xl text-lg font-medium text-slate-200 text-center flex items-center justify-center min-h-[80px]";
+                btn.innerHTML = opt;
+                btn.onclick = () => checkAnswer(idx, q.c, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct, btn) {
+            const btns = document.querySelectorAll('.btn-answer');
+            btns.forEach(b => b.disabled = true);
+
+            if (selected === correct) {
+                // Correct
+                btn.classList.add('correct');
+                score += 100;
+                updateUI();
+                playCorrectSound();
+                playAttackSound();
+                
+                // Attack Animation
+                document.getElementById('hero').classList.add('hero-attacking');
+                setTimeout(() => document.getElementById('hero').classList.remove('hero-attacking'), 500);
+                
+                // Defeat Monster Animation
+                document.getElementById('monster').classList.add('monster-defeated');
+                document.getElementById('monster').classList.remove('active');
+
+                showFeedback("🤩");
+                fireConfetti();
+
+                // Update Sky based on progress (every 3 questions)
+                if ((currentIdx + 1) % 3 === 0) {
+                    updateSky(Math.floor((currentIdx + 1) / 3));
+                }
+
+                setTimeout(() => {
+                    currentIdx++;
+                    currentMonsterIdx++;
+                    loadQuestion();
+                }, 1500);
+
+            } else {
+                // Wrong
+                btn.classList.add('wrong');
+                btns[correct].classList.add('correct');
+                playWrongSound();
+                
+                // Screen Shake (Damage)
+                document.body.classList.add('screen-shake');
+                setTimeout(() => document.body.classList.remove('screen-shake'), 500);
+                
+                showFeedback("🤕");
+
+                setTimeout(() => {
+                    currentIdx++;
+                    currentMonsterIdx++;
+                    loadQuestion();
+                }, 2000);
+            }
+        }
+
+        function updateSky(stage) {
+            const sky = document.getElementById('sky-container');
+            const sun = document.getElementById('sun');
+            
+            // Remove old stages
+            for(let i=0; i<=5; i++) sky.classList.remove(`sky-stage-${i}`);
+            
+            // Add new stage
+            sky.classList.add(`sky-stage-${stage}`);
+
+            // Move Sun
+            // Start: -150px. End (Win): 80% height.
+            const sunPos = -150 + (stage * 150); 
+            sun.style.bottom = `${sunPos}px`;
+        }
+
+        function showFeedback(emoji) {
+            const el = document.getElementById('feedback-emoji');
+            el.innerText = emoji;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 1000);
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            
+            // Final Sun position (High in sky)
+            updateSky(5);
+            document.getElementById('sun').style.bottom = "70%";
+            
+            playWinSound();
+            fireConfetti();
+            setInterval(fireConfetti, 1500);
+        }
+
+        // --- CONFETTI ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function fireConfetti() {
+            for (let i = 0; i < 80; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 25,
+                    vy: (Math.random() - 0.5) * 25,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                    size: Math.random() * 8 + 4,
+                    life: 100
+                });
+            }
+            if(particles.length <= 80) requestAnimationFrame(updateConfetti);
+        }
+
+        function updateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.3; // Gravity
+                p.life--;
+                p.size *= 0.98;
+                
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (p.life <= 0 || p.y > canvas.height) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) requestAnimationFrame(updateConfetti);
+        }
+
+    </script>
+</body>
+</html>
