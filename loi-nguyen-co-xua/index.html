@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lời Nguyền Cổ Xưa - Toán 9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0f0f0f;
+            color: #e0e0e0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .title-font {
+            font-family: 'Creepster', cursive;
+            letter-spacing: 2px;
+        }
+
+        /* --- Background Effects --- */
+        #fog-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+        }
+
+        .fog {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/img/fog1.png') repeat-x;
+            background-size: contain;
+            animation: fogAnim 60s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes fogAnim {
+            0% { transform: translate3d(-25%, 0, 0); }
+            100% { transform: translate3d(25%, 0, 0); }
+        }
+
+        /* --- Game Container --- */
+        .game-card {
+            background: rgba(30, 30, 30, 0.9);
+            border: 2px solid #4a4a4a;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), 0 0 10px rgba(100, 255, 100, 0.1);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .option-btn {
+            background: linear-gradient(145deg, #2a2a2a, #333);
+            border: 1px solid #555;
+            transition: transform 0.1s, box-shadow 0.2s, background 0.2s;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            background: #444;
+            border-color: #888;
+        }
+
+        .option-btn:active {
+            transform: translateY(0);
+        }
+
+        .option-btn.correct {
+            background: #1b5e20 !important;
+            border-color: #4caf50 !important;
+            color: #fff;
+        }
+
+        .option-btn.wrong {
+            background: #b71c1c !important;
+            border-color: #f44336 !important;
+            color: #fff;
+        }
+
+        /* --- Animations --- */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .shake-element {
+            animation: shake 0.5s;
+        }
+
+        /* --- Progress Bar --- */
+        .progress-container {
+            background: #333;
+            border-radius: 999px;
+            overflow: hidden;
+            height: 10px;
+            border: 1px solid #555;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #4caf50, #81c784);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease-out;
+        }
+
+        /* --- Feedback Overlay --- */
+        #feedback-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+        
+        .feedback-emoji {
+            font-size: 8rem;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .feedback-emoji.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+    </style>
+</head>
+<body class="h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Background Fog -->
+    <div id="fog-container">
+        <div class="fog"></div>
+    </div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="game-card p-10 rounded-2xl text-center max-w-2xl w-full z-10">
+        <h1 class="title-font text-6xl text-red-600 mb-2 text-shadow-lg">Lời Nguyền Cổ Xưa</h1>
+        <h2 class="text-2xl text-gray-400 mb-6 font-bold">Chinh Phục Tỉ Số Lượng Giác</h2>
+        
+        <p class="text-lg text-gray-300 mb-8 leading-relaxed">
+            Ngôi đền tri thức đã bị phong ấn bởi một lời nguyền đen tối. 
+            Chỉ có người nắm vững kiến thức về <b>sin, cos, tan, cot</b> mới có thể thắp sáng 15 ngọn đuốc và giải cứu ngôi đền.
+        </p>
+
+        <div class="grid grid-cols-2 gap-4 text-left bg-gray-800 p-4 rounded-lg mb-8 border border-gray-700">
+            <div class="text-green-400">⚡ 6 Câu Nhận Biết</div>
+            <div class="text-blue-400">🧠 5 Câu Thông Hiểu</div>
+            <div class="text-yellow-400">🔥 3 Câu Vận Dụng</div>
+            <div class="text-red-500">☠️ 1 Câu Vận Dụng Cao</div>
+        </div>
+
+        <button onclick="startGame()" class="px-8 py-4 bg-red-800 hover:bg-red-700 text-white font-bold rounded-lg text-xl shadow-lg transform transition hover:scale-105 border border-red-600">
+            Bước Vào Ngôi Đền 🕯️
+        </button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden w-full max-w-4xl z-10 flex-col h-full justify-center">
+        <!-- Header Stats -->
+        <div class="flex justify-between items-center mb-4 px-2">
+            <div class="text-gray-400">Cấp độ: <span id="level-badge" class="font-bold text-green-400">Nhận Biết</span></div>
+            <div class="text-xl font-bold text-yellow-500">Điểm: <span id="score">0</span></div>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-container w-full mb-6">
+            <div id="progress-bar" class="progress-fill"></div>
+        </div>
+
+        <!-- Question Card -->
+        <div id="question-card" class="game-card p-6 md:p-8 rounded-xl mb-6 relative">
+            <div class="absolute -top-4 -left-4 bg-red-900 text-white w-12 h-12 rounded-full flex items-center justify-center font-bold border-2 border-gray-600 shadow-lg" id="q-number">1</div>
+            <div id="question-text" class="text-xl md:text-2xl text-center font-medium leading-relaxed mt-2">
+                Loading question...
+            </div>
+        </div>
+
+        <!-- Options Grid -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Buttons will be injected here -->
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden game-card p-10 rounded-2xl text-center max-w-2xl w-full z-10">
+        <div class="text-6xl mb-4">🏆</div>
+        <h2 class="title-font text-5xl text-yellow-500 mb-4">Lời Nguyền Đã Được Hóa Giải!</h2>
+        <p class="text-xl text-gray-300 mb-6">Bạn đã thắp sáng toàn bộ ngôi đền bằng trí tuệ của mình.</p>
+        <div class="text-4xl font-bold text-white mb-8" id="final-score">0</div>
+        <button onclick="location.reload()" class="px-8 py-3 bg-green-700 hover:bg-green-600 text-white font-bold rounded-lg shadow-lg">
+            Chơi Lại
+        </button>
+    </div>
+
+    <!-- Feedback Overlay -->
+    <div id="feedback-overlay">
+        <div id="feedback-emoji" class="feedback-emoji">🤩</div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50"></canvas>
+
+    <script>
+        // --- DATA ---
+        // 15 câu: 6 NB, 5 TH, 3 VD, 1 VDC
+        // Đã chia đều đáp án đúng: A(4), B(4), C(4), D(3)
+        const questions = [
+            // LEVEL 1: NHẬN BIẾT (6 câu)
+            {
+                q: "Cho tam giác ABC vuông tại A. Tỉ số giữa cạnh đối và cạnh huyền của góc B được gọi là:",
+                a: ["sin B", "cos B", "tan B", "cot B"],
+                correct: 0,   // A
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Trong tam giác vuông, tỉ số giữa cạnh kề và cạnh huyền của một góc nhọn là:",
+                a: ["Tang (tan)", "Sin", "Côtang (cot)", "Côsin (cos)"],
+                correct: 3,   // D: cos
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Công thức nào sau đây là ĐÚNG với góc nhọn &alpha;?",
+                a: [
+                    "tan &alpha; = cos &alpha; / sin &alpha;",
+                    "tan &alpha; = sin &alpha; / cos &alpha;",
+                    "tan &alpha; = 1 / sin &alpha;",
+                    "tan &alpha; = 1 / cos &alpha;"
+                ],
+                correct: 1,   // B
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Nếu hai góc phụ nhau (tổng bằng 90&deg;), thì sin góc này bằng:",
+                a: [
+                    "sin góc kia",
+                    "tan góc kia",
+                    "cos góc kia",
+                    "cot góc kia"
+                ],
+                correct: 2,   // C
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Với góc nhọn &alpha; bất kỳ, khẳng định nào sau đây luôn đúng?",
+                a: [
+                    "sin &alpha; &gt; 1",
+                    "0 &lt; sin &alpha; &lt; 1",
+                    "cos &alpha; &gt; 1",
+                    "sin &alpha; = 1"
+                ],
+                correct: 1,   // B
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Trong tam giác vuông ABC vuông tại A, tỉ số AC/AB (cạnh đối/cạnh kề của góc B) là:",
+                a: ["tan B", "sin B", "cos B", "cot B"],
+                correct: 0,   // A
+                level: "NHẬN BIẾT"
+            },
+
+            // LEVEL 2: THÔNG HIỂU (5 câu)
+            {
+                q: "Cho tam giác ABC vuông tại A, có AB = 3cm, AC = 4cm, BC = 5cm. Giá trị của sin B là:",
+                a: ["3/5", "3/4", "4/5", "4/3"],
+                correct: 2,   // C: 4/5 = AC/BC
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Cho tam giác ABC vuông tại A, biết tan B = 1. Số đo góc B là:",
+                a: ["45 độ", "30 độ", "60 độ", "90 độ"],
+                correct: 0,   // A: 45°
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Biết sin 30 độ = 0.5. Giá trị của cos 60 độ là:",
+                a: ["1", "0.866", "Không xác định", "0.5"],
+                correct: 3,   // D: 0.5
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Rút gọn biểu thức: A = sin²&alpha; + cos²&alpha;",
+                a: ["0", "1", "2", "2sin&alpha;"],
+                correct: 1,   // B
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Cho tam giác MNP vuông tại M. Hệ thức nào sau đây đúng?",
+                a: [
+                    "MP = NP . cos N",
+                    "MP = MN . tan P",
+                    "MP = NP . sin N",
+                    "MP = MN . cot N"
+                ],
+                correct: 2,   // C
+                level: "THÔNG HIỂU"
+            },
+
+            // LEVEL 3: VẬN DỤNG (3 câu)
+            {
+                q: "Một cái thang dài 4m dựa vào tường, chân thang cách tường 2m. Tính góc tạo bởi thang và mặt đất (làm tròn đến độ).",
+                a: ["30 độ", "45 độ", "75 độ", "60 độ"],
+                correct: 3,   // D: cos = 2/4 = 0.5 => 60°
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "(Thực tế) Một cột điện cao 10m có bóng trên mặt đất dài 10m. Hỏi tia nắng mặt trời tạo với mặt đất một góc bao nhiêu độ?",
+                a: ["45 độ", "30 độ", "60 độ", "50 độ"],
+                correct: 0,   // A: tan = 10/10 = 1 => 45°
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "Cho tam giác ABC vuông tại A, đường cao AH. Biết BH = 1, HC = 4. Tính tan B.",
+                a: ["0.5", "2", "4", "0.25"],
+                correct: 1,   // B: AH² = BH.HC = 4 => AH=2, tanB = AH/BH = 2
+                level: "VẬN DỤNG"
+            },
+
+            // LEVEL 4: VẬN DỤNG CAO (1 câu)
+            {
+                q: "Tính giá trị biểu thức: M = sin²10° + sin²20° + ... + sin²80°",
+                a: ["1", "2", "4", "3"],
+                correct: 2,   // C: 4
+                level: "VẬN DỤNG CAO"
+            }
+        ];
+
+        // --- GAME STATE ---
+        let currentQIndex = 0;
+        let score = 0;
+        let isAnswering = false;
+
+        // --- AUDIO ENGINE ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1046.5, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'win') {
+                const now = audioCtx.currentTime;
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((note, i) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.frequency.value = note;
+                    o.type = 'triangle';
+                    g.gain.setValueAtTime(0.2, now + i*0.15);
+                    g.gain.exponentialRampToValueAtTime(0.01, now + i*0.15 + 0.5);
+                    o.start(now + i*0.15);
+                    o.stop(now + i*0.15 + 0.5);
+                });
+            }
+        }
+
+        // --- GAME LOGIC ---
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+            
+            currentQIndex = 0;
+            score = 0;
+            updateUI();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQIndex >= questions.length) {
+                endGame();
+                return;
+            }
+
+            const q = questions[currentQIndex];
+            
+            document.getElementById('q-number').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerHTML = q.q;
+            document.getElementById('level-badge').innerText = q.level;
+            
+            const badge = document.getElementById('level-badge');
+            if (q.level.includes("NHẬN BIẾT")) badge.className = "font-bold text-green-400";
+            else if (q.level.includes("THÔNG HIỂU")) badge.className = "font-bold text-blue-400";
+            else if (q.level.includes("VẬN DỤNG CAO")) badge.className = "font-bold text-red-500";
+            else badge.className = "font-bold text-yellow-400";
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            q.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn w-full p-4 rounded-lg text-lg font-semibold text-gray-200 shadow-md";
+                btn.innerHTML = opt;
+                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                grid.appendChild(btn);
+            });
+
+            isAnswering = false;
+            updateUI();
+        }
+
+        function handleAnswer(selectedIndex, correctIndex, btnElement) {
+            if (isAnswering) return;
+            isAnswering = true;
+
+            const buttons = document.querySelectorAll('.option-btn');
+
+            if (selectedIndex === correctIndex) {
+                btnElement.classList.add('correct');
+                score += 100;
+                playSound('correct');
+                showFeedback("😍");
+                fireConfetti(20);
+            } else {
+                btnElement.classList.add('wrong');
+
+                // Rung đúng thẻ câu hỏi
+                const card = document.getElementById('question-card');
+                card.classList.add('shake-element');
+                setTimeout(() => card.classList.remove('shake-element'), 500);
+                
+                buttons[correctIndex].classList.add('correct');
+                playSound('wrong');
+                showFeedback("💀");
+            }
+
+            updateUI();
+
+            setTimeout(() => {
+                currentQIndex++;
+                loadQuestion();
+            }, 1500);
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score;
+            const progress = (currentQIndex / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        function showFeedback(emoji) {
+            const el = document.getElementById('feedback-emoji');
+            el.innerText = emoji;
+            el.classList.add('show');
+            setTimeout(() => {
+                el.classList.remove('show');
+            }, 800);
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            playSound('win');
+            fireConfetti(100);
+        }
+
+        // --- CONFETTI SYSTEM ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+
+        function fireConfetti(amount) {
+            for (let i = 0; i < amount; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20,
+                    life: 100 + Math.random() * 50,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                    size: Math.random() * 8 + 4
+                });
+            }
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+                p.vy += 0.5;
+
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animateConfetti);
+        }
+        animateConfetti();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
