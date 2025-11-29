@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuộc Xâm Lăng Ngoài Trái Đất - Toán 9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Share+Tech+Mono&display=swap');
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: #000;
+            color: #0f0;
+            overflow: hidden;
+            margin: 0;
+            user-select: none;
+        }
+
+        .sci-fi-font {
+            font-family: 'Black Ops One', cursive;
+        }
+
+        /* --- Space Background --- */
+        #space {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* --- Game Elements --- */
+        #game-area {
+            position: relative;
+            width: 100%;
+            height: 40vh;
+            overflow: hidden;
+            border-bottom: 2px solid #0f0;
+            background: rgba(0, 20, 0, 0.2);
+        }
+
+        #earth-base {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 80px;
+            background: url('https://img.icons8.com/color/96/space-shuttle.png') no-repeat center bottom;
+            background-size: contain;
+            z-index: 10;
+            filter: drop-shadow(0 0 10px #0f0);
+        }
+
+        .alien-ship {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 5rem;
+            transition: all 0.5s ease;
+            filter: drop-shadow(0 0 15px #f00);
+            animation: hover 3s ease-in-out infinite;
+        }
+
+        @keyframes hover {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(20px); }
+        }
+
+        .laser-beam {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            width: 6px;
+            height: 20px;
+            background: #0f0;
+            box-shadow: 0 0 10px #fff, 0 0 20px #0f0;
+            transform: translateX(-50%);
+            z-index: 5;
+        }
+
+        .explosion {
+            position: absolute;
+            font-size: 6rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: expand 0.5s forwards;
+        }
+
+        @keyframes expand {
+            0% { opacity: 1; transform: translateX(-50%) scale(0.5); }
+            100% { opacity: 0; transform: translateX(-50%) scale(2); }
+        }
+
+        /* --- UI Panels --- */
+        .panel {
+            background: rgba(0, 20, 0, 0.9);
+            border: 2px solid #0f0;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .btn-option {
+            background: #001a00;
+            border: 1px solid #004d00;
+            color: #0f0;
+            transition: all 0.2s;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-option:hover {
+            background: #003300;
+            border-color: #0f0;
+            box-shadow: 0 0 10px #0f0;
+            transform: translateX(5px);
+        }
+
+        .btn-option.correct {
+            background: #004d00 !important;
+            border-color: #00ff00 !important;
+            box-shadow: inset 0 0 20px #00ff00;
+        }
+
+        .btn-option.wrong {
+            background: #4d0000 !important;
+            border-color: #ff0000 !important;
+            box-shadow: inset 0 0 20px #ff0000;
+            color: #ffaaaa;
+        }
+
+        /* --- Math Display --- */
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 2px;
+            font-size: 0.9em;
+        }
+        .fraction > span { display: block; padding: 0.1em; }
+        .fraction span.numerator { border-bottom: 1px solid currentColor; }
+        .fraction span.denominator { border-top: 1px solid transparent; }
+
+        /* --- Feedback --- */
+        #feedback-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .emoji-feedback {
+            font-size: 8rem;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .emoji-feedback.show { opacity: 1; transform: scale(1); }
+
+        /* --- Shake Animation for Wrong Answer --- */
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-2 md:p-4">
+
+    <!-- Space Background -->
+    <div id="space"></div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-95">
+        <div class="panel p-8 text-center max-w-2xl w-full mx-4 border-4 border-green-500 shadow-[0_0_50px_rgba(0,255,0,0.5)]">
+            <h1 class="sci-fi-font text-5xl md:text-7xl text-green-400 mb-2 animate-pulse">ALIEN INVASION</h1>
+            <h2 class="text-xl md:text-2xl text-green-200 mb-6 tracking-widest uppercase">Hệ Thức Lượng - Toán 9</h2>
+            
+            <p class="text-lg text-green-100 mb-8 leading-relaxed font-mono">
+                <span class="text-red-500 font-bold">CẢNH BÁO!</span> Hạm đội người ngoài hành tinh đang tiến vào bầu khí quyển.<br>
+                Hệ thống phòng thủ chỉ hoạt động bằng <span class="text-yellow-400 font-bold">Kiến Thức Toán Học</span>.<br>
+                Hãy trả lời đúng 15 câu hỏi để kích hoạt pháo Laser!
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 text-left border border-green-800 p-4 rounded mb-8 bg-black/50">
+                <div class="text-green-400">Target 1: 6 Câu Nhận Biết</div>
+                <div class="text-blue-400">Target 2: 5 Câu Thông Hiểu</div>
+                <div class="text-yellow-400">Target 3: 3 Câu Vận Dụng</div>
+                <div class="text-red-500">Target 4: 1 Câu Vận Dụng Cao</div>
+            </div>
+
+            <button onclick="startGame()" class="px-10 py-4 bg-green-900 hover:bg-green-700 text-green-100 font-bold rounded text-2xl border-2 border-green-500 shadow-[0_0_20px_#0f0] transition hover:scale-105 sci-fi-font tracking-widest">
+                KÍCH HOẠT HỆ THỐNG
+            </button>
+        </div>
+    </div>
+
+    <!-- Game UI -->
+    <div id="game-screen" class="hidden flex-col w-full max-w-5xl mx-auto h-full justify-between">
+        
+        <!-- Header Info -->
+        <div class="flex justify-between items-end mb-2 px-2">
+            <div>
+                <div class="text-xs text-green-600 uppercase">Cấp độ ưu tiên</div>
+                <div id="level-badge" class="font-bold text-green-400 text-lg">NHẬN BIẾT</div>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-green-600 uppercase">Điểm số</div>
+                <div class="text-3xl font-bold text-yellow-400 font-mono" id="score">0000</div>
+            </div>
+        </div>
+
+        <!-- Visual Game Area -->
+        <div id="game-area" class="rounded-xl relative mb-4">
+            <div id="alien" class="alien-ship">🛸</div>
+            <div id="earth-base"></div>
+            <!-- Laser and explosions will be injected here -->
+        </div>
+
+        <!-- Question Panel -->
+        <div class="panel p-4 md:p-6 mb-4 relative min-h-[160px] flex flex-col justify-center">
+            <div class="absolute top-0 right-0 bg-green-900 text-green-100 px-3 py-1 text-xs font-bold rounded-bl border-b border-l border-green-500">
+                CÂU <span id="q-number">1</span>/15
+            </div>
+            <div id="question-text" class="text-xl md:text-2xl font-medium leading-relaxed text-center text-green-100">
+                Đang tải dữ liệu mục tiêu...
+            </div>
+        </div>
+
+        <!-- Options -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            <!-- Buttons injected by JS -->
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-95">
+        <div class="panel p-10 text-center max-w-2xl w-full border-4 border-yellow-500 shadow-[0_0_50px_rgba(255,215,0,0.5)]">
+            <div class="text-8xl mb-4 animate-bounce">🏆</div>
+            <h2 class="sci-fi-font text-5xl text-yellow-400 mb-4">NHIỆM VỤ HOÀN THÀNH!</h2>
+            <p class="text-xl text-green-200 mb-6">Trái Đất đã được bảo vệ an toàn.</p>
+            
+            <div class="inline-block bg-green-900/50 p-4 rounded mb-8 border border-green-500">
+                <div class="text-sm text-green-400 uppercase">Tổng điểm đạt được</div>
+                <div class="text-6xl font-bold text-white font-mono" id="final-score">0</div>
+            </div>
+
+            <div>
+                <button onclick="location.reload()" class="px-8 py-3 bg-blue-900 hover:bg-blue-700 text-white font-bold rounded shadow-lg border border-blue-500">
+                    CHƠI LẠI
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Overlay -->
+    <div id="feedback-overlay">
+        <div id="feedback-emoji" class="emoji-feedback">🚀</div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+    <script>
+        // --- GAME DATA ---
+        // 15 Questions: Chapter 4 Math 9 (Trigonometry in Right Triangles)
+        // No $ symbols. Using HTML entities.
+     const questions = [
+    // LEVEL 1: NHẬN BIẾT (6 câu)
+    {
+        q: "Trong tam giác vuông, tỉ số giữa cạnh đối và cạnh huyền của một góc nhọn được gọi là:",
+        a: ["sin", "cos", "tan", "cot"],
+        correct: 0,
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Hệ thức nào sau đây là ĐÚNG với góc nhọn &alpha;?",
+        a: [
+            "tan &alpha; = cos &alpha; / sin &alpha;",
+            "tan &alpha; = sin &alpha; / cos &alpha;",
+            "tan &alpha; = 1 + sin &alpha;",
+            "tan &alpha; = 1 - cos &alpha;"
+        ],
+        correct: 1,
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Nếu hai góc phụ nhau (tổng bằng 90&deg;), thì sin góc này bằng:",
+        a: ["sin góc kia", "tan góc kia", "cot góc kia", "cos góc kia"],
+        correct: 3,
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Cho tam giác ABC vuông tại A. Cạnh góc vuông AC bằng:",
+        a: ["BC . sin B", "BC . cos B", "BC . tan B", "BC . cot B"],
+        correct: 0, // AC là cạnh đối của B, BC là huyền -> AC = BC.sinB
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Cho tam giác MNP vuông tại M. Cạnh góc vuông MN bằng cạnh góc vuông MP nhân với:",
+        a: [
+            "sin P",
+            "cos P",
+            "cot P",
+            "tan P"
+        ],
+        correct: 3, // MN = MP.tanP
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Giá trị của biểu thức sin<sup>2</sup>&alpha; + cos<sup>2</sup>&alpha; luôn bằng:",
+        a: ["0", "1", "2", "tan &alpha;"],
+        correct: 1,
+        level: "NHẬN BIẾT"
+    },
+
+    // LEVEL 2: THÔNG HIỂU (5 câu)
+    {
+        q: "Tam giác ABC vuông tại A có AB = 6, AC = 8. Giá trị sin B là:",
+        a: ["0.6", "0.8", "0.75", "1.33"],
+        correct: 1, // BC = 10. sin B = AC/BC = 8/10 = 0.8
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Cho cos &alpha; = 0.5. Số đo góc &alpha; là:",
+        a: ["30&deg;", "45&deg;", "60&deg;", "90&deg;"],
+        correct: 2,
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Rút gọn biểu thức P = 1 - sin<sup>2</sup>&alpha; ta được:",
+        a: [
+            "sin<sup>2</sup>&alpha;",
+            "cos<sup>2</sup>&alpha;",
+            "tan<sup>2</sup>&alpha;",
+            "1"
+        ],
+        correct: 1,
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Một cái thang dài 4m dựa vào tường, chân thang cách tường 2m. Góc tạo bởi thang và mặt đất là:",
+        a: ["30&deg;", "45&deg;", "60&deg;", "75&deg;"],
+        correct: 2, // cos a = 2/4 = 0.5 -> a = 60
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Cho tam giác ABC vuông tại A, đường cao AH. Biết BH=1, HC=4. Giá trị tan B là:",
+        a: ["2", "0.5", "4", "0.25"],
+        correct: 0, // AH^2 = 1*4=4 -> AH=2. tan B = AH/BH = 2/1 = 2
+        level: "THÔNG HIỂU"
+    },
+
+    // LEVEL 3: VẬN DỤNG (3 câu)
+    {
+        q: "(Thực tế) Một cột cờ cao 10m có bóng trên mặt đất dài 10m. Góc nắng mặt trời (góc tạo bởi tia nắng và mặt đất) là:",
+        a: [
+            "30&deg;",
+            "45&deg;",
+            "60&deg;",
+            "50&deg;"
+        ],
+        // tan a = 10/10 = 1 -> a = 45
+        correct: 3, // ĐÃ ĐỔI: đáp án đúng chuyển sang D = 45°
+        level: "VẬN DỤNG"
+    },
+    {
+        q: "Tam giác ABC vuông tại A, BC = 20, góc C = 30&deg;. Độ dài cạnh AB là:",
+        a: ["10", "10&radic;3", "20&radic;3", "20"],
+        correct: 0, // AB = BC.sin C = 20.sin 30 = 10
+        level: "VẬN DỤNG"
+    },
+    {
+        q: "Tìm x trong tam giác vuông có cạnh huyền bằng 10, một góc nhọn bằng 40&deg;, x là cạnh kề góc đó (Làm tròn 1 chữ số thập phân):",
+        a: [
+            "6.4",
+            "8.2",
+            "7.7",
+            "5.0"
+        ],
+        // x = 10 cos40 ≈ 7.66
+        correct: 2, // ĐÃ ĐỔI: đáp án đúng chuyển sang C
+        level: "VẬN DỤNG"
+    },
+
+    // LEVEL 4: VẬN DỤNG CAO (1 câu)
+    {
+        q: "Tính giá trị biểu thức: S = sin<sup>2</sup>15&deg; + sin<sup>2</sup>25&deg; + sin<sup>2</sup>35&deg; + sin<sup>2</sup>55&deg; + sin<sup>2</sup>65&deg; + sin<sup>2</sup>75&deg;",
+        a: ["1", "2", "3", "4"],
+        correct: 2, // (15,75), (25,65), (35,55). 3 cặp => 3
+        level: "VẬN DỤNG CAO"
+    }
+];
+
+        // --- GAME LOGIC ---
+        let currentQIndex = 0;
+        let score = 0;
+        let isAnswering = false;
+        
+        // Stars generation
+        const space = document.getElementById('space');
+        for(let i=0; i<100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = Math.random() * 3 + 'px';
+            star.style.height = star.style.width;
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 2 + 's';
+            space.appendChild(star);
+        }
+
+        // Audio System (Synthesized)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'laser') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(880, now);
+                osc.frequency.exponentialRampToValueAtTime(110, now + 0.2);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'explosion') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.exponentialRampToValueAtTime(0.01, now + 0.5);
+                gainNode.gain.setValueAtTime(0.5, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.3);
+                gainNode.gain.setValueAtTime(0.5, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, i) => {
+                    setTimeout(() => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'square';
+                        o.frequency.value = freq;
+                        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                        o.start();
+                        o.stop(audioCtx.currentTime + 0.3);
+                    }, i * 150);
+                });
+            }
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+            
+            currentQIndex = 0;
+            score = 0;
+            updateUI();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQIndex >= questions.length) {
+                endGame();
+                return;
+            }
+
+            const q = questions[currentQIndex];
+            
+            // Reset Alien
+            const alien = document.getElementById('alien');
+            alien.style.opacity = '1';
+            alien.style.transform = 'translateX(-50%)';
+            alien.innerText = getAlienSkin(currentQIndex);
+
+            // Update Text
+            document.getElementById('q-number').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerHTML = q.q;
+            document.getElementById('level-badge').innerText = q.level;
+            
+            // Level Color
+            const badge = document.getElementById('level-badge');
+            if (q.level.includes("NHẬN BIẾT")) badge.className = "font-bold text-green-400 text-lg";
+            else if (q.level.includes("THÔNG HIỂU")) badge.className = "font-bold text-blue-400 text-lg";
+            else if (q.level.includes("VẬN DỤNG CAO")) badge.className = "font-bold text-red-500 text-lg";
+            else badge.className = "font-bold text-yellow-400 text-lg";
+
+            // Buttons
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            q.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-option w-full p-4 rounded text-lg font-medium shadow-lg min-h-[70px] font-mono";
+                btn.innerHTML = opt;
+                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                grid.appendChild(btn);
+            });
+
+            isAnswering = false;
+        }
+
+        function getAlienSkin(index) {
+            const aliens = ['🛸', '👽', '👾', '🤖', '🕷️', '🐙', '🛸', '🧟', '🦇', '🐉'];
+            return aliens[index % aliens.length];
+        }
+
+        function fireLaser() {
+            playSound('laser');
+            const gameArea = document.getElementById('game-area');
+            const laser = document.createElement('div');
+            laser.className = 'laser-beam';
+            gameArea.appendChild(laser);
+
+            // Animate laser
+            let pos = 60;
+            const interval = setInterval(() => {
+                pos += 20;
+                laser.style.bottom = pos + 'px';
+                if (pos > gameArea.offsetHeight - 50) {
+                    clearInterval(interval);
+                    laser.remove();
+                    createExplosion();
+                }
+            }, 16);
+        }
+
+        function createExplosion() {
+            playSound('explosion');
+            const gameArea = document.getElementById('game-area');
+            const alien = document.getElementById('alien');
+            
+            // Hide alien
+            alien.style.opacity = '0';
+
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            explosion.innerText = '💥';
+            explosion.style.top = '20px';
+            gameArea.appendChild(explosion);
+
+            setTimeout(() => explosion.remove(), 500);
+        }
+
+        function handleAnswer(selected, correct, btn) {
+            if (isAnswering) return;
+            isAnswering = true;
+
+            const allBtns = document.querySelectorAll('.btn-option');
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                score += 100;
+                
+                // Visual & Audio effects
+                fireLaser();
+                setTimeout(() => {
+                    playSound('correct');
+                    showFeedback("🎯");
+                    fireConfetti(30);
+                }, 400);
+
+            } else {
+                btn.classList.add('wrong');
+                allBtns[correct].classList.add('correct');
+                playSound('wrong');
+                showFeedback("⚠️");
+                
+                // Shake screen
+                document.getElementById('game-area').classList.add('shake');
+                setTimeout(() => document.getElementById('game-area').classList.remove('shake'), 500);
+            }
+
+            updateUI();
+
+            setTimeout(() => {
+                currentQIndex++;
+                loadQuestion();
+            }, 2000); // Wait for animations
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score.toString().padStart(4, '0');
+        }
+
+        function showFeedback(emoji) {
+            const el = document.getElementById('feedback-emoji');
+            el.innerText = emoji;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 1000);
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            playSound('win');
+            setInterval(() => fireConfetti(50), 1000);
+        }
+
+        // --- CONFETTI ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+
+        function fireConfetti(amount) {
+            for (let i = 0; i < amount; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20,
+                    life: 100,
+                    color: `hsl(${Math.random() * 120}, 100%, 50%)`, // Green spectrum
+                    size: Math.random() * 5 + 2
+                });
+            }
+            if(particles.length <= amount) requestAnimationFrame(updateConfetti);
+        }
+
+        function updateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+                
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) requestAnimationFrame(updateConfetti);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+    </script>
+</body>
+</html>
