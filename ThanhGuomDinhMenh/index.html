@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh Gươm Định Mệnh - Toán 9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1a0b0b;
+            color: #e5e5e5;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .fantasy-font {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* --- Background Animation --- */
+        .fire-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at bottom, #4a0404 0%, #000000 70%);
+            z-index: -1;
+        }
+        
+        .ember {
+            position: absolute;
+            bottom: -10px;
+            width: 4px;
+            height: 4px;
+            background: #ff4500;
+            border-radius: 50%;
+            animation: rise 4s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes rise {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-100vh) scale(0.5); }
+        }
+
+        /* --- Game Container --- */
+        .game-panel {
+            background: rgba(20, 10, 10, 0.9);
+            border: 2px solid #8b4513;
+            box-shadow: 0 0 20px #ff4500;
+            backdrop-filter: blur(5px);
+        }
+
+        /* --- Sword Progress --- */
+        .sword-container {
+            position: relative;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #555;
+        }
+        
+        .sword-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff8c00, #ffd700);
+            width: 0%;
+            transition: width 0.5s ease-out;
+            box-shadow: 0 0 10px #ffd700;
+        }
+
+        /* --- Buttons --- */
+        .btn-option {
+            background: linear-gradient(to bottom, #3e2723, #281815);
+            border: 1px solid #8d6e63;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-option:hover {
+            transform: translateY(-2px);
+            border-color: #ffb74d;
+            box-shadow: 0 0 15px rgba(255, 167, 38, 0.4);
+        }
+
+        .btn-option:active { transform: translateY(0); }
+
+        .btn-option.correct {
+            background: linear-gradient(to bottom, #1b5e20, #0d3b12) !important;
+            border-color: #66bb6a !important;
+            box-shadow: 0 0 20px #66bb6a;
+        }
+
+        .btn-option.wrong {
+            background: linear-gradient(to bottom, #b71c1c, #7f0000) !important;
+            border-color: #ef5350 !important;
+            animation: shake 0.4s;
+        }
+
+        /* --- Animations --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* dùng cho khung câu hỏi khi trả lời sai */
+        .shake-anim {
+            animation: shake 0.4s;
+        }
+
+        @keyframes sword-slash {
+            0% { transform: rotate(0deg) translateX(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: rotate(-45deg) translateX(50px); opacity: 0; }
+        }
+
+        .slash-effect {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 200px; height: 5px;
+            background: #fff;
+            box-shadow: 0 0 20px #fff;
+            z-index: 50;
+            display: none;
+        }
+
+        /* --- Math Formatting --- */
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 2px;
+            font-size: 0.9em;
+        }
+        .fraction > span { display: block; padding: 0.1em; }
+        .fraction span.numerator { border-bottom: 1px solid currentColor; }
+        .fraction span.denominator { border-top: 1px solid transparent; }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Dynamic Background -->
+    <div class="fire-bg" id="ember-container"></div>
+
+    <!-- Slash Effect -->
+    <div id="slash" class="slash-effect"></div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="game-panel p-10 rounded-2xl text-center max-w-2xl w-full z-10 relative">
+        <div class="text-6xl mb-4 animate-pulse">⚔️</div>
+        <h1 class="fantasy-font text-5xl md:text-6xl text-yellow-500 mb-2 text-shadow">THANH GƯƠM<br>ĐỊNH MỆNH</h1>
+        <h2 class="text-xl text-orange-400 mb-6 font-bold tracking-widest">HỆ THỨC CẠNH &amp; GÓC</h2>
+        
+        <p class="text-lg text-gray-300 mb-8 leading-relaxed">
+            Vương quốc đang bị bóng tối bao phủ. Hãy rèn lại thanh gươm thần thánh bằng cách trả lời đúng 15 câu hỏi toán học để đánh bại Quỷ Vương!
+        </p>
+
+        <div class="grid grid-cols-2 gap-4 text-left bg-black/40 p-4 rounded-lg mb-8 border border-gray-700">
+            <div class="text-green-400">🛡️ 6 Câu Nhận Biết</div>
+            <div class="text-blue-400">🔮 5 Câu Thông Hiểu</div>
+            <div class="text-purple-400">⚡ 3 Câu Vận Dụng</div>
+            <div class="text-red-500">🐉 1 Câu Vận Dụng Cao</div>
+        </div>
+
+        <button onclick="startGame()" class="px-10 py-4 bg-yellow-700 hover:bg-yellow-600 text-white font-bold rounded-lg text-xl shadow-[0_0_20px_rgba(255,165,0,0.5)] transition transform hover:scale-105 border-2 border-yellow-500 fantasy-font">
+            RÚT GƯƠM CHIẾN ĐẤU
+        </button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden w-full max-w-4xl z-10 flex-col h-full justify-center">
+        <!-- Stats Header -->
+        <div class="flex justify-between items-center mb-4 px-2">
+            <div>
+                <div class="text-gray-400 text-sm uppercase tracking-wider">Cấp độ</div>
+                <div id="level-badge" class="font-bold text-green-400 text-lg">NHẬN BIẾT</div>
+            </div>
+            <div class="text-right">
+                <div class="text-gray-400 text-sm uppercase tracking-wider">Sức Mạnh</div>
+                <div class="text-2xl font-bold text-yellow-500"><span id="score">0</span></div>
+            </div>
+        </div>
+
+        <!-- Progress Bar (Sword Forging) -->
+        <div class="mb-2 text-xs text-center text-orange-300 uppercase tracking-widest">Tiến độ rèn gươm</div>
+        <div class="sword-container w-full mb-6">
+            <div id="progress-bar" class="sword-fill"></div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="game-panel p-6 md:p-8 rounded-xl mb-6 relative min-h-[180px] flex flex-col justify-center items-center">
+            <div class="absolute -top-5 bg-black border-2 border-yellow-600 text-yellow-500 px-4 py-1 rounded-full font-bold fantasy-font shadow-lg">
+                Câu <span id="q-number">1</span>/15
+            </div>
+            <div id="question-text" class="text-xl md:text-2xl text-center font-medium leading-relaxed mt-4">
+                Loading...
+            </div>
+        </div>
+
+        <!-- Options Grid -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Buttons injected here -->
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden game-panel p-10 rounded-2xl text-center max-w-2xl w-full z-10 border-yellow-500">
+        <div class="text-7xl mb-4">👑</div>
+        <h2 class="fantasy-font text-5xl text-yellow-400 mb-4">VINH QUANG!</h2>
+        <p class="text-xl text-gray-300 mb-6">Thanh Gươm Định Mệnh đã được rèn thành công. Bạn đã đẩy lùi bóng tối!</p>
+        <div class="text-5xl font-bold text-white mb-2" id="final-score">0</div>
+        <p class="text-gray-400 mb-8">Điểm Sức Mạnh</p>
+        <button onclick="location.reload()" class="px-8 py-3 bg-green-700 hover:bg-green-600 text-white font-bold rounded-lg shadow-lg border border-green-500">
+            Chơi Lại Từ Đầu
+        </button>
+    </div>
+
+    <!-- Feedback Overlay -->
+    <div id="feedback-overlay" class="fixed inset-0 pointer-events-none flex justify-center items-center z-50">
+        <div id="feedback-emoji" class="text-9xl opacity-0 transform scale-50 transition-all duration-300"></div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+    <script>
+        // --- DATA ---
+        // 6 Nhận biết, 5 Thông hiểu, 3 Vận dụng, 1 Vận dụng cao
+        const questions = [
+            // LEVEL 1: NHẬN BIẾT (6 câu)
+            {
+                q: "Cho tam giác ABC vuông tại A. Hệ thức nào sau đây ĐÚNG?",
+                a: [
+                    "b = a.sin B",
+                    "b = a.cos B",
+                    "b = a.tan B",
+                    "b = a.cot B"
+                ],
+                correct: 0,
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Trong tam giác vuông, cạnh góc vuông bằng cạnh góc vuông kia nhân với:",
+                a: [
+                    "sin góc đối",
+                    "tan góc đối",
+                    "cos góc đối",
+                    "sin góc kề"
+                ],
+                correct: 1, // đối = kề . tan(góc đối)
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Cho tam giác MNP vuông tại M. Cạnh MP bằng:",
+                a: [
+                    "MN . cot N",
+                    "NP . cos P",
+                    "MN . tan N",
+                    "NP . tan P"
+                ],
+                correct: 2, // MP = MN.tanN
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Cho tam giác ABC vuông tại A. Biểu thức tính cạnh c là:",
+                a: [
+                    "c = b . cot C",
+                    "c = a . tan C",
+                    "c = b . cos C",
+                    "c = b . tan C"
+                ],
+                correct: 3, // Đúng: c = b.tanC
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Hệ thức nào sau đây SAI đối với tam giác ABC vuông tại A?",
+                a: [
+                    "b = c.sin B",
+                    "b = a.sin B",
+                    "b = a.cos C",
+                    "b = c.tan B"
+                ],
+                correct: 0, // A sai
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Trong tam giác vuông, cạnh góc vuông bằng cạnh huyền nhân với:",
+                a: [
+                    "tan góc đối",
+                    "cos góc kề",
+                    "cot góc kề",
+                    "tan góc kề"
+                ],
+                correct: 1, // cos góc kề
+                level: "NHẬN BIẾT"
+            },
+
+            // LEVEL 2: THÔNG HIỂU (5 câu)
+            {
+                q: "Cho tam giác ABC vuông tại A, có AB = 10, góc C = 30&deg;. Độ dài cạnh AC là:",
+                a: [
+                    "10 / &radic;3",
+                    "5",
+                    "10&radic;3",
+                    "20"
+                ],
+                correct: 2, // AC = 10.cot30 = 10√3
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Cho tam giác DEF vuông tại D, DE = 6, DF = 8. Giá trị tan E là:",
+                a: [
+                    "3/4",
+                    "3/5",
+                    "4/5",
+                    "4/3"
+                ],
+                correct: 3, // 8/6 = 4/3
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Cho tam giác ABC vuông tại A, BC = 20, góc B = 60&deg;. Độ dài cạnh AB là:",
+                a: [
+                    "10",
+                    "10&radic;3",
+                    "20&radic;3",
+                    "20"
+                ],
+                correct: 0, // AB = 20cos60 = 10
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Một chiếc thang dài 3m tạo với mặt đất một góc 65&deg;. Chân thang cách tường bao nhiêu mét? (Làm tròn 1 chữ số thập phân)",
+                a: [
+                    "2.7 m",
+                    "1.3 m",
+                    "1.5 m",
+                    "1.1 m"
+                ],
+                correct: 1, // ≈ 1.3 m
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Biết sin &alpha; = 0.6. Giá trị của cos &alpha; (với &alpha; là góc nhọn) là:",
+                a: [
+                    "0.4",
+                    "0.5",
+                    "0.8",
+                    "0.75"
+                ],
+                correct: 2, // cosα = 0.8
+                level: "THÔNG HIỂU"
+            },
+
+            // LEVEL 3: VẬN DỤNG (3 câu)
+            {
+                q: "(Vận dụng thực tế) Một cột đèn cao 7m có bóng trên mặt đất dài 4m. Góc mà tia sáng mặt trời tạo với mặt đất là bao nhiêu độ? (Làm tròn đến độ)",
+                a: [
+                    "30&deg;",
+                    "60&deg;",
+                    "29&deg;",
+                    "45&deg;"
+                ],
+                correct: 1, // tanα = 7/4 ≈ 60°
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "Cho tam giác ABC vuông tại A, đường cao AH. Biết BH = 4, HC = 9. Tính góc B (Làm tròn đến độ).",
+                a: [
+                    "56&deg;",
+                    "34&deg;",
+                    "42&deg;",
+                    "48&deg;"
+                ],
+                correct: 0, // tanB = 6/4 ⇒ B ≈ 56°
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "Một người đứng cách tháp 20m nhìn thấy đỉnh tháp với góc nâng 45&deg;. Nếu mắt người đó cách mặt đất 1.6m thì chiều cao của tháp là:",
+                a: [
+                    "20 m",
+                    "21.6 m",
+                    "18.4 m",
+                    "22.5 m"
+                ],
+                correct: 1, // 20 + 1.6 = 21.6
+                level: "VẬN DỤNG"
+            },
+
+            // LEVEL 4: VẬN DỤNG CAO (1 câu)
+            {
+                q: "Cho tam giác ABC nhọn, BC = 8cm, góc B = 60&deg;, góc C = 45&deg;. Tính độ dài đường cao AH kẻ từ A.",
+                a: [
+                    "4&radic;3 / (&radic;3 + 1)",
+                    "4&radic;3",
+                    "8&radic;3 / (&radic;3 + 1)",
+                    "2&radic;3 + 2"
+                ],
+                correct: 2, 
+                // AH = 8 / (cot60 + cot45) = 8√3 / (√3 + 1)
+                level: "VẬN DỤNG CAO"
+            }
+        ];
+
+        // --- GAME STATE ---
+        let currentQIndex = 0;
+        let score = 0;
+        let isAnswering = false;
+
+        // --- AUDIO ENGINE ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'sword') {
+                // Metal clash sound
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'correct') {
+                // Heroic chord
+                const now = audioCtx.currentTime;
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);      // A4
+                osc.frequency.setValueAtTime(554.37, now+0.1); // C#5
+                osc.frequency.setValueAtTime(659.25, now+0.2); // E5
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start();
+                osc.stop(now + 0.5);
+            } else if (type === 'wrong') {
+                // Dull thud
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.3);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'win') {
+                // Victory Fanfare
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, i) => {
+                    setTimeout(() => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'square';
+                        o.frequency.value = freq;
+                        g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                        o.start();
+                        o.stop(audioCtx.currentTime + 0.4);
+                    }, i * 150);
+                });
+            }
+        }
+
+        // --- GAME LOGIC ---
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+            
+            playSound('sword');
+            currentQIndex = 0;
+            score = 0;
+            updateUI();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQIndex >= questions.length) {
+                endGame();
+                return;
+            }
+
+            const q = questions[currentQIndex];
+            
+            // UI Updates
+            document.getElementById('q-number').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerHTML = q.q;
+            document.getElementById('level-badge').innerText = q.level;
+            
+            // Badge Color
+            const badge = document.getElementById('level-badge');
+            if (q.level.includes("NHẬN BIẾT")) badge.className = "font-bold text-green-400 text-lg";
+            else if (q.level.includes("THÔNG HIỂU")) badge.className = "font-bold text-blue-400 text-lg";
+            else if (q.level.includes("VẬN DỤNG CAO")) badge.className = "font-bold text-red-500 text-lg";
+            else badge.className = "font-bold text-yellow-400 text-lg";
+
+            // Buttons
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            q.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-option w-full p-4 rounded-lg text-lg font-medium text-gray-200 shadow-lg min-h-[80px]";
+                btn.innerHTML = opt;
+                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                grid.appendChild(btn);
+            });
+
+            isAnswering = false;
+        }
+
+        function handleAnswer(selected, correct, btn) {
+            if (isAnswering) return;
+            isAnswering = true;
+
+            const allBtns = document.querySelectorAll('.btn-option');
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                score += 100;
+                playSound('correct');
+                showFeedback("⚔️");
+                fireConfetti();
+                
+                // Visual Slash Effect
+                const slash = document.getElementById('slash');
+                slash.style.display = 'block';
+                slash.style.animation = 'sword-slash 0.3s forwards';
+                setTimeout(() => { slash.style.display = 'none'; slash.style.animation = ''; }, 300);
+
+            } else {
+                btn.classList.add('wrong');
+                allBtns[correct].classList.add('correct'); // Show correct one
+                playSound('wrong');
+                showFeedback("🛡️");
+                
+                // Shake effect on question panel trong game-screen
+                const qPanel = document.querySelector('#game-screen .game-panel');
+                if (qPanel) {
+                    qPanel.classList.add('shake-anim');
+                    setTimeout(() => qPanel.classList.remove('shake-anim'), 500);
+                }
+            }
+
+            updateUI();
+
+            setTimeout(() => {
+                currentQIndex++;
+                loadQuestion();
+            }, 1500);
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score;
+            const progress = (currentQIndex / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        function showFeedback(emoji) {
+            const el = document.getElementById('feedback-emoji');
+            el.innerText = emoji;
+            el.style.opacity = '1';
+            el.style.transform = 'scale(1.5)';
+            
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transform = 'scale(0)';
+            }, 800);
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('progress-bar').style.width = `100%`;
+            playSound('win');
+            setInterval(fireConfetti, 800);
+        }
+
+        // --- BACKGROUND EMBERS ---
+        const emberContainer = document.getElementById('ember-container');
+        for (let i = 0; i < 30; i++) {
+            let ember = document.createElement('div');
+            ember.className = 'ember';
+            ember.style.left = Math.random() * 100 + '%';
+            ember.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            ember.style.animationDelay = Math.random() * 2 + 's';
+            emberContainer.appendChild(ember);
+        }
+
+        // --- CONFETTI SYSTEM ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+
+        function fireConfetti() {
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 25,
+                    vy: (Math.random() - 0.5) * 25,
+                    life: 100,
+                    color: `hsl(${Math.random() * 60 + 30}, 100%, 50%)`,
+                    size: Math.random() * 8 + 4
+                });
+            }
+            if (particles.length <= 50) requestAnimationFrame(updateConfetti);
+        }
+
+        function updateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+                p.vy += 0.5;
+                
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) requestAnimationFrame(updateConfetti);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+    </script>
+</body>
+</html>
