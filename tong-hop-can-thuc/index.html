@@ -237,7 +237,41 @@
     </div>
 
     <!-- End Screen -->
-    <div id="end-screen" class="hidden glass-panel p-10 rounded-2xl text-center max-w-2xl w-full z-20">
+ <div id="end-screen" class="hidden glass-panel p-10 rounded-2xl text-center max-w-2xl w-full z-20">
+
+    <div class="text-7xl mb-4">🏆</div>
+    <h2 class="sci-fi-font text-4xl text-yellow-400 mb-4">CHINH PHỤC VŨ TRỤ!</h2>
+
+    <p class="text-xl text-gray-300 mb-4">Bạn đã hoàn thành chuyến du hành xuất sắc.</p>
+
+    <!-- Final Score -->
+    <div class="text-5xl font-bold text-white mb-6" id="final-score">0</div>
+
+    <!-- Nhập tên -->
+    <div class="mb-6">
+        <input id="player-name" 
+               type="text" 
+               placeholder="Nhập tên của bạn..." 
+               class="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 text-center text-white text-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"/>
+    </div>
+
+    <button onclick="saveScore()" 
+            class="px-8 py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold shadow-lg mb-6">
+        Lưu Điểm 🎉
+    </button>
+
+    <!-- Leaderboard -->
+    <div id="leaderboard" class="text-left bg-slate-900/60 p-6 rounded-xl max-h-[300px] overflow-auto hidden">
+        <h3 class="text-2xl text-cyan-300 sci-fi-font mb-3">BẢNG XẾP HẠNG</h3>
+        <ul id="leaderboard-list" class="space-y-2"></ul>
+    </div>
+
+    <button onclick="location.reload()" 
+            class="mt-6 px-8 py-3 bg-cyan-600 hover:bg-cyan-500 rounded-lg font-bold shadow-lg">
+        Chơi Lại
+    </button>
+</div>
+
         <div class="text-8xl mb-4">🏆</div>
         <h2 class="sci-fi-font text-4xl text-yellow-400 mb-4">CHINH PHỤC VŨ TRỤ!</h2>
         <p class="text-xl text-gray-300 mb-6">Bạn đã hoàn thành chuyến du hành xuất sắc.</p>
@@ -546,6 +580,75 @@
                function loadQuestion() {
             if (currentIdx >= questions.length) {
                 endGame();
+                // ===============================
+// LEADERBOARD SYSTEM
+// ===============================
+
+// Lấy danh sách từ localStorage (nếu có)
+function getLeaderboard() {
+    const data = localStorage.getItem("star_leaderboard");
+    return data ? JSON.parse(data) : [];
+}
+
+// Lưu danh sách vào localStorage
+function setLeaderboard(list) {
+    localStorage.setItem("star_leaderboard", JSON.stringify(list));
+}
+
+// Lưu điểm học sinh
+function saveScore() {
+    const name = document.getElementById("player-name").value.trim();
+    if (name === "") {
+        alert("Vui lòng nhập tên!");
+        return;
+    }
+
+    const finalScore = score;
+    const leaderboard = getLeaderboard();
+
+    // Thêm vào danh sách
+    leaderboard.push({
+        name: name,
+        score: finalScore,
+        date: new Date().toLocaleString()
+    });
+
+    // Sắp xếp giảm dần theo điểm
+    leaderboard.sort((a, b) => b.score - a.score);
+
+    // Giới hạn Top 10
+    const top10 = leaderboard.slice(0, 10);
+
+    // Lưu lại
+    setLeaderboard(top10);
+
+    // Hiển thị leaderboard
+    renderLeaderboard();
+}
+
+// Render bảng xếp hạng
+function renderLeaderboard() {
+    const leaderboard = getLeaderboard();
+    const listEl = document.getElementById("leaderboard-list");
+    const section = document.getElementById("leaderboard");
+
+    listEl.innerHTML = "";
+
+    leaderboard.forEach((item, index) => {
+        const li = document.createElement("li");
+        li.className = "flex justify-between bg-slate-800 p-3 rounded-lg text-gray-200 border border-slate-700";
+
+        li.innerHTML = `
+            <span class="font-bold">${index + 1}. ${item.name}</span>
+            <span class="text-yellow-300">${item.score} điểm</span>
+        `;
+
+        listEl.appendChild(li);
+    });
+
+    section.classList.remove("hidden");
+}
+
                 return;
             }
 
@@ -654,6 +757,7 @@
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('end-screen').classList.remove('hidden');
             document.getElementById('final-score').innerText = score;
+            renderLeaderboard();
             playWinSound();
             fireConfetti();
             setInterval(fireConfetti, 1000);
