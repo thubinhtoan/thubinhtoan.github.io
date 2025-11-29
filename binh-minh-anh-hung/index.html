@@ -461,9 +461,9 @@
             else badge.className = "text-xs font-bold px-2 py-1 bg-red-800 text-red-200 rounded uppercase tracking-wider mb-1 inline-block";
 
             // Spawn Monster
-            const monsterEl = document.getElementById('monster');
-            monsterEl.innerText = monsters[currentMonsterIdx % monsters.length];
-            monsterEl.className = 'active'; // Reset monster animation
+           monsterEl.innerText = monsters[currentMonsterIdx % monsters.length];
+monsterEl.classList.remove('monster-defeated');
+monsterEl.classList.add('active');
 
             // Options
             const grid = document.getElementById('options-grid');
