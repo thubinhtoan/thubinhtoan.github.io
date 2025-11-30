@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bí Mật Kim Tự Tháp - Hình chóp tam giác & tứ giác đều</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Josefin+Sans:wght@400;600;700&display=swap');
+
+        :root {
+            --sand: #f4d28b;
+            --dark-sand: #c79b4b;
+            --night: #0b1020;
+            --gold: #ffd54f;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Josefin Sans', system-ui, sans-serif;
+            background: radial-gradient(circle at top, #243b53 0%, #020308 60%);
+            color: #fefce8;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .title-font {
+            font-family: 'Alfa Slab One', cursive;
+        }
+
+        /* --- Background Desert & Stars --- */
+        #bg-layer {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: twinkle 2s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.4); }
+        }
+
+        .desert {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 130%;
+            height: 30%;
+            background: radial-gradient(circle at top, #ffecb3 0%, #c79b4b 45%, #8d5a2b 100%);
+            transform: translateX(-10%);
+        }
+
+        /* --- Pyramid --- */
+        #game-area {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+            border: 2px solid rgba(253, 224, 71, 0.5);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+            background: radial-gradient(circle at top, #1f2937 0%, #020617 60%);
+        }
+
+        .pyramid {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 230px;
+            height: 160px;
+            perspective: 800px;
+        }
+
+        .pyramid-face {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 120px solid transparent;
+            border-right: 120px solid transparent;
+            border-bottom: 190px solid #d7b46a;
+            filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.7));
+        }
+
+        .pyramid-face::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.35), transparent 40%, rgba(0,0,0,0.45));
+            mix-blend-mode: screen;
+        }
+
+        .pyramid-shadow {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%) skewX(-20deg);
+            width: 260px;
+            height: 40px;
+            background: radial-gradient(circle, rgba(0,0,0,0.6), transparent 70%);
+            filter: blur(4px);
+        }
+
+        .pyramid-door {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 40px;
+            height: 55px;
+            transform: translateX(-50%);
+            background: linear-gradient(to top, #4b2f16, #8d5524);
+            border-radius: 4px 4px 0 0;
+            box-shadow: 0 0 12px rgba(0,0,0,0.9);
+        }
+
+        .pyramid-door::after {
+            content: "";
+            position: absolute;
+            inset: 8px;
+            border-radius: 3px 3px 0 0;
+            border: 2px solid rgba(255, 215, 64, 0.4);
+        }
+
+        .door-glow {
+            box-shadow: 0 0 25px rgba(255, 235, 59, 0.9);
+            background: radial-gradient(circle at top, #fff7c2 0%, #f59e0b 45%, #7c2d12 100%);
+        }
+
+        .explorer {
+            position: absolute;
+            bottom: 10px;
+            left: 15%;
+            font-size: 3rem;
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.7));
+            transition: transform 0.3s ease;
+        }
+
+        .explorer.jump {
+            transform: translateY(-10px);
+        }
+
+        /* --- Buttons --- */
+        .btn-answer {
+            background: rgba(15,23,42,0.9);
+            border: 1px solid rgba(148,163,184,0.8);
+            color: #e5e7eb;
+            transition: all 0.18s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-answer:hover {
+            background: rgba(30,64,175,0.7);
+            border-color: #fbbf24;
+            transform: translateX(4px);
+            box-shadow: 0 0 12px rgba(251,191,36,0.5);
+        }
+
+        .btn-answer.correct {
+            background: linear-gradient(to right, #166534, #22c55e) !important;
+            border-color: #bbf7d0 !important;
+            color: #ecfdf5 !important;
+            box-shadow: 0 0 18px rgba(34,197,94,0.9);
+        }
+
+        .btn-answer.wrong {
+            background: linear-gradient(to right, #7f1d1d, #b91c1c) !important;
+            border-color: #fecaca !important;
+            color: #fee2e2 !important;
+            box-shadow: 0 0 18px rgba(248,113,113,0.9);
+        }
+
+        /* --- Explanation Box --- */
+        #explanation-box {
+            background: rgba(15, 23, 42, 0.96);
+            border-left: 4px solid #facc15;
+            border-radius: 0.75rem;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        #explanation-box.show {
+            max-height: 400px;
+            opacity: 1;
+            padding: 0.75rem 1rem 1rem 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 0 18px rgba(0,0,0,0.6);
+        }
+
+        /* --- Feedback Emoji Overlay --- */
+        #feedback-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            z-index: 40;
+        }
+
+        #feedback-emoji {
+            font-size: 6rem;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+
+        #feedback-emoji.show {
+            opacity: 1;
+            transform: scale(1.3);
+        }
+
+        /* --- Shake for wrong --- */
+        .shake {
+            animation: shake 0.45s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Confetti canvas is full screen; CSS in tag */
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-3 md:p-6">
+
+    <!-- Background -->
+    <div id="bg-layer">
+        <div class="desert"></div>
+    </div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="fixed inset-0 flex items-center justify-center z-30 bg-black/90">
+        <div class="max-w-3xl w-full mx-4 panel bg-slate-900/90 border border-yellow-500 rounded-2xl p-8 shadow-[0_0_40px_rgba(250,204,21,0.35)]">
+            <h1 class="title-font text-4xl md:text-5xl text-yellow-300 text-center mb-3 tracking-[0.2em]">
+                BÍ MẬT KIM TỰ THÁP
+            </h1>
+            <p class="text-center text-sm uppercase tracking-[0.3em] text-amber-200 mb-6">
+                Hình chóp tam giác & tứ giác đều – Toán 8
+            </p>
+
+            <p class="text-amber-100 text-center mb-6">
+                Mỗi câu trả lời đúng sẽ mở thêm một <span class="font-semibold text-yellow-300">cửa hầm bí mật</span> trong Kim Tự Tháp.  
+                Trả lời sai, cát sẽ sụt xuống và bạn phải thật cẩn thận!
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm mb-6">
+                <div class="bg-slate-800/80 rounded-lg p-3 border border-amber-500/60">
+                    <div class="font-bold text-amber-300 mb-1">Cấp độ 1 – Cửa hầm bí mật</div>
+                    <div class="text-amber-100">6 câu Nhận biết: nhận diện đáy, mặt, cạnh, đường cao.</div>
+                </div>
+                <div class="bg-slate-800/80 rounded-lg p-3 border border-sky-400/60">
+                    <div class="font-bold text-sky-300 mb-1">Cấp độ 2 – Hành lang mê cung</div>
+                    <div class="text-amber-100">5 câu Thông hiểu: trung đoạn, thể tích, tính chất hình chóp.</div>
+                </div>
+                <div class="bg-slate-800/80 rounded-lg p-3 border border-lime-400/60">
+                    <div class="font-bold text-lime-300 mb-1">Cấp độ 3 – Mật mã kho báu</div>
+                    <div class="text-amber-100">3 câu Vận dụng: bài toán thực tế về S<sub>xq</sub>, V.</div>
+                </div>
+                <div class="bg-slate-800/80 rounded-lg p-3 border border-red-500/80">
+                    <div class="font-bold text-red-300 mb-1">Cấp độ 4 – Ngai vàng Pharaoh</div>
+                    <div class="text-amber-100">1 câu Vận dụng cao: kết hợp Pytago & hình chóp.</div>
+                </div>
+            </div>
+
+            <button
+                onclick="startGame()"
+                class="w-full md:w-auto mx-auto block px-10 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-slate-900 font-bold text-lg shadow-[0_0_25px_rgba(250,204,21,0.8)] hover:scale-105 transition transform"
+            >
+                BẮT ĐẦU KHAM PHÁ ⛏️
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden w-full max-w-5xl flex-col gap-3">
+        <!-- Header -->
+        <div class="flex justify-between items-end gap-3">
+            <div class="bg-slate-900/80 border border-yellow-500/60 rounded-xl px-4 py-2">
+                <div class="text-[0.65rem] uppercase text-yellow-300/80 tracking-[0.3em] mb-1">
+                    Cấp độ
+                </div>
+                <div id="level-label" class="font-semibold text-sm text-yellow-100">
+                    Cửa hầm bí mật – Nhận biết
+                </div>
+            </div>
+
+            <div class="flex-1">
+                <div class="flex justify-between text-[0.65rem] text-slate-200 uppercase mb-1">
+                    <span>0%</span><span>Tiến độ</span><span>100%</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-amber-400 via-yellow-300 to-lime-300 w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-sky-400/60 rounded-xl px-4 py-2 text-right">
+                <div class="text-[0.65rem] uppercase text-sky-300/80 tracking-[0.3em] mb-1">
+                    Điểm số
+                </div>
+                <div id="score" class="font-mono text-3xl font-bold text-amber-200">
+                    0000
+                </div>
+            </div>
+        </div>
+
+        <!-- Visual Area -->
+        <div id="game-area" class="mt-1 h-[210px] md:h-[240px]">
+            <div class="pyramid">
+                <div class="pyramid-face"></div>
+                <div id="pyramid-door" class="pyramid-door"></div>
+                <div class="pyramid-shadow"></div>
+            </div>
+            <div id="explorer" class="explorer">🧑‍🎓</div>
+        </div>
+
+        <!-- Question Panel -->
+        <div class="bg-slate-900/90 border border-slate-600/70 rounded-2xl p-4 md:p-5 relative">
+            <div class="absolute top-0 right-0 rounded-bl-xl rounded-tr-2xl px-3 py-1 bg-amber-500/90 text-slate-900 text-xs font-bold flex items-center gap-1">
+                CÂU <span id="question-number">1</span>/15
+            </div>
+            <div id="question-text" class="text-base md:text-xl leading-relaxed text-amber-50 text-center px-1 md:px-4 mt-3 md:mt-4">
+                Đang tải câu hỏi...
+            </div>
+        </div>
+
+        <!-- Explanation -->
+        <div id="explanation-box" class="text-sm md:text-base">
+            <div class="flex items-center gap-2 mb-1 text-yellow-300 font-semibold">
+                <span>📜</span>
+                <span>Giải mã bí mật:</span>
+            </div>
+            <div id="explanation-content" class="text-amber-50 leading-relaxed"></div>
+        </div>
+
+        <!-- Options -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-1">
+            <!-- Buttons injected here -->
+        </div>
+
+        <!-- Next button -->
+        <div id="next-btn-container" class="hidden text-center pb-2">
+            <button
+                onclick="nextQuestion()"
+                class="inline-flex items-center gap-2 px-8 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-slate-50 font-semibold shadow-lg border border-sky-300 transition"
+            >
+                CỬA BÍ MẬT TIẾP THEO →
+            </button>
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden fixed inset-0 z-30 flex items-center justify-center bg-black/90">
+        <div class="max-w-xl w-full mx-4 bg-slate-900/95 border-2 border-amber-400 rounded-2xl p-8 text-center shadow-[0_0_40px_rgba(250,204,21,0.7)]">
+            <div class="text-6xl mb-4">👑</div>
+            <h2 class="title-font text-4xl text-yellow-300 mb-3 tracking-[0.2em]">
+                PHARAOH TOÁN HỌC
+            </h2>
+            <p class="text-amber-100 mb-6">
+                Bạn đã mở hết mọi cánh cửa và chinh phục <span class="font-semibold text-yellow-300">Bí Mật Kim Tự Tháp</span>!
+            </p>
+            <div class="inline-block px-6 py-4 rounded-xl bg-slate-800/90 border border-amber-300 mb-6">
+                <div class="text-xs uppercase text-amber-200/80 tracking-[0.25em] mb-1">
+                    Tổng điểm
+                </div>
+                <div id="final-score" class="font-mono text-5xl text-amber-100 font-bold">
+                    0
+                </div>
+            </div>
+            <button
+                onclick="location.reload()"
+                class="px-8 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-emerald-400 text-slate-900 font-semibold shadow-lg hover:scale-105 transition"
+            >
+                CHƠI LẠI TỪ ĐẦU 🔁
+            </button>
+        </div>
+    </div>
+
+    <!-- Feedback Emoji -->
+    <div id="feedback-overlay">
+        <div id="feedback-emoji">🌟</div>
+    </div>
+
+    <!-- Confetti -->
+    <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-20 w-full h-full"></canvas>
+
+    <script>
+        // ----------------------
+        // DỮ LIỆU CÂU HỎI
+        // ----------------------
+        const questions = [
+            // CẤP 1: NHẬN BIẾT
+            {
+                q: "Quan sát hình chóp tam giác đều S.ABC. Mặt đáy ABC là hình gì?",
+                a: [
+                    "Tam giác cân",
+                    "Tam giác vuông",
+                    "Tam giác đều",
+                    "Tam giác thường"
+                ],
+                correct: 2, // C
+                rationale: "Trong hình chóp tam giác đều, đáy là tam giác đều nên ba cạnh đáy bằng nhau và ba góc ở đáy cũng bằng nhau.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Hình chóp tứ giác đều có bao nhiêu mặt bên?",
+                a: [
+                    "4 mặt",
+                    "3 mặt",
+                    "5 mặt",
+                    "6 mặt"
+                ],
+                correct: 0, // A
+                rationale: "Đáy là hình vuông nên có 4 cạnh đáy, tương ứng có 4 mặt bên là 4 tam giác cân.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Trong hình chóp tứ giác đều, chân đường cao trùng với điểm nào sau đây?",
+                a: [
+                    "Một đỉnh của đáy",
+                    "Trung điểm của một cạnh đáy",
+                    "Trọng tâm của một mặt bên",
+                    "Giao điểm hai đường chéo của đáy"
+                ],
+                correct: 3, // D
+                rationale: "Tâm đáy của hình chóp tứ giác đều là giao điểm hai đường chéo của hình vuông đáy, nên đường cao đi qua điểm này.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Tên gọi của đoạn thẳng nối từ đỉnh hình chóp vuông góc xuống tâm của đáy là gì?",
+                a: [
+                    "Trung đoạn",
+                    "Cạnh bên",
+                    "Chiều cao (đường cao)",
+                    "Đường trung tuyến"
+                ],
+                correct: 2, // C
+                rationale: "Đoạn thẳng nối đỉnh và vuông góc với mặt đáy chính là chiều cao (hay đường cao) của hình chóp.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Các mặt bên của chóp tam giác đều là hình gì?",
+                a: [
+                    "Tam giác đều",
+                    "Tam giác cân",
+                    "Tam giác vuông",
+                    "Hình chữ nhật"
+                ],
+                correct: 1, // B
+                rationale: "Ba cạnh bên bằng nhau và tạo với mặt đáy những góc bằng nhau nên mỗi mặt bên là tam giác cân có đáy là cạnh của tam giác đáy.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Hình chóp tam giác đều có bao nhiêu cạnh (tổng cạnh bên và cạnh đáy)?",
+                a: [
+                    "4 cạnh",
+                    "6 cạnh",
+                    "8 cạnh",
+                    "5 cạnh"
+                ],
+                correct: 1, // B
+                rationale: "Đáy là tam giác nên có 3 cạnh đáy, thêm 3 cạnh bên nối đỉnh với 3 đỉnh đáy, tổng cộng là 6 cạnh.",
+                level: "NHẬN BIẾT"
+            },
+
+            // CẤP 2: THÔNG HIỂU
+            {
+                q: "Trung đoạn của hình chóp tứ giác đều là đoạn thẳng nối từ đỉnh hình chóp đến:",
+                a: [
+                    "Tâm của đáy",
+                    "Một đỉnh của đáy",
+                    "Trọng tâm mặt đáy",
+                    "Trung điểm của một cạnh đáy"
+                ],
+                correct: 3, // D
+                rationale: "Theo định nghĩa trong bài học, trung đoạn của hình chóp nối đỉnh hình chóp với trung điểm của một cạnh đáy.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Một hình chóp tứ giác đều có cạnh đáy 10cm, chiều cao mặt bên (đường cao các tam giác bên) bằng 12cm. Diện tích xung quanh S<sub>xq</sub> của hình chóp là:",
+                a: [
+                    "240 cm<sup>2</sup>",
+                    "120 cm<sup>2</sup>",
+                    "480 cm<sup>2</sup>",
+                    "60 cm<sup>2</sup>"
+                ],
+                correct: 0, // A
+                rationale: "Đáy là hình vuông cạnh 10 nên chu vi đáy là 40, nửa chu vi p = 20. Ta có S<sub>xq</sub> = p.d = 20 · 12 = 240 cm<sup>2</sup>.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Khi khai triển (trải phẳng) một hình chóp tam giác đều, ta sẽ thu được:",
+                a: [
+                    "1 tam giác đều và 3 tam giác cân bằng nhau chung đáy với tam giác đều đó",
+                    "4 tam giác đều bằng nhau",
+                    "1 hình vuông và 4 tam giác cân",
+                    "3 tam giác đều và 1 tam giác cân"
+                ],
+                correct: 0, // A
+                rationale: "Đáy là tam giác đều, mỗi mặt bên là tam giác cân có chung cạnh đáy với tam giác đều nên khi khai triển ta được 1 tam giác đều ở giữa và 3 tam giác cân xung quanh.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Cho hình chóp tam giác đều S.DEF có cạnh đáy a. Khẳng định nào sau đây SAI?",
+                a: [
+                    "DE = EF = FD = a",
+                    "Các cạnh bên SD, SE, SF bằng nhau",
+                    "Các cạnh bên bằng luôn cạnh đáy (SD = DE)",
+                    "Các góc ở đáy của các mặt bên bằng nhau"
+                ],
+                correct: 2, // C
+                rationale: "Hình chóp tam giác đều chỉ yêu cầu đáy là tam giác đều và các cạnh bên bằng nhau; không bắt buộc cạnh bên phải bằng cạnh đáy, nên khẳng định (C) là sai.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Công thức tính thể tích của hình chóp tứ giác đều là:",
+                a: [
+                    "V = S<sub>đáy</sub> · h",
+                    "V = \\( \\dfrac{1}{3} \\) · S<sub>đáy</sub> · h",
+                    "V = \\( \\dfrac{1}{2} \\) · S<sub>đáy</sub> · h",
+                    "V = 3 · S<sub>đáy</sub> · h"
+                ],
+                correct: 1, // B
+                rationale: "Thể tích mọi hình chóp đều được tính theo công thức chung: V = \\( \\dfrac{1}{3} \\) · S<sub>đáy</sub> · h.",
+                level: "THÔNG HIỂU"
+            },
+
+            // CẤP 3: VẬN DỤNG
+            {
+                q: "Tính thể tích của một hình chóp tứ giác đều biết chiều cao h = 9cm và cạnh đáy a = 4cm.",
+                a: [
+                    "144 cm<sup>3</sup>",
+                    "36 cm<sup>3</sup>",
+                    "48 cm<sup>3</sup>",
+                    "12 cm<sup>3</sup>"
+                ],
+                correct: 2, // C
+                rationale: "Đáy là hình vuông cạnh 4cm ⇒ S<sub>đáy</sub> = 4<sup>2</sup> = 16. Do đó V = \\( \\dfrac{1}{3} \\) · 16 · 9 = 48 cm<sup>3</sup>.",
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "Bạn Nam làm một chiếc đèn lồng hình chóp tam giác đều có cạnh đáy 20cm và chiều cao mặt bên là 30cm. Nam cần ít nhất bao nhiêu cm<sup>2</sup> giấy màu để dán kín 3 mặt bên (bỏ qua khung)?",
+                a: [
+                    "600 cm<sup>2</sup>",
+                    "300 cm<sup>2</sup>",
+                    "1800 cm<sup>2</sup>",
+                    "900 cm<sup>2</sup>"
+                ],
+                correct: 3, // D
+                rationale: "Chu vi đáy là 20 · 3 = 60. Diện tích xung quanh của chóp tam giác đều: S<sub>xq</sub> = \\( \\dfrac{1}{2} \\) · chu vi đáy · chiều cao mặt bên = \\( \\dfrac{1}{2} \\) · 60 · 30 = 900 cm<sup>2</sup>.",
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "Một hình chóp tứ giác đều có thể tích 50 cm<sup>3</sup> và chiều cao 6cm. Độ dài cạnh đáy của hình chóp đó bằng:",
+                a: [
+                    "5 cm",
+                    "25 cm",
+                    "10 cm",
+                    "&radic;50 cm"
+                ],
+                correct: 0, // A
+                rationale: "V = \\( \\dfrac{1}{3} \\) a<sup>2</sup> · h ⇒ 50 = \\( \\dfrac{1}{3} \\) · a<sup>2</sup> · 6 ⇒ a<sup>2</sup> = 25 ⇒ a = 5 cm.",
+                level: "VẬN DỤNG"
+            },
+
+            // CẤP 4: VẬN DỤNG CAO
+            {
+                q: "Một kim tự tháp kính (hình chóp tứ giác đều) có chiều cao h = 21m và cạnh đáy a = 35m. Gọi d là độ dài đoạn thẳng nối từ đỉnh kim tự tháp đến trung điểm một cạnh đáy. Giá trị gần đúng của d (làm tròn đến một chữ số thập phân) là:",
+                a: [
+                    "40,8m",
+                    "27,3m",
+                    "25,5m",
+                    "30,1m"
+                ],
+                correct: 1, // B
+                rationale: "Trong tam giác vuông tạo bởi chiều cao h và đoạn từ tâm đáy đến trung điểm cạnh đáy, ta có: a/2 = 17,5m. Do đó d<sup>2</sup> = 21<sup>2</sup> + 17,5<sup>2</sup> ≈ 747,25 ⇒ d ≈ 27,3m.",
+                level: "VẬN DỤNG CAO"
+            }
+        ];
+
+        // ----------------------
+        // GAME STATE
+        // ----------------------
+        let currentIndex = 0;
+        let score = 0;
+        let isAnswering = false;
+
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const levelLabelEl = document.getElementById('level-label');
+        const scoreEl = document.getElementById('score');
+        const progressBarEl = document.getElementById('progress-bar');
+
+        const optionsGrid = document.getElementById('options-grid');
+        const explanationBox = document.getElementById('explanation-box');
+        const explanationContent = document.getElementById('explanation-content');
+        const nextBtnContainer = document.getElementById('next-btn-container');
+        const finalScoreEl = document.getElementById('final-score');
+
+        const gameArea = document.getElementById('game-area');
+        const pyramidDoor = document.getElementById('pyramid-door');
+        const explorerEl = document.getElementById('explorer');
+        const feedbackEmoji = document.getElementById('feedback-emoji');
+
+        // ----------------------
+        // AUDIO
+        // ----------------------
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTone(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'start') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(660, now);
+                osc.frequency.exponentialRampToValueAtTime(990, now + 0.15);
+                gain.gain.setValueAtTime(0.22, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(80, now + 0.25);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } else if (type === 'win') {
+                const notes = [523, 659, 784, 1046];
+                notes.forEach((f, i) => {
+                    setTimeout(() => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'square';
+                        o.frequency.value = f;
+                        g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                        o.start();
+                        o.stop(audioCtx.currentTime + 0.3);
+                    }, i * 160);
+                });
+            }
+        }
+
+        // ----------------------
+        // GAME FLOW
+        // ----------------------
+        function startGame() {
+            startScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            gameScreen.classList.add('flex');
+
+            currentIndex = 0;
+            score = 0;
+            updateUI();
+            playTone('start');
+            createStars();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentIndex >= questions.length) {
+                endGame();
+                return;
+            }
+
+            const q = questions[currentIndex];
+            isAnswering = false;
+
+            // Level label
+            let levelText = "";
+            if (q.level === "NHẬN BIẾT") levelText = "Cấp 1 – Cửa hầm bí mật (Nhận biết)";
+            else if (q.level === "THÔNG HIỂU") levelText = "Cấp 2 – Hành lang mê cung (Thông hiểu)";
+            else if (q.level === "VẬN DỤNG") levelText = "Cấp 3 – Mật mã kho báu (Vận dụng)";
+            else levelText = "Cấp 4 – Ngai vàng Pharaoh (Vận dụng cao)";
+            levelLabelEl.textContent = levelText;
+
+            questionNumberEl.textContent = currentIndex + 1;
+            questionTextEl.innerHTML = q.q;
+
+            // Reset explanation
+            explanationBox.classList.remove('show');
+            explanationContent.innerHTML = "";
+
+            // Reset visuals
+            pyramidDoor.classList.remove('door-glow');
+            explorerEl.classList.remove('jump');
+            gameArea.classList.remove('shake');
+
+            // Build answer buttons
+            optionsGrid.innerHTML = "";
+            q.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className =
+                    "btn-answer w-full px-4 py-3 rounded-xl text-sm md:text-base font-medium shadow-md";
+                btn.innerHTML = `<span class="font-bold mr-2">${String.fromCharCode(
+                    65 + idx
+                )}.</span> ${opt}`;
+                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                optionsGrid.appendChild(btn);
+            });
+
+            nextBtnContainer.classList.add('hidden');
+            updateUI();
+        }
+
+        function handleAnswer(selectedIndex, correctIndex, clickedBtn) {
+            if (isAnswering) return;
+            isAnswering = true;
+
+            const q = questions[currentIndex];
+            const buttons = optionsGrid.querySelectorAll('.btn-answer');
+
+            // Disable all buttons
+            buttons.forEach(b => (b.disabled = true));
+
+            // Show explanation
+            explanationContent.innerHTML = q.rationale;
+            explanationBox.classList.add('show');
+
+            if (selectedIndex === correctIndex) {
+                clickedBtn.classList.add('correct');
+                score += 100;
+
+                // Visual effects
+                pyramidDoor.classList.add('door-glow');
+                explorerEl.classList.add('jump');
+                showFeedback("🔓");
+                playTone('correct');
+                fireConfetti(30);
+            } else {
+                clickedBtn.classList.add('wrong');
+                if (buttons[correctIndex]) {
+                    buttons[correctIndex].classList.add('correct');
+                }
+                showFeedback("💥");
+                playTone('wrong');
+                gameArea.classList.add('shake');
+                setTimeout(() => gameArea.classList.remove('shake'), 500);
+            }
+
+            updateUI();
+            nextBtnContainer.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < questions.length) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function updateUI() {
+            scoreEl.textContent = score.toString().padStart(4, "0");
+            const progress = ((currentIndex) / questions.length) * 100;
+            progressBarEl.style.width = progress + "%";
+        }
+
+        function endGame() {
+            gameScreen.classList.add('hidden');
+            gameScreen.classList.remove('flex');
+            endScreen.classList.remove('hidden');
+            finalScoreEl.textContent = score;
+            playTone('win');
+            fireConfetti(80);
+            setInterval(() => fireConfetti(40), 1200);
+        }
+
+        // ----------------------
+        // Stars Background
+        // ----------------------
+        function createStars() {
+            const bg = document.getElementById('bg-layer');
+            // tránh tạo lại nếu đã có
+            if (bg.dataset.starsCreated) return;
+            bg.dataset.starsCreated = "true";
+
+            for (let i = 0; i < 90; i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                const size = Math.random() * 2 + 1;
+                s.style.width = size + "px";
+                s.style.height = size + "px";
+                s.style.left = Math.random() * 100 + "%";
+                s.style.top = Math.random() * 70 + "%";
+                s.style.animationDelay = (Math.random() * 2).toFixed(2) + "s";
+                bg.appendChild(s);
+            }
+        }
+
+        // ----------------------
+        // Feedback Emoji
+        // ----------------------
+        function showFeedback(emoji) {
+            feedbackEmoji.textContent = emoji;
+            feedbackEmoji.classList.add('show');
+            setTimeout(() => {
+                feedbackEmoji.classList.remove('show');
+            }, 900);
+        }
+
+        // ----------------------
+        // CONFETTI
+        // ----------------------
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        function fireConfetti(amount) {
+            const cx = window.innerWidth / 2;
+            const cy = window.innerHeight / 4;
+
+            for (let i = 0; i < amount; i++) {
+                particles.push({
+                    x: cx,
+                    y: cy,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 0.5) * 12,
+                    life: 80 + Math.random() * 40,
+                    size: 3 + Math.random() * 4,
+                    color: `hsl(${40 + Math.random() * 40}, 95%, 60%)`
+                });
+            }
+
+            if (particles.length <= amount * 1.2) {
+                requestAnimationFrame(updateConfetti);
+            }
+        }
+
+        function updateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.2; // gravity
+                p.life--;
+
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) {
+                requestAnimationFrame(updateConfetti);
+            }
+        }
+    </script>
+</body>
+</html>
