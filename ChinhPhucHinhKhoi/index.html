@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thử Thách Toán Học: Hình Chóp Đều</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        .option-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .option-card:hover:not(.disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .option-card.selected-correct {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .option-card.selected-wrong {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .option-card.show-correct {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+
+        /* Math formula style adjustment */
+        .math-text {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Audio Elements -->
+    <audio id="correctSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="wrongSound" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3"></audio>
+    <audio id="finishSound" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+
+    <div class="w-full max-w-3xl">
+        <!-- Start Screen -->
+        <div id="start-screen" class="glass-panel rounded-3xl p-8 md:p-12 text-center fade-in">
+            <div class="mb-6">
+                <span class="inline-block p-4 rounded-full bg-blue-100 text-blue-600 mb-4">
+                    <i class="fas fa-shapes text-4xl"></i>
+                </span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4">
+                Chinh Phục Hình Khối
+            </h1>
+            <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+                Chào mừng bạn đến với thử thách kiến thức về 
+                <span class="font-bold text-blue-600">Diện tích & Thể tích Hình chóp</span>. 
+                <br>Gồm 15 câu hỏi từ cơ bản đến nâng cao. Bạn đã sẵn sàng chưa?
+            </p>
+            <button onclick="startGame()" class="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-blue-600 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                <span>Bắt đầu ngay</span>
+                <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden glass-panel rounded-3xl overflow-hidden fade-in">
+            <!-- Header / Progress -->
+            <div class="bg-slate-50 border-b border-slate-100 p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold shadow-sm">
+                            <i class="fas fa-flag mr-1"></i> Câu <span id="current-question-num">1</span>/15
+                        </span>
+                        <span id="level-badge" class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold shadow-sm">
+                            Nhận biết
+                        </span>
+                    </div>
+                    <div class="text-slate-600 font-bold">
+                        <i class="fas fa-star text-yellow-400 mr-1"></i>
+                        Điểm: <span id="score" class="text-slate-800">0</span>
+                    </div>
+                </div>
+                <!-- Progress Bar -->
+                <div class="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="progress-bar h-full bg-blue-500 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Question Area -->
+            <div class="p-6 md:p-8">
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800 mb-8 leading-relaxed">
+                    <!-- Question goes here -->
+                </h2>
+
+                <!-- Options Grid -->
+                <div id="options-container" class="grid gap-4 md:grid-cols-2">
+                    <!-- Options generated by JS -->
+                </div>
+
+                <!-- Rationale / Feedback Area -->
+                <div id="feedback-area" class="hidden mt-6 p-5 rounded-2xl border-l-4">
+                    <div class="flex items-start">
+                        <div id="feedback-icon" class="flex-shrink-0 mr-3 mt-1"></div>
+                        <div>
+                            <h3 id="feedback-title" class="font-bold text-lg mb-1"></h3>
+                            <p id="feedback-text" class="text-slate-700 leading-relaxed"></p>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-right">
+                        <button id="next-btn" onclick="nextQuestion()" class="px-6 py-2 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-700 transition-colors shadow-lg">
+                            Câu tiếp theo <i class="fas fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden glass-panel rounded-3xl p-8 md:p-12 text-center fade-in">
+            <div class="mb-6 relative inline-block">
+                <i class="fas fa-trophy text-6xl text-yellow-400 drop-shadow-lg"></i>
+                <i class="fas fa-star text-2xl text-yellow-300 absolute -top-2 -right-4 animate-bounce"></i>
+            </div>
+            <h2 class="text-3xl font-extrabold text-slate-800 mb-2">Hoàn thành xuất sắc!</h2>
+            <p class="text-slate-500 mb-8">Bạn đã chinh phục thử thách hình học.</p>
+            
+            <div class="grid grid-cols-2 gap-4 mb-8 max-w-sm mx-auto">
+                <div class="bg-blue-50 p-4 rounded-2xl">
+                    <div class="text-3xl font-black text-blue-600 mb-1" id="final-score">0</div>
+                    <div class="text-sm text-slate-500 font-semibold uppercase tracking-wider">Điểm số</div>
+                </div>
+                <div class="bg-green-50 p-4 rounded-2xl">
+                    <div class="text-3xl font-black text-green-600 mb-1" id="final-percent">0%</div>
+                    <div class="text-sm text-slate-500 font-semibold uppercase tracking-wider">Chính xác</div>
+                </div>
+            </div>
+
+            <p id="result-message" class="text-lg text-slate-700 mb-8 font-medium px-4 py-3 bg-slate-50 rounded-xl inline-block border border-slate-100">
+                <!-- Dynamic message -->
+            </p>
+
+            <button onclick="location.reload()" class="px-8 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl">
+                <i class="fas fa-redo mr-2"></i> Chơi lại
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Quiz Data
+       // Quiz Data
+const questions = [
+    // --- MỨC ĐỘ: NHẬN BIẾT (6 câu) ---
+    {
+        level: "Nhận biết",
+        question: "Diện tích xung quanh của hình chóp tam giác đều bằng tổng diện tích của các hình nào?",
+        options: [
+            "Các mặt bên",
+            "Mặt đáy và một mặt bên",
+            "Tất cả các mặt (đáy và bên)",
+            "Chu vi đáy và chiều cao"
+        ],
+        correct: 0, // A
+        rationale: "Theo định nghĩa, diện tích xung quanh của hình chóp đều bằng tổng diện tích của các mặt bên (các tam giác cân bằng nhau)."
+    },
+    {
+        level: "Nhận biết",
+        question: "Công thức tính thể tích <span class='math-text'>V</span> của hình chóp có diện tích đáy <span class='math-text'>S</span> và chiều cao <span class='math-text'>h</span> là:",
+        options: [
+            "<span class='math-text'>V = S . h</span>",
+            "<span class='math-text'>V = 1/3 . S . h</span>",
+            "<span class='math-text'>V = 1/2 . S . h</span>",
+            "<span class='math-text'>V = 3 . S . h</span>"
+        ],
+        correct: 1, // B
+        rationale: "Công thức chuẩn tính thể tích hình chóp là một phần ba diện tích đáy nhân với chiều cao tương ứng."
+    },
+    {
+        level: "Nhận biết",
+        question: "Để tính diện tích xung quanh của hình chóp tứ giác đều, ta cần biết những yếu tố nào?",
+        options: [
+            "Chu vi đáy và chiều cao hình chóp",
+            "Diện tích đáy và chiều cao hình chóp",
+            "Chu vi đáy và trung đoạn (chiều cao mặt bên)",
+            "Độ dài cạnh đáy và diện tích đáy"
+        ],
+        correct: 2, // C
+        rationale: "Diện tích xung quanh hình chóp đều = nửa chu vi đáy × trung đoạn (hoặc tổng diện tích các mặt bên tam giác)."
+    },
+    {
+        level: "Nhận biết",
+        question: "Hình chóp tứ giác đều có mặt đáy là hình gì?",
+        options: [
+            "Hình bình hành",
+            "Hình chữ nhật",
+            "Hình thoi",
+            "Hình vuông"
+        ],
+        correct: 3, // D
+        rationale: "Định nghĩa: Hình chóp tứ giác đều là hình chóp có đáy là hình vuông và các cạnh bên bằng nhau."
+    },
+    {
+        level: "Nhận biết",
+        question: "Đơn vị nào sau đây dùng để đo thể tích?",
+        options: [
+            "<span class='math-text'>cm<sup>3</sup></span>",
+            "<span class='math-text'>cm</span>",
+            "<span class='math-text'>m<sup>2</sup></span>",
+            "<span class='math-text'>cm<sup>2</sup></span>"
+        ],
+        correct: 0, // A
+        rationale: "Thể tích là đại lượng đo không gian 3 chiều nên có đơn vị lập phương (cm³, m³, ...)."
+    },
+    {
+        level: "Nhận biết",
+        question: "Trung đoạn của hình chóp đều là đường thẳng nào?",
+        options: [
+            "Đường cao của hình chóp kẻ từ đỉnh xuống đáy",
+            "Đường cao của mặt bên kẻ từ đỉnh chóp",
+            "Đường chéo của mặt đáy",
+            "Cạnh bên của hình chóp"
+        ],
+        correct: 1, // B
+        rationale: "Trung đoạn là đường cao của tam giác cân tại mặt bên, kẻ từ đỉnh S xuống trung điểm cạnh đáy."
+    },
+
+    // --- MỨC ĐỘ: THÔNG HIỂU (5 câu) ---
+    {
+        level: "Thông hiểu",
+        question: "Một hình chóp tứ giác đều có cạnh đáy bằng 4cm và trung đoạn (chiều cao mặt bên) bằng 5cm. Diện tích xung quanh là bao nhiêu?",
+        options: [
+            "20 cm²",
+            "40 cm²",
+            "80 cm²",
+            "10 cm²"
+        ],
+        correct: 1, // B
+        rationale: "Hình chóp tứ giác đều có 4 mặt bên là tam giác cân bằng nhau. Diện tích 1 mặt = 1/2 × 4 × 5 = 10 cm². Tổng S_xq = 4 × 10 = 40 cm²."
+    },
+    {
+        level: "Thông hiểu",
+        question: "Một hình chóp tam giác đều có diện tích đáy là 12 cm² và chiều cao là 4 cm. Thể tích của nó là:",
+        options: [
+            "48 cm³",
+            "16 cm³",
+            "12 cm³",
+            "24 cm³"
+        ],
+        correct: 1, // B
+        rationale: "Áp dụng công thức: V = 1/3 . S . h = 1/3 . 12 . 4 = 4 . 4 = 16 cm³."
+    },
+    {
+        level: "Thông hiểu",
+        question: "Nếu cạnh đáy của hình chóp tứ giác đều tăng gấp đôi và chiều cao giữ nguyên thì thể tích của hình chóp sẽ:",
+        options: [
+            "Tăng gấp 4 lần",
+            "Tăng gấp 8 lần",
+            "Không đổi",
+            "Tăng gấp đôi"
+        ],
+        correct: 0, // A
+        rationale: "Diện tích đáy là hình vuông (S = a²). Nếu cạnh a tăng 2 lần thì S tăng 2² = 4 lần. Vì V tỉ lệ thuận với S đáy nên V tăng 4 lần."
+    },
+    {
+        level: "Thông hiểu",
+        question: "So sánh chiều cao của hình chóp đều (h) và trung đoạn (d) của nó?",
+        options: [
+            "Không so sánh được",
+            "h < d",
+            "h > d",
+            "h = d"
+        ],
+        correct: 1, // B
+        rationale: "Trong tam giác vuông tạo bởi chiều cao hình chóp, trung đoạn và đoạn nối tâm đáy đến trung điểm cạnh, trung đoạn là cạnh huyền nên luôn lớn hơn chiều cao hình chóp."
+    },
+    {
+        level: "Thông hiểu",
+        question: "Tính diện tích toàn phần của hình chóp tứ giác đều có diện tích xung quanh là 60 cm² và diện tích đáy là 25 cm².",
+        options: [
+            "35 cm²",
+            "1500 cm²",
+            "85 cm²",
+            "42.5 cm²"
+        ],
+        correct: 2, // C
+        rationale: "Diện tích toàn phần = Diện tích xung quanh + Diện tích đáy = 60 + 25 = 85 cm²."
+    },
+
+    // --- MỨC ĐỘ: VẬN DỤNG (3 câu) ---
+    {
+        level: "Vận dụng (Thực tế)",
+        question: "Bạn Nam dựng một lều trại hình chóp tứ giác đều. Cạnh đáy lều dài 3m, chiều cao của lều là 2m. Tính thể tích không gian bên trong lều.",
+        options: [
+            "6 m³",
+            "9 m³",
+            "18 m³",
+            "4.5 m³"
+        ],
+        correct: 0, // A
+        rationale: "Diện tích đáy (hình vuông) S = 3² = 9 m². Thể tích V = 1/3 . S . h = 1/3 . 9 . 2 = 6 m³."
+    },
+    {
+        level: "Vận dụng",
+        question: "Một hộp quà hình chóp tam giác đều có cạnh đáy bằng 10cm và trung đoạn bằng 12cm. Tính diện tích giấy cần dùng để bọc quanh hộp (chỉ tính diện tích xung quanh, không tính đáy và mép dán).",
+        options: [
+            "120 cm²",
+            "180 cm²",
+            "360 cm²",
+            "60 cm²"
+        ],
+        correct: 1, // B
+        rationale: "S_xq = 3 . (1/2 . cạnh đáy . trung đoạn) = 3 . (1/2 . 10 . 12) = 3 . 60 = 180 cm²."
+    },
+    {
+        level: "Vận dụng",
+        question: "Một khối chóp có thể tích V = 100 cm³ và diện tích đáy S = 25 cm². Tính chiều cao h của khối chóp đó.",
+        options: [
+            "4 cm",
+            "12 cm",
+            "8 cm",
+            "25 cm"
+        ],
+        correct: 1, // B
+        rationale: "Từ công thức V = 1/3 . S . h => h = (3 . V) / S = (3 . 100) / 25 = 300 / 25 = 12 cm."
+    },
+
+    // --- MỨC ĐỘ: VẬN DỤNG CAO (1 câu) ---
+    {
+        level: "Vận dụng cao",
+        question: "Cho hình chóp tứ giác đều có cạnh đáy bằng 6 cm và cạnh bên bằng 5 cm. Tính thể tích của hình chóp đó.",
+        options: [
+            "48 cm³",
+            "12 cm³",
+            "12√7 cm³",
+            "36√7 cm³"
+        ],
+        correct: 2, // C
+        rationale: "Đường chéo đáy = 6√2 => Nửa đường chéo = 3√2. Chiều cao h = √(cạnh bên² - (nửa đg chéo)²) = √(5² - (3√2)²) = √(25-18) = √7. V = 1/3 . 6² . √7 = 12√7."
+    }
+];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        // Sound Effects
+        const playSound = (type) => {
+            const sound = document.getElementById(type + 'Sound');
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log("Audio play failed:", e));
+            }
+        };
+
+        const startGame = () => {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            loadQuestion();
+        };
+
+        const loadQuestion = () => {
+            isAnswered = false;
+            const currentQ = questions[currentQuestionIndex];
+            
+            // Update UI
+            document.getElementById('current-question-num').textContent = currentQuestionIndex + 1;
+            document.getElementById('question-text').innerHTML = currentQ.question;
+            document.getElementById('progress-bar').style.width = `${((currentQuestionIndex) / questions.length) * 100}%`;
+            
+            // Update badge color based on level
+            const badge = document.getElementById('level-badge');
+            badge.textContent = currentQ.level;
+            if (currentQ.level.includes("Nhận biết")) badge.className = "px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold shadow-sm";
+            else if (currentQ.level.includes("Thông hiểu")) badge.className = "px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold shadow-sm";
+            else if (currentQ.level.includes("Vận dụng")) badge.className = "px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-bold shadow-sm";
+            else badge.className = "px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-bold shadow-sm";
+
+            // Reset feedback
+            document.getElementById('feedback-area').className = "hidden mt-6 p-5 rounded-2xl border-l-4";
+            
+            // Render Options
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            currentQ.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = `option-card w-full p-4 text-left border-2 border-slate-200 rounded-2xl bg-white text-slate-700 font-semibold hover:border-blue-400 focus:outline-none`;
+                btn.innerHTML = `<div class="flex items-center"><span class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mr-3 text-sm font-bold">${String.fromCharCode(65 + index)}</span>${opt}</div>`;
+                btn.onclick = () => checkAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+        };
+
+        const checkAnswer = (selectedIndex, btnElement) => {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const currentQ = questions[currentQuestionIndex];
+            const options = document.querySelectorAll('.option-card');
+            const feedbackArea = document.getElementById('feedback-area');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackText = document.getElementById('feedback-text');
+
+            // Disable all buttons
+            options.forEach(opt => opt.classList.add('disabled', 'cursor-default'));
+
+            if (selectedIndex === currentQ.correct) {
+                // Correct Answer
+                score += 10;
+                document.getElementById('score').textContent = score;
+                btnElement.classList.add('selected-correct');
+                
+                playSound('correct');
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#10b981', '#3b82f6', '#f59e0b']
+                });
+
+                feedbackArea.classList.remove('hidden');
+                feedbackArea.classList.add('bg-green-50', 'border-green-500', 'fade-in');
+                feedbackIcon.innerHTML = '<i class="fas fa-check-circle text-2xl text-green-500"></i>';
+                feedbackTitle.className = "font-bold text-lg mb-1 text-green-800";
+                feedbackTitle.textContent = "Chính xác! 🎉";
+            } else {
+                // Wrong Answer
+                btnElement.classList.add('selected-wrong');
+                options[currentQ.correct].classList.add('show-correct'); // Show correct answer
+                
+                playSound('wrong');
+
+                feedbackArea.classList.remove('hidden');
+                feedbackArea.classList.add('bg-red-50', 'border-red-500', 'fade-in');
+                feedbackIcon.innerHTML = '<i class="fas fa-times-circle text-2xl text-red-500"></i>';
+                feedbackTitle.className = "font-bold text-lg mb-1 text-red-800";
+                feedbackTitle.textContent = "Chưa đúng rồi 😅";
+            }
+
+            feedbackText.innerHTML = currentQ.rationale;
+        };
+
+        const nextQuestion = () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        };
+
+        const showResult = () => {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            
+            const maxScore = questions.length * 10;
+            const percent = Math.round((score / maxScore) * 100);
+            
+            // Animation for score
+            animateValue("final-score", 0, score, 1000);
+            document.getElementById('final-percent').textContent = `${percent}%`;
+
+            playSound('finish');
+            if (percent >= 80) {
+                confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+                document.getElementById('result-message').textContent = "Tuyệt vời! Bạn là bậc thầy hình học không gian! 🏆";
+            } else if (percent >= 50) {
+                document.getElementById('result-message').textContent = "Làm tốt lắm! Hãy ôn lại một chút để đạt điểm tối đa nhé. 💪";
+            } else {
+                document.getElementById('result-message').textContent = "Đừng nản lòng! Hãy xem lại lý thuyết và thử lại nhé. 🌱";
+            }
+        };
+
+        function animateValue(id, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                document.getElementById(id).innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+    </script>
+</body>
+</html>
