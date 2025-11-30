@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học Viện Phép Thuật - Toán 8 Bài 3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Merriweather:wght@300;400;700&display=swap');
+
+        body {
+            font-family: 'Merriweather', serif;
+            background-color: #0f0518;
+            color: #e0d0ff;
+            overflow: hidden;
+            margin: 0;
+            user-select: none;
+        }
+
+        .magic-font {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* --- Dynamic Background --- */
+        #magic-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at 50% 30%, #2a0a4a 0%, #0f0518 80%);
+            overflow: hidden;
+        }
+
+        .rune {
+            position: absolute;
+            color: rgba(167, 139, 250, 0.1);
+            font-size: 2rem;
+            user-select: none;
+            animation: floatUp 10s linear infinite;
+        }
+
+        @keyframes floatUp {
+            from { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            50% { opacity: 0.5; }
+            to { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- Magic Book (Game Container) --- */
+        .spellbook {
+            background: #1a0b2e;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-leather.png');
+            border: 8px solid #583c87;
+            border-radius: 12px;
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.3), inset 0 0 50px rgba(0, 0, 0, 0.8);
+            position: relative;
+            max-width: 900px;
+            width: 95%;
+            margin: 0 auto;
+        }
+
+        .spellbook::before {
+            content: '';
+            position: absolute;
+            top: 5px; left: 5px; right: 5px; bottom: 5px;
+            border: 2px solid rgba(167, 139, 250, 0.3);
+            pointer-events: none;
+            border-radius: 6px;
+        }
+
+        /* --- Buttons (Spells) --- */
+        .btn-spell {
+            background: linear-gradient(to bottom, #4c1d95, #2e1065);
+            border: 2px solid #7c3aed;
+            color: #fff;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .btn-spell:hover {
+            background: linear-gradient(to bottom, #6d28d9, #4c1d95);
+            box-shadow: 0 0 20px #8b5cf6;
+            transform: translateY(-2px);
+            border-color: #a78bfa;
+            cursor: pointer;
+        }
+
+        .btn-spell.correct {
+            background: linear-gradient(to bottom, #059669, #064e3b) !important;
+            border-color: #34d399 !important;
+            box-shadow: 0 0 30px #10b981;
+        }
+
+        .btn-spell.wrong {
+            background: linear-gradient(to bottom, #991b1b, #7f1d1d) !important;
+            border-color: #f87171 !important;
+            box-shadow: 0 0 30px #ef4444;
+            animation: shake 0.4s;
+        }
+
+        /* --- Explanation Box (Scroll) --- */
+        #magic-scroll {
+            background: #2e1065;
+            color: #e9d5ff;
+            border-left: 5px solid #d8b4fe;
+            transition: all 0.5s ease;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            font-family: 'Merriweather', serif;
+        }
+
+        #magic-scroll.show {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 1rem;
+            padding: 1.2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: rgba(46, 16, 101, 0.95);
+        }
+
+        /* --- Math Display --- */
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 2px;
+            font-size: 0.9em;
+        }
+        .fraction > span { display: block; padding: 0.1em; }
+        .fraction span.numerator { border-bottom: 1px solid currentColor; }
+        .fraction span.denominator { border-top: 1px solid transparent; }
+
+        sup { vertical-align: super; font-size: smaller; }
+
+        /* --- Animations --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px #a78bfa; }
+            50% { text-shadow: 0 0 20px #a78bfa, 0 0 30px #8b5cf6; }
+            100% { text-shadow: 0 0 5px #a78bfa; }
+        }
+
+        .glowing-text { animation: glow 2s infinite; }
+
+        /* --- Progress Bar (Mana Bar) --- */
+        .mana-bar-container {
+            width: 100%;
+            height: 12px;
+            background: #1e1b4b;
+            border: 1px solid #4c1d95;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .mana-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #7c3aed, #c084fc);
+            transition: width 0.5s;
+            box-shadow: 0 0 10px #a78bfa;
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div id="magic-bg"></div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="spellbook p-12 text-center z-10">
+        <h1 class="magic-font text-5xl md:text-7xl text-purple-300 mb-4 glowing-text">HỌC VIỆN<br>PHÉP THUẬT</h1>
+        <h2 class="text-2xl text-purple-200 mb-8 font-bold uppercase tracking-widest border-b-2 border-purple-700 inline-block pb-2">Bí Mật Hằng Đẳng Thức</h2>
+        
+        <p class="text-lg text-purple-100 mb-8 leading-relaxed max-w-2xl mx-auto italic">
+            "Chào mừng phù thủy tập sự. Để mở cánh cửa vào Thư Viện Cấm, ngươi phải giải mã 15 bùa chú cổ đại dựa trên các <b>Hằng Đẳng Thức Đáng Nhớ</b>."
+        </p>
+
+        <div class="grid grid-cols-2 gap-6 mb-10 text-sm font-bold text-purple-200 max-w-lg mx-auto bg-purple-900/30 p-4 rounded-lg border border-purple-500/30">
+            <div class="flex items-center gap-2"><span class="text-green-400">✦</span> 6 Câu Nhận Biết</div>
+            <div class="flex items-center gap-2"><span class="text-blue-400">✦</span> 5 Câu Thông Hiểu</div>
+            <div class="flex items-center gap-2"><span class="text-yellow-400">✦</span> 3 Câu Vận Dụng</div>
+            <div class="flex items-center gap-2"><span class="text-red-400">✦</span> 1 Câu Vận Dụng Cao</div>
+        </div>
+
+        <button onclick="startGame()" class="btn-spell px-12 py-4 rounded-lg text-2xl w-full md:w-auto shadow-lg">
+            KHAI MỞ PHÁP TRẬN ✨
+        </button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden w-full max-w-4xl z-10 flex-col h-full justify-center">
+        <!-- Header -->
+        <div class="flex justify-between items-end mb-6 px-4">
+            <div class="flex flex-col">
+                <div class="text-xs text-purple-400 uppercase tracking-widest mb-1">Bùa chú số</div>
+                <div class="text-3xl font-bold text-white magic-font">#<span id="q-number">1</span></div>
+            </div>
+            <div class="flex-grow mx-8">
+                 <div class="flex justify-between text-xs text-purple-300 mb-1">
+                     <span>MANA</span>
+                     <span id="score">0</span>
+                 </div>
+                 <div class="mana-bar-container">
+                     <div id="progress-bar" class="mana-bar"></div>
+                 </div>
+            </div>
+            <div class="flex flex-col text-right">
+                <div class="text-xs text-purple-400 uppercase tracking-widest mb-1">Cấp độ</div>
+                <div id="level-badge" class="text-xl font-bold text-green-400 magic-font">NHẬN BIẾT</div>
+            </div>
+        </div>
+
+        <!-- Question Panel -->
+        <div class="spellbook p-8 mb-6 relative min-h-[200px] flex flex-col justify-center items-center text-center">
+            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1a0b2e] px-4 border-2 border-[#583c87] rounded-full">
+                <span class="text-2xl">📜</span>
+            </div>
+            
+            <div id="question-text" class="text-2xl md:text-3xl font-bold text-white leading-relaxed mt-4">
+                Đang triệu hồi câu hỏi...
+            </div>
+        </div>
+
+        <!-- Explanation (Magic Scroll) -->
+        <div id="magic-scroll" class="rounded-lg shadow-lg mb-6 w-full max-w-4xl mx-auto">
+            <div class="text-yellow-300 font-bold mb-2 border-b border-purple-500 pb-1 magic-font tracking-wide flex items-center gap-2">
+                <span>🔮</span> GIẢI MÃ BÙA CHÚ:
+            </div>
+            <div id="log-content" class="text-purple-50 leading-relaxed text-lg"></div>
+        </div>
+
+        <!-- Options Grid -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 max-w-4xl mx-auto w-full">
+            <!-- Buttons injected here -->
+        </div>
+
+        <!-- Next Button -->
+        <div id="next-btn-container" class="hidden text-center pb-8">
+            <button onclick="nextQuestion()" class="btn-spell px-10 py-3 text-xl rounded-lg animate-bounce">
+                BÙA CHÚ TIẾP THEO &rarr;
+            </button>
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/90">
+        <div class="spellbook p-12 text-center max-w-2xl w-full mx-4 border-yellow-500">
+            <div class="text-8xl mb-6 animate-pulse">💎</div>
+            <h2 class="magic-font text-5xl text-yellow-400 mb-4">PHÁP SƯ ĐẠI TÀI!</h2>
+            <p class="text-xl text-purple-100 mb-8">Ngươi đã mở khóa toàn bộ tri thức của thư viện cổ đại.</p>
+            
+            <div class="bg-purple-900/40 p-6 rounded-lg border border-purple-500 inline-block mb-8 w-full">
+                <div class="text-sm text-purple-300 uppercase mb-2 tracking-widest">Điểm Mana Tích Lũy</div>
+                <div class="text-7xl font-bold text-white magic-font" id="final-score">0</div>
+            </div>
+
+            <div>
+                <button onclick="location.reload()" class="btn-spell px-10 py-4 text-xl w-full rounded-lg">
+                    NHẬP HỌC LẠI
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Overlay -->
+    <div id="feedback-overlay" class="fixed inset-0 pointer-events-none flex justify-center items-center z-50">
+        <div id="feedback-emoji" class="text-9xl opacity-0 transform scale-0 transition-all duration-300 filter drop-shadow-[0_0_30px_rgba(255,255,255,0.6)]"></div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+    <script>
+        // --- DATA ---
+        // 15 Questions: Math 8 Chapter 1 Lesson 3 (Notable Algebraic Identities)
+        // 4 Levels: 6 NB, 5 TH, 3 VD, 1 VDC
+const questions = [
+    // LEVEL 1: NHẬN BIẾT (6 câu)
+    {
+        q: "Hằng đẳng thức bình phương của một tổng (A + B)<sup>2</sup> bằng:",
+        a: ["A<sup>2</sup> + B<sup>2</sup>", "A<sup>2</sup> - B<sup>2</sup>", "A<sup>2</sup> + 2AB + B<sup>2</sup>", "A<sup>2</sup> - 2AB + B<sup>2</sup>"],
+        correct: 2,
+        rationale: "Công thức chuẩn: (A + B)<sup>2</sup> = A<sup>2</sup> + 2AB + B<sup>2</sup>.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Biểu thức A<sup>2</sup> - B<sup>2</sup> bằng:",
+        a: ["(A - B)<sup>2</sup>", "(A - B)(A + B)", "(A + B)<sup>2</sup>", "A<sup>2</sup> - 2AB + B<sup>2</sup>"],
+        correct: 1,
+        rationale: "Hằng đẳng thức hiệu hai bình phương: A<sup>2</sup> - B<sup>2</sup> = (A - B)(A + B).",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Khai triển (x + 1)<sup>2</sup> ta được:",
+        a: ["x<sup>2</sup> + 1", "x<sup>2</sup> + x + 1", "2x + 2", "x<sup>2</sup> + 2x + 1"],
+        correct: 3,
+        rationale: "(x + 1)<sup>2</sup> = x<sup>2</sup> + 2x + 1.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Khai triển (x - 2)<sup>2</sup> ta được:",
+        a: ["x<sup>2</sup> - 4", "x<sup>2</sup> + 4", "x<sup>2</sup> - 4x + 4", "x<sup>2</sup> - 2x + 4"],
+        correct: 2,
+        rationale: "(x - 2)<sup>2</sup> = x<sup>2</sup> - 4x + 4.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Viết biểu thức x<sup>2</sup> - 4 dưới dạng tích:",
+        a: ["(x - 2)(x + 2)", "(x - 2)<sup>2</sup>", "(x + 2)<sup>2</sup>", "(x - 4)(x + 4)"],
+        correct: 0,
+        rationale: "x<sup>2</sup> - 4 = (x - 2)(x + 2).",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Hằng đẳng thức lập phương của một tổng (A + B)<sup>3</sup> bằng:",
+        a: ["A<sup>3</sup> - B<sup>3</sup>", "A<sup>3</sup> + B<sup>3</sup>", "3A + 3B", "A<sup>3</sup> + 3A<sup>2</sup>B + 3AB<sup>2</sup> + B<sup>3</sup>"],
+        correct: 3,
+        rationale: "(A + B)<sup>3</sup> = A³ + 3A²B + 3AB² + B³.",
+        level: "NHẬN BIỂT"
+    },
+
+    // LEVEL 2: THÔNG HIỂU (5 câu)
+    {
+        q: "(2x + 3)<sup>2</sup> khai triển bằng:",
+        a: ["4x<sup>2</sup> + 9", "4x<sup>2</sup> + 6x + 9", "4x<sup>2</sup> + 12x + 9", "2x<sup>2</sup> + 12x + 9"],
+        correct: 2,
+        rationale: "(2x + 3)² = 4x² + 12x + 9.",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "9x<sup>2</sup> - 16y<sup>2</sup> viết thành tích:",
+        a: ["(3x - 4y)(3x + 4y)", "(3x - 16y)(3x + 16y)", "(3x - 4y)<sup>2</sup>", "(9x - 16y)(9x + 16y)"],
+        correct: 0,
+        rationale: "9x² - 16y² = (3x - 4y)(3x + 4y).",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Giá trị nhanh của 101<sup>2</sup> là:",
+        a: ["10001", "10101", "10201", "12010"],
+        correct: 2,
+        rationale: "(100 + 1)² = 10000 + 200 + 1 = 10201.",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "x<sup>3</sup> - 8 viết thành tích:",
+        a: ["(x - 2)(x<sup>2</sup> + 2x + 4)", "(x + 2)(x<sup>2</sup> - 2x + 4)", "(x - 2)(x<sup>2</sup> - 2x + 4)", "(x - 2)<sup>3</sup>"],
+        correct: 0,
+        rationale: "x³ - 2³ = (x - 2)(x² + 2x + 4).",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "(x + 1)(x - 1) - x<sup>2</sup> rút gọn bằng:",
+        a: ["1", "-1", "-2", "0"],
+        correct: 1,
+        rationale: "(x² - 1) - x² = -1.",
+        level: "THÔNG HIỂU"
+    },
+
+    // LEVEL 3: VẬN DỤNG (3 câu)
+    {
+        q: "Rút gọn: (x + y)² - (x - y)²",
+        a: ["2xy", "0", "4xy", "2x² + 2y²"],
+        correct: 2,
+        rationale: "(x+y)² - (x-y)² = 4xy.",
+        level: "VẬN DỤNG"
+    },
+    {
+        q: "(Thực tế) Diện tích tăng thêm khi mở rộng hình vuông cạnh x thêm 5m:",
+        a: ["5x + 25", "25", "x² + 25", "10x + 25"],
+        correct: 3,
+        rationale: "Tăng thêm = (x+5)² - x² = 10x + 25.",
+        level: "VẬN DỤNG"
+    },
+    {
+        q: "Tìm x biết: (x + 2)² - x² = 20",
+        a: ["x = 4", "x = 5", "x = 2", "x = 3"],
+        correct: 0,
+        rationale: "4x + 4 = 20 → x = 4.",
+        level: "VẬN DỤNG"
+    },
+
+    // LEVEL 4: VẬN DỤNG CAO (1 câu)
+    {
+        q: "Cho x + y = 3 và xy = 2. Tính x<sup>3</sup> + y<sup>3</sup>:",
+        a: ["27", "15", "9", "18"],
+        correct: 2,
+        rationale: "x³ + y³ = (x+y)(x² - xy + y²) = 3(9 - 6) = 9.",
+        level: "VẬN DỤNG CAO"
+    }
+];
+
+        // --- GAME LOGIC ---
+        let currentQIndex = 0;
+        let score = 0;
+        
+        // Generate Rune Background
+        const bg = document.getElementById('magic-bg');
+        const runesChars = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛈᛇᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ";
+        for(let i=0; i<20; i++) {
+            const el = document.createElement('div');
+            el.className = 'rune';
+            el.innerText = runesChars[Math.floor(Math.random() * runesChars.length)];
+            el.style.left = Math.random() * 100 + '%';
+            el.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            el.style.animationDelay = (Math.random() * 5) + 's';
+            bg.appendChild(el);
+        }
+
+        // Audio Setup
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'magic') { // Sparkle
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.linearRampToValueAtTime(1200, now + 0.3);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'correct') { // Magical chime
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now); 
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'wrong') { // Thud
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') { // Fanfare
+                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+                    setTimeout(() => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'square';
+                        o.frequency.value = f;
+                        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                        o.start();
+                        o.stop(audioCtx.currentTime + 0.5);
+                    }, i * 150);
+                });
+            }
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+            
+            playSound('magic');
+            currentQIndex = 0;
+            score = 0;
+            updateUI();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQIndex];
+            
+            document.getElementById('q-number').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerHTML = q.q;
+            
+            // Level Badge Color
+            const badge = document.getElementById('level-badge');
+            badge.innerText = q.level;
+            if (q.level === "NHẬN BIẾT") badge.className = "text-xl font-bold text-green-400 magic-font";
+            else if (q.level === "THÔNG HIỂU") badge.className = "text-xl font-bold text-blue-400 magic-font";
+            else if (q.level === "VẬN DỤNG CAO") badge.className = "text-xl font-bold text-red-500 magic-font";
+            else badge.className = "text-xl font-bold text-yellow-400 magic-font";
+
+            // Reset Log
+            const logBox = document.getElementById('magic-scroll');
+            logBox.classList.remove('show');
+            document.getElementById('next-btn-container').classList.add('hidden');
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            q.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-spell w-full p-4 rounded-lg min-h-[80px]";
+                btn.innerHTML = opt; // HTML allowed for superscripts
+                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selected, correct, btn) {
+          const btns = document.querySelectorAll('#options-grid .btn-spell');
+            btns.forEach(b => b.disabled = true);
+            const q = questions[currentQIndex];
+            const logBox = document.getElementById('magic-scroll');
+            const content = document.getElementById('log-content');
+            
+            content.innerHTML = q.rationale;
+            logBox.classList.add('show');
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                score += 100;
+                playSound('correct');
+                showFeedback("✨"); 
+                fireConfetti(30);
+            } else {
+                btn.classList.add('wrong');
+                btns[correct].classList.add('correct');
+                playSound('wrong');
+                showFeedback("🔮");
+            }
+
+            updateUI();
+            document.getElementById('next-btn-container').classList.remove('hidden');
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score;
+            const progress = ((currentQIndex + 1) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        function showFeedback(emoji) {
+            const el = document.getElementById('feedback-emoji');
+            el.innerText = emoji;
+            el.style.opacity = '1';
+            el.style.transform = 'scale(1.5)';
+            
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transform = 'scale(0)';
+            }, 800);
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < questions.length) {
+                playSound('magic');
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            playSound('win');
+            setInterval(() => fireConfetti(50), 1000);
+        }
+
+        // --- CONFETTI (Magic Dust) ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+
+        function fireConfetti(amount) {
+            for (let i = 0; i < amount; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20,
+                    life: 100,
+                    size: Math.random() * 3 + 1,
+                    color: `hsl(${Math.random() * 60 + 250}, 100%, 70%)` // Purple spectrum
+                });
+            }
+            if(particles.length <= amount) requestAnimationFrame(animateParticles);
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.2; // Gravity
+                p.life--;
+                
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+    </script>
+</body>
+</html>
