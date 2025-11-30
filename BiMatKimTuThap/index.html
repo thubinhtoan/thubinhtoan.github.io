@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bí Mật Kim Tự Tháp - Toán 9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Marcellus&display=swap');
+
+        body {
+            font-family: 'Marcellus', serif;
+            background-color: #0f0a05;
+            color: #f0e6d2;
+            overflow: hidden;
+            margin: 0;
+            user-select: none;
+        }
+
+        .egypt-font {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* --- Background --- */
+        #desert-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at center bottom, #cca466 0%, #5d4037 60%, #1a120b 100%);
+        }
+
+        .sand-dust {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/dust.png');
+            opacity: 0.4;
+            animation: drift 120s linear infinite;
+        }
+
+        @keyframes drift {
+            from { background-position: 0 0; }
+            to { background-position: 1000px 0; }
+        }
+
+        /* --- Game Container --- */
+        .tablet-panel {
+            background: linear-gradient(135deg, #e6cba5, #d4b483);
+            border: 8px solid #8d6e63;
+            border-image: linear-gradient(to bottom, #d7ccc8, #8d6e63, #3e2723) 1;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 60px rgba(62, 39, 35, 0.5);
+            color: #3e2723;
+            position: relative;
+        }
+
+        .tablet-panel::before {
+            content: "𓂀";
+            position: absolute;
+            top: 10px; left: 50%; transform: translateX(-50%);
+            font-size: 3rem;
+            opacity: 0.2;
+            color: #3e2723;
+        }
+
+        .hieroglyphs {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/wall-4-light.png');
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* --- Buttons --- */
+        .btn-stone {
+            background: linear-gradient(to bottom, #d7ccc8, #a1887f);
+            border: 2px solid #5d4037;
+            color: #3e2723;
+            font-weight: bold;
+            font-size: 1.15rem;
+            transition: all 0.2s;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-stone:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(to bottom, #efebe9, #bcaaa4);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+
+        .btn-stone:active { transform: translateY(1px); }
+
+        .btn-stone.correct {
+            background: linear-gradient(to bottom, #66bb6a, #2e7d32) !important;
+            border-color: #1b5e20 !important;
+            color: white !important;
+            text-shadow: none;
+            box-shadow: 0 0 20px #4caf50;
+        }
+
+        .btn-stone.wrong {
+            background: linear-gradient(to bottom, #ef5350, #c62828) !important;
+            border-color: #b71c1c !important;
+            color: white !important;
+            text-shadow: none;
+            animation: shake 0.4s;
+        }
+
+        /* --- Scroll (Explanation) --- */
+        #papyrus-scroll {
+            background: #fff3e0;
+            background-image: url('https://www.transparenttextures.com/patterns/old-map.png');
+            color: #4e342e;
+            border-top: 4px double #8d6e63;
+            border-bottom: 4px double #8d6e63;
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transform-origin: top;
+            transform: scaleY(0);
+            padding: 0 1.5rem;
+        }
+
+        #papyrus-scroll.show {
+            max-height: 500px;
+            opacity: 1;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transform: scaleY(1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        /* --- Math Display --- */
+        .system-eq {
+            display: inline-flex;
+            flex-direction: column;
+            text-align: left;
+            border-left: 3px solid currentColor;
+            padding-left: 8px;
+            border-radius: 4px 0 0 4px;
+            vertical-align: middle;
+            line-height: 1.5;
+            font-style: italic;
+        }
+        
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 2px;
+            font-size: 0.9em;
+        }
+        .fraction > span { display: block; padding: 0.1em; }
+        .fraction span.numerator { border-bottom: 1px solid currentColor; }
+        .fraction span.denominator { border-top: 1px solid transparent; }
+
+        /* --- Animations --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes shine {
+            0% { background-position: -100px; }
+            100% { background-position: 500px; }
+        }
+
+        /* --- Gem Progress --- */
+        .gem-container {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+        .gem {
+            width: 12px; height: 20px;
+            background: #3e2723;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            transition: all 0.5s;
+        }
+        .gem.active {
+            background: #00e676;
+            box-shadow: 0 0 10px #00e676;
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div id="desert-bg"></div>
+    <div class="sand-dust"></div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="tablet-panel p-12 text-center max-w-2xl w-full z-10 rounded-lg">
+        <div class="hieroglyphs"></div>
+        <div class="relative z-10">
+            <h1 class="egypt-font text-5xl md:text-7xl text-brown-900 mb-2 drop-shadow-sm" style="color: #3e2723;">BÍ MẬT<br>KIM TỰ THÁP</h1>
+            <h2 class="text-xl text-brown-800 mb-8 font-bold tracking-widest uppercase border-b-2 border-brown-500 inline-block pb-1">Ôn Tập Chương 1</h2>
+            
+            <p class="text-lg text-brown-900 mb-8 leading-relaxed font-semibold">
+                "Hỡi kẻ lữ hành tìm kiếm tri thức. Để mở cánh cửa vào Phòng Châu Báu, ngươi phải giải mã 15 phiến đá cổ đại khắc ghi những bí ẩn về <b>Phương Trình & Hệ Phương Trình</b>."
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 text-left bg-white/30 p-4 rounded mb-8 border border-brown-400 text-brown-900">
+                <div>👁️ 6 Câu Nhận Biết</div>
+                <div>🧠 5 Câu Thông Hiểu</div>
+                <div>⚖️ 3 Câu Vận Dụng</div>
+                <div>👑 1 Câu Vận Dụng Cao</div>
+            </div>
+
+            <button onclick="startGame()" class="btn-stone px-12 py-4 rounded text-2xl shadow-lg w-full md:w-auto egypt-font">
+                KHÁM PHÁ NGAY ▲
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden w-full max-w-4xl z-10 flex-col h-full justify-center">
+        <!-- Header -->
+        <div class="flex justify-between items-end mb-4 px-2 text-orange-100">
+            <div>
+                <div class="text-xs uppercase tracking-widest opacity-80">Phiến đá</div>
+                <div class="text-2xl font-bold egypt-font">#<span id="q-number">1</span></div>
+            </div>
+            
+            <div class="flex-grow mx-8 hidden md:block">
+                <div class="gem-container" id="gem-bar">
+                    <!-- Gems injected here -->
+                </div>
+            </div>
+
+            <div class="text-right">
+                <div class="text-xs uppercase tracking-widest opacity-80">Điểm số</div>
+                <div class="text-2xl font-bold text-yellow-400 egypt-font" id="score">0</div>
+            </div>
+        </div>
+
+        <!-- Question Panel -->
+        <div class="tablet-panel p-8 mb-4 relative min-h-[180px] flex flex-col justify-center items-center text-center rounded-lg">
+            <div class="hieroglyphs"></div>
+            
+            <div id="level-badge" class="absolute top-0 right-0 bg-brown-800 text-white px-3 py-1 text-xs shadow font-bold z-10 rounded-bl-lg" style="background: #3e2723;">NHẬN BIẾT</div>
+            
+            <div id="question-text" class="text-2xl md:text-3xl font-bold text-brown-900 leading-relaxed relative z-10 egypt-font">
+                Đang giải mã ký tự cổ...
+            </div>
+        </div>
+
+        <!-- Explanation (Papyrus) -->
+        <div id="papyrus-scroll" class="rounded-sm shadow-xl relative">
+            <div class="text-brown-800 font-bold mb-2 border-b border-brown-400 pb-1 egypt-font tracking-wide mt-2">📜 LỜI GIẢI CỔ ĐẠI:</div>
+            <div id="log-content" class="text-brown-900 font-medium leading-relaxed text-lg"></div>
+        </div>
+
+        <!-- Options -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <!-- Buttons injected here -->
+        </div>
+
+        <!-- Next Button -->
+        <div id="next-btn-container" class="hidden text-center pb-4">
+            <button onclick="nextQuestion()" class="px-10 py-3 bg-yellow-600 hover:bg-yellow-500 text-white font-bold rounded shadow-lg border-2 border-yellow-300 transition transform hover:scale-105">
+                PHIẾN ĐÁ TIẾP THEO &rarr;
+            </button>
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/90">
+        <div class="tablet-panel p-12 text-center max-w-2xl w-full mx-4 rounded-lg">
+            <div class="hieroglyphs"></div>
+            <div class="relative z-10">
+                <div class="text-7xl mb-4 text-yellow-600">🏺</div>
+                <h2 class="egypt-font text-5xl text-brown-900 mb-4">KHO BÁU ĐÃ MỞ!</h2>
+                <p class="text-xl text-brown-800 mb-8 font-bold">"Trí tuệ của ngươi sáng hơn cả vàng ròng của Pharaoh."</p>
+                
+                <div class="bg-white/40 p-6 rounded border border-brown-300 inline-block mb-8 w-full shadow-inner">
+                    <div class="text-sm text-brown-700 uppercase mb-2 tracking-widest">Tổng Điểm Khảo Cổ</div>
+                    <div class="text-6xl font-bold text-brown-900 egypt-font" id="final-score">0</div>
+                </div>
+
+                <div>
+                    <button onclick="location.reload()" class="btn-stone px-10 py-4 rounded text-xl w-full">
+                        KHÁM PHÁ LẠI
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sound Effects (Invisible) -->
+    <div id="sfx"></div>
+
+    <script>
+        // --- DATA ---
+        // 15 Questions: End of Chapter 1 Review (Math 9)
+       const questions = [
+    // LEVEL 1: NHẬN BIẾT (6 câu)
+    {
+        q: "Phương trình nào sau đây là phương trình bậc nhất hai ẩn?",
+        a: ["2x - 3y = 5", "x<sup>2</sup> + y = 1", "0x + 0y = 2", "x + 1 = 0"],
+        correct: 0,
+        rationale: "Phương trình bậc nhất hai ẩn có dạng ax + by = c (a, b không đồng thời bằng 0).<br>2x - 3y = 5 thỏa mãn.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Cặp số (2; 1) là nghiệm của phương trình nào?",
+        a: ["x - y = 0", "x + y = 3", "2x + y = 4", "x + 2y = 5"],
+        correct: 1,
+        rationale: "Thay x=2, y=1 vào x + y = 3 &rArr; 2 + 1 = 3 (Đúng).",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Hệ phương trình <div class='system-eq'><span>x = 3</span><span>2x - y = 1</span></div> có nghiệm là:",
+        a: ["(2; 3)", "(3; 1)", "(3; 5)", "(1; 3)"],
+        correct: 2,
+        rationale: "Thay x=3 vào pt 2: 2(3) - y = 1 &rArr; 6 - y = 1 &rArr; y = 5. Vậy nghiệm là (3; 5).",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Công thức nghiệm tổng quát của phương trình 2x - y = 1 biểu diễn theo x là:",
+        a: ["y = 1 - 2x", "y = 2x + 1", "x = (y+1)/2", "y = 2x - 1"],
+        correct: 3,
+        rationale: "2x - y = 1 &rArr; y = 2x - 1.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Trong phương pháp thế, để giải hệ <div class='system-eq'><span>x + 2y = 4</span><span>3x - y = 5</span></div>, ta nên rút ẩn nào?",
+        a: ["Rút x từ phương trình 1", "Rút y từ phương trình 1", "Rút x từ phương trình 2", "Rút y từ phương trình 2"],
+        correct: 0,
+        rationale: "Ẩn x ở pt 1 có hệ số là 1, rút x = 4 - 2y là đơn giản nhất.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Phương trình (x - 2)(y + 1) = 0 tương đương với:",
+        a: ["x = 2 và y = -1", "x = 2 hoặc y = -1", "x = -2 hoặc y = 1", "x = 0 hoặc y = 0"],
+        correct: 1,
+        rationale: "Phương trình tích A.B=0 &hArr; A=0 hoặc B=0.<br>x - 2 = 0 &rArr; x=2; y + 1 = 0 &rArr; y=-1.",
+        level: "NHẬN BIẾT"
+    },
+
+    // LEVEL 2: THÔNG HIỂU (5 câu)
+    {
+        q: "Giải hệ phương trình <div class='system-eq'><span>x + y = 5</span><span>x - y = 1</span></div>.",
+        a: ["(2; 3)", "(3; 2)", "(4; 1)", "(1; 4)"],
+        correct: 1,
+        rationale: "Cộng 2 vế: 2x = 6 &rArr; x = 3.<br>Thay x=3 vào x+y=5 &rArr; 3+y=5 &rArr; y=2.",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Tìm ĐKXĐ của phương trình <div class='fraction'><span class='numerator'>3</span><span class='denominator'>x + 2</span></div> = <div class='fraction'><span class='numerator'>x</span><span class='denominator'>x - 1</span></div>.",
+        a: ["x &ne; -2 hoặc x &ne; 1", "x &ne; 2 và x &ne; -1", "x &ne; -2 và x &ne; 1", "x &ne; 0"],
+        correct: 2,
+        rationale: "Mẫu thức khác 0: x + 2 &ne; 0 &rArr; x &ne; -2; x - 1 &ne; 0 &rArr; x &ne; 1.",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Tìm a, b biết hệ <div class='system-eq'><span>ax + y = 3</span><span>x + by = 3</span></div> có nghiệm (1; 1).",
+        a: ["a = 2, b = 2", "a = 1, b = 1", "a = 2, b = 1", "a = 3, b = 3"],
+        correct: 0,
+        rationale: "Thay x=1, y=1 vào hệ:<br>a + 1 = 3 &rArr; a = 2.<br>1 + b = 3 &rArr; b = 2.",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Số nghiệm của phương trình x<sup>2</sup> - 3x + 2 = 0 là:",
+        a: ["1 nghiệm", "2 nghiệm", "Vô nghiệm", "3 nghiệm"],
+        correct: 1,
+        rationale: "Phân tích thành nhân tử: (x - 1)(x - 2) = 0.<br>Suy ra x = 1 hoặc x = 2.",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Với giá trị nào của k thì đường thẳng y = (k-1)x + 2 song song với đường thẳng y = 2x - 1?",
+        a: ["k = 1", "k = 2", "k = 3", "k = -1"],
+        correct: 2,
+        rationale: "Hai đường thẳng song song khi hệ số góc bằng nhau: k - 1 = 2 &rArr; k = 3.",
+        level: "THÔNG HIỂU"
+    },
+
+    // LEVEL 3: VẬN DỤNG (3 câu)
+    {
+        q: "(Thực tế) Một mảnh vườn hình chữ nhật có chu vi 34m. Nếu tăng chiều dài 2m và giảm chiều rộng 1m thì diện tích không đổi. Tính chiều dài và chiều rộng.",
+        a: ["9m và 8m", "10m và 7m", "11m và 6m", "12m và 5m"],
+        correct: 3,
+        rationale: "Gọi x, y là dài, rộng. Hệ:<br>2(x+y)=34 &rArr; x+y=17.<br>(x+2)(y-1)=xy &rArr; -x+2y=2.<br>Giải hệ được x=12, y=5.",
+        level: "VẬN DỤNG"
+    },
+    {
+        q: "Tìm m để hệ <div class='system-eq'><span>x + my = 1</span><span>mx - y = -m</span></div> có nghiệm duy nhất.",
+        a: ["Mọi m", "m &ne; 0", "m &ne; 1", "m = 0"],
+        correct: 0,
+        rationale: "Ta xét tỷ số a/a' và b/b': 1/m và m/-1. Tích chéo: -1 &ne; m<sup>2</sup>.<br>Vì m<sup>2</sup> &ge; 0 nên m<sup>2</sup> &ne; -1 luôn đúng với mọi m.",
+        level: "VẬN DỤNG"
+    },
+    {
+        q: "Hai vòi nước cùng chảy vào bể thì sau 4 giờ 48 phút đầy bể. Nếu mở vòi 1 trong 3h, vòi 2 trong 4h thì được 3/4 bể. Hỏi vòi 1 chảy một mình bao lâu đầy bể?",
+        a: ["12 giờ", "8 giờ", "6 giờ", "10 giờ"],
+        correct: 1,
+        rationale: "4h48' = 24/5 h. Gọi x, y là thời gian mỗi vòi. Hệ:<br>1/x + 1/y = 5/24<br>3/x + 4/y = 3/4<br>Đặt u=1/x, v=1/y. Giải hệ u, v rồi suy ra x = 8.",
+        level: "VẬN DỤNG"
+    },
+
+    // LEVEL 4: VẬN DỤNG CAO (1 câu)
+    {
+        q: "Cho hệ phương trình <div class='system-eq'><span>x + y = 3m - 2</span><span>x - 2y = 3 - 3m</span></div>. Tìm m nguyên để hệ có nghiệm (x; y) sao cho x<sup>2</sup> + y<sup>2</sup> đạt giá trị nhỏ nhất.",
+        a: ["m = 2", "m = 0", "m = 1", "m = -1"],
+        correct: 2,
+        rationale: "Giải hệ:<br>Từ x + y = 3m - 2 và x - 2y = 3 - 3m &rArr; trừ hai phương trình: 3y = 6m - 5 &rArr; y = 2m - 5/3.<br>Thay lại vào x + y = 3m - 2 &rArr; x = m - 1/3.<br>Đặt P = x<sup>2</sup> + y<sup>2</sup> = 5m<sup>2</sup> - \\dfrac{22}{3}m + \\dfrac{26}{9}.<br>P là tam thức bậc hai có đỉnh tại m = 11/15 &approx; 0,73. Với m nguyên, P nhỏ nhất tại m = 1.",
+        level: "VẬN DỤNG CAO"
+    }
+];
+
+        // --- GAME LOGIC ---
+        let currentQIndex = 0;
+        let score = 0;
+        
+        // Audio Setup
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'stone') { // Deep thud
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(80, now);
+                osc.frequency.exponentialRampToValueAtTime(10, now + 0.3);
+                gain.gain.setValueAtTime(0.6, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'correct') { // Magical chord
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now); 
+                osc.frequency.linearRampToValueAtTime(880, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'wrong') { // Crumble
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.4);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'win') { // Fanfare
+                [392.00, 523.25, 659.25, 783.99].forEach((f, i) => {
+                    setTimeout(() => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'square';
+                        o.frequency.value = f;
+                        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                        o.start();
+                        o.stop(audioCtx.currentTime + 0.5);
+                    }, i * 150);
+                });
+            }
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+            
+            initGems();
+            playSound('stone');
+            currentQIndex = 0;
+            score = 0;
+            updateUI();
+            loadQuestion();
+        }
+
+        function initGems() {
+            const container = document.getElementById('gem-bar');
+            container.innerHTML = '';
+            for(let i=0; i<questions.length; i++) {
+                const gem = document.createElement('div');
+                gem.className = 'gem';
+                gem.id = `gem-${i}`;
+                container.appendChild(gem);
+            }
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQIndex];
+            
+            document.getElementById('q-number').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerHTML = q.q;
+            document.getElementById('level-badge').innerText = q.level;
+            
+            // Reset UI
+            const scroll = document.getElementById('papyrus-scroll');
+            scroll.classList.remove('show');
+            document.getElementById('next-btn-container').classList.add('hidden');
+
+            // Difficulty Colors
+            const badge = document.getElementById('level-badge');
+            if (q.level === "NHẬN BIẾT") badge.style.backgroundColor = "#2e7d32";
+            else if (q.level === "THÔNG HIỂU") badge.style.backgroundColor = "#1565c0";
+            else if (q.level === "VẬN DỤNG CAO") badge.style.backgroundColor = "#c62828";
+            else badge.style.backgroundColor = "#f9a825"; // Van Dung
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            q.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-stone w-full p-4 rounded min-h-[80px]";
+                btn.innerHTML = opt;
+                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selected, correct, btn) {
+            const btns = document.querySelectorAll('.btn-stone');
+            btns.forEach(b => b.disabled = true);
+
+            const q = questions[currentQIndex];
+            const scroll = document.getElementById('papyrus-scroll');
+            const content = document.getElementById('log-content');
+            
+            content.innerHTML = q.rationale;
+            scroll.classList.add('show');
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                score += 100;
+                playSound('correct');
+                
+                // Light up gem
+                document.getElementById(`gem-${currentQIndex}`).classList.add('active');
+            } else {
+                btn.classList.add('wrong');
+                btns[correct].classList.add('correct');
+                playSound('wrong');
+            }
+
+            updateUI();
+            document.getElementById('next-btn-container').classList.remove('hidden');
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score;
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < questions.length) {
+                playSound('stone');
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            playSound('win');
+        }
+
+    </script>
+</body>
+</html>
