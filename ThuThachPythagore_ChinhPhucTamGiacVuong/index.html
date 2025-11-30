@@ -411,33 +411,49 @@
         }
 
         // Hàm hiển thị câu hỏi
-        function displayQuestion() {
-            rationaleBox.classList.add('hidden');
-            nextButton.classList.add('hidden');
-            answerOptionsContainer.innerHTML = '';
-            isAnswered = false;
+      // Hàm hiển thị câu hỏi
+function displayQuestion() {
+    rationaleBox.classList.add('hidden');
+    nextButton.classList.add('hidden');
+    answerOptionsContainer.innerHTML = '';
+    isAnswered = false;
 
-            if (currentQuestionIndex < quizQuestions.length) {
-                const currentQ = quizQuestions[currentQuestionIndex];
-                
-                // Cập nhật thanh tiến trình
-                const progressPercentage = ((currentQuestionIndex) / quizQuestions.length) * 100;
-                progressBar.style.width = `${progressPercentage}%`;
-                
-                questionText.innerHTML = `Câu ${currentQuestionIndex + 1}/${quizQuestions.length}: ${currentQ.question}`;
-                difficultyLevel.textContent = `Mức độ: ${currentQ.level}`;
+    if (currentQuestionIndex < quizQuestions.length) {
+        const currentQ = quizQuestions[currentQuestionIndex];
+        
+        // Cập nhật thanh tiến trình
+        const progressPercentage = ((currentQuestionIndex) / quizQuestions.length) * 100;
+        progressBar.style.width = `${progressPercentage}%`;
+        
+        questionText.innerHTML = `Câu ${currentQuestionIndex + 1}/${quizQuestions.length}: ${currentQ.question}`;
+        difficultyLevel.textContent = `Mức độ: ${currentQ.level}`;
 
-                currentQ.options.forEach((option, index) => {
-                    const button = document.createElement('button');
-                    button.className = 'option-button w-full text-left p-3 rounded-lg border-2 border-indigo-200 bg-white text-gray-700 font-medium hover:bg-indigo-100 transition duration-150';
-                    button.innerHTML = `<span>${String.fromCharCode(65 + index)}. </span>${option.text}`; // A, B, C, D
-                    button.onclick = () => handleAnswer(button, option.isCorrect, currentQ.options, currentQ.hint, currentQ.question, option.rationale);
-                    answerOptionsContainer.appendChild(button);
-                });
-            } else {
-                showResult();
-            }
-        }
+        // 🔀 TẠO BẢN SAO ĐÁP ÁN VÀ XÁO TRỘN
+        const shuffledOptions = [...currentQ.options].sort(() => Math.random() - 0.5);
+
+        // Tạo các nút đáp án theo thứ tự đã shuffle
+        shuffledOptions.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.className = 'option-button w-full text-left p-3 rounded-lg border-2 border-indigo-200 bg-white text-gray-700 font-medium hover:bg-indigo-100 transition duration-150';
+            
+            button.innerHTML = `<span>${String.fromCharCode(65 + index)}. </span>${option.text}`; // A, B, C, D
+
+            // ⚠️ Truyền shuffledOptions thay vì currentQ.options
+            button.onclick = () => handleAnswer(
+                button,
+                option.isCorrect,
+                shuffledOptions,      // dùng mảng đã random
+                currentQ.hint,
+                currentQ.question,
+                option.rationale
+            );
+
+            answerOptionsContainer.appendChild(button);
+        });
+    } else {
+        showResult();
+    }
+}
 
         // Hàm xử lý trả lời
         function handleAnswer(selectedButton, isCorrect, options, hint, question, rationale) {
