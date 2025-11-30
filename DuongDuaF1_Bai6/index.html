@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đường Đua F1 - Toán 8 Bài 6</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Racing+Sans+One&family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            overflow: hidden;
+            margin: 0;
+            user-select: none;
+        }
+
+        .race-font {
+            font-family: 'Racing Sans One', cursive;
+        }
+
+        /* --- Track Background --- */
+        #track-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: #333;
+            overflow: hidden;
+        }
+
+        .grass {
+            position: absolute;
+            top: 0; width: 100%; height: 30%;
+            background: #2e7d32;
+            border-bottom: 5px solid #fff;
+        }
+
+        .road {
+            position: absolute;
+            top: 30%; width: 100%; height: 70%;
+            background: #555;
+            perspective: 1000px;
+        }
+
+        .kerb {
+            position: absolute;
+            top: 30%; width: 100%; height: 20px;
+            background: repeating-linear-gradient(90deg, #f44336, #f44336 20px, #fff 20px, #fff 40px);
+            animation: moveRoad 0.5s linear infinite;
+        }
+
+        .line {
+            position: absolute;
+            top: 50%; left: 0; width: 100%; height: 10px;
+            background: repeating-linear-gradient(90deg, transparent, transparent 50px, #fff 50px, #fff 100px);
+            opacity: 0.5;
+            animation: moveRoad 0.5s linear infinite;
+        }
+
+        @keyframes moveRoad {
+            from { background-position: 0 0; }
+            to { background-position: -100px 0; }
+        }
+
+        /* --- Cars --- */
+        #player-car {
+            position: absolute;
+            bottom: 50px; left: 100px;
+            font-size: 6rem;
+            z-index: 10;
+            transition: left 1s ease;
+            filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.5));
+        }
+
+        .opponent-car {
+            position: absolute;
+            bottom: 80px; 
+            font-size: 4rem;
+            opacity: 0.8;
+            transition: left 2s linear;
+        }
+
+        /* --- HUD --- */
+        .dashboard {
+            background: linear-gradient(180deg, #000 0%, #222 100%);
+            border: 4px solid #444;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .speedometer {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            border: 3px solid #f44336;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- Buttons --- */
+        .btn-race {
+            background: linear-gradient(to bottom, #e53935, #b71c1c);
+            border: 2px solid #ff8a80;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            transform: skew(-10deg);
+            transition: all 0.1s;
+        }
+
+        .btn-race:hover {
+            background: linear-gradient(to bottom, #ff5252, #d32f2f);
+            transform: skew(-10deg) translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+        }
+
+        .btn-race:active { transform: skew(-10deg) translateY(1px); }
+
+        .btn-race.correct {
+            background: linear-gradient(to bottom, #43a047, #1b5e20) !important;
+            border-color: #69f0ae !important;
+            box-shadow: 0 0 20px #00e676;
+        }
+
+        .btn-race.wrong {
+            background: linear-gradient(to bottom, #616161, #212121) !important;
+            border-color: #9e9e9e !important;
+            opacity: 0.8;
+        }
+
+        /* --- Explanation Box (Pit Stop) --- */
+        #pit-stop-log {
+            background: rgba(0, 0, 0, 0.9);
+            border-left: 5px solid #ffeb3b;
+            color: #e0e0e0;
+            transition: all 0.5s ease;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        #pit-stop-log.show {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 1rem;
+            padding: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        /* --- Math Display --- */
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 2px;
+            font-size: 0.9em;
+        }
+        .fraction > span { display: block; padding: 0.1em; }
+        .fraction span.numerator { border-bottom: 1px solid currentColor; }
+        .fraction span.denominator { border-top: 1px solid transparent; }
+
+        /* --- Animations --- */
+        .nitro-boost {
+            animation: nitro 0.5s infinite;
+        }
+
+        @keyframes nitro {
+            0% { transform: translateX(0) scale(1); }
+            50% { transform: translateX(5px) scale(1.05); }
+            100% { transform: translateX(0) scale(1); }
+        }
+
+        /* --- Progress --- */
+        .lap-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .lap-bar {
+            height: 100%;
+            width: 0%;
+            background: #ffeb3b;
+            transition: width 0.5s;
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Background -->
+    <div id="track-bg">
+        <div class="grass"></div>
+        <div class="kerb"></div>
+        <div class="road">
+            <div class="line"></div>
+        </div>
+    </div>
+
+    <div id="player-car">🏎️</div>
+    <div id="opponent" class="opponent-car" style="left: 10%;">🚗</div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="dashboard p-10 text-center max-w-2xl w-full z-10 relative">
+        <h1 class="race-font text-6xl text-yellow-400 mb-2 italic drop-shadow-lg">ĐƯỜNG ĐUA F1</h1>
+        <h2 class="text-2xl text-white mb-6 font-bold uppercase tracking-wider">Giải Mã Phân Thức</h2>
+        
+        <div class="text-left bg-gray-800 p-6 rounded-lg mb-8 border border-gray-600 text-lg">
+            <p class="mb-3 text-yellow-300"><span class="text-xl">🏁</span> <b>Mục tiêu:</b> Về đích đầu tiên bằng cách giải 15 phép tính phân thức.</p>
+            <p class="mb-3 text-white"><span class="text-xl">🔧</span> <b>Kỹ năng:</b> Quy đồng mẫu thức, Cộng/Trừ, Rút gọn.</p>
+            <p class="text-red-400"><span class="text-xl">⚠️</span> <b>Cảnh báo:</b> Trả lời sai sẽ bị tụt lại phía sau!</p>
+        </div>
+
+        <button onclick="startGame()" class="btn-race px-12 py-4 w-full md:w-auto text-2xl rounded shadow-lg">
+            KHỞI ĐỘNG ĐỘNG CƠ 🚦
+        </button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden w-full max-w-4xl z-10 flex-col h-full justify-center">
+        <!-- Header -->
+        <div class="flex justify-between items-end mb-4 px-2">
+            <div class="bg-black/70 p-3 rounded border border-gray-500">
+                <div class="text-xs text-gray-400 uppercase">Vòng đua</div>
+                <div class="text-2xl font-bold text-white race-font">LAP <span id="q-number">1</span>/15</div>
+            </div>
+            <div class="flex-grow mx-4">
+                 <div class="flex justify-between text-xs text-white mb-1">
+                     <span>START</span>
+                     <span>FINISH</span>
+                 </div>
+                 <div class="lap-bar-container">
+                     <div id="progress-bar" class="lap-bar"></div>
+                 </div>
+            </div>
+            <div class="bg-black/70 p-3 rounded border border-gray-500 text-center">
+                <div class="text-xs text-gray-400 uppercase">Tốc độ</div>
+                <div class="text-2xl font-bold text-yellow-400 race-font"><span id="score">0</span> km/h</div>
+            </div>
+        </div>
+
+        <!-- Question Panel -->
+        <div class="dashboard p-8 mb-4 relative min-h-[180px] flex flex-col justify-center items-center text-center bg-gray-900/90">
+            <div id="level-badge" class="absolute top-0 right-0 bg-green-600 text-white px-4 py-1 text-xs font-bold rounded-bl-lg">NHẬN BIẾT</div>
+            
+            <div id="question-text" class="text-2xl md:text-3xl font-bold text-white leading-relaxed mt-4">
+                Đang nạp dữ liệu đường đua...
+            </div>
+        </div>
+
+        <!-- Explanation (Pit Stop Log) -->
+        <div id="pit-stop-log" class="rounded shadow-lg w-full">
+            <div class="text-yellow-400 font-bold mb-2 border-b border-yellow-700 pb-1 race-font tracking-wide flex items-center gap-2">
+                <span>🛠️</span> DỮ LIỆU KỸ THUẬT (PIT STOP):
+            </div>
+            <div id="log-content" class="text-white leading-relaxed text-lg"></div>
+        </div>
+
+        <!-- Options Grid -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <!-- Buttons injected here -->
+        </div>
+
+        <!-- Next Button -->
+        <div id="next-btn-container" class="hidden text-center pb-4">
+            <button onclick="nextQuestion()" class="btn-race px-10 py-3 text-xl bg-blue-600 border-blue-400 rounded">
+                TĂNG TỐC &rarr;
+            </button>
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/95">
+        <div class="dashboard p-12 text-center max-w-2xl w-full mx-4 border-yellow-500">
+            <div class="text-7xl mb-4">🏆</div>
+            <h2 class="race-font text-5xl text-yellow-400 mb-4">NHÀ VÔ ĐỊCH!</h2>
+            <p class="text-xl text-white mb-8">Bạn đã cán đích với thành tích xuất sắc.</p>
+            
+            <div class="bg-gray-800 p-6 rounded border border-gray-600 inline-block mb-8 w-full">
+                <div class="text-sm text-gray-400 uppercase mb-2 tracking-widest">Tốc độ tối đa</div>
+                <div class="text-7xl font-bold text-white race-font" id="final-score">0</div>
+            </div>
+
+            <div>
+                <button onclick="location.reload()" class="btn-race px-10 py-4 text-xl w-full rounded">
+                    ĐUA LẠI
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Overlay -->
+    <div id="feedback-overlay" class="fixed inset-0 pointer-events-none flex justify-center items-center z-50">
+        <div id="feedback-emoji" class="text-9xl opacity-0 transform scale-0 transition-all duration-300"></div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+    <script>
+        // --- DATA ---
+        // 15 Questions: Math 8 Chapter 1 Lesson 6 (Adding & Subtracting Algebraic Fractions)
+        // Levels: 6 NB, 5 TH, 3 VD, 1 VDC
+       const questions = [
+    // LEVEL 1: NHẬN BIẾT (6 câu)
+    {
+        q: "Muốn cộng hai phân thức có cùng mẫu thức, ta làm thế nào?",
+        a: [
+            "Cộng tử với tử, cộng mẫu với mẫu",
+            "Cộng tử với tử, giữ nguyên mẫu",
+            "Nhân tử với tử, giữ nguyên mẫu",
+            "Giữ nguyên tử, cộng mẫu với mẫu"
+        ],
+        // ĐÚNG: B
+        correct: 1,
+        rationale: "Quy tắc: A/M + B/M = (A+B)/M.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Kết quả của phép cộng <div class='fraction'><span class='numerator'>2x</span><span class='denominator'>x+1</span></div> + <div class='fraction'><span class='numerator'>2</span><span class='denominator'>x+1</span></div> là:",
+        a: [
+            "<div class='fraction'><span class='numerator'>2x+2</span><span class='denominator'>x+1</span></div>",
+            "<div class='fraction'><span class='numerator'>2x</span><span class='denominator'>x+1</span></div>",
+            "1",
+            "2"
+        ],
+        // ĐÚNG: D
+        correct: 3,
+        rationale: "Cộng tử: 2x + 2 = 2(x+1).<br>Phân thức: 2(x+1)/(x+1) = 2.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Muốn trừ hai phân thức khác mẫu, bước đầu tiên là gì?",
+        a: [
+            "Quy đồng mẫu thức",
+            "Trừ tử cho tử",
+            "Nhân chéo",
+            "Rút gọn tử"
+        ],
+        // ĐÚNG: A
+        correct: 0,
+        rationale: "Để cộng hoặc trừ phân thức khác mẫu, ta phải quy đồng mẫu thức để đưa về cùng mẫu.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Mẫu thức chung của hai phân thức <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2x</span></div> và <div class='fraction'><span class='numerator'>1</span><span class='denominator'>x<sup>2</sup></span></div> là:",
+        a: [
+            "2x",
+            "x<sup>3</sup>",
+            "2x<sup>2</sup>",
+            "2x<sup>3</sup>"
+        ],
+        // ĐÚNG: C
+        correct: 2,
+        rationale: "BSCNN của hệ số (2, 1) là 2. Lũy thừa cao nhất của x là x<sup>2</sup>. MTC = 2x<sup>2</sup>.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Phân thức đối của phân thức <div class='fraction'><span class='numerator'>x - 1</span><span class='denominator'>x</span></div> là:",
+        a: [
+            "<div class='fraction'><span class='numerator'>1 - x</span><span class='denominator'>x</span></div>",
+            "<div class='fraction'><span class='numerator'>x - 1</span><span class='denominator'>-x</span></div>",
+            "Cả A và B đều đúng",
+            "<div class='fraction'><span class='numerator'>x + 1</span><span class='denominator'>x</span></div>"
+        ],
+        // ĐÚNG: C
+        correct: 2,
+        rationale: "-(x-1)/x = (1-x)/x = (x-1)/(-x).",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Phép tính <div class='fraction'><span class='numerator'>3x</span><span class='denominator'>5y</span></div> - <div class='fraction'><span class='numerator'>x</span><span class='denominator'>5y</span></div> bằng:",
+        a: [
+            "<div class='fraction'><span class='numerator'>4x</span><span class='denominator'>5y</span></div>",
+            "<div class='fraction'><span class='numerator'>2x</span><span class='denominator'>5y</span></div>",
+            "<div class='fraction'><span class='numerator'>2x</span><span class='denominator'>0</span></div>",
+            "<div class='fraction'><span class='numerator'>3x</span><span class='denominator'>5y</span></div>"
+        ],
+        // ĐÚNG: B
+        correct: 1,
+        rationale: "Cùng mẫu 5y. Tử: 3x - x = 2x. Kết quả: 2x/5y.",
+        level: "NHẬN BIẾT"
+    },
+
+    // LEVEL 2: THÔNG HIỂU (5 câu)
+    {
+        q: "Thực hiện phép tính: <div class='fraction'><span class='numerator'>3</span><span class='denominator'>x</span></div> + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2x</span></div>",
+        a: [
+            "<div class='fraction'><span class='numerator'>7</span><span class='denominator'>2x</span></div>",
+            "<div class='fraction'><span class='numerator'>4</span><span class='denominator'>2x</span></div>",
+            "<div class='fraction'><span class='numerator'>4</span><span class='denominator'>3x</span></div>",
+            "<div class='fraction'><span class='numerator'>6</span><span class='denominator'>2x</span></div>"
+        ],
+        // ĐÚNG: A
+        correct: 0,
+        rationale: "MTC = 2x. <br>3/x = 6/2x.<br>6/2x + 1/2x = 7/2x.",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Kết quả của <div class='fraction'><span class='numerator'>1</span><span class='denominator'>x - 1</span></div> - <div class='fraction'><span class='numerator'>1</span><span class='denominator'>1 - x</span></div> là:",
+        a: [
+            "0",
+            "<div class='fraction'><span class='numerator'>2</span><span class='denominator'>1 - x</span></div>",
+            "1",
+            "<div class='fraction'><span class='numerator'>2</span><span class='denominator'>x - 1</span></div>"
+        ],
+        // ĐÚNG: D
+        correct: 3,
+        rationale: "1 - x = -(x - 1).<br>Phép tính trở thành: 1/(x-1) - (-1/(x-1)) = 1/(x-1) + 1/(x-1) = 2/(x-1).",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Cộng hai phân thức: <div class='fraction'><span class='numerator'>x + 1</span><span class='denominator'>x - 2</span></div> + <div class='fraction'><span class='numerator'>x - 5</span><span class='denominator'>x - 2</span></div>",
+        a: [
+            "<div class='fraction'><span class='numerator'>2x - 4</span><span class='denominator'>x - 2</span></div>",
+            "2",
+            "<div class='fraction'><span class='numerator'>2x + 6</span><span class='denominator'>x - 2</span></div>",
+            "x"
+        ],
+        // ĐÚNG: B
+        correct: 1,
+        rationale: "Tử: (x+1) + (x-5) = 2x - 4 = 2(x-2).<br>Chia cho mẫu (x-2), ta được 2.",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Tìm phân thức P biết: P + <div class='fraction'><span class='numerator'>2</span><span class='denominator'>x</span></div> = <div class='fraction'><span class='numerator'>3x + 2</span><span class='denominator'>x</span></div>",
+        a: [
+            "3",
+            "<div class='fraction'><span class='numerator'>3x</span><span class='denominator'>2</span></div>",
+            "3x",
+            "<div class='fraction'><span class='numerator'>3x + 4</span><span class='denominator'>x</span></div>"
+        ],
+        // ĐÚNG: A
+        correct: 0,
+        rationale: "P = (3x+2)/x - 2/x = (3x+2-2)/x = 3x/x = 3.",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Kết quả rút gọn của <div class='fraction'><span class='numerator'>x</span><span class='denominator'>x + y</span></div> + <div class='fraction'><span class='numerator'>y</span><span class='denominator'>x + y</span></div> là:",
+        a: [
+            "x + y",
+            "2",
+            "1",
+            "0"
+        ],
+        // ĐÚNG: C
+        correct: 2,
+        rationale: "(x + y) / (x + y) = 1.",
+        level: "THÔNG HIỂU"
+    },
+
+    // LEVEL 3: VẬN DỤNG (3 câu)
+    {
+        q: "Thực hiện phép tính: <div class='fraction'><span class='numerator'>1</span><span class='denominator'>x<sup>2</sup> - 1</span></div> - <div class='fraction'><span class='numerator'>1</span><span class='denominator'>x - 1</span></div>",
+        a: [
+            "<div class='fraction'><span class='numerator'>x</span><span class='denominator'>x<sup>2</sup> - 1</span></div>",
+            "<div class='fraction'><span class='numerator'>2 - x</span><span class='denominator'>x<sup>2</sup> - 1</span></div>",
+            "<div class='fraction'><span class='numerator'>-1</span><span class='denominator'>x + 1</span></div>",
+            "<div class='fraction'><span class='numerator'>-x</span><span class='denominator'>x<sup>2</sup> - 1</span></div>"
+        ],
+        // ĐÚNG: D  (kết quả -x/(x²-1))
+        correct: 3,
+        rationale: "MTC = x^2 - 1 = (x-1)(x+1).<br>1/(x-1) = (x+1)/(x^2-1).<br>Vậy: 1/(x^2-1) - 1/(x-1) = 1/(x^2-1) - (x+1)/(x^2-1) = -x/(x^2-1).",
+        level: "VẬN DỤNG"
+    },
+    {
+        q: "(Thực tế) Một vòi nước chảy vào bể trong x giờ. Vòi thứ hai chảy vào bể trong y giờ. Nếu mở cả hai vòi cùng lúc, trong 1 giờ chảy được bao nhiêu phần bể?",
+        a: [
+            "<div class='fraction'><span class='numerator'>x + y</span><span class='denominator'>xy</span></div>",
+            "<div class='fraction'><span class='numerator'>xy</span><span class='denominator'>x + y</span></div>",
+            "<div class='fraction'><span class='numerator'>1</span><span class='denominator'>x + y</span></div>",
+            "x + y"
+        ],
+        // ĐÚNG: A
+        correct: 0,
+        rationale: "Vòi 1: 1/x bể/giờ. Vòi 2: 1/y bể/giờ.<br>Tổng: 1/x + 1/y = (y+x)/xy.",
+        level: "VẬN DỤNG"
+    },
+    {
+        q: "Kết quả của phép tính <div class='fraction'><span class='numerator'>1</span><span class='denominator'>x - 2</span></div> + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>x + 2</span></div> + <div class='fraction'><span class='numerator'>x<sup>2</sup></span><span class='denominator'>x<sup>2</sup> - 4</span></div> là:",
+        a: [
+            "<div class='fraction'><span class='numerator'>x + 2</span><span class='denominator'>x - 2</span></div>",
+            "<div class='fraction'><span class='numerator'>x</span><span class='denominator'>x - 2</span></div>",
+            "<div class='fraction'><span class='numerator'>x<sup>2</sup> + 2x</span><span class='denominator'>x<sup>2</sup> - 4</span></div>",
+            "<div class='fraction'><span class='numerator'>x</span><span class='denominator'>x + 2</span></div>"
+        ],
+        // ĐÚNG: B
+        correct: 1,
+        rationale: "MTC: x^2 - 4 = (x-2)(x+2).<br>Tử: (x+2) + (x-2) + x^2 = 2x + x^2 = x(x+2).<br>Phân thức: x(x+2) / [(x-2)(x+2)] = x / (x-2).",
+        level: "VẬN DỤNG"
+    },
+
+    // LEVEL 4: VẬN DỤNG CAO (1 câu)
+    {
+        q: "Tìm các giá trị nguyên của x để biểu thức A = <div class='fraction'><span class='numerator'>2x + 1</span><span class='denominator'>x - 1</span></div> + <div class='fraction'><span class='numerator'>3</span><span class='denominator'>x - 1</span></div> có giá trị nguyên.",
+        a: [
+            "x &isin; {0; 2}",
+            "x &isin; {-3; -1; 3; 5}",
+            "x &isin; {-5; -2; -1; 0; 2; 3; 4; 7}",
+            "x &isin; {-2; 4}"
+        ],
+        // ĐÚNG: C
+        correct: 2,
+        rationale: "A = (2x+4)/(x-1) = 2 + 6/(x-1).<br>Để A nguyên, (x-1) là ước của 6: &plusmn;1, &plusmn;2, &plusmn;3, &plusmn;6.<br>Suy ra x &isin; {-5; -2; -1; 0; 2; 3; 4; 7}.",
+        level: "VẬN DỤNG CAO"
+    }
+];
+
+        // --- GAME LOGIC ---
+        let currentQIndex = 0;
+        let score = 0;
+        
+        // Audio Setup
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'rev') { // Engine rev
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(50, now);
+                osc.frequency.linearRampToValueAtTime(150, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'correct') { // Checkpoint chime
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now); 
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'wrong') { // Tire screech
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.4);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'win') { // Victory
+                [523, 659, 783, 1046].forEach((f, i) => {
+                    setTimeout(() => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.value = f;
+                        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                        o.start();
+                        o.stop(audioCtx.currentTime + 0.5);
+                    }, i * 150);
+                });
+            }
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+            
+            playSound('rev');
+            currentQIndex = 0;
+            score = 0;
+            updateUI();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQIndex];
+            
+            document.getElementById('q-number').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerHTML = q.q;
+            
+            // Level Badge Color
+            const badge = document.getElementById('level-badge');
+            badge.innerText = q.level;
+            if (q.level === "NHẬN BIẾT") badge.className = "absolute top-0 right-0 bg-green-600 text-white px-4 py-1 text-xs font-bold rounded-bl-lg";
+            else if (q.level === "THÔNG HIỂU") badge.className = "absolute top-0 right-0 bg-blue-600 text-white px-4 py-1 text-xs font-bold rounded-bl-lg";
+            else if (q.level === "VẬN DỤNG CAO") badge.className = "absolute top-0 right-0 bg-red-600 text-white px-4 py-1 text-xs font-bold rounded-bl-lg";
+            else badge.className = "absolute top-0 right-0 bg-purple-600 text-white px-4 py-1 text-xs font-bold rounded-bl-lg";
+
+            // Reset Log
+            const logBox = document.getElementById('pit-stop-log');
+            logBox.classList.remove('show');
+            document.getElementById('next-btn-container').classList.add('hidden');
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            q.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-race w-full p-4 rounded min-h-[80px]";
+                btn.innerHTML = opt;
+                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                grid.appendChild(btn);
+            });
+
+            // Move cars
+            document.getElementById('player-car').style.left = '100px';
+            document.getElementById('player-car').classList.remove('nitro-boost');
+        }
+
+       function handleAnswer(selected, correct, btn) {
+    // Chỉ khóa các nút đáp án trong khung lựa chọn
+    const btns = document.querySelectorAll('#options-grid .btn-race');
+    btns.forEach(b => b.disabled = true);
+
+    const q = questions[currentQIndex];
+    const logBox = document.getElementById('pit-stop-log');
+    const content = document.getElementById('log-content');
+    
+    content.innerHTML = q.rationale;
+    logBox.classList.add('show');
+
+    if (selected === correct) {
+        btn.classList.add('correct');
+        score += 100;
+        playSound('correct');
+        showFeedback("🏎️💨"); 
+        fireConfetti(30);
+        
+        // Move Player Car
+        document.getElementById('player-car').style.left = 'calc(100% - 200px)';
+        document.getElementById('player-car').classList.add('nitro-boost');
+    } else {
+        btn.classList.add('wrong');
+        btns[correct].classList.add('correct');
+        playSound('wrong');
+        showFeedback("💥");
+        
+        // Opponent moves ahead
+        document.getElementById('opponent').style.left = 'calc(100% - 200px)';
+    }
+
+    updateUI();
+    document.getElementById('next-btn-container').classList.remove('hidden');
+}
+
+            updateUI();
+            document.getElementById('next-btn-container').classList.remove('hidden');
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score;
+            const progress = ((currentQIndex + 1) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        function showFeedback(emoji) {
+            const el = document.getElementById('feedback-emoji');
+            el.innerText = emoji;
+            el.style.opacity = '1';
+            el.style.transform = 'scale(1.5)';
+            
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transform = 'scale(0)';
+            }, 800);
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < questions.length) {
+                playSound('rev');
+                // Reset opponent pos
+                document.getElementById('opponent').style.left = '10%';
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score + " km/h";
+            playSound('win');
+            setInterval(() => fireConfetti(50), 1000);
+        }
+
+        // --- CONFETTI ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+
+        function fireConfetti(amount) {
+            for (let i = 0; i < amount; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20,
+                    life: 100,
+                    size: Math.random() * 5 + 2,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`
+                });
+            }
+            if(particles.length <= amount) requestAnimationFrame(animateParticles);
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.2;
+                p.life--;
+                
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+    </script>
+</body>
+</html>
