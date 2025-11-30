@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuộc Xâm Lăng Ngoài Trái Đất - Toán 8</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Share+Tech+Mono&display=swap');
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: #000;
+            color: #0f0;
+            overflow: hidden;
+            margin: 0;
+            user-select: none;
+        }
+
+        .sci-fi-font {
+            font-family: 'Black Ops One', cursive;
+        }
+
+        /* --- Space Background --- */
+        #space {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* --- Game Elements --- */
+        #game-area {
+            position: relative;
+            width: 100%;
+            height: 40vh;
+            overflow: hidden;
+            border-bottom: 2px solid #0f0;
+            background: rgba(0, 20, 0, 0.2);
+        }
+
+        #earth-base {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 80px;
+            background: url('https://img.icons8.com/color/96/space-shuttle.png') no-repeat center bottom;
+            background-size: contain;
+            z-index: 10;
+            filter: drop-shadow(0 0 10px #0f0);
+        }
+
+        .alien-ship {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 5rem;
+            transition: all 0.5s ease;
+            filter: drop-shadow(0 0 15px #f00);
+            animation: hover 3s ease-in-out infinite;
+        }
+
+        @keyframes hover {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(20px); }
+        }
+
+        .laser-beam {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            width: 6px;
+            height: 20px;
+            background: #0f0;
+            box-shadow: 0 0 10px #fff, 0 0 20px #0f0;
+            transform: translateX(-50%);
+            z-index: 5;
+        }
+
+        .explosion {
+            position: absolute;
+            font-size: 6rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: expand 0.5s forwards;
+        }
+
+        @keyframes expand {
+            0% { opacity: 1; transform: translateX(-50%) scale(0.5); }
+            100% { opacity: 0; transform: translateX(-50%) scale(2); }
+        }
+
+        /* --- UI Panels --- */
+        .panel {
+            background: rgba(0, 20, 0, 0.9);
+            border: 2px solid #0f0;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .btn-option {
+            background: #001a00;
+            border: 1px solid #004d00;
+            color: #0f0;
+            transition: all 0.2s;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-option:hover {
+            background: #003300;
+            border-color: #0f0;
+            box-shadow: 0 0 10px #0f0;
+            transform: translateX(5px);
+        }
+
+        .btn-option.correct {
+            background: #004d00 !important;
+            border-color: #00ff00 !important;
+            box-shadow: inset 0 0 20px #00ff00;
+        }
+
+        .btn-option.wrong {
+            background: #4d0000 !important;
+            border-color: #ff0000 !important;
+            box-shadow: inset 0 0 20px #ff0000;
+            color: #ffaaaa;
+        }
+
+        /* --- Math Display --- */
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 2px;
+            font-size: 0.9em;
+        }
+        .fraction > span { display: block; padding: 0.1em; }
+        .fraction span.numerator { border-bottom: 1px solid currentColor; }
+        .fraction span.denominator { border-top: 1px solid transparent; }
+
+        /* --- Explanation Box --- */
+        #data-log {
+            background: rgba(0, 20, 0, 0.95);
+            border-left: 4px solid #00ff00;
+            color: #ccffcc;
+            transition: all 0.5s ease;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        #data-log.show {
+            max-height: 400px;
+            opacity: 1;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+        }
+
+        /* --- Feedback --- */
+        #feedback-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .emoji-feedback {
+            font-size: 8rem;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .emoji-feedback.show { opacity: 1; transform: scale(1); }
+
+        /* --- Shake Animation for Wrong Answer --- */
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-2 md:p-4">
+
+    <!-- Space Background -->
+    <div id="space"></div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-95">
+        <div class="panel p-8 text-center max-w-2xl w-full mx-4 border-4 border-green-500 shadow-[0_0_50px_rgba(0,255,0,0.5)]">
+            <h1 class="sci-fi-font text-5xl md:text-7xl text-green-400 mb-2 animate-pulse">ALIEN INVASION</h1>
+            <h2 class="text-xl md:text-2xl text-green-200 mb-6 tracking-widest uppercase">Nhân Chia Phân Thức</h2>
+            
+            <p class="text-lg text-green-100 mb-8 leading-relaxed font-mono">
+                <span class="text-red-500 font-bold">CẢNH BÁO!</span> Hạm đội người ngoài hành tinh đang tiến vào bầu khí quyển.<br>
+                Hệ thống phòng thủ chỉ hoạt động bằng <span class="text-yellow-400 font-bold">Phép Tính Nhân Chia</span>.<br>
+                Hãy trả lời đúng 15 câu hỏi để kích hoạt pháo Laser!
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 text-left border border-green-800 p-4 rounded mb-8 bg-black/50">
+                <div class="text-green-400">Target 1: 6 Câu Nhận Biết</div>
+                <div class="text-blue-400">Target 2: 5 Câu Thông Hiểu</div>
+                <div class="text-yellow-400">Target 3: 3 Câu Vận Dụng</div>
+                <div class="text-red-500">Target 4: 1 Câu Vận Dụng Cao</div>
+            </div>
+
+            <button onclick="startGame()" class="px-10 py-4 bg-green-900 hover:bg-green-700 text-green-100 font-bold rounded text-2xl border-2 border-green-500 shadow-[0_0_20px_#0f0] transition hover:scale-105 sci-fi-font tracking-widest">
+                KÍCH HOẠT HỆ THỐNG
+            </button>
+        </div>
+    </div>
+
+    <!-- Game UI -->
+    <div id="game-screen" class="hidden flex-col w-full max-w-5xl mx-auto h-full justify-between">
+        
+        <!-- Header Info -->
+        <div class="flex justify-between items-end mb-2 px-2">
+            <div>
+                <div class="text-xs text-green-600 uppercase">Cấp độ ưu tiên</div>
+                <div id="level-badge" class="font-bold text-green-400 text-lg">NHẬN BIẾT</div>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-green-600 uppercase">Điểm số</div>
+                <div class="text-3xl font-bold text-yellow-400 font-mono" id="score">0000</div>
+            </div>
+        </div>
+
+        <!-- Visual Game Area -->
+        <div id="game-area" class="rounded-xl relative mb-4">
+            <div id="alien" class="alien-ship">🛸</div>
+            <div id="earth-base"></div>
+            <!-- Laser and explosions will be injected here -->
+        </div>
+
+        <!-- Question Panel -->
+        <div class="panel p-4 md:p-6 mb-4 relative min-h-[160px] flex flex-col justify-center">
+            <div class="absolute top-0 right-0 bg-green-900 text-green-100 px-3 py-1 text-xs font-bold rounded-bl border-b border-l border-green-500">
+                CÂU <span id="q-number">1</span>/15
+            </div>
+            <div id="question-text" class="text-xl md:text-2xl font-medium leading-relaxed text-center text-green-100">
+                Đang tải dữ liệu mục tiêu...
+            </div>
+        </div>
+
+        <!-- Explanation (Data Log) -->
+        <div id="data-log" class="rounded shadow-lg">
+            <div class="text-green-400 font-bold mb-2 border-b border-green-900 pb-1 tracking-wide flex items-center gap-2">
+                <span>📂</span> PHÂN TÍCH DỮ LIỆU:
+            </div>
+            <div id="log-content" class="text-green-100 leading-relaxed text-lg"></div>
+        </div>
+
+        <!-- Options -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            <!-- Buttons injected by JS -->
+        </div>
+        
+        <!-- Next Button -->
+        <div id="next-btn-container" class="hidden text-center pb-4">
+            <button onclick="nextQuestion()" class="px-10 py-3 bg-blue-900 hover:bg-blue-700 text-white font-bold rounded shadow-lg border border-blue-500">
+                MỤC TIÊU TIẾP THEO &rarr;
+            </button>
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-95">
+        <div class="panel p-10 text-center max-w-2xl w-full border-4 border-yellow-500 shadow-[0_0_50px_rgba(255,215,0,0.5)]">
+            <div class="text-8xl mb-4 animate-bounce">🏆</div>
+            <h2 class="sci-fi-font text-5xl text-yellow-400 mb-4">NHIỆM VỤ HOÀN THÀNH!</h2>
+            <p class="text-xl text-green-200 mb-6">Trái Đất đã được bảo vệ an toàn.</p>
+            
+            <div class="inline-block bg-green-900/50 p-4 rounded mb-8 border border-green-500">
+                <div class="text-sm text-green-400 uppercase">Tổng điểm đạt được</div>
+                <div class="text-6xl font-bold text-white font-mono" id="final-score">0</div>
+            </div>
+
+            <div>
+                <button onclick="location.reload()" class="px-8 py-3 bg-blue-900 hover:bg-blue-700 text-white font-bold rounded shadow-lg border border-blue-500">
+                    CHƠI LẠI
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Overlay -->
+    <div id="feedback-overlay">
+        <div id="feedback-emoji" class="emoji-feedback">🚀</div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+    <script>
+        // --- GAME DATA ---
+        // 15 Questions: Chapter 1 Lesson 7 Math 8 (Mult/Div Algebraic Fractions)
+        // No $ symbols. Using HTML entities.
+       const questions = [
+    // LEVEL 1: NHẬN BIẾT (6 câu)
+    {
+        q: "Muốn nhân hai phân thức, ta thực hiện như thế nào?",
+        a: [
+            "Nhân tử với mẫu, mẫu với tử",
+            "Nhân tử với tử, mẫu với mẫu",
+            "Quy đồng mẫu rồi nhân tử",
+            "Giữ nguyên mẫu, nhân các tử"
+        ],
+        // ĐÚNG: B
+        correct: 1,
+        rationale: "Quy tắc: <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> . <div class='fraction'><span class='numerator'>C</span><span class='denominator'>D</span></div> = <div class='fraction'><span class='numerator'>A.C</span><span class='denominator'>B.D</span></div>.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Phân thức nghịch đảo của phân thức <div class='fraction'><span class='numerator'>x - 2</span><span class='denominator'>x + 1</span></div> (với x &ne; 2, x &ne; -1) là:",
+        a: [
+            "<div class='fraction'><span class='numerator'>-(x - 2)</span><span class='denominator'>x + 1</span></div>",
+            "<div class='fraction'><span class='numerator'>x - 2</span><span class='denominator'>-(x + 1)</span></div>",
+            "<div class='fraction'><span class='numerator'>1</span><span class='denominator'>x - 2</span></div>",
+            "<div class='fraction'><span class='numerator'>x + 1</span><span class='denominator'>x - 2</span></div>"
+        ],
+        // ĐÚNG: D
+        correct: 3,
+        rationale: "Phân thức nghịch đảo của A/B là B/A.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Kết quả của phép tính <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> : <div class='fraction'><span class='numerator'>C</span><span class='denominator'>D</span></div> là:",
+        a: [
+            "<div class='fraction'><span class='numerator'>A.C</span><span class='denominator'>B.D</span></div>",
+            "<div class='fraction'><span class='numerator'>A.B</span><span class='denominator'>C.D</span></div>",
+            "<div class='fraction'><span class='numerator'>A.D</span><span class='denominator'>B.C</span></div>",
+            "<div class='fraction'><span class='numerator'>B.C</span><span class='denominator'>A.D</span></div>"
+        ],
+        // ĐÚNG: C
+        correct: 2,
+        rationale: "Chia là nhân với nghịch đảo: (A/B) . (D/C) = (A.D)/(B.C).",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Điều kiện để thực hiện phép chia <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> : <div class='fraction'><span class='numerator'>C</span><span class='denominator'>D</span></div> là:",
+        a: [
+            "C/D &ne; 0",
+            "A/B &ne; 0",
+            "A &ne; 0",
+            "D = 0"
+        ],
+        // ĐÚNG: A
+        correct: 0,
+        rationale: "Phân thức chia (số chia) phải khác 0.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Kết quả của phép tính <div class='fraction'><span class='numerator'>2x</span><span class='denominator'>3y</span></div> . <div class='fraction'><span class='numerator'>3y</span><span class='denominator'>2x</span></div> (với x, y &ne; 0) là:",
+        a: [
+            "0",
+            "1",
+            "x/y",
+            "2/3"
+        ],
+        // ĐÚNG: B
+        correct: 1,
+        rationale: "Tích của một phân thức và nghịch đảo của nó luôn bằng 1.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Lũy thừa tầng của phân thức: (<div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div>)<sup>n</sup> bằng:",
+        a: [
+            "<div class='fraction'><span class='numerator'>A.n</span><span class='denominator'>B.n</span></div>",
+            "<div class='fraction'><span class='numerator'>A<sup>n</sup></span><span class='denominator'>B</span></div>",
+            "<div class='fraction'><span class='numerator'>A<sup>n</sup></span><span class='denominator'>B<sup>n</sup></span></div>",
+            "<div class='fraction'><span class='numerator'>A</span><span class='denominator'>B<sup>n</sup></span></div>"
+        ],
+        // ĐÚNG: C
+        correct: 2,
+        rationale: "Lũy thừa của một thương bằng thương các lũy thừa.",
+        level: "NHẬN BIẾT"
+    },
+
+    // LEVEL 2: THÔNG HIỂU (5 câu)
+    {
+        q: "Thực hiện phép tính: <div class='fraction'><span class='numerator'>15x</span><span class='denominator'>7y<sup>3</sup></span></div> . <div class='fraction'><span class='numerator'>2y<sup>2</sup></span><span class='denominator'>x<sup>2</sup></span></div>",
+        a: [
+            "<div class='fraction'><span class='numerator'>30</span><span class='denominator'>7xy</span></div>",
+            "<div class='fraction'><span class='numerator'>30x</span><span class='denominator'>7y</span></div>",
+            "<div class='fraction'><span class='numerator'>15</span><span class='denominator'>14xy</span></div>",
+            "<div class='fraction'><span class='numerator'>30xy</span><span class='denominator'>7</span></div>"
+        ],
+        // ĐÚNG: A
+        correct: 0,
+        rationale: "Tử: 15x . 2y<sup>2</sup> = 30xy<sup>2</sup>. Mẫu: 7y<sup>3</sup> . x<sup>2</sup> = 7x<sup>2</sup>y<sup>3</sup>.<br>Rút gọn: 30xy<sup>2</sup> / 7x<sup>2</sup>y<sup>3</sup> = 30 / 7xy.",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Kết quả của phép nhân <div class='fraction'><span class='numerator'>x<sup>2</sup> - 4</span><span class='denominator'>3x</span></div> . <div class='fraction'><span class='numerator'>6</span><span class='denominator'>x + 2</span></div> là:",
+        a: [
+            "<div class='fraction'><span class='numerator'>2(x + 2)</span><span class='denominator'>x</span></div>",
+            "<div class='fraction'><span class='numerator'>x - 2</span><span class='denominator'>2x</span></div>",
+            "2",
+            "<div class='fraction'><span class='numerator'>2(x - 2)</span><span class='denominator'>x</span></div>"
+        ],
+        // ĐÚNG: D
+        correct: 3,
+        rationale: "Phân tích: x<sup>2</sup>-4 = (x-2)(x+2).<br>Biểu thức = <div class='fraction'><span class='numerator'>(x-2)(x+2).6</span><span class='denominator'>3x(x+2)</span></div> = <div class='fraction'><span class='numerator'>2(x-2)</span><span class='denominator'>x</span></div>.",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Thực hiện phép chia: <div class='fraction'><span class='numerator'>5x</span><span class='denominator'>2y</span></div> : <div class='fraction'><span class='numerator'>10x<sup>2</sup></span><span class='denominator'>6y</span></div>",
+        a: [
+            "<div class='fraction'><span class='numerator'>3x</span><span class='denominator'>2</span></div>",
+            "<div class='fraction'><span class='numerator'>3</span><span class='denominator'>2x</span></div>",
+            "<div class='fraction'><span class='numerator'>2</span><span class='denominator'>3x</span></div>",
+            "<div class='fraction'><span class='numerator'>3</span><span class='denominator'>x</span></div>"
+        ],
+        // ĐÚNG: B
+        correct: 1,
+        rationale: "= <div class='fraction'><span class='numerator'>5x</span><span class='denominator'>2y</span></div> . <div class='fraction'><span class='numerator'>6y</span><span class='denominator'>10x<sup>2</sup></span></div> = <div class='fraction'><span class='numerator'>30xy</span><span class='denominator'>20x<sup>2</sup>y</span></div> = <div class='fraction'><span class='numerator'>3</span><span class='denominator'>2x</span></div>.",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Rút gọn biểu thức <div class='fraction'><span class='numerator'>x - 1</span><span class='denominator'>x</span></div> . <div class='fraction'><span class='numerator'>x<sup>2</sup></span><span class='denominator'>1 - x</span></div>",
+        a: [
+            "x",
+            "1",
+            "-x",
+            "-1"
+        ],
+        // ĐÚNG: C
+        correct: 2,
+        rationale: "1 - x = -(x - 1).<br>Biểu thức = <div class='fraction'><span class='numerator'>(x-1)x<sup>2</sup></span><span class='denominator'>x . [-(x-1)]</span></div> = -x.",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Kết quả của phép tính <div class='fraction'><span class='numerator'>4x<sup>2</sup></span><span class='denominator'>5y<sup>2</sup></span></div> : <div class='fraction'><span class='numerator'>2x</span><span class='denominator'>5y</span></div> là:",
+        a: [
+            "<div class='fraction'><span class='numerator'>2x</span><span class='denominator'>y</span></div>",
+            "<div class='fraction'><span class='numerator'>2y</span><span class='denominator'>x</span></div>",
+            "<div class='fraction'><span class='numerator'>x</span><span class='denominator'>2y</span></div>",
+            "<div class='fraction'><span class='numerator'>y</span><span class='denominator'>2x</span></div>"
+        ],
+        // ĐÚNG: A
+        correct: 0,
+        rationale: "= <div class='fraction'><span class='numerator'>4x<sup>2</sup></span><span class='denominator'>5y<sup>2</sup></span></div> . <div class='fraction'><span class='numerator'>5y</span><span class='denominator'>2x</span></div> = <div class='fraction'><span class='numerator'>20x<sup>2</sup>y</span><span class='denominator'>10xy<sup>2</sup></span></div> = <div class='fraction'><span class='numerator'>2x</span><span class='denominator'>y</span></div>.",
+        level: "THÔNG HIỂU"
+    },
+
+    // LEVEL 3: VẬN DỤNG (3 câu)
+    {
+        q: "Rút gọn biểu thức P = <div class='fraction'><span class='numerator'>x<sup>2</sup> - 1</span><span class='denominator'>x + 2</span></div> . <div class='fraction'><span class='numerator'>x<sup>2</sup> + 4x + 4</span><span class='denominator'>x + 1</span></div>",
+        a: [
+            "(x + 1)(x - 2)",
+            "x<sup>2</sup> + 2",
+            "(x - 1)(x + 2)",
+            "x - 1"
+        ],
+        // ĐÚNG: C
+        correct: 2,
+        rationale: "P = <div class='fraction'><span class='numerator'>(x-1)(x+1) . (x+2)<sup>2</sup></span><span class='denominator'>(x+2)(x+1)</span></div> = (x-1)(x+2).",
+        level: "VẬN DỤNG"
+    },
+    {
+        q: "(Thực tế) Một hình chữ nhật có diện tích <div class='fraction'><span class='numerator'>3x<sup>2</sup> - 3x</span><span class='denominator'>x + 2</span></div> (cm<sup>2</sup>) và chiều rộng <div class='fraction'><span class='numerator'>3x</span><span class='denominator'>x + 2</span></div> (cm). Chiều dài hình chữ nhật là:",
+        a: [
+            "x + 1 (cm)",
+            "x - 1 (cm)",
+            "3(x - 1) (cm)",
+            "3x (cm)"
+        ],
+        // ĐÚNG: B
+        correct: 1,
+        rationale: "Chiều dài = Diện tích : Chiều rộng = <div class='fraction'><span class='numerator'>3x(x-1)</span><span class='denominator'>x+2</span></div> . <div class='fraction'><span class='numerator'>x+2</span><span class='denominator'>3x</span></div> = x - 1.",
+        level: "VẬN DỤNG"
+    },
+    {
+        q: "Một ca nô đi xuôi dòng với vận tốc v km/h. Thời gian đi hết quãng đường s km là <div class='fraction'><span class='numerator'>s</span><span class='denominator'>v</span></div>. Nếu vận tốc tăng gấp đôi và quãng đường giảm một nửa thì thời gian mới bằng bao nhiêu lần thời gian cũ?",
+        a: [
+            "1/4",
+            "1/2",
+            "4",
+            "2"
+        ],
+        // ĐÚNG: A
+        correct: 0,
+        rationale: "t_mới = (s/2) / (2v) = s / 4v = 1/4 . (s/v) = 1/4 t_cũ.",
+        level: "VẬN DỤNG"
+    },
+
+    // LEVEL 4: VẬN DỤNG CAO (1 câu)
+    {
+        q: "Tìm các giá trị nguyên dương của x để biểu thức P = <div class='fraction'><span class='numerator'>3(x-2)</span><span class='denominator'>x+2</span></div> nhận giá trị nguyên.",
+        a: [
+            "x &isin; {1; 5}",
+            "x &isin; {0; 1}",
+            "x &isin; {1; 2; 4; 10}",
+            "x &isin; {2; 4}"
+        ],
+        // ĐÚNG: C
+        correct: 2,
+        rationale: "P = 3 - 12/(x+2). Để P nguyên, x+2 là ước của 12.<br>x nguyên dương => x+2 &ge; 3.<br>x+2 &isin; {3; 4; 6; 12} => x &isin; {1; 2; 4; 10}.",
+        level: "VẬN DỤNG CAO"
+    }
+];
+
+        // --- GAME LOGIC ---
+        let currentQIndex = 0;
+        let score = 0;
+        let isAnswering = false;
+        
+        // Stars generation
+        const space = document.getElementById('space');
+        for(let i=0; i<100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = Math.random() * 3 + 'px';
+            star.style.height = star.style.width;
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 2 + 's';
+            space.appendChild(star);
+        }
+
+        // Audio System (Synthesized)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'laser') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(880, now);
+                osc.frequency.exponentialRampToValueAtTime(110, now + 0.2);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'explosion') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.exponentialRampToValueAtTime(0.01, now + 0.5);
+                gainNode.gain.setValueAtTime(0.5, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.3);
+                gainNode.gain.setValueAtTime(0.5, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, i) => {
+                    setTimeout(() => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'square';
+                        o.frequency.value = freq;
+                        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                        o.start();
+                        o.stop(audioCtx.currentTime + 0.3);
+                    }, i * 150);
+                });
+            }
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+            
+            currentQIndex = 0;
+            score = 0;
+            updateUI();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQIndex >= questions.length) {
+                endGame();
+                return;
+            }
+
+            const q = questions[currentQIndex];
+            
+            // Reset Alien
+            const alien = document.getElementById('alien');
+            alien.style.opacity = '1';
+            alien.style.transform = 'translateX(-50%)';
+            alien.innerText = getAlienSkin(currentQIndex);
+
+            // Update Text
+            document.getElementById('q-number').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerHTML = q.q;
+            document.getElementById('level-badge').innerText = q.level;
+            
+            // Level Color
+            const badge = document.getElementById('level-badge');
+            if (q.level.includes("NHẬN BIẾT")) badge.className = "font-bold text-green-400 text-lg";
+            else if (q.level.includes("THÔNG HIỂU")) badge.className = "font-bold text-blue-400 text-lg";
+            else if (q.level.includes("VẬN DỤNG CAO")) badge.className = "font-bold text-red-500 text-lg";
+            else badge.className = "font-bold text-yellow-400 text-lg";
+
+            // Reset Log
+            const logBox = document.getElementById('data-log');
+            logBox.classList.remove('show');
+            document.getElementById('next-btn-container').classList.add('hidden');
+
+            // Buttons
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            q.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-option w-full p-4 rounded text-lg font-medium shadow-lg min-h-[70px] font-mono";
+                btn.innerHTML = opt;
+                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                grid.appendChild(btn);
+            });
+
+            isAnswering = false;
+        }
+
+        function getAlienSkin(index) {
+            const aliens = ['🛸', '👽', '👾', '🤖', '🕷️', '🐙', '🛸', '🧟', '🦇', '🐉'];
+            return aliens[index % aliens.length];
+        }
+
+        function fireLaser() {
+            playSound('laser');
+            const gameArea = document.getElementById('game-area');
+            const laser = document.createElement('div');
+            laser.className = 'laser-beam';
+            gameArea.appendChild(laser);
+
+            // Animate laser
+            let pos = 60;
+            const interval = setInterval(() => {
+                pos += 20;
+                laser.style.bottom = pos + 'px';
+                if (pos > gameArea.offsetHeight - 50) {
+                    clearInterval(interval);
+                    laser.remove();
+                    createExplosion();
+                }
+            }, 16);
+        }
+
+        function createExplosion() {
+            playSound('explosion');
+            const gameArea = document.getElementById('game-area');
+            const alien = document.getElementById('alien');
+            
+            // Hide alien
+            alien.style.opacity = '0';
+
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            explosion.innerText = '💥';
+            explosion.style.top = '20px';
+            gameArea.appendChild(explosion);
+
+            setTimeout(() => explosion.remove(), 500);
+        }
+
+        function handleAnswer(selected, correct, btn) {
+            if (isAnswering) return;
+            isAnswering = true;
+
+            const allBtns = document.querySelectorAll('.btn-option');
+            
+            const q = questions[currentQIndex];
+            const logBox = document.getElementById('data-log');
+            const content = document.getElementById('log-content');
+            content.innerHTML = q.rationale;
+            logBox.classList.add('show');
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                score += 100;
+                
+                // Visual & Audio effects
+                fireLaser();
+                setTimeout(() => {
+                    playSound('correct');
+                    showFeedback("🎯");
+                    fireConfetti(30);
+                }, 400);
+
+            } else {
+                btn.classList.add('wrong');
+                allBtns[correct].classList.add('correct');
+                playSound('wrong');
+                showFeedback("⚠️");
+                
+                // Shake screen
+                document.getElementById('game-area').classList.add('shake');
+                setTimeout(() => document.getElementById('game-area').classList.remove('shake'), 500);
+            }
+
+            updateUI();
+            document.getElementById('next-btn-container').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < questions.length) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score.toString().padStart(4, '0');
+        }
+
+        function showFeedback(emoji) {
+            const el = document.getElementById('feedback-emoji');
+            el.innerText = emoji;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 1000);
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            playSound('win');
+            setInterval(() => fireConfetti(50), 1000);
+        }
+
+        // --- CONFETTI ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+
+        function fireConfetti(amount) {
+            for (let i = 0; i < amount; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20,
+                    life: 100,
+                    color: `hsl(${Math.random() * 120}, 100%, 50%)`, // Green spectrum
+                    size: Math.random() * 5 + 2
+                });
+            }
+            if(particles.length <= amount) requestAnimationFrame(updateConfetti);
+        }
+
+        function updateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+                
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) requestAnimationFrame(updateConfetti);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+    </script>
+</body>
+</html>
