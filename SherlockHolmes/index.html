@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thám Tử Sherlock - Toán 9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1c1c1c;
+            color: #dcdcdc;
+            overflow: hidden;
+            margin: 0;
+            user-select: none;
+        }
+
+        .detective-font {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* --- Background --- */
+        #london-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: 
+                linear-gradient(to bottom, rgba(20, 20, 20, 0.9), rgba(40, 30, 20, 0.8)),
+                url('https://www.transparenttextures.com/patterns/dark-brick-wall.png');
+            background-size: cover;
+        }
+
+        /* --- Fog Animation --- */
+        .fog-layer {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/img/fog1.png') repeat-x;
+            background-size: contain;
+            animation: drift 60s linear infinite;
+            opacity: 0.4;
+            z-index: -1;
+        }
+
+        @keyframes drift {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+
+        /* --- Game Panel (Case File) --- */
+        .case-file {
+            background: #fdfbf7;
+            color: #2c2c2c;
+            border: 1px solid #d4c5b0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 0 10px rgba(255,255,255,0.05);
+            position: relative;
+            transform: rotate(-1deg);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .case-file::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 40px; bottom: 0;
+            border-left: 2px solid #e0d0c0;
+        }
+
+        .paper-texture {
+            background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* --- Buttons --- */
+        .btn-clue {
+            background: #fff;
+            border: 2px solid #8b7355;
+            color: #4a3b2a;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .btn-clue:hover {
+            background: #f4e4bc;
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        .btn-clue.correct {
+            background: #e8f5e9 !important;
+            border-color: #2e7d32 !important;
+            color: #1b5e20 !important;
+        }
+
+        .btn-clue.wrong {
+            background: #ffebee !important;
+            border-color: #c62828 !important;
+            color: #b71c1c !important;
+            animation: shake 0.4s;
+        }
+
+        /* --- Notebook (Explanation) --- */
+        #notebook {
+            background: #3e3e3e;
+            color: #fff;
+            border-top: 4px solid #8b7355;
+            border-radius: 0 0 5px 5px;
+            transition: all 0.5s ease;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+
+        #notebook.show {
+            max-height: 400px; /* Expand enough for content */
+            opacity: 1;
+            padding: 1rem;
+            margin-top: 1rem;
+            overflow-y: auto;
+        }
+
+        /* --- Math Display --- */
+        .system-eq {
+            display: inline-flex;
+            flex-direction: column;
+            text-align: left;
+            border-left: 3px solid currentColor;
+            padding-left: 8px;
+            border-radius: 4px 0 0 4px;
+            vertical-align: middle;
+            line-height: 1.5;
+            font-style: italic;
+        }
+        
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 2px;
+            font-size: 0.9em;
+        }
+        .fraction > span { display: block; padding: 0.1em; }
+        .fraction span.numerator { border-bottom: 1px solid currentColor; }
+        .fraction span.denominator { border-top: 1px solid transparent; }
+
+        /* --- Animations --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* --- Stamp Effect --- */
+        .stamp {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg) scale(2);
+            border: 5px solid;
+            padding: 10px 20px;
+            font-family: 'Black Ops One', sans-serif;
+            text-transform: uppercase;
+            font-size: 3rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 50;
+        }
+        
+        .stamp.solved {
+            color: #2e7d32;
+            border-color: #2e7d32;
+            opacity: 0.8;
+            transform: translate(-50%, -50%) rotate(-15deg) scale(1);
+        }
+
+        .stamp.denied {
+            color: #c62828;
+            border-color: #c62828;
+            opacity: 0.8;
+            transform: translate(-50%, -50%) rotate(15deg) scale(1);
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div id="london-bg"></div>
+    <div class="fog-layer"></div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="case-file p-10 text-center w-full z-10">
+        <div class="paper-texture"></div>
+        <div class="relative z-10">
+            <h1 class="detective-font text-5xl md:text-7xl text-brown-900 mb-2" style="color: #3e2723;">VỤ ÁN BÓNG ĐÊM</h1>
+            <h2 class="text-xl text-gray-700 mb-6 font-bold tracking-widest uppercase border-b-2 border-gray-400 inline-block pb-1">Hồ sơ số: Math-9-CH1-03</h2>
+            
+            <p class="text-lg text-gray-800 mb-8 leading-relaxed font-serif italic max-w-2xl mx-auto">
+                "Thân gửi cộng sự. Moriarty đã để lại 15 hệ phương trình hóc búa để khóa chặt két sắt chứa tài liệu mật. 
+                Tôi cần khả năng suy luận sắc bén của cậu để giải mã chúng. Thời gian không còn nhiều!"
+                <br><br>
+                <b>- Sherlock Holmes -</b>
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 text-left bg-orange-50 p-4 rounded mb-8 border border-orange-200 text-gray-700 max-w-lg mx-auto">
+                <div>🔍 6 Câu Nhận Biết</div>
+                <div>💡 5 Câu Thông Hiểu</div>
+                <div>🗝️ 3 Câu Vận Dụng</div>
+                <div>🎩 1 Câu Vận Dụng Cao</div>
+            </div>
+
+            <button onclick="startGame()" class="btn-clue px-10 py-4 rounded text-2xl shadow-lg bg-gray-800 text-white hover:bg-gray-700 border-none transition transform hover:scale-105">
+                TIẾP NHẬN VỤ ÁN 🕵️‍♂️
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden w-full z-10 flex-col h-full justify-center max-w-4xl">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-4 px-2 text-gray-300">
+            <div class="bg-black/50 px-4 py-2 rounded border border-gray-600">
+                <span class="text-xs uppercase tracking-widest text-gray-400">Manh mối</span>
+                <div class="text-xl font-bold font-serif">#<span id="q-number">1</span>/15</div>
+            </div>
+            <div class="bg-black/50 px-4 py-2 rounded border border-gray-600">
+                <span class="text-xs uppercase tracking-widest text-gray-400">Uy tín</span>
+                <div class="text-xl font-bold text-yellow-500" id="score">0</div>
+            </div>
+        </div>
+
+        <!-- Question Panel -->
+        <div class="case-file p-8 mb-4 relative min-h-[200px] flex flex-col justify-center items-center text-center">
+            <div class="paper-texture"></div>
+            
+            <div id="level-badge" class="absolute top-0 right-0 bg-gray-800 text-white px-4 py-1 text-xs shadow font-bold z-10">NHẬN BIẾT</div>
+            
+            <div id="question-text" class="text-2xl font-bold text-gray-900 leading-relaxed relative z-10 detective-font">
+                Đang giải mã dữ liệu...
+            </div>
+
+            <!-- Stamps -->
+            <div id="stamp-solved" class="stamp solved">CHÍNH XÁC</div>
+            <div id="stamp-denied" class="stamp denied">SAI RỒI</div>
+        </div>
+
+        <!-- Explanation (Notebook) -->
+        <div id="notebook" class="mb-4 shadow-lg">
+            <div class="text-yellow-500 font-bold mb-2 border-b border-gray-600 pb-1 font-mono tracking-wide">📝 SỔ TAY GHI CHÉP:</div>
+            <div id="log-content" class="text-gray-300 font-light leading-relaxed text-sm md:text-base"></div>
+        </div>
+
+        <!-- Options -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <!-- Buttons injected here -->
+        </div>
+
+        <!-- Next Button -->
+        <div id="next-btn-container" class="hidden text-center pb-4">
+            <button onclick="nextQuestion()" class="px-8 py-3 bg-gray-800 hover:bg-gray-700 text-white font-bold rounded shadow-lg border border-gray-600 transition">
+                MANH MỐI TIẾP THEO &rarr;
+            </button>
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/90">
+        <div class="case-file p-12 text-center max-w-2xl w-full mx-4">
+            <div class="paper-texture"></div>
+            <div class="relative z-10">
+                <div class="text-6xl mb-4">💼</div>
+                <h2 class="detective-font text-5xl text-gray-900 mb-4">VỤ ÁN KHÉP LẠI!</h2>
+                <p class="text-xl text-gray-700 mb-6 italic">"Thật tuyệt vời! Két sắt đã mở, công lý đã được thực thi."</p>
+                
+                <div class="bg-gray-100 p-6 rounded border border-gray-300 inline-block mb-8 w-full shadow-inner">
+                    <div class="text-sm text-gray-500 uppercase mb-2">Điểm Thám Tử</div>
+                    <div class="text-6xl font-bold text-gray-800 font-mono" id="final-score">0</div>
+                </div>
+
+                <div>
+                    <button onclick="location.reload()" class="btn-clue px-8 py-3 rounded text-xl w-full bg-gray-800 text-white hover:bg-gray-700">
+                        NHẬN VỤ ÁN MỚI
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+    <script>
+        // --- DATA ---
+        // 15 câu: Giải hệ PT bậc nhất hai ẩn (Bài 3)
+        const questions = [
+            // LEVEL 1: NHẬN BIẾT (6 câu)
+            {
+                q: "Phương pháp nào sau đây <b>không</b> phải là phương pháp giải hệ phương trình bậc nhất hai ẩn?",
+                a: [
+                    "Phương pháp thế",
+                    "Phương pháp cộng đại số",
+                    "Phương pháp đồ thị",
+                    "Phương pháp khai căn"
+                ],
+                correct: 3, // D
+                rationale: "Hai phương pháp đại số chính là Thế và Cộng đại số. Ngoài ra có thể dùng đồ thị. 'Khai căn' không phải là phương pháp giải hệ này.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Từ phương trình x - y = 2, ta biểu diễn x theo y như thế nào?",
+                a: [
+                    "x = 2 - y",
+                    "x = y + 2",
+                    "x = y - 2",
+                    "y = x - 2"
+                ],
+                correct: 1, // B
+                rationale: "Chuyển -y sang vế phải đổi dấu thành +y: x = 2 + y (hay y + 2).",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Cho hệ phương trình <div class='system-eq'><span>x + y = 3 (1)</span><span>x - y = 1 (2)</span></div>. Khi cộng vế theo vế hai phương trình, ta được phương trình nào?",
+                a: [
+                    "2y = 2",
+                    "2x = 2",
+                    "2x = 4",
+                    "2y = 4"
+                ],
+                correct: 2, // C
+                rationale: "(x + x) + (y - y) = 3 + 1 &rarr; 2x = 4.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Cặp số nào sau đây là nghiệm của hệ <div class='system-eq'><span>x = 2</span><span>2x + y = 5</span></div>?",
+                a: [
+                    "(2; 1)",
+                    "(2; 3)",
+                    "(1; 2)",
+                    "(3; 2)"
+                ],
+                correct: 0, // A
+                rationale: "x = 2 đã biết. Thay vào pt 2: 2(2) + y = 5 &rarr; 4 + y = 5 &rarr; y = 1.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Để giải hệ <div class='system-eq'><span>x + 2y = 5</span><span>3x + 4y = 1</span></div> bằng phương pháp thế, bước đầu tiên nên làm gì?",
+                a: [
+                    "Rút y từ pt (1): y = (5-x)/2",
+                    "Rút x từ pt (2): x = (1-4y)/3",
+                    "Cộng hai phương trình",
+                    "Rút x từ pt (1): x = 5 - 2y"
+                ],
+                correct: 3, // D
+                rationale: "Nên rút ẩn có hệ số là 1 (hoặc -1) để tránh phân số. Ở đây x ở pt (1) có hệ số 1 là lựa chọn tốt nhất.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Hệ phương trình <div class='system-eq'><span>x + y = 2</span><span>x + y = 3</span></div> có bao nhiêu nghiệm?",
+                a: [
+                    "1 nghiệm duy nhất",
+                    "Vô nghiệm",
+                    "Vô số nghiệm",
+                    "2 nghiệm"
+                ],
+                correct: 1, // B
+                rationale: "Vế trái giống nhau (x+y) mà vế phải khác nhau (2 &ne; 3) nên hệ vô nghiệm (hai đường thẳng song song).",
+                level: "NHẬN BIẾT"
+            },
+
+            // LEVEL 2: THÔNG HIỂU (5 câu)
+            {
+                q: "Giải hệ phương trình <div class='system-eq'><span>x + y = 4</span><span>x - y = 0</span></div>.",
+                a: [
+                    "(4; 0)",
+                    "(4; 0)",
+                    "(2; 2)",
+                    "(2; -2)"
+                ],
+                // small adjustment: keep only one correct C, but avoid duplicate;
+                // I'll correct to a unique set:
+            }
+        ];
+    </script>
+</body>
+</html>
