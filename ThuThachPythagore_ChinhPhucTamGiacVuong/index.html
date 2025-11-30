@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thử Thách Pythagore: Chinh Phục Tam Giác Vuông</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Tùy chỉnh font cho tiếng Việt */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .quiz-container {
+            max-width: 900px;
+        }
+        .option-button {
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .option-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+        .correct-answer {
+            background-color: #4ade80 !important; /* green-400 */
+            color: #166534 !important; /* green-800 */
+            border-color: #16a34a !important; /* green-600 */
+        }
+        .incorrect-answer {
+            background-color: #fca5a5 !important; /* red-300 */
+            color: #b91c1c !important; /* red-700 */
+            border-color: #ef4444 !important; /* red-500 */
+        }
+        /* Hiệu ứng pháo hoa - Confetti */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: transparent;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .confetti-visible {
+            opacity: 1;
+            transition: none;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
+
+    <div id="quiz-app" class="quiz-container w-full bg-white p-6 md:p-10 rounded-xl shadow-2xl relative">
+        <h1 class="text-3xl font-bold text-center text-indigo-700 mb-6">Thử Thách Pythagore: Chinh Phục Tam Giác Vuông</h1>
+        <p id="difficulty-level" class="text-center text-sm font-medium text-gray-500 mb-4"></p>
+        
+        <!-- Khởi động/Kết quả -->
+        <div id="start-screen" class="text-center">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Chào mừng đến với Chương 3 - Định lý Pythagore (Toán 8)</h2>
+            <p class="mb-6 text-gray-600">Trắc nghiệm này gồm 15 câu hỏi được xây dựng theo 4 mức độ: Nhận biết (6), Thông hiểu (5), Vận dụng (3), Vận dụng cao (1).</p>
+            <p class="mb-8 text-gray-600 font-medium">Cùng nhau chinh phục kiến thức và nhận những lời chúc mừng đặc biệt khi trả lời đúng nhé!</p>
+            <button id="start-button" class="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300 transform hover:scale-105">Bắt Đầu Thử Thách</button>
+        </div>
+
+        <!-- Phần Quiz -->
+        <div id="quiz-content" class="hidden">
+            <div id="progress-bar" class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                <div id="progress" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+
+            <div id="question-card" class="bg-indigo-50 p-6 rounded-xl border-t-4 border-indigo-500 mb-6">
+                <p id="question-text" class="text-xl font-medium text-gray-800 mb-4"></p>
+                <div id="answer-options" class="space-y-3">
+                    <!-- Các nút trả lời sẽ được thêm vào đây -->
+                </div>
+            </div>
+
+            <!-- Giải thích (Rationale) -->
+            <div id="rationale-box" class="hidden p-4 mt-4 rounded-lg bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800">
+                <p class="font-semibold">Giải thích:</p>
+                <p id="rationale-text" class="mt-1 text-sm"></p>
+            </div>
+
+            <!-- Nút Tiếp theo -->
+            <button id="next-button" class="hidden w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 mt-6">Câu Tiếp Theo</button>
+        </div>
+
+        <!-- Màn hình kết quả -->
+        <div id="result-screen" class="hidden text-center">
+            <h2 class="text-3xl font-bold text-indigo-700 mb-4">Hoàn Thành Thử Thách!</h2>
+            <p class="text-5xl font-extrabold text-green-600 mb-6"><span id="score-display">0</span>/15</p>
+            <p id="result-message" class="text-xl text-gray-700 mb-8"></p>
+            <button id="restart-button" class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:bg-green-700 transition duration-300 transform hover:scale-105">Làm Lại</button>
+        </div>
+
+        <!-- Confetti Emitter -->
+        <div id="confetti-emitter"></div>
+    </div>
+
+    <script>
+        // Dữ liệu 15 câu hỏi
+        const quizQuestions = [
+            // --- 6 CÂU NHẬN BIẾT ---
+            {
+                level: "Nhận biết",
+                question: "Định lý Pythagore phát biểu rằng trong một tam giác vuông, bình phương độ dài cạnh huyền bằng tổng bình phương độ dài hai cạnh góc vuông. Công thức đúng là gì?",
+                options: [
+                    { text: "$a^2 + b^2 = c^2$", isCorrect: true, rationale: "Trong tam giác vuông, nếu $a$ và $b$ là độ dài hai cạnh góc vuông và $c$ là độ dài cạnh huyền, thì $a^2 + b^2 = c^2$." },
+                    { text: "$a + b = c$", isCorrect: false, rationale: "Định lý Pythagore liên quan đến bình phương độ dài các cạnh, không phải tổng trực tiếp." },
+                    { text: "$c^2 - a^2 = b^2$", isCorrect: false, rationale: "Công thức này đúng nhưng chưa phải là phát biểu chuẩn của định lý." },
+                    { text: "$2a + 2b = 2c$", isCorrect: false, rationale: "Đây là công thức chu vi (sai), không phải Định lý Pythagore." }
+                ],
+                hint: "Hãy nhớ Định lý Pythagore liên quan đến bình phương độ dài các cạnh."
+            },
+            {
+                level: "Nhận biết",
+                question: "Trong tam giác vuông $\\triangle ABC$ tại $A$, cạnh nào là cạnh huyền?",
+                options: [
+                    { text: "Cạnh $AB$", isCorrect: false, rationale: "Cạnh $AB$ là một trong hai cạnh góc vuông." },
+                    { text: "Cạnh $AC$", isCorrect: false, rationale: "Cạnh $AC$ là một trong hai cạnh góc vuông." },
+                    { text: "Cạnh $BC$", isCorrect: true, rationale: "Cạnh huyền là cạnh đối diện với góc vuông, trong trường hợp này là cạnh $BC$." },
+                    { text: "Cạnh $AH$ (với $H$ là chân đường cao)", isCorrect: false, rationale: "Cạnh $AH$ là đường cao, không phải cạnh huyền." }
+                ],
+                hint: "Cạnh huyền là cạnh dài nhất và đối diện với góc vuông."
+            },
+            {
+                level: "Nhận biết",
+                question: "Một tam giác vuông có độ dài hai cạnh góc vuông lần lượt là $3\\text{ cm}$ và $4\\text{ cm}$. Độ dài cạnh huyền là bao nhiêu?",
+                options: [
+                    { text: "$5\\text{ cm}$", isCorrect: true, rationale: "Áp dụng định lý Pythagore: $c^2 = 3^2 + 4^2 = 9 + 16 = 25$, suy ra $c = \\sqrt{25} = 5\\text{ cm}$." },
+                    { text: "$7\\text{ cm}$", isCorrect: false, rationale: "Đây là tổng trực tiếp của hai cạnh góc vuông ($3+4$), không phải cạnh huyền." },
+                    { text: "$25\\text{ cm}$", isCorrect: false, rationale: "Đây là bình phương độ dài cạnh huyền, không phải độ dài cạnh huyền." },
+                    { text: "$\\sqrt{7}\\text{ cm}$", isCorrect: false, rationale: "Đáp án này là $\\sqrt{3+4}$, là sai." }
+                ],
+                hint: "Sử dụng công thức $c = \\sqrt{a^2 + b^2}$."
+            },
+            {
+                level: "Nhận biết",
+                question: "Trong các bộ ba số sau, bộ ba nào là bộ ba Pythagore?",
+                options: [
+                    { text: "$(2, 3, 4)$", isCorrect: false, rationale: "$2^2 + 3^2 = 4 + 9 = 13 \\ne 4^2 = 16$." },
+                    { text: "$(5, 12, 13)$", isCorrect: true, rationale: "Kiểm tra: $5^2 + 12^2 = 25 + 144 = 169$, và $13^2 = 169$. Vậy $5^2 + 12^2 = 13^2$." },
+                    { text: "$(6, 8, 9)$", isCorrect: false, rationale: "$6^2 + 8^2 = 36 + 64 = 100 \\ne 9^2 = 81$." },
+                    { text: "$(1, 2, 3)$", isCorrect: false, rationale: "$1^2 + 2^2 = 1 + 4 = 5 \\ne 3^2 = 9$." }
+                ],
+                hint: "Một bộ ba Pythagore $(a, b, c)$ phải thỏa mãn $a^2 + b^2 = c^2$."
+            },
+            {
+                level: "Nhận biết",
+                question: "Cho $\\triangle MNP$ vuông tại $P$. Công thức tính độ dài cạnh góc vuông $MP$ theo hai cạnh còn lại là:",
+                options: [
+                    { text: "$MP^2 = MN^2 + NP^2$", isCorrect: false, rationale: "Đây là công thức tính cạnh huyền $MN$, không phải cạnh góc vuông $MP$." },
+                    { text: "$MP = MN - NP$", isCorrect: false, rationale: "Định lý Pythagore liên quan đến bình phương độ dài các cạnh." },
+                    { text: "$MP^2 = MN^2 - NP^2$", isCorrect: true, rationale: "Cạnh góc vuông $MP$ được tính bằng căn bậc hai của hiệu bình phương cạnh huyền $MN$ và cạnh góc vuông còn lại $NP$." },
+                    { text: "$MP^2 = NP^2 - MN^2$", isCorrect: false, rationale: "Bình phương cạnh huyền $MN$ phải lớn hơn bình phương cạnh góc vuông $NP$." }
+                ],
+                hint: "Cạnh góc vuông bằng căn bậc hai của hiệu bình phương cạnh huyền và bình phương cạnh góc vuông kia."
+            },
+            {
+                level: "Nhận biết",
+                question: "Tam giác có độ dài ba cạnh là $6\\text{ cm}$, $8\\text{ cm}$ và $10\\text{ cm}$ có phải là tam giác vuông không?",
+                options: [
+                    { text: "Là tam giác vuông", isCorrect: true, rationale: "Kiểm tra: $6^2 + 8^2 = 36 + 64 = 100$, và $10^2 = 100$. Vì $6^2 + 8^2 = 10^2$, nên đây là tam giác vuông theo Định lý Pythagore đảo." },
+                    { text: "Không là tam giác vuông", isCorrect: false, rationale: "Cần kiểm tra xem tổng bình phương hai cạnh nhỏ có bằng bình phương cạnh lớn nhất hay không." },
+                    { text: "Chỉ là tam giác nhọn", isCorrect: false, rationale: "Tam giác nhọn là tam giác có ba góc nhọn." },
+                    { text: "Chỉ là tam giác tù", isCorrect: false, rationale: "Tam giác tù là tam giác có một góc tù." }
+                ],
+                hint: "Sử dụng Định lý Pythagore đảo: kiểm tra xem $a^2 + b^2 = c^2$ có đúng không, với $c$ là cạnh lớn nhất."
+            },
+            // --- 5 CÂU THÔNG HIỂU ---
+            {
+                level: "Thông hiểu",
+                question: "Một tam giác vuông có hai cạnh góc vuông là $5\\text{ cm}$ và $6\\text{ cm}$. Độ dài cạnh huyền (làm tròn đến hàng phần mười) là:",
+                options: [
+                    { text: "$7,8\\text{ cm}$", isCorrect: true, rationale: "Tính toán: $c^2 = 5^2 + 6^2 = 25 + 36 = 61$. $c = \\sqrt{61} \\approx 7,81\\text{ cm}$. Làm tròn đến hàng phần mười là $7,8\\text{ cm}$." },
+                    { text: "$11\\text{ cm}$", isCorrect: false, rationale: "Đây là tổng trực tiếp của hai cạnh ($5+6$), là sai." },
+                    { text: "$7,1\\text{ cm}$", isCorrect: false, rationale: "Đây là $\\sqrt{5^2 + 4^2}$, nhầm lẫn trong tính toán." },
+                    { text: "$8,0\\text{ cm}$", isCorrect: false, rationale: "Làm tròn không chính xác." }
+                ],
+                hint: "Kết quả là một số vô tỉ, bạn cần tính căn bậc hai và làm tròn chính xác."
+            },
+            {
+                level: "Thông hiểu",
+                question: "Cho tam giác vuông có cạnh huyền dài $17\\text{ cm}$ và một cạnh góc vuông dài $8\\text{ cm}$. Độ dài cạnh góc vuông còn lại là:",
+                options: [
+                    { text: "$15\\text{ cm}$", isCorrect: true, rationale: "Áp dụng định lý Pythagore: $a^2 = c^2 - b^2 = 17^2 - 8^2 = 289 - 64 = 225$. Suy ra $a = \\sqrt{225} = 15\\text{ cm}$." },
+                    { text: "$9\\text{ cm}$", isCorrect: false, rationale: "Đây là hiệu trực tiếp của hai cạnh ($17-8$), là sai." },
+                    { text: "$12\\text{ cm}$", isCorrect: false, rationale: "Đây là kết quả của $\\sqrt{17^2 - 13^2}$, nhầm lẫn trong tính toán." },
+                    { text: "$25\\text{ cm}$", isCorrect: false, rationale: "Đây là kết quả của $17+8$, là sai." }
+                ],
+                hint: "Sử dụng công thức tính cạnh góc vuông: $a^2 = c^2 - b^2$."
+            },
+            {
+                level: "Thông hiểu",
+                question: "Một hình chữ nhật có chiều dài $12\\text{ m}$ và chiều rộng $9\\text{ m}$. Độ dài đường chéo của hình chữ nhật là bao nhiêu?",
+                options: [
+                    { text: "$15\\text{ m}$", isCorrect: true, rationale: "Đường chéo chia hình chữ nhật thành hai tam giác vuông. Áp dụng Pythagore: $d^2 = 12^2 + 9^2 = 144 + 81 = 225$. $d = \\sqrt{225} = 15\\text{ m}$." },
+                    { text: "$18\\text{ m}$", isCorrect: false, rationale: "Đây là tổng của chiều dài và chiều rộng ($12+9$), là sai." },
+                    { text: "$21\\text{ m}$", isCorrect: false, rationale: "Giá trị sai, không phản ánh mối quan hệ Pythagore." },
+                    { text: "$16\\text{ m}$", isCorrect: false, rationale: "Giá trị sai, không phản ánh mối quan hệ Pythagore." }
+                ],
+                hint: "Đường chéo của hình chữ nhật đóng vai trò là cạnh huyền của tam giác vuông được tạo bởi hai cạnh kề."
+            },
+            {
+                level: "Thông hiểu",
+                question: "Độ dài hai cạnh góc vuông của một tam giác vuông lần lượt là $0,5\\text{ cm}$ và $1,2\\text{ cm}$. Cạnh huyền dài bao nhiêu?",
+                options: [
+                    { text: "$1,3\\text{ cm}$", isCorrect: true, rationale: "Tính toán: $c^2 = (0,5)^2 + (1,2)^2 = 0,25 + 1,44 = 1,69$. $c = \\sqrt{1,69} = 1,3\\text{ cm}$." },
+                    { text: "$1,7\\text{ cm}$", isCorrect: false, rationale: "Đây là tổng trực tiếp của hai cạnh ($0,5+1,2$), là sai." },
+                    { text: "$1,44\\text{ cm}$", isCorrect: false, rationale: "Đây là bình phương của $1,2$, là sai." },
+                    { text: "$1,0\\text{ cm}$", isCorrect: false, rationale: "Giá trị sai, không chính xác." }
+                ],
+                hint: "Bạn cần cẩn thận khi tính bình phương và cộng các số thập phân."
+            },
+            {
+                level: "Thông hiểu",
+                question: "Kiểm tra xem tam giác có độ dài ba cạnh là $\\sqrt{10}\\text{ cm}$, $3\\text{ cm}$ và $1\\text{ cm}$ có phải là tam giác vuông không?",
+                options: [
+                    { text: "Là tam giác vuông", isCorrect: true, rationale: "Kiểm tra: $1^2 + 3^2 = 1 + 9 = 10$. Cạnh lớn nhất là $\\sqrt{10}$. $(\\sqrt{10})^2 = 10$. Vì $1^2 + 3^2 = (\\sqrt{10})^2$, nên đây là tam giác vuông." },
+                    { text: "Không là tam giác vuông", isCorrect: false, rationale: "Cần kiểm tra xem tổng bình phương hai cạnh nhỏ có bằng bình phương cạnh lớn nhất hay không." },
+                    { text: "Chỉ là tam giác nhọn", isCorrect: false, rationale: "Đây là một tam giác vuông." },
+                    { text: "Không thể xác định", isCorrect: false, rationale: "Có thể xác định được bằng Định lý Pythagore đảo." }
+                ],
+                hint: "Bình phương của $\\sqrt{a}$ là $a$. Cạnh lớn nhất là $\\sqrt{10}$."
+            },
+            // --- 3 CÂU VẬN DỤNG ---
+            {
+                level: "Vận dụng",
+                question: "Trên mặt phẳng tọa độ $Oxy$, khoảng cách giữa hai điểm $A(1, 2)$ và $B(5, 5)$ là bao nhiêu?",
+                options: [
+                    { text: "$5$", isCorrect: true, rationale: "Khoảng cách $AB$ là cạnh huyền của tam giác vuông có hai cạnh góc vuông là $|5-1|=4$ và $|5-2|=3$. $AB = \\sqrt{4^2 + 3^2} = \\sqrt{16+9} = \\sqrt{25} = 5$." },
+                    { text: "$7$", isCorrect: false, rationale: "Đây là tổng của sự thay đổi tọa độ ($4+3$), là sai." },
+                    { text: "$\\sqrt{45}$", isCorrect: false, rationale: "Kết quả tính toán sai." },
+                    { text: "$\\sqrt{17}$", isCorrect: false, rationale: "Đây là $\\sqrt{(5-4)^2 + (5-1)^2}$, nhầm lẫn trong tính toán." }
+                ],
+                hint: "Sử dụng công thức tính khoảng cách giữa hai điểm, dựa trên Định lý Pythagore."
+            },
+            {
+                level: "Vận dụng",
+                question: "Cho tam giác cân $ABC$ với $AB = AC = 13\\text{ cm}$ và cạnh đáy $BC = 10\\text{ cm}$. Tính độ dài đường cao $AH$ hạ từ đỉnh $A$ xuống cạnh đáy $BC$.",
+                options: [
+                    { text: "$12\\text{ cm}$", isCorrect: true, rationale: "Đường cao $AH$ trong tam giác cân cũng là đường trung tuyến, nên $BH = BC/2 = 5\\text{ cm}$. Trong $\\triangle ABH$ vuông tại $H$: $AH^2 = AB^2 - BH^2 = 13^2 - 5^2 = 169 - 25 = 144$. $AH = \\sqrt{144} = 12\\text{ cm}$." },
+                    { text: "$10\\text{ cm}$", isCorrect: false, rationale: "Giá trị này bằng độ dài cạnh đáy, là sai." },
+                    { text: "$\\sqrt{194}\\text{ cm}$", isCorrect: false, rationale: "Đây là $\\sqrt{13^2+5^2}$, tính toán sai." },
+                    { text: "$8\\text{ cm}$", isCorrect: false, rationale: "Giá trị tính toán sai." }
+                ],
+                hint: "Đường cao trong tam giác cân chia tam giác đó thành hai tam giác vuông bằng nhau. Cạnh đáy được chia đôi."
+            },
+            {
+                level: "Vận dụng (Thực tế)",
+                question: "Một chiếc thang dài $5\\text{ m}$ được đặt dựa vào tường, chân thang cách tường $3\\text{ m}$. Hỏi thang chạm vào tường ở độ cao bao nhiêu mét so với mặt đất?",
+                options: [
+                    { text: "$4\\text{ m}$", isCorrect: true, rationale: "Đây là một tam giác vuông với cạnh huyền là thang ($5\\text{ m}$), một cạnh góc vuông là khoảng cách từ chân thang đến tường ($3\\text{ m}$). Độ cao $h = \\sqrt{5^2 - 3^2} = \\sqrt{25 - 9} = \\sqrt{16} = 4\\text{ m}$." },
+                    { text: "$5\\text{ m}$", isCorrect: false, rationale: "Độ cao không thể bằng độ dài thang trừ khi thang đứng thẳng." },
+                    { text: "$8\\text{ m}$", isCorrect: false, rationale: "Đây là tổng trực tiếp của hai cạnh ($5+3$), là sai." },
+                    { text: "$16\\text{ m}$", isCorrect: false, rationale: "Đây là bình phương của độ cao, là sai." }
+                ],
+                hint: "Chiếc thang, mặt đất và bức tường tạo thành một tam giác vuông. Thang là cạnh huyền."
+            },
+            // --- 1 CÂU VẬN DỤNG CAO ---
+            {
+                level: "Vận dụng cao",
+                question: "Một hình vuông $ABCD$ có cạnh dài $4\\text{ cm}$. Gọi $M$ là trung điểm của cạnh $BC$. Tính độ dài đoạn thẳng $AM$.",
+                options: [
+                    { text: "$2\\sqrt{5}\\text{ cm}$", isCorrect: true, rationale: "Xét $\\triangle ABM$ vuông tại $B$. $AB = 4\\text{ cm}$, $BM = BC/2 = 4/2 = 2\\text{ cm}$. Áp dụng Pythagore: $AM^2 = AB^2 + BM^2 = 4^2 + 2^2 = 16 + 4 = 20$. $AM = \\sqrt{20} = \\sqrt{4 \\cdot 5} = 2\\sqrt{5}\\text{ cm}$." },
+                    { text: "$\\sqrt{20}\\text{ cm}$", isCorrect: false, rationale: "Giá trị đúng nhưng chưa được rút gọn." },
+                    { text: "$2\\sqrt{3}\\text{ cm}$", isCorrect: false, rationale: "Đây là kết quả sai, nhầm lẫn trong tính toán." },
+                    { text: "$4\\text{ cm}$", isCorrect: false, rationale: "Độ dài đoạn $AM$ phải lớn hơn cạnh góc vuông $BM$." }
+                ],
+                hint: "Hãy tạo một tam giác vuông bằng cách sử dụng trung điểm $M$. Cạnh $AM$ sẽ là cạnh huyền."
+            },
+            // --- 5 CÂU THÔNG HIỂU (còn lại) ---
+            {
+                level: "Thông hiểu",
+                question: "Cho $\\triangle ABC$ có $AB = 6\\text{ cm}$, $AC = 8\\text{ cm}$ và $BC = 10\\text{ cm}$. Diện tích của $\\triangle ABC$ là bao nhiêu?",
+                options: [
+                    { text: "$24\\text{ cm}^2$", isCorrect: true, rationale: "Kiểm tra: $6^2 + 8^2 = 36 + 64 = 100$, và $10^2 = 100$. Vì $6^2 + 8^2 = 10^2$, $\\triangle ABC$ vuông tại $A$. Diện tích là $S = \\frac{1}{2} \\cdot AB \\cdot AC = \\frac{1}{2} \\cdot 6 \\cdot 8 = 24\\text{ cm}^2$." },
+                    { text: "$30\\text{ cm}^2$", isCorrect: false, rationale: "Nhầm lẫn khi tính diện tích tam giác thường." },
+                    { text: "$48\\text{ cm}^2$", isCorrect: false, rationale: "Đây là $6 \\cdot 8$, không phải $\\frac{1}{2} \\cdot 6 \\cdot 8$." },
+                    { text: "$12\\text{ cm}^2$", isCorrect: false, rationale: "Tính toán sai." }
+                ],
+                hint: "Đầu tiên, sử dụng Định lý Pythagore đảo để xác định xem đó có phải là tam giác vuông không."
+            },
+            {
+                level: "Thông hiểu",
+                question: "Một con tàu đi từ điểm $A$ về phía Bắc $12\\text{ km}$ đến điểm $B$, sau đó rẽ sang phía Đông đi $5\\text{ km}$ đến điểm $C$. Khoảng cách từ điểm xuất phát $A$ đến điểm cuối $C$ là bao nhiêu?",
+                options: [
+                    { text: "$13\\text{ km}$", isCorrect: true, rationale: "Quãng đường tạo thành tam giác vuông $\\triangle ABC$ vuông tại $B$. Khoảng cách $AC$ là cạnh huyền: $AC = \\sqrt{12^2 + 5^2} = \\sqrt{144 + 25} = \\sqrt{169} = 13\\text{ km}$." },
+                    { text: "$17\\text{ km}$", isCorrect: false, rationale: "Đây là tổng trực tiếp quãng đường ($12+5$), là sai." },
+                    { text: "$15\\text{ km}$", isCorrect: false, rationale: "Giá trị sai, không chính xác." },
+                    { text: "$\\sqrt{119}\\text{ km}$", isCorrect: false, rationale: "Đây là $\\sqrt{144 - 25}$, là sai." }
+                ],
+                hint: "Hướng Bắc và hướng Đông vuông góc với nhau, tạo thành một tam giác vuông."
+            },
+            {
+                level: "Thông hiểu",
+                question: "Nếu độ dài cạnh góc vuông của một tam giác vuông cân là $4\\text{ cm}$, thì cạnh huyền dài bao nhiêu?",
+                options: [
+                    { text: "$4\\sqrt{2}\\text{ cm}$", isCorrect: true, rationale: "Trong tam giác vuông cân, $a=b=4$. $c^2 = 4^2 + 4^2 = 16 + 16 = 32$. $c = \\sqrt{32} = \\sqrt{16 \\cdot 2} = 4\\sqrt{2}\\text{ cm}$." },
+                    { text: "$8\\text{ cm}$", isCorrect: false, rationale: "Đây là tổng trực tiếp của hai cạnh ($4+4$), là sai." },
+                    { text: "$16\\text{ cm}$", isCorrect: false, rationale: "Đây là $4^2$, là sai." },
+                    { text: "$2\\sqrt{4}\\text{ cm}$", isCorrect: false, rationale: "Tính toán sai." }
+                ],
+                hint: "Tam giác vuông cân có hai cạnh góc vuông bằng nhau."
+            },
+            // --- 6 CÂU NHẬN BIẾT (còn lại) ---
+            {
+                level: "Nhận biết",
+                question: "Định lý Pythagore đảo được dùng để làm gì?",
+                options: [
+                    { text: "Tính diện tích tam giác bất kỳ.", isCorrect: false, rationale: "Định lý Pythagore đảo được dùng để kiểm tra tính vuông góc." },
+                    { text: "Xác định một tam giác là tam giác vuông hay không.", isCorrect: true, rationale: "Nếu tổng bình phương hai cạnh bằng bình phương cạnh còn lại, thì đó là tam giác vuông." },
+                    { text: "Tính độ dài đường cao trong tam giác.", isCorrect: false, rationale: "Cần Định lý Pythagore hoặc các công thức khác cho việc này." },
+                    { text: "Tìm độ lớn của các góc trong tam giác.", isCorrect: false, rationale: "Cần các công thức lượng giác cho việc này." }
+                ],
+                hint: "Định lý đảo giúp xác nhận tính chất của hình học phẳng."
+            }
+        ];
+
+        // Biến trạng thái trò chơi
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        // Lấy các phần tử DOM
+        const startScreen = document.getElementById('start-screen');
+        const quizContent = document.getElementById('quiz-content');
+        const resultScreen = document.getElementById('result-screen');
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const questionText = document.getElementById('question-text');
+        const difficultyLevel = document.getElementById('difficulty-level');
+        const answerOptionsContainer = document.getElementById('answer-options');
+        const rationaleBox = document.getElementById('rationale-box');
+        const rationaleText = document.getElementById('rationale-text');
+        const nextButton = document.getElementById('next-button');
+        const progressBar = document.getElementById('progress');
+        const scoreDisplay = document.getElementById('score-display');
+        const resultMessage = document.getElementById('result-message');
+        const confettiEmitter = document.getElementById('confetti-emitter');
+
+        // Hàm phát âm thanh chúc mừng (Web Audio API)
+        function playCorrectSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(600, audioContext.currentTime); // Chime pitch
+
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.01);
+                gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
+
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (error) {
+                console.error("Không thể phát âm thanh: ", error);
+            }
+        }
+
+        // Hàm tạo hiệu ứng pháo hoa
+        function createConfetti() {
+            const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#00bcd4', '#009688', '#4caf50', '#ffeb3b', '#ff9800', '#ff5722'];
+            const count = 30;
+            const containerWidth = confettiEmitter.offsetWidth;
+            const containerHeight = confettiEmitter.offsetHeight;
+
+            for (let i = 0; i < count; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti confetti-visible';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Vị trí xuất phát từ giữa màn hình quiz
+                const x = (containerWidth / 2) + (Math.random() * 200 - 100);
+                const y = (containerHeight / 2) + (Math.random() * 100 - 50);
+                
+                confetti.style.left = `${x}px`;
+                confetti.style.top = `${y}px`;
+                
+                // Hoạt ảnh (Animation)
+                const angle = Math.random() * 360;
+                const distance = 500 + Math.random() * 300;
+                const duration = 1.5 + Math.random();
+
+                confetti.animate([
+                    { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+                    { transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) rotate(${Math.random() * 1080}deg)`, opacity: 0 }
+                ], {
+                    duration: duration * 1000,
+                    easing: 'ease-out',
+                    fill: 'forwards'
+                });
+
+                confettiEmitter.appendChild(confetti);
+
+                setTimeout(() => {
+                    confetti.remove();
+                }, duration * 1000 + 50);
+            }
+        }
+
+        // Hàm hiển thị câu hỏi
+        function displayQuestion() {
+            rationaleBox.classList.add('hidden');
+            nextButton.classList.add('hidden');
+            answerOptionsContainer.innerHTML = '';
+            isAnswered = false;
+
+            if (currentQuestionIndex < quizQuestions.length) {
+                const currentQ = quizQuestions[currentQuestionIndex];
+                
+                // Cập nhật thanh tiến trình
+                const progressPercentage = ((currentQuestionIndex) / quizQuestions.length) * 100;
+                progressBar.style.width = `${progressPercentage}%`;
+                
+                questionText.innerHTML = `Câu ${currentQuestionIndex + 1}/${quizQuestions.length}: ${currentQ.question}`;
+                difficultyLevel.textContent = `Mức độ: ${currentQ.level}`;
+
+                currentQ.options.forEach((option, index) => {
+                    const button = document.createElement('button');
+                    button.className = 'option-button w-full text-left p-3 rounded-lg border-2 border-indigo-200 bg-white text-gray-700 font-medium hover:bg-indigo-100 transition duration-150';
+                    button.innerHTML = `<span>${String.fromCharCode(65 + index)}. </span>${option.text}`; // A, B, C, D
+                    button.onclick = () => handleAnswer(button, option.isCorrect, currentQ.options, currentQ.hint, currentQ.question, option.rationale);
+                    answerOptionsContainer.appendChild(button);
+                });
+            } else {
+                showResult();
+            }
+        }
+
+        // Hàm xử lý trả lời
+        function handleAnswer(selectedButton, isCorrect, options, hint, question, rationale) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            // Vô hiệu hóa tất cả các nút
+            const allButtons = answerOptionsContainer.querySelectorAll('button');
+            allButtons.forEach(btn => btn.disabled = true);
+
+            // Tìm và đánh dấu đáp án đúng/sai
+            options.forEach((option, index) => {
+                const btn = allButtons[index];
+                if (option.isCorrect) {
+                    btn.classList.add('correct-answer');
+                    btn.classList.remove('bg-white', 'hover:bg-indigo-100');
+                } else if (btn === selectedButton && !option.isCorrect) {
+                    btn.classList.add('incorrect-answer');
+                    btn.classList.remove('bg-white', 'hover:bg-indigo-100');
+                }
+            });
+
+            // Hiển thị giải thích
+            rationaleText.textContent = rationale;
+            rationaleBox.classList.remove('hidden');
+
+            // Xử lý logic đúng/sai
+            if (isCorrect) {
+                score++;
+                playCorrectSound();
+                createConfetti();
+                // Thay thế emoji mặt cười cho tung hoa
+                selectedButton.innerHTML += ' <span class="ml-2">🎉😊</span>';
+            } else {
+                selectedButton.innerHTML += ' <span class="ml-2">❌😔</span>';
+            }
+
+            nextButton.classList.remove('hidden');
+        }
+
+        // Hàm chuyển sang câu hỏi tiếp theo
+        function nextQuestion() {
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        // Hàm hiển thị kết quả
+        function showResult() {
+            quizContent.classList.add('hidden');
+            startScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            const total = quizQuestions.length;
+            scoreDisplay.textContent = score;
+            let message = '';
+
+            if (score === total) {
+                message = "Xuất sắc! Bạn đã đạt điểm tuyệt đối. Bạn là một chuyên gia về Định lý Pythagore!";
+            } else if (score >= total * 0.8) {
+                message = "Rất tốt! Bạn có kiến thức vững vàng về Định lý Pythagore.";
+            } else if (score >= total * 0.5) {
+                message = "Tốt! Bạn đã nắm được những kiến thức cơ bản. Hãy ôn tập thêm các câu vận dụng nhé.";
+            } else {
+                message = "Bạn cần cố gắng hơn. Hãy xem lại các công thức và cách áp dụng Định lý Pythagore nhé!";
+            }
+            resultMessage.textContent = message;
+            
+            // Cập nhật thanh tiến trình lần cuối
+            progressBar.style.width = `100%`;
+        }
+
+        // Hàm khởi động lại trò chơi
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            isAnswered = false;
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizContent.classList.remove('hidden');
+            displayQuestion();
+        }
+
+        // Gán sự kiện cho các nút
+        startButton.addEventListener('click', startQuiz);
+        restartButton.addEventListener('click', startQuiz);
+        nextButton.addEventListener('click', nextQuestion);
+
+        // Khởi tạo trạng thái ban đầu (đảm bảo thanh tiến trình rỗng)
+        progressBar.style.width = '0%';
+        
+        // Kích hoạt trò chơi trên window.onload
+        window.onload = () => {
+             // Đặt lại confetti emitter tại vị trí tương đối
+             const rect = quizContent.getBoundingClientRect();
+             confettiEmitter.style.position = 'absolute';
+             confettiEmitter.style.top = `${rect.top}px`;
+             confettiEmitter.style.left = `${rect.left}px`;
+             confettiEmitter.style.width = `${rect.width}px`;
+             confettiEmitter.style.height = `${rect.height}px`;
+        };
+
+    </script>
+</body>
+</html>
