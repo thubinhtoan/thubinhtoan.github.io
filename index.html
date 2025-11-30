@@ -58,15 +58,15 @@
 
           <div id="grade-tabs" class="flex flex-wrap gap-3"></div>
         </section>
-                <!-- Banner riêng cho từng Lớp -->
-        <section id="grade-banner" class="mb-6">
-          <div
-            id="grade-banner-inner"
-            class="rounded-2xl border px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition"
-          >
-            <!-- Nội dung banner sẽ được JS thay vào -->
+
+        <!-- Banner riêng cho từng Lớp -->
+        <section class="mb-4">
+          <div id="grade-banner" class="hidden">
+            <div id="grade-banner-inner"></div>
           </div>
-               <!-- Lưới: Chủ đề bên trái – Game của chủ đề bên phải -->
+        </section>
+
+        <!-- Lưới: Chủ đề bên trái – Game của chủ đề bên phải -->
         <section>
           <div
             class="grid grid-cols-1 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1.8fr)] gap-6 items-start"
@@ -108,456 +108,459 @@
   <!-- TOÀN BỘ JS -->
   <script>
     // ===== DỮ LIỆU: CÁC LỚP → CHỦ ĐỀ → GAME =====
-const grades = [
-  {
-    id: "lop6",
-    name: "Lớp 6",
-    color: "emerald",
-    topics: [
+    const grades = [
       {
-        id: "lop6-so-hoc",
-        name: "Số học",
-        description: "Các game luyện tập phân số, số nguyên… cho học sinh lớp 6.",
-        games: [
+        id: "lop6",
+        name: "Lớp 6",
+        color: "emerald",
+        topics: [
           {
-            id: 1,
-            folder: "phan-so",
-            icon: "🧮",
-            color: "emerald",
-            label: "Trò chơi 1",
-            grade: "Lớp 6 – Số học",
-            title: "Khám phá phân số – Hành trình kỳ thú",
-            description: "Ôn tập và luyện phân số qua một hành trình khám phá vui nhộn."
+            id: "lop6-so-hoc",
+            name: "Số học",
+            description: "Các game luyện tập phân số, số nguyên… cho học sinh lớp 6.",
+            games: [
+              {
+                id: 1,
+                folder: "phan-so",
+                icon: "🧮",
+                color: "emerald",
+                label: "Trò chơi 1",
+                grade: "Lớp 6 – Số học",
+                title: "Khám phá phân số – Hành trình kỳ thú",
+                description: "Ôn tập và luyện phân số qua một hành trình khám phá vui nhộn."
+              }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: "lop7",
+        name: "Lớp 7",
+        color: "indigo",
+        topics: [
+          {
+            id: "lop7-so-hoc",
+            name: "Số học",
+            description: "Chủ đề đang được Thu Bình Toán xây dựng thêm cho lớp 7.",
+            games: []
+          }
+        ]
+      },
+
+      {
+        id: "lop8",
+        name: "Lớp 8",
+        color: "sky",
+        topics: [
+          {
+            id: "lop8-tu-giac",
+            name: "Tứ giác",
+            description:
+              "Các game hình học về tứ giác: hình bình hành, hình chữ nhật, hình vuông, hình thang và hình thoi cho Toán 8.",
+            games: [
+              {
+                id: 1,
+                folder: "vuong-quoc-kim-cuong",
+                icon: "💎",
+                color: "emerald",
+                label: "Trò chơi 1",
+                grade: "Toán 8 – Tứ giác",
+                title: "Vương Quốc Kim Cương",
+                description:
+                  "Luyện tập nhận biết và tính chất hình thoi, hình vuông qua những viên kim cương lấp lánh."
+              },
+              {
+                id: 2,
+                folder: "phao-dai-hinh-chu-nhat",
+                icon: "🏰",
+                color: "indigo",
+                label: "Trò chơi 2",
+                grade: "Toán 8 – Tứ giác",
+                title: "Pháo Đài Hình Chữ Nhật",
+                description:
+                  "Củng cố tính chất hình chữ nhật để bảo vệ pháo đài khỏi quân địch."
+              },
+              {
+                id: 3,
+                folder: "lau-dai-hinh-vuong",
+                icon: "🏯",
+                color: "yellow",
+                label: "Trò chơi 3",
+                grade: "Toán 8 – Tứ giác",
+                title: "Lâu Đài Hình Vuông",
+                description:
+                  "Khám phá các bài toán về hình vuông để xây dựng lâu đài kiên cố."
+              },
+              {
+                id: 4,
+                folder: "hanh-trinh-hinh-thoi",
+                icon: "🔷",
+                color: "sky",
+                label: "Trò chơi 4",
+                grade: "Toán 8 – Tứ giác",
+                title: "Hành Trình Hình Thoi",
+                description:
+                  "Vượt qua các thử thách về đường chéo và cạnh của hình thoi."
+              },
+              {
+                id: 5,
+                folder: "cau-treo-hinh-thang",
+                icon: "🌉",
+                color: "rose",
+                label: "Trò chơi 5",
+                grade: "Toán 8 – Tứ giác",
+                title: "Cầu Treo Hình Thang",
+                description:
+                  "Luyện tập kiến thức hình thang để xây dựng cây cầu treo an toàn."
+              },
+              {
+                id: 7,
+                folder: "huyen-thoai-tai-sinh",
+                icon: "🔥",
+                color: "rose",
+                label: "Trò chơi 7",
+                grade: "Toán 8 – Hình bình hành",
+                title: "Huyền Thoại Tái Sinh – Hình bình hành",
+                description:
+                  "Đánh thức Phượng Hoàng Huyền Thoại qua 15 câu hỏi về hình bình hành."
+              }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: "lop9",
+        name: "Lớp 9",
+        color: "rose",
+        topics: [
+          {
+            id: "lop9-phuong-trinh-he",
+            name: "Phương trình & Hệ phương trình",
+            description:
+              "Các game về phương trình một ẩn, hai ẩn và hệ phương trình cho Toán 9.",
+            games: [
+              {
+                id: 31,
+                folder: "ThoSanPhuongTrinh",
+                icon: "🏹",
+                color: "rose",
+                label: "Trò chơi 31",
+                grade: "Toán 9 – Phương trình",
+                title: "Thợ Săn Phương Trình",
+                description:
+                  "Giải phương trình tích & phương trình chứa ẩn ở mẫu để mở kho báu cổ xưa."
+              },
+              {
+                id: 32,
+                folder: "HaiTrinhVoTan",
+                icon: "🚢",
+                color: "sky",
+                label: "Trò chơi 32",
+                grade: "Toán 9 – Hệ phương trình",
+                title: "Hải Trình Vô Tận",
+                description:
+                  "Giải mã 15 hệ phương trình để tìm kho báu dưới lòng đại dương."
+              },
+              {
+                id: 41,
+                folder: "SherlockHolmes",
+                icon: "🕵️‍♂️",
+                color: "indigo",
+                label: "Trò chơi 41",
+                grade: "Toán 9 – Hệ phương trình",
+                title: "Vụ Án Bóng Đêm – Sherlock Holmes",
+                description:
+                  "15 câu hệ phương trình – Giải mã mật thư cùng Sherlock trong vụ án bóng đêm."
+              },
+              {
+                id: 42,
+                folder: "bi-mat-kim-tu-thap",
+                icon: "🏺",
+                color: "yellow",
+                label: "Trò chơi 42",
+                grade: "Toán 9 – Ôn tập Chương 1",
+                title: "Bí Mật Kim Tự Tháp",
+                description:
+                  "Ôn tập Chương 1 – Phương trình & Hệ phương trình qua 15 câu hỏi từ Nhận biết đến Vận dụng cao."
+              }
+            ]
+          },
+
+          {
+            id: "lop9-bat-dang-thuc-bpt",
+            name: "Bất đẳng thức & Bất phương trình",
+            description:
+              "Luyện tập bất đẳng thức và bất phương trình bậc nhất, bậc hai.",
+            games: [
+              {
+                id: 19,
+                folder: "BiAnDemKhuya",
+                icon: "🌙",
+                color: "indigo",
+                label: "Trò chơi 19",
+                grade: "Toán 9 – Bất đẳng thức",
+                title: "Bí Ẩn Đêm Khuya – Thử thách bất đẳng thức",
+                description:
+                  "Giải 15 câu hỏi về tính chất bất đẳng thức để thắp sáng con đường dẫn tới Thư Viện Ánh Sáng trong đêm khuya."
+              },
+              {
+                id: 18,
+                folder: "DiepVuBatKhaThi",
+                icon: "🟩",
+                color: "emerald",
+                label: "Trò chơi 18",
+                grade: "Toán 9 – Bất phương trình",
+                title: "Điệp Vụ Bất Khả Thi – Giải mã bất phương trình",
+                description:
+                  "Giải 15 mật mã toán học về bất phương trình bậc nhất một ẩn để hoàn thành nhiệm vụ tuyệt mật."
+              }
+            ]
+          },
+
+          {
+            id: "lop9-can-thuc",
+            name: "Căn thức",
+            description:
+              "Các game ôn tập căn bậc hai, biến đổi căn thức và vận dụng vào bài toán.",
+            games: [
+              {
+                id: 5,
+                folder: "du-hanh-vu-tru",
+                icon: "🚀",
+                color: "sky",
+                label: "Trò chơi 5",
+                grade: "Toán 9 – Căn thức",
+                title: "Du Hành Giữa Các Vì Sao – Căn bậc hai",
+                description:
+                  "Điều khiển tàu vũ trụ vượt qua thử thách về căn bậc hai."
+              },
+              {
+                id: 6,
+                folder: "de-che-troi-day",
+                icon: "🏰",
+                color: "yellow",
+                label: "Trò chơi 6",
+                grade: "Toán 9 – Căn thức",
+                title: "Đế Chế Trỗi Dậy – Biến đổi căn bậc hai",
+                description:
+                  "Thu thập tài nguyên xây dựng đế chế bằng các phép biến đổi căn bậc hai."
+              },
+              {
+                id: 14,
+                folder: "can-bac-ba",
+                icon: "📦",
+                color: "sky",
+                label: "Trò chơi 14",
+                grade: "Toán 9 – Căn thức",
+                title: "Hành Trình Căn Bậc Ba – Khối lập phương năng lượng",
+                description:
+                  "Vượt qua 12 câu hỏi về căn bậc ba để nạp năng lượng cho thành phố khối lập phương xanh."
+              },
+              {
+                id: 8,
+                folder: "bien-doi-can-thuc",
+                icon: "🔥",
+                color: "rose",
+                label: "Trò chơi 8",
+                grade: "Toán 9 – Căn thức",
+                title: "Huyền Thoại Tái Sinh – Biến đổi căn thức",
+                description:
+                  "Chinh phục 15 câu hỏi về biến đổi biểu thức chứa căn thức bậc hai để đánh thức Phượng Hoàng Huyền Thoại."
+              },
+              {
+                id: 15,
+                folder: "tong-hop-can-thuc",
+                icon: "🌟",
+                color: "emerald",
+                label: "Trò chơi 15",
+                grade: "Toán 9 – Căn thức",
+                title: "Vương Quốc Căn Thức – Thử Thách Tối Thượng",
+                description:
+                  "30 câu hỏi chia 4 cổng thử thách: Nhận biết, Thông hiểu, Vận dụng và Vận dụng cao về căn thức."
+              }
+            ]
+          },
+
+          {
+            id: "lop9-he-thuc-luong",
+            name: "Hệ thức lượng trong tam giác vuông",
+            description:
+              "Các game luyện tập hệ thức lượng, sin – cos – tan – cot trong tam giác vuông.",
+            games: [
+              {
+                id: 16,
+                folder: "loi-nguyen-co-xua",
+                icon: "🕯️",
+                color: "rose",
+                label: "Trò chơi 16",
+                grade: "Toán 9 – Hệ thức lượng",
+                title: "Lời Nguyền Cổ Xưa – Tỉ số lượng giác",
+                description:
+                  "Giải 15 câu hỏi về sin, cos, tan, cot để hóa giải lời nguyền cổ xưa và thắp sáng ngôi đền."
+              },
+              {
+                id: 17,
+                folder: "ThanhGuomDinhMenh",
+                icon: "⚔️",
+                color: "yellow",
+                label: "Trò chơi 17",
+                grade: "Toán 9 – Hệ thức lượng",
+                title: "Thanh Gươm Định Mệnh – Hệ thức cạnh & góc",
+                description:
+                  "Rèn lại Thanh Gươm Định Mệnh bằng cách vượt qua 15 câu hỏi về hệ thức cạnh – góc trong tam giác vuông để đánh bại Quỷ Vương!"
+              },
+              {
+                id: 18,
+                folder: "cuoc-xam-lang-ngoai-trai-dat",
+                icon: "🛸",
+                color: "emerald",
+                label: "Trò chơi 18",
+                grade: "Toán 9 – Hệ thức lượng",
+                title:
+                  "Cuộc Xâm Lăng Ngoài Trái Đất – Ôn tập hệ thức lượng trong tam giác vuông",
+                description:
+                  "Kích hoạt hệ thống phòng thủ Laser bằng cách chinh phục 15 câu hỏi về sin, cos, tan, cot trong tam giác vuông để bảo vệ Trái Đất."
+              }
+            ]
+          },
+
+          {
+            id: "lop9-duong-tron-tu-giac",
+            name: "Đường tròn – Tứ giác nội tiếp đường tròn",
+            description:
+              "Các game về đường tròn, góc ở tâm, góc nội tiếp, dây cung, tiếp tuyến và tứ giác nội tiếp.",
+            games: [
+              {
+                id: 1,
+                folder: "khu-vuon-bi-mat",
+                icon: "🌸",
+                color: "emerald",
+                label: "Trò chơi 1",
+                grade: "Toán 9 – Đường tròn",
+                title: "Khu Vườn Bí Mật – Đường tròn",
+                description:
+                  "Làm nở những bông hoa xinh trong khu vườn bằng cách trả lời câu hỏi về đường tròn."
+              },
+              {
+                id: 2,
+                folder: "cuoc-xam-lang",
+                icon: "🛸",
+                color: "indigo",
+                label: "Trò chơi 2",
+                grade: "Toán 9 – Tiếp tuyến đường tròn",
+                title: "Cuộc Xâm Lăng – Tiếp tuyến đường tròn",
+                description:
+                  "Bắn hạ tàu UFO bằng kiến thức về tiếp tuyến của đường tròn."
+              },
+              {
+                id: 3,
+                folder: "me-cung-tri-tue",
+                icon: "🧠",
+                color: "sky",
+                label: "Trò chơi 3",
+                grade: "Toán 9 – Góc ở tâm & góc nội tiếp",
+                title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp",
+                description:
+                  "Vượt qua mê cung bằng cách giải các bài toán về góc ở tâm và góc nội tiếp."
+              },
+              {
+                id: 4,
+                folder: "chien-binh-rong",
+                icon: "🐉",
+                color: "rose",
+                label: "Trò chơi 4",
+                grade: "Toán 9 – Hình quạt & vành khuyên",
+                title: "Chiến Binh Rồng – Hình quạt và vành khuyên",
+                description:
+                  "Cùng chiến binh rồng tiêu diệt quái vật bằng kiến thức về hình quạt và hình vành khuyên."
+              },
+              {
+                id: 8,
+                folder: "phao-dai-toi-thuong",
+                icon: "🏰",
+                color: "indigo",
+                label: "Trò chơi 8",
+                grade: "Toán 9 – Tổng hợp Đường tròn & Căn thức",
+                title: "Pháo Đài Tối Thượng – Bài toán tổng hợp",
+                description:
+                  "Bảo vệ pháo đài bằng những bài toán tổng hợp về đường tròn và căn bậc hai."
+              },
+              {
+                id: 9,
+                folder: "binh-minh-anh-hung",
+                icon: "☀️",
+                color: "yellow",
+                label: "Trò chơi 9",
+                grade: "Toán 9 – Đường tròn",
+                title: "Bình Minh Anh Hùng – Bài tập cuối Chương 5",
+                description:
+                  "Game tổng ôn 15 câu hỏi cuối Chương 5 Đường tròn với đủ 4 mức độ: Nhận biết, Thông hiểu, Vận dụng và Vận dụng cao."
+              }
+            ]
+          },
+
+          {
+            id: "lop9-ham-bac-2",
+            name: "Hàm số bậc 2 & Phương trình bậc 2",
+            description:
+              "Các game về đồ thị hàm số bậc 2 và phương trình bậc 2 một ẩn.",
+            games: []
+          },
+          {
+            id: "lop9-hinh-khoi",
+            name: "Hình khối",
+            description:
+              "Các game hình học không gian: lăng trụ, chóp, khối tròn xoay…",
+            games: []
+          },
+          {
+            id: "lop9-xac-suat-thong-ke",
+            name: "Xác suất & Thống kê",
+            description:
+              "Các game luyện tập bảng tần số, biểu đồ và xác suất cho Toán 9.",
+            games: []
           }
         ]
       }
-    ]
-  },
+    ];
 
-  {
-    id: "lop7",
-    name: "Lớp 7",
-    color: "indigo",
-    topics: [
-      {
-        id: "lop7-so-hoc",
-        name: "Số học",
-        description: "Chủ đề đang được Thu Bình Toán xây dựng thêm cho lớp 7.",
-        games: []
+    // ===== CẤU HÌNH BANNER RIÊNG CHO TỪNG LỚP =====
+    const gradeBanners = {
+      lop6: {
+        icon: "🧮",
+        title: "Khởi động cùng Toán 6",
+        subtitle: "Rèn nền tảng số học, phân số, số nguyên một cách nhẹ nhàng và vui vẻ.",
+        pillText: "Luyện nền tảng",
+        bgClass: "from-emerald-500/20 via-emerald-400/10 to-slate-900/80",
+        borderClass: "border border-emerald-400/60 shadow-lg shadow-emerald-500/30"
+      },
+      lop7: {
+        icon: "📘",
+        title: "Khám phá Toán 7",
+        subtitle: "Các chủ đề đang được Thu Bình Toán xây dựng và cập nhật dần.",
+        pillText: "Đang cập nhật",
+        bgClass: "from-indigo-500/20 via-indigo-400/10 to-slate-900/80",
+        borderClass: "border border-indigo-400/60 shadow-lg shadow-indigo-500/30"
+      },
+      lop8: {
+        icon: "📐",
+        title: "Chinh phục Hình học 8",
+        subtitle: "Luyện tập tứ giác: hình bình hành, chữ nhật, vuông, thang, thoi.",
+        pillText: "Tập trung: Tứ giác",
+        bgClass: "from-sky-500/20 via-sky-400/10 to-slate-900/80",
+        borderClass: "border border-sky-400/60 shadow-lg shadow-sky-500/30"
+      },
+      lop9: {
+        icon: "🧠",
+        title: "Nước rút Toán 9",
+        subtitle: "Ôn hệ phương trình, căn thức, hệ thức lượng, đường tròn và nhiều chủ đề quan trọng.",
+        pillText: "Lớp 9 – Nước rút",
+        bgClass: "from-rose-500/20 via-rose-400/10 to-slate-900/80",
+        borderClass: "border border-rose-400/60 shadow-lg shadow-rose-500/30"
       }
-    ]
-  },
-  {
-    id: "lop8",
-    name: "Lớp 8",
-    color: "sky",
-    topics: [
-      {
-        id: "lop8-tu-giac",
-        name: "Tứ giác",
-        description:
-          "Các game hình học về tứ giác: hình bình hành, hình chữ nhật, hình vuông, hình thang và hình thoi cho Toán 8.",
-        games: [
-          {
-            id: 1,
-            folder: "vuong-quoc-kim-cuong",
-            icon: "💎",
-            color: "emerald",
-            label: "Trò chơi 1",
-            grade: "Toán 8 – Tứ giác",
-            title: "Vương Quốc Kim Cương",
-            description: "Luyện tập nhận biết và tính chất hình thoi, hình vuông qua những viên kim cương lấp lánh."
-          },
-          {
-            id: 2,
-            folder: "phao-dai-hinh-chu-nhat",
-            icon: "🏰",
-            color: "indigo",
-            label: "Trò chơi 2",
-            grade: "Toán 8 – Tứ giác",
-            title: "Pháo Đài Hình Chữ Nhật",
-            description: "Củng cố tính chất hình chữ nhật để bảo vệ pháo đài khỏi quân địch."
-          },
-          {
-            id: 3,
-            folder: "lau-dai-hinh-vuong",
-            icon: "🏯",
-            color: "yellow",
-            label: "Trò chơi 3",
-            grade: "Toán 8 – Tứ giác",
-            title: "Lâu Đài Hình Vuông",
-            description: "Khám phá các bài toán về hình vuông để xây dựng lâu đài kiên cố."
-          },
-          {
-            id: 4,
-            folder: "hanh-trinh-hinh-thoi",
-            icon: "🔷",
-            color: "sky",
-            label: "Trò chơi 4",
-            grade: "Toán 8 – Tứ giác",
-            title: "Hành Trình Hình Thoi",
-            description: "Vượt qua các thử thách về đường chéo và cạnh của hình thoi."
-          },
-          {
-            id: 5,
-            folder: "cau-treo-hinh-thang",
-            icon: "🌉",
-            color: "rose",
-            label: "Trò chơi 5",
-            grade: "Toán 8 – Tứ giác",
-            title: "Cầu Treo Hình Thang",
-            description: "Luyện tập kiến thức hình thang để xây dựng cây cầu treo an toàn."
-          },
-          {
-            id: 7,
-            folder: "huyen-thoai-tai-sinh",
-            icon: "🔥",
-            color: "rose",
-            label: "Trò chơi 7",
-            grade: "Toán 8 – Hình bình hành",
-            title: "Huyền Thoại Tái Sinh – Hình bình hành",
-            description:
-              "Đánh thức Phượng Hoàng Huyền Thoại qua 15 câu hỏi về hình bình hành."
-          }
-        ]
-      }
-    ]
-  },
-
-  {
-    id: "lop9",
-    name: "Lớp 9",
-    color: "rose",
-    topics: [
-      {
-        id: "lop9-phuong-trinh-he",
-        name: "Phương trình & Hệ phương trình",
-        description:
-          "Các game về phương trình một ẩn, hai ẩn và hệ phương trình cho Toán 9.",
-        games: [
-          {
-            id: 31,
-            folder: "ThoSanPhuongTrinh",
-            icon: "🏹",
-            color: "rose",
-            label: "Trò chơi 31",
-            grade: "Toán 9 – Phương trình",
-            title: "Thợ Săn Phương Trình",
-            description:
-              "Giải phương trình tích & phương trình chứa ẩn ở mẫu để mở kho báu cổ xưa."
-          },
-          {
-            id: 32,
-            folder: "HaiTrinhVoTan",
-            icon: "🚢",
-            color: "sky",
-            label: "Trò chơi 32",
-            grade: "Toán 9 – Hệ phương trình",
-            title: "Hải Trình Vô Tận",
-            description:
-              "Giải mã 15 hệ phương trình để tìm kho báu dưới lòng đại dương."
-          },
-          {
-            id: 41,
-            folder: "SherlockHolmes",
-            icon: "🕵️‍♂️",
-            color: "indigo",
-            label: "Trò chơi 41",
-            grade: "Toán 9 – Hệ phương trình",
-            title: "Vụ Án Bóng Đêm – Sherlock Holmes",
-            description:
-              "15 câu hệ phương trình – Giải mã mật thư cùng Sherlock trong vụ án bóng đêm."
-          },
-          {
-            id: 42,
-            folder: "bi-mat-kim-tu-thap",
-            icon: "🏺",
-            color: "yellow",
-            label: "Trò chơi 42",
-            grade: "Toán 9 – Ôn tập Chương 1",
-            title: "Bí Mật Kim Tự Tháp",
-            description:
-              "Ôn tập Chương 1 – Phương trình & Hệ phương trình qua 15 câu hỏi từ Nhận biết đến Vận dụng cao."
-          }
-        ]
-      },
-
-      {
-        id: "lop9-bat-dang-thuc-bpt",
-        name: "Bất đẳng thức & Bất phương trình",
-        description:
-          "Luyện tập bất đẳng thức và bất phương trình bậc nhất, bậc hai.",
-        games: [
-          {
-            id: 19,
-            folder: "BiAnDemKhuya",
-            icon: "🌙",
-            color: "indigo",
-            label: "Trò chơi 19",
-            grade: "Toán 9 – Bất đẳng thức",
-            title: "Bí Ẩn Đêm Khuya – Thử thách bất đẳng thức",
-            description:
-              "Giải 15 câu hỏi về tính chất bất đẳng thức để thắp sáng con đường dẫn tới Thư Viện Ánh Sáng trong đêm khuya."
-          },
-          {
-            id: 18,
-            folder: "DiepVuBatKhaThi",
-            icon: "🟩",
-            color: "emerald",
-            label: "Trò chơi 18",
-            grade: "Toán 9 – Bất phương trình",
-            title: "Điệp Vụ Bất Khả Thi – Giải mã bất phương trình",
-            description:
-              "Giải 15 mật mã toán học về bất phương trình bậc nhất một ẩn để hoàn thành nhiệm vụ tuyệt mật."
-          }
-        ]
-      },
-
-      {
-        id: "lop9-can-thuc",
-        name: "Căn thức",
-        description:
-          "Các game ôn tập căn bậc hai, biến đổi căn thức và vận dụng vào bài toán.",
-        games: [
-          {
-            id: 5,
-            folder: "du-hanh-vu-tru",
-            icon: "🚀",
-            color: "sky",
-            label: "Trò chơi 5",
-            grade: "Toán 9 – Căn thức",
-            title: "Du Hành Giữa Các Vì Sao – Căn bậc hai",
-            description:
-              "Điều khiển tàu vũ trụ vượt qua thử thách về căn bậc hai."
-          },
-          {
-            id: 6,
-            folder: "de-che-troi-day",
-            icon: "🏰",
-            color: "yellow",
-            label: "Trò chơi 6",
-            grade: "Toán 9 – Căn thức",
-            title: "Đế Chế Trỗi Dậy – Biến đổi căn bậc hai",
-            description:
-              "Thu thập tài nguyên xây dựng đế chế bằng các phép biến đổi căn bậc hai."
-          },
-          {
-            id: 14,
-            folder: "can-bac-ba",
-            icon: "📦",
-            color: "sky",
-            label: "Trò chơi 14",
-            grade: "Toán 9 – Căn thức",
-            title: "Hành Trình Căn Bậc Ba – Khối lập phương năng lượng",
-            description:
-              "Vượt qua 12 câu hỏi về căn bậc ba để nạp năng lượng cho thành phố khối lập phương xanh."
-          },
-          {
-            id: 8,
-            folder: "bien-doi-can-thuc",
-            icon: "🔥",
-            color: "rose",
-            label: "Trò chơi 8",
-            grade: "Toán 9 – Căn thức",
-            title: "Huyền Thoại Tái Sinh – Biến đổi căn thức",
-            description:
-              "Chinh phục 15 câu hỏi về biến đổi biểu thức chứa căn thức bậc hai để đánh thức Phượng Hoàng Huyền Thoại."
-          },
-          {
-            id: 15,
-            folder: "tong-hop-can-thuc",
-            icon: "🌟",
-            color: "emerald",
-            label: "Trò chơi 15",
-            grade: "Toán 9 – Căn thức",
-            title: "Vương Quốc Căn Thức – Thử Thách Tối Thượng",
-            description:
-              "30 câu hỏi chia 4 cổng thử thách: Nhận biết, Thông hiểu, Vận dụng và Vận dụng cao về căn thức."
-          }
-        ]
-      },
-
-      {
-        id: "lop9-he-thuc-luong",
-        name: "Hệ thức lượng trong tam giác vuông",
-        description:
-          "Các game luyện tập hệ thức lượng, sin – cos – tan – cot trong tam giác vuông.",
-        games: [
-          {
-            id: 16,
-            folder: "loi-nguyen-co-xua",
-            icon: "🕯️",
-            color: "rose",
-            label: "Trò chơi 16",
-            grade: "Toán 9 – Hệ thức lượng",
-            title: "Lời Nguyền Cổ Xưa – Tỉ số lượng giác",
-            description:
-              "Giải 15 câu hỏi về sin, cos, tan, cot để hóa giải lời nguyền cổ xưa và thắp sáng ngôi đền."
-          },
-          {
-            id: 17,
-            folder: "ThanhGuomDinhMenh",
-            icon: "⚔️",
-            color: "yellow",
-            label: "Trò chơi 17",
-            grade: "Toán 9 – Hệ thức lượng",
-            title: "Thanh Gươm Định Mệnh – Hệ thức cạnh & góc",
-            description:
-              "Rèn lại Thanh Gươm Định Mệnh bằng cách vượt qua 15 câu hỏi về hệ thức cạnh – góc trong tam giác vuông để đánh bại Quỷ Vương!"
-          },
-          {
-            id: 18,
-            folder: "cuoc-xam-lang-ngoai-trai-dat",
-            icon: "🛸",
-            color: "emerald",
-            label: "Trò chơi 18",
-            grade: "Toán 9 – Hệ thức lượng",
-            title:
-              "Cuộc Xâm Lăng Ngoài Trái Đất – Ôn tập hệ thức lượng trong tam giác vuông",
-            description:
-              "Kích hoạt hệ thống phòng thủ Laser bằng cách chinh phục 15 câu hỏi về sin, cos, tan, cot trong tam giác vuông để bảo vệ Trái Đất."
-          }
-        ]
-      },
-
-      {
-        id: "lop9-duong-tron-tu-giac",
-        name: "Đường tròn – Tứ giác nội tiếp đường tròn",
-        description:
-          "Các game về đường tròn, góc ở tâm, góc nội tiếp, dây cung, tiếp tuyến và tứ giác nội tiếp.",
-        games: [
-          {
-            id: 1,
-            folder: "khu-vuon-bi-mat",
-            icon: "🌸",
-            color: "emerald",
-            label: "Trò chơi 1",
-            grade: "Toán 9 – Đường tròn",
-            title: "Khu Vườn Bí Mật – Đường tròn",
-            description:
-              "Làm nở những bông hoa xinh trong khu vườn bằng cách trả lời câu hỏi về đường tròn."
-          },
-          {
-            id: 2,
-            folder: "cuoc-xam-lang",
-            icon: "🛸",
-            color: "indigo",
-            label: "Trò chơi 2",
-            grade: "Toán 9 – Tiếp tuyến đường tròn",
-            title: "Cuộc Xâm Lăng – Tiếp tuyến đường tròn",
-            description:
-              "Bắn hạ tàu UFO bằng kiến thức về tiếp tuyến của đường tròn."
-          },
-          {
-            id: 3,
-            folder: "me-cung-tri-tue",
-            icon: "🧠",
-            color: "sky",
-            label: "Trò chơi 3",
-            grade: "Toán 9 – Góc ở tâm & góc nội tiếp",
-            title: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp",
-            description:
-              "Vượt qua mê cung bằng cách giải các bài toán về góc ở tâm và góc nội tiếp."
-          },
-          {
-            id: 4,
-            folder: "chien-binh-rong",
-            icon: "🐉",
-            color: "rose",
-            label: "Trò chơi 4",
-            grade: "Toán 9 – Hình quạt & vành khuyên",
-            title: "Chiến Binh Rồng – Hình quạt và vành khuyên",
-            description:
-              "Cùng chiến binh rồng tiêu diệt quái vật bằng kiến thức về hình quạt và hình vành khuyên."
-          },
-          {
-            id: 8,
-            folder: "phao-dai-toi-thuong",
-            icon: "🏰",
-            color: "indigo",
-            label: "Trò chơi 8",
-            grade: "Toán 9 – Tổng hợp Đường tròn & Căn thức",
-            title: "Pháo Đài Tối Thượng – Bài toán tổng hợp",
-            description:
-              "Bảo vệ pháo đài bằng những bài toán tổng hợp về đường tròn và căn bậc hai."
-          },
-          {
-            id: 9,
-            folder: "binh-minh-anh-hung",
-            icon: "☀️",
-            color: "yellow",
-            label: "Trò chơi 9",
-            grade: "Toán 9 – Đường tròn",
-            title: "Bình Minh Anh Hùng – Bài tập cuối Chương 5",
-            description:
-              "Game tổng ôn 15 câu hỏi cuối Chương 5 Đường tròn với đủ 4 mức độ: Nhận biết, Thông hiểu, Vận dụng và Vận dụng cao."
-          }
-        ]
-      },
-
-      {
-        id: "lop9-ham-bac-2",
-        name: "Hàm số bậc 2 & Phương trình bậc 2",
-        description:
-          "Các game về đồ thị hàm số bậc 2 và phương trình bậc 2 một ẩn.",
-        games: []
-      },
-      {
-        id: "lop9-hinh-khoi",
-        name: "Hình khối",
-        description:
-          "Các game hình học không gian: lăng trụ, chóp, khối tròn xoay…",
-        games: []
-      },
-      {
-        id: "lop9-xac-suat-thong-ke",
-        name: "Xác suất & Thống kê",
-        description:
-          "Các game luyện tập bảng tần số, biểu đồ và xác suất cho Toán 9.",
-        games: []
-      }
-    ]
-  }
-];
-// ===== BANNER RIÊNG CHO TỪNG LỚP =====
-const gradeBanners = {
-  lop6: {
-    icon: "🧠",
-    title: "Lớp 6 – Khởi đầu hành trình toán học",
-    subtitle:
-      "Ôn tập số học, phân số, số nguyên qua những trò chơi nhẹ nhàng, vui nhộn dành cho các bạn nhỏ.",
-    bgClass: "from-emerald-500/20 via-emerald-400/10 to-slate-900/60",
-    borderClass: "border-emerald-400/60",
-    pillText: "Khối 6 – Cơ bản"
-  },
-  lop7: {
-    icon: "📘",
-    title: "Lớp 7 – Cấp tốc luyện kỹ năng",
-    subtitle:
-      "Các chủ đề đang được Thu Bình Toán xây dựng thêm, hứa hẹn nhiều màn thử thách hấp dẫn trong thời gian tới.",
-    bgClass: "from-indigo-500/20 via-indigo-400/10 to-slate-900/60",
-    borderClass: "border-indigo-400/60",
-    pillText: "Khối 7 – Đang cập nhật"
-  },
-  lop8: {
-    icon: "📐",
-    title: "Lớp 8 – Chinh phục hình học Tứ giác",
-    subtitle:
-      "Luyện tập hình bình hành, hình chữ nhật, hình vuông, hình thang và hình thoi qua thế giới game đầy màu sắc.",
-    bgClass: "from-sky-500/20 via-sky-400/10 to-slate-900/60",
-    borderClass: "border-sky-400/60",
-    pillText: "Khối 8 – Hình học thú vị"
-  },
-  lop9: {
-    icon: "🎓",
-    title: "Lớp 9 – Sẵn sàng cho kỳ thi",
-    subtitle:
-      "Ôn tập phương trình, bất phương trình, căn thức, hệ thức lượng, đường tròn… thông qua những nhiệm vụ gamified.",
-    bgClass: "from-rose-500/20 via-rose-400/10 to-slate-900/60",
-    borderClass: "border-rose-400/60",
-    pillText: "Khối 9 – Luyện thi THCS"
-  }
-};
+    };
 
     // ===== STYLE MÀU CHO THẺ GAME =====
     const colorStyles = {
@@ -734,57 +737,58 @@ const gradeBanners = {
 
         gameListEl.appendChild(a);
       });
-      function renderGradeBanner() {
-  const grade = grades.find((g) => g.id === activeGradeId);
-  if (!grade || !gradeBannerEl || !gradeBannerInnerEl) return;
+    }
 
-  const config = gradeBanners[grade.id];
+    function renderGradeBanner() {
+      const grade = grades.find((g) => g.id === activeGradeId);
+      if (!grade || !gradeBannerEl || !gradeBannerInnerEl) return;
 
-  if (!config) {
-    // Không có cấu hình riêng → ẩn banner
-    gradeBannerEl.classList.add("hidden");
-    return;
-  }
+      const config = gradeBanners[grade.id];
+      if (!config) {
+        gradeBannerEl.classList.add("hidden");
+        return;
+      }
 
-  gradeBannerEl.classList.remove("hidden");
+      gradeBannerEl.classList.remove("hidden");
 
-  gradeBannerInnerEl.className =
-    "rounded-2xl border px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition bg-gradient-to-r " +
-    config.bgClass +
-    " " +
-    config.borderClass;
+      gradeBannerInnerEl.className =
+        "rounded-2xl border px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition bg-gradient-to-r " +
+        config.bgClass +
+        " " +
+        config.borderClass;
 
-  gradeBannerInnerEl.innerHTML = `
-    <div class="flex items-start gap-3 sm:gap-4">
-      <div class="text-3xl sm:text-4xl">${config.icon}</div>
-      <div>
-        <div class="text-xs uppercase tracking-wide text-emerald-300 mb-1">
-          ${grade.name} – Banner chủ đề
+      gradeBannerInnerEl.innerHTML = `
+        <div class="flex items-start gap-3 sm:gap-4">
+          <div class="text-3xl sm:text-4xl">${config.icon}</div>
+          <div>
+            <div class="text-xs uppercase tracking-wide text-emerald-300 mb-1">
+              ${grade.name} – Banner chủ đề
+            </div>
+            <h2 class="text-base sm:text-lg font-semibold text-white mb-1">
+              ${config.title}
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-200/90">
+              ${config.subtitle}
+            </p>
+          </div>
         </div>
-        <h2 class="text-base sm:text-lg font-semibold text-white mb-1">
-          ${config.title}
-        </h2>
-        <p class="text-xs sm:text-sm text-slate-200/90">
-          ${config.subtitle}
-        </p>
-      </div>
-    </div>
-    <div class="self-stretch flex items-center">
-      <span
-        class="inline-flex items-center px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-slate-900/70 text-slate-100 border border-slate-500/70"
-      >
-        ${config.pillText}
-      </span>
-    </div>
-  `;
-}
+        <div class="self-stretch flex items-center">
+          <span
+            class="inline-flex items-center px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold
+                   bg-slate-900/70 text-slate-100 border border-slate-500/70"
+          >
+            ${config.pillText}
+          </span>
+        </div>
+      `;
+    }
 
     function renderAll() {
-  renderGradeTabs();
-  renderTopics();
-  renderGames();
-  renderGradeBanner(); // <-- thêm dòng này
-}
+      renderGradeTabs();
+      renderTopics();
+      renderGames();
+      renderGradeBanner();
+    }
 
     // Khởi tạo
     renderAll();
