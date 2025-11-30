@@ -101,228 +101,228 @@
 
     <script>
         // Dữ liệu 15 câu hỏi
-     const quizQuestions = [
+   const quizQuestions = [
     // --- 6 CÂU NHẬN BIẾT ---
     {
         level: "Nhận biết",
         question: "Định lý Pythagore phát biểu rằng trong một tam giác vuông, bình phương độ dài cạnh huyền bằng tổng bình phương độ dài hai cạnh góc vuông. Công thức đúng là gì?",
         options: [
-            { text: "$a^2 + b^2 = c^2$", isCorrect: true, rationale: "Trong tam giác vuông, nếu $a$ và $b$ là độ dài hai cạnh góc vuông và $c$ là độ dài cạnh huyền, thì $a^2 + b^2 = c^2$." },
-            { text: "$a + b = c$", isCorrect: false, rationale: "Định lý Pythagore liên quan đến bình phương độ dài các cạnh, không phải tổng trực tiếp." },
-            { text: "$c^2 - a^2 = b^2$", isCorrect: false, rationale: "Công thức này đúng nhưng chưa phải là phát biểu chuẩn của định lý." },
-            { text: "$2a + 2b = 2c$", isCorrect: false, rationale: "Đây là công thức chu vi (sai), không phải Định lý Pythagore." }
+            { text: "a^2 + b^2 = c^2", isCorrect: true, rationale: "Trong tam giác vuông: a^2 + b^2 = c^2." },
+            { text: "a + b = c", isCorrect: false, rationale: "Định lý Pythagore liên quan đến bình phương độ dài các cạnh." },
+            { text: "c^2 - a^2 = b^2", isCorrect: false, rationale: "Đây là dạng biến đổi, không phải phát biểu chuẩn." },
+            { text: "2a + 2b = 2c", isCorrect: false, rationale: "Đây là công thức chu vi, không đúng." }
         ],
-        hint: "Hãy nhớ Định lý Pythagore liên quan đến bình phương độ dài các cạnh."
+        hint: "Hãy nhớ định lý liên quan đến bình phương độ dài các cạnh."
     },
     {
         level: "Nhận biết",
-        question: "Trong tam giác vuông $\\triangle ABC$ tại $A$, cạnh nào là cạnh huyền?",
+        question: "Trong tam giác vuông ABC tại A, cạnh nào là cạnh huyền?",
         options: [
-            { text: "Cạnh $AB$", isCorrect: false, rationale: "Cạnh $AB$ là một trong hai cạnh góc vuông." },
-            { text: "Cạnh $BC$", isCorrect: true, rationale: "Cạnh huyền là cạnh đối diện với góc vuông, trong trường hợp này là cạnh $BC$." },
-            { text: "Cạnh $AC$", isCorrect: false, rationale: "Cạnh $AC$ là một trong hai cạnh góc vuông." },
-            { text: "Cạnh $AH$ (với $H$ là chân đường cao)", isCorrect: false, rationale: "Cạnh $AH$ là đường cao, không phải cạnh huyền." }
+            { text: "Cạnh AB", isCorrect: false, rationale: "AB là cạnh góc vuông." },
+            { text: "Cạnh BC", isCorrect: true, rationale: "Cạnh huyền đối diện góc vuông." },
+            { text: "Cạnh AC", isCorrect: false, rationale: "AC là cạnh góc vuông." },
+            { text: "Cạnh AH (với H là chân đường cao)", isCorrect: false, rationale: "AH là đường cao." }
         ],
-        hint: "Cạnh huyền là cạnh dài nhất và đối diện với góc vuông."
+        hint: "Cạnh huyền là cạnh dài nhất."
     },
     {
         level: "Nhận biết",
-        question: "Một tam giác vuông có độ dài hai cạnh góc vuông lần lượt là $3\\text{ cm}$ và $4\\text{ cm}$. Độ dài cạnh huyền là bao nhiêu?",
+        question: "Một tam giác vuông có hai cạnh góc vuông dài 3 cm và 4 cm. Độ dài cạnh huyền là bao nhiêu?",
         options: [
-            { text: "$7\\text{ cm}$", isCorrect: false, rationale: "Đây là tổng trực tiếp của hai cạnh góc vuông ($3+4$), không phải cạnh huyền." },
-            { text: "$25\\text{ cm}$", isCorrect: false, rationale: "Đây là bình phương độ dài cạnh huyền, không phải độ dài cạnh huyền." },
-            { text: "$5\\text{ cm}$", isCorrect: true, rationale: "Áp dụng định lý Pythagore: $c^2 = 3^2 + 4^2 = 9 + 16 = 25$, suy ra $c = \\sqrt{25} = 5\\text{ cm}$." },
-            { text: "$\\sqrt{7}\\text{ cm}$", isCorrect: false, rationale: "Đáp án này là $\\sqrt{3+4}$, là sai." }
+            { text: "7 cm", isCorrect: false, rationale: "3 + 4 không phải là cạnh huyền." },
+            { text: "25 cm", isCorrect: false, rationale: "25 là c^2, không phải c." },
+            { text: "5 cm", isCorrect: true, rationale: "c = sqrt(3^2 + 4^2) = 5 cm." },
+            { text: "sqrt(7) cm", isCorrect: false, rationale: "Sai công thức." }
         ],
-        hint: "Sử dụng công thức $c = \\sqrt{a^2 + b^2}$."
+        hint: "Công thức: c = sqrt(a^2 + b^2)."
     },
     {
         level: "Nhận biết",
         question: "Trong các bộ ba số sau, bộ ba nào là bộ ba Pythagore?",
         options: [
-            { text: "$(2, 3, 4)$", isCorrect: false, rationale: "$2^2 + 3^2 = 4 + 9 = 13 \\ne 4^2 = 16$." },
-            { text: "$(6, 8, 9)$", isCorrect: false, rationale: "$6^2 + 8^2 = 36 + 64 = 100 \\ne 9^2 = 81$." },
-            { text: "$(1, 2, 3)$", isCorrect: false, rationale: "$1^2 + 2^2 = 1 + 4 = 5 \\ne 3^2 = 9$." },
-            { text: "$(5, 12, 13)$", isCorrect: true, rationale: "Kiểm tra: $5^2 + 12^2 = 25 + 144 = 169$, và $13^2 = 169$. Vậy $5^2 + 12^2 = 13^2$." }
+            { text: "(2, 3, 4)", isCorrect: false, rationale: "2^2 + 3^2 = 13, không bằng 4^2." },
+            { text: "(6, 8, 9)", isCorrect: false, rationale: "6^2 + 8^2 = 100, không bằng 81." },
+            { text: "(1, 2, 3)", isCorrect: false, rationale: "1 + 4 không bằng 9." },
+            { text: "(5, 12, 13)", isCorrect: true, rationale: "5^2 + 12^2 = 13^2." }
         ],
-        hint: "Một bộ ba Pythagore $(a, b, c)$ phải thỏa mãn $a^2 + b^2 = c^2$."
+        hint: "Phải thỏa mãn a^2 + b^2 = c^2."
     },
     {
         level: "Nhận biết",
-        question: "Cho $\\triangle MNP$ vuông tại $P$. Công thức tính độ dài cạnh góc vuông $MP$ theo hai cạnh còn lại là:",
+        question: "Cho tam giác MNP vuông tại P. Công thức tính MP theo hai cạnh còn lại là:",
         options: [
-            { text: "$MP^2 = MN^2 - NP^2$", isCorrect: true, rationale: "Cạnh góc vuông $MP$ được tính bằng căn bậc hai của hiệu bình phương cạnh huyền $MN$ và cạnh góc vuông còn lại $NP$." },
-            { text: "$MP^2 = MN^2 + NP^2$", isCorrect: false, rationale: "Đây là công thức tính cạnh huyền $MN$, không phải cạnh góc vuông $MP$." },
-            { text: "$MP = MN - NP$", isCorrect: false, rationale: "Định lý Pythagore liên quan đến bình phương độ dài các cạnh." },
-            { text: "$MP^2 = NP^2 - MN^2$", isCorrect: false, rationale: "Bình phương cạnh huyền $MN$ phải lớn hơn bình phương cạnh góc vuông $NP$." }
+            { text: "MP^2 = MN^2 - NP^2", isCorrect: true, rationale: "MP là cạnh góc vuông." },
+            { text: "MP^2 = MN^2 + NP^2", isCorrect: false, rationale: "Công thức dành cho cạnh huyền." },
+            { text: "MP = MN - NP", isCorrect: false, rationale: "Không đúng định lý Pythagore." },
+            { text: "MP^2 = NP^2 - MN^2", isCorrect: false, rationale: "MN là cạnh lớn nhất nên MN^2 > NP^2." }
         ],
-        hint: "Cạnh góc vuông bằng căn bậc hai của hiệu bình phương cạnh huyền và bình phương cạnh góc vuông kia."
+        hint: "Cạnh góc vuông bằng căn bậc hai hiệu bình phương."
     },
     {
         level: "Nhận biết",
-        question: "Tam giác có độ dài ba cạnh là $6\\text{ cm}$, $8\\text{ cm}$ và $10\\text{ cm}$ có phải là tam giác vuông không?",
+        question: "Tam giác có ba cạnh 6 cm, 8 cm và 10 cm có phải là tam giác vuông không?",
         options: [
-            { text: "Không là tam giác vuông", isCorrect: false, rationale: "Cần kiểm tra xem tổng bình phương hai cạnh nhỏ có bằng bình phương cạnh lớn nhất hay không." },
-            { text: "Là tam giác vuông", isCorrect: true, rationale: "Kiểm tra: $6^2 + 8^2 = 36 + 64 = 100$, và $10^2 = 100$. Vì $6^2 + 8^2 = 10^2$, nên đây là tam giác vuông theo Định lý Pythagore đảo." },
-            { text: "Chỉ là tam giác nhọn", isCorrect: false, rationale: "Tam giác nhọn là tam giác có ba góc nhọn." },
-            { text: "Chỉ là tam giác tù", isCorrect: false, rationale: "Tam giác tù là tam giác có một góc tù." }
+            { text: "Không phải tam giác vuông", isCorrect: false, rationale: "Cần kiểm tra bằng định lý đảo." },
+            { text: "Là tam giác vuông", isCorrect: true, rationale: "6^2 + 8^2 = 10^2." },
+            { text: "Tam giác nhọn", isCorrect: false, rationale: "Sai." },
+            { text: "Tam giác tù", isCorrect: false, rationale: "Sai." }
         ],
-        hint: "Sử dụng Định lý Pythagore đảo: kiểm tra xem $a^2 + b^2 = c^2$ có đúng không, với $c$ là cạnh lớn nhất."
+        hint: "Dùng định lý Pythagore đảo."
     },
 
     // --- 5 CÂU THÔNG HIỂU ---
     {
         level: "Thông hiểu",
-        question: "Một tam giác vuông có hai cạnh góc vuông là $5\\text{ cm}$ và $6\\text{ cm}$. Độ dài cạnh huyền (làm tròn đến hàng phần mười) là:",
+        question: "Tam giác vuông có hai cạnh góc vuông 5 cm và 6 cm. Cạnh huyền (làm tròn 0,1) bằng:",
         options: [
-            { text: "$11\\text{ cm}$", isCorrect: false, rationale: "Đây là tổng trực tiếp của hai cạnh ($5+6$), là sai." },
-            { text: "$8,0\\text{ cm}$", isCorrect: false, rationale: "Làm tròn không chính xác." },
-            { text: "$7,8\\text{ cm}$", isCorrect: true, rationale: "Tính toán: $c^2 = 5^2 + 6^2 = 25 + 36 = 61$. $c = \\sqrt{61} \\approx 7,81\\text{ cm}$. Làm tròn đến hàng phần mười là $7,8\\text{ cm}$." },
-            { text: "$7,1\\text{ cm}$", isCorrect: false, rationale: "Đây là $\\sqrt{5^2 + 4^2}$, nhầm lẫn trong tính toán." }
+            { text: "11 cm", isCorrect: false },
+            { text: "8,0 cm", isCorrect: false },
+            { text: "7,8 cm", isCorrect: true, rationale: "sqrt(61) ≈ 7,8 cm." },
+            { text: "7,1 cm", isCorrect: false }
         ],
-        hint: "Kết quả là một số vô tỉ, bạn cần tính căn bậc hai và làm tròn chính xác."
+        hint: "Tính căn rồi làm tròn."
     },
     {
         level: "Thông hiểu",
-        question: "Cho tam giác vuông có cạnh huyền dài $17\\text{ cm}$ và một cạnh góc vuông dài $8\\text{ cm}$. Độ dài cạnh góc vuông còn lại là:",
+        question: "Tam giác vuông có cạnh huyền 17 cm và một cạnh góc vuông 8 cm. Cạnh góc vuông còn lại bằng:",
         options: [
-            { text: "$9\\text{ cm}$", isCorrect: false, rationale: "Đây là hiệu trực tiếp của hai cạnh ($17-8$), là sai." },
-            { text: "$12\\text{ cm}$", isCorrect: false, rationale: "Đây là kết quả của $\\sqrt{17^2 - 13^2}$, nhầm lẫn trong tính toán." },
-            { text: "$25\\text{ cm}$", isCorrect: false, rationale: "Đây là kết quả của $17+8$, là sai." },
-            { text: "$15\\text{ cm}$", isCorrect: true, rationale: "Áp dụng định lý Pythagore: $a^2 = c^2 - b^2 = 17^2 - 8^2 = 289 - 64 = 225$. Suy ra $a = \\sqrt{225} = 15\\text{ cm}$." }
+            { text: "9 cm", isCorrect: false },
+            { text: "12 cm", isCorrect: false },
+            { text: "25 cm", isCorrect: false },
+            { text: "15 cm", isCorrect: true, rationale: "sqrt(17^2 - 8^2) = 15 cm." }
         ],
-        hint: "Sử dụng công thức tính cạnh góc vuông: $a^2 = c^2 - b^2$."
+        hint: "a = sqrt(c^2 - b^2)."
     },
     {
         level: "Thông hiểu",
-        question: "Một hình chữ nhật có chiều dài $12\\text{ m}$ và chiều rộng $9\\text{ m}$. Độ dài đường chéo của hình chữ nhật là bao nhiêu?",
+        question: "Hình chữ nhật có chiều dài 12 m và chiều rộng 9 m. Độ dài đường chéo là:",
         options: [
-            { text: "$15\\text{ m}$", isCorrect: true, rationale: "Đường chéo chia hình chữ nhật thành hai tam giác vuông. Áp dụng Pythagore: $d^2 = 12^2 + 9^2 = 144 + 81 = 225$. $d = \\sqrt{225} = 15\\text{ m}$." },
-            { text: "$18\\text{ m}$", isCorrect: false, rationale: "Đây là tổng của chiều dài và chiều rộng ($12+9$), là sai." },
-            { text: "$21\\text{ m}$", isCorrect: false, rationale: "Giá trị sai, không phản ánh mối quan hệ Pythagore." },
-            { text: "$16\\text{ m}$", isCorrect: false, rationale: "Giá trị sai, không phản ánh mối quan hệ Pythagore." }
+            { text: "15 m", isCorrect: true },
+            { text: "18 m", isCorrect: false },
+            { text: "21 m", isCorrect: false },
+            { text: "16 m", isCorrect: false }
         ],
-        hint: "Đường chéo của hình chữ nhật đóng vai trò là cạnh huyền của tam giác vuông được tạo bởi hai cạnh kề."
+        hint: "Đường chéo là cạnh huyền."
     },
     {
         level: "Thông hiểu",
-        question: "Độ dài hai cạnh góc vuông của một tam giác vuông lần lượt là $0,5\\text{ cm}$ và $1,2\\text{ cm}$. Cạnh huyền dài bao nhiêu?",
+        question: "Tam giác vuông có hai cạnh góc vuông 0,5 cm và 1,2 cm. Cạnh huyền bằng:",
         options: [
-            { text: "$1,7\\text{ cm}$", isCorrect: false, rationale: "Đây là tổng trực tiếp của hai cạnh ($0,5+1,2$), là sai." },
-            { text: "$1,3\\text{ cm}$", isCorrect: true, rationale: "Tính toán: $c^2 = (0,5)^2 + (1,2)^2 = 0,25 + 1,44 = 1,69$. $c = \\sqrt{1,69} = 1,3\\text{ cm}$." },
-            { text: "$1,44\\text{ cm}$", isCorrect: false, rationale: "Đây là bình phương của $1,2$, là sai." },
-            { text: "$1,0\\text{ cm}$", isCorrect: false, rationale: "Giá trị sai, không chính xác." }
+            { text: "1,7 cm", isCorrect: false },
+            { text: "1,3 cm", isCorrect: true },
+            { text: "1,44 cm", isCorrect: false },
+            { text: "1,0 cm", isCorrect: false }
         ],
-        hint: "Bạn cần cẩn thận khi tính bình phương và cộng các số thập phân."
+        hint: "Cẩn thận số thập phân."
     },
     {
         level: "Thông hiểu",
-        question: "Kiểm tra xem tam giác có độ dài ba cạnh là $\\sqrt{10}\\text{ cm}$, $3\\text{ cm}$ và $1\\text{ cm}$ có phải là tam giác vuông không?",
+        question: "Tam giác có cạnh sqrt(10) cm, 3 cm và 1 cm có phải là tam giác vuông không?",
         options: [
-            { text: "Không là tam giác vuông", isCorrect: false, rationale: "Cần kiểm tra xem tổng bình phương hai cạnh nhỏ có bằng bình phương cạnh lớn nhất hay không." },
-            { text: "Không thể xác định", isCorrect: false, rationale: "Có thể xác định được bằng Định lý Pythagore đảo." },
-            { text: "Là tam giác vuông", isCorrect: true, rationale: "Kiểm tra: $1^2 + 3^2 = 1 + 9 = 10$. Cạnh lớn nhất là $\\sqrt{10}$. $(\\sqrt{10})^2 = 10$. Vì $1^2 + 3^2 = (\\sqrt{10})^2$, nên đây là tam giác vuông." },
-            { text: "Chỉ là tam giác nhọn", isCorrect: false, rationale: "Đây là một tam giác vuông." }
+            { text: "Không là tam giác vuông", isCorrect: false },
+            { text: "Không thể xác định", isCorrect: false },
+            { text: "Là tam giác vuông", isCorrect: true, rationale: "1^2 + 3^2 = 10." },
+            { text: "Tam giác nhọn", isCorrect: false }
         ],
-        hint: "Bình phương của $\\sqrt{a}$ là $a$. Cạnh lớn nhất là $\\sqrt{10}$."
+        hint: "sqrt(10)^2 = 10."
     },
 
     // --- 3 CÂU VẬN DỤNG ---
     {
         level: "Vận dụng",
-        question: "Trên mặt phẳng tọa độ $Oxy$, khoảng cách giữa hai điểm $A(1, 2)$ và $B(5, 5)$ là bao nhiêu?",
+        question: "Trên mặt phẳng Oxy, khoảng cách giữa A(1,2) và B(5,5) là:",
         options: [
-            { text: "$7$", isCorrect: false, rationale: "Đây là tổng của sự thay đổi tọa độ ($4+3$), là sai." },
-            { text: "$\\sqrt{45}$", isCorrect: false, rationale: "Kết quả tính toán sai." },
-            { text: "$\\sqrt{17}$", isCorrect: false, rationale: "Đây là $\\sqrt{(5-4)^2 + (5-1)^2}$, nhầm lẫn trong tính toán." },
-            { text: "$5$", isCorrect: true, rationale: "Khoảng cách $AB$ là cạnh huyền của tam giác vuông có hai cạnh góc vuông là $|5-1|=4$ và $|5-2|=3$. $AB = \\sqrt{4^2 + 3^2} = \\sqrt{16+9} = \\sqrt{25} = 5$." }
+            { text: "7", isCorrect: false },
+            { text: "sqrt(45)", isCorrect: false },
+            { text: "sqrt(17)", isCorrect: false },
+            { text: "5", isCorrect: true }
         ],
-        hint: "Sử dụng công thức tính khoảng cách giữa hai điểm, dựa trên Định lý Pythagore."
+        hint: "AB = sqrt((x2-x1)^2 + (y2-y1)^2)."
     },
     {
         level: "Vận dụng",
-        question: "Cho tam giác cân $ABC$ với $AB = AC = 13\\text{ cm}$ và cạnh đáy $BC = 10\\text{ cm}$. Tính độ dài đường cao $AH$ hạ từ đỉnh $A$ xuống cạnh đáy $BC$.",
+        question: "Tam giác cân ABC có AB = AC = 13 cm, BC = 10 cm. Đường cao AH bằng:",
         options: [
-            { text: "$12\\text{ cm}$", isCorrect: true, rationale: "Đường cao $AH$ trong tam giác cân cũng là đường trung tuyến, nên $BH = BC/2 = 5\\text{ cm}$. Trong $\\triangle ABH$ vuông tại $H$: $AH^2 = AB^2 - BH^2 = 13^2 - 5^2 = 169 - 25 = 144$. $AH = \\sqrt{144} = 12\\text{ cm}$." },
-            { text: "$10\\text{ cm}$", isCorrect: false, rationale: "Giá trị này bằng độ dài cạnh đáy, là sai." },
-            { text: "$\\sqrt{194}\\text{ cm}$", isCorrect: false, rationale: "Đây là $\\sqrt{13^2+5^2}$, tính toán sai." },
-            { text: "$8\\text{ cm}$", isCorrect: false, rationale: "Giá trị tính toán sai." }
+            { text: "12 cm", isCorrect: true },
+            { text: "10 cm", isCorrect: false },
+            { text: "sqrt(194) cm", isCorrect: false },
+            { text: "8 cm", isCorrect: false }
         ],
-        hint: "Đường cao trong tam giác cân chia tam giác đó thành hai tam giác vuông bằng nhau. Cạnh đáy được chia đôi."
+        hint: "Đường cao chia đáy thành hai phần bằng nhau."
     },
     {
-        level: "Vận dụng (Thực tế)",
-        question: "Một chiếc thang dài $5\\text{ m}$ được đặt dựa vào tường, chân thang cách tường $3\\text{ m}$. Hỏi thang chạm vào tường ở độ cao bao nhiêu mét so với mặt đất?",
+        level: "Vận dụng",
+        question: "Cái thang dài 5 m, chân thang cách tường 3 m. Độ cao chạm tường là:",
         options: [
-            { text: "$5\\text{ m}$", isCorrect: false, rationale: "Độ cao không thể bằng độ dài thang trừ khi thang đứng thẳng." },
-            { text: "$4\\text{ m}$", isCorrect: true, rationale: "Đây là một tam giác vuông với cạnh huyền là thang ($5\\text{ m}$), một cạnh góc vuông là khoảng cách từ chân thang đến tường ($3\\text{ m}$). Độ cao $h = \\sqrt{5^2 - 3^2} = \\sqrt{25 - 9} = \\sqrt{16} = 4\\text{ m}$." },
-            { text: "$8\\text{ m}$", isCorrect: false, rationale: "Đây là tổng trực tiếp của hai cạnh ($5+3$), là sai." },
-            { text: "$16\\text{ m}$", isCorrect: false, rationale: "Đây là bình phương của độ cao, là sai." }
+            { text: "5 m", isCorrect: false },
+            { text: "4 m", isCorrect: true },
+            { text: "8 m", isCorrect: false },
+            { text: "16 m", isCorrect: false }
         ],
-        hint: "Chiếc thang, mặt đất và bức tường tạo thành một tam giác vuông. Thang là cạnh huyền."
+        hint: "Dùng c^2 - a^2."
     },
 
     // --- 1 CÂU VẬN DỤNG CAO ---
     {
         level: "Vận dụng cao",
-        question: "Một hình vuông $ABCD$ có cạnh dài $4\\text{ cm}$. Gọi $M$ là trung điểm của cạnh $BC$. Tính độ dài đoạn thẳng $AM$.",
+        question: "Hình vuông ABCD cạnh 4 cm. M là trung điểm BC. Độ dài AM bằng:",
         options: [
-            { text: "$4\\text{ cm}$", isCorrect: false, rationale: "Độ dài đoạn $AM$ phải lớn hơn cạnh góc vuông $BM$." },
-            { text: "$\\sqrt{20}\\text{ cm}$", isCorrect: false, rationale: "Giá trị đúng nhưng chưa được rút gọn." },
-            { text: "$2\\sqrt{5}\\text{ cm}$", isCorrect: true, rationale: "Xét $\\triangle ABM$ vuông tại $B$. $AB = 4\\text{ cm}$, $BM = BC/2 = 4/2 = 2\\text{ cm}$. Áp dụng Pythagore: $AM^2 = AB^2 + BM^2 = 4^2 + 2^2 = 16 + 4 = 20$. $AM = \\sqrt{20} = \\sqrt{4 \\cdot 5} = 2\\sqrt{5}\\text{ cm}$." },
-            { text: "$2\\sqrt{3}\\text{ cm}$", isCorrect: false, rationale: "Đây là kết quả sai, nhầm lẫn trong tính toán." }
+            { text: "4 cm", isCorrect: false },
+            { text: "sqrt(20) cm", isCorrect: false },
+            { text: "2 sqrt(5) cm", isCorrect: true },
+            { text: "2 sqrt(3) cm", isCorrect: false }
         ],
-        hint: "Hãy tạo một tam giác vuông bằng cách sử dụng trung điểm $M$. Cạnh $AM$ sẽ là cạnh huyền."
+        hint: "AM^2 = AB^2 + BM^2."
     },
 
     // --- 5 CÂU THÔNG HIỂU (còn lại) ---
     {
         level: "Thông hiểu",
-        question: "Cho $\\triangle ABC$ có $AB = 6\\text{ cm}$, $AC = 8\\text{ cm}$ và $BC = 10\\text{ cm}$. Diện tích của $\\triangle ABC$ là bao nhiêu?",
+        question: "Tam giác ABC có AB = 6 cm, AC = 8 cm, BC = 10 cm. Diện tích ABC là:",
         options: [
-            { text: "$30\\text{ cm}^2$", isCorrect: false, rationale: "Nhầm lẫn khi tính diện tích tam giác thường." },
-            { text: "$48\\text{ cm}^2$", isCorrect: false, rationale: "Đây là $6 \\cdot 8$, không phải $\\frac{1}{2} \\cdot 6 \\cdot 8$." },
-            { text: "$12\\text{ cm}^2$", isCorrect: false, rationale: "Tính toán sai." },
-            { text: "$24\\text{ cm}^2$", isCorrect: true, rationale: "Kiểm tra: $6^2 + 8^2 = 36 + 64 = 100$, và $10^2 = 100$. Vì $6^2 + 8^2 = 10^2$, $\\triangle ABC$ vuông tại $A$. Diện tích là $S = \\frac{1}{2} \\cdot AB \\cdot AC = \\frac{1}{2} \\cdot 6 \\cdot 8 = 24\\text{ cm}^2$." }
+            { text: "30 cm^2", isCorrect: false },
+            { text: "48 cm^2", isCorrect: false },
+            { text: "12 cm^2", isCorrect: false },
+            { text: "24 cm^2", isCorrect: true }
         ],
-        hint: "Đầu tiên, sử dụng Định lý Pythagore đảo để xác định xem đó có phải là tam giác vuông không."
+        hint: "Đó là tam giác vuông tại A."
     },
     {
         level: "Thông hiểu",
-        question: "Một con tàu đi từ điểm $A$ về phía Bắc $12\\text{ km}$ đến điểm $B$, sau đó rẽ sang phía Đông đi $5\\text{ km}$ đến điểm $C$. Khoảng cách từ điểm xuất phát $A$ đến điểm cuối $C$ là bao nhiêu?",
+        question: "Tàu đi 12 km về Bắc rồi 5 km về Đông. Khoảng cách AC là:",
         options: [
-            { text: "$13\\text{ km}$", isCorrect: true, rationale: "Quãng đường tạo thành tam giác vuông $\\triangle ABC$ vuông tại $B$. Khoảng cách $AC$ là cạnh huyền: $AC = \\sqrt{12^2 + 5^2} = \\sqrt{144 + 25} = \\sqrt{169} = 13\\text{ km}$." },
-            { text: "$17\\text{ km}$", isCorrect: false, rationale: "Đây là tổng trực tiếp quãng đường ($12+5$), là sai." },
-            { text: "$15\\text{ km}$", isCorrect: false, rationale: "Giá trị sai, không chính xác." },
-            { text: "$\\sqrt{119}\\text{ km}$", isCorrect: false, rationale: "Đây là $\\sqrt{144 - 25}$, là sai." }
+            { text: "13 km", isCorrect: true },
+            { text: "17 km", isCorrect: false },
+            { text: "15 km", isCorrect: false },
+            { text: "sqrt(119) km", isCorrect: false }
         ],
-        hint: "Hướng Bắc và hướng Đông vuông góc với nhau, tạo thành một tam giác vuông."
+        hint: "Tạo thành tam giác vuông."
     },
     {
         level: "Thông hiểu",
-        question: "Nếu độ dài cạnh góc vuông của một tam giác vuông cân là $4\\text{ cm}$, thì cạnh huyền dài bao nhiêu?",
+        question: "Tam giác vuông cân có cạnh góc vuông 4 cm. Cạnh huyền bằng:",
         options: [
-            { text: "$8\\text{ cm}$", isCorrect: false, rationale: "Đây là tổng trực tiếp của hai cạnh ($4+4$), là sai." },
-            { text: "$4\\sqrt{2}\\text{ cm}$", isCorrect: true, rationale: "Trong tam giác vuông cân, $a=b=4$. $c^2 = 4^2 + 4^2 = 16 + 16 = 32$. $c = \\sqrt{32} = \\sqrt{16 \\cdot 2} = 4\\sqrt{2}\\text{ cm}$." },
-            { text: "$16\\text{ cm}$", isCorrect: false, rationale: "Đây là $4^2$, là sai." },
-            { text: "$2\\sqrt{4}\\text{ cm}$", isCorrect: false, rationale: "Tính toán sai." }
+            { text: "8 cm", isCorrect: false },
+            { text: "4 sqrt(2) cm", isCorrect: true },
+            { text: "16 cm", isCorrect: false },
+            { text: "2 sqrt(4) cm", isCorrect: false }
         ],
-        hint: "Tam giác vuông cân có hai cạnh góc vuông bằng nhau."
+        hint: "Vuông cân: a = b."
     },
-    // --- 6 CÂU NHẬN BIẾT (còn lại) ---
+
+    // --- 6 CÂU NHẬN BIẾT (cuối) ---
     {
         level: "Nhận biết",
-        question: "Định lý Pythagore đảo được dùng để làm gì?",
+        question: "Định lý Pythagore đảo dùng để làm gì?",
         options: [
-            { text: "Tính diện tích tam giác bất kỳ.", isCorrect: false, rationale: "Định lý Pythagore đảo được dùng để kiểm tra tính vuông góc." },
-            { text: "Tính độ dài đường cao trong tam giác.", isCorrect: false, rationale: "Cần Định lý Pythagore hoặc các công thức khác cho việc này." },
-            { text: "Xác định một tam giác là tam giác vuông hay không.", isCorrect: true, rationale: "Nếu tổng bình phương hai cạnh bằng bình phương cạnh còn lại, thì đó là tam giác vuông." },
-            { text: "Tìm độ lớn của các góc trong tam giác.", isCorrect: false, rationale: "Cần các công thức lượng giác cho việc này." }
+            { text: "Tính diện tích tam giác bất kỳ", isCorrect: false },
+            { text: "Tính độ dài đường cao", isCorrect: false },
+            { text: "Xác định tam giác vuông hay không", isCorrect: true },
+            { text: "Tìm góc tam giác", isCorrect: false }
         ],
-        hint: "Định lý đảo giúp xác nhận tính chất của hình học phẳng."
+        hint: "Dùng để kiểm tra tam giác vuông."
     }
 ];
-
         // Biến trạng thái trò chơi
         let currentQuestionIndex = 0;
         let score = 0;
