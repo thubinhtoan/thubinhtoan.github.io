@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thợ Săn Phương Trình - Toán 9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Philosopher:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Philosopher', sans-serif;
+            background-color: #1a1510;
+            color: #d4c5b0;
+            overflow: hidden;
+            margin: 0;
+            user-select: none;
+        }
+
+        .title-font {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* --- Ambient Background --- */
+        #dungeon-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at center, #2e261f 0%, #0d0a08 100%);
+            background-image: 
+                repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 4px),
+                linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%);
+        }
+
+        /* --- Game Container --- */
+        .stone-panel {
+            background: #2a231d;
+            border: 4px solid #5d4037;
+            border-top-color: #8d6e63;
+            border-left-color: #795548;
+            border-right-color: #3e2723;
+            border-bottom-color: #3e2723;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 50px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .stone-panel::before {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 2px solid rgba(141, 110, 99, 0.3);
+            pointer-events: none;
+        }
+
+        /* --- Buttons --- */
+        .btn-relic {
+            background: linear-gradient(to bottom, #5d4037, #3e2723);
+            border: 2px solid #8d6e63;
+            color: #efebe9;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            text-shadow: 1px 1px 2px black;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-relic:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+            border-color: #ffcc80;
+            cursor: pointer;
+        }
+
+        .btn-relic:active { transform: translateY(1px); }
+
+        .btn-relic.correct {
+            background: linear-gradient(to bottom, #2e7d32, #1b5e20) !important;
+            border-color: #66bb6a !important;
+            box-shadow: 0 0 15px #66bb6a;
+        }
+
+        .btn-relic.wrong {
+            background: linear-gradient(to bottom, #c62828, #b71c1c) !important;
+            border-color: #ef5350 !important;
+            animation: shake 0.4s;
+        }
+
+        /* --- Journal / Explanation --- */
+        #journal-box {
+            background: #e0c9a6;
+            color: #3e2723;
+            border: 1px solid #8d6e63;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+            transform: rotate(-1deg);
+            transition: all 0.5s ease;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            font-family: 'Philosopher', sans-serif;
+            position: relative;
+        }
+
+        #journal-box::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('https://www.transparenttextures.com/patterns/aged-paper.png');
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        #journal-box.show {
+            max-height: 300px;
+            opacity: 1;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            transform: rotate(0deg) scale(1);
+        }
+
+        /* --- Torch Animation --- */
+        .torch-container {
+            position: absolute;
+            top: 20px;
+            width: 40px;
+            height: 100px;
+            z-index: -1;
+        }
+        .torch-left { left: 5%; }
+        .torch-right { right: 5%; }
+        
+        .flame {
+            width: 20px; height: 20px;
+            background: orange;
+            border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 20px orange, 0 -10px 40px red;
+            animation: flicker 0.5s infinite alternate;
+            position: absolute;
+            top: 0; left: 10px;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.1) translateY(-2px); opacity: 0.8; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* --- Math Display --- */
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 2px;
+            font-size: 0.9em;
+        }
+        .fraction > span { display: block; padding: 0.1em; }
+        .fraction span.numerator { border-bottom: 1px solid currentColor; }
+        .fraction span.denominator { border-top: 1px solid transparent; }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div id="dungeon-bg"></div>
+    <div class="torch-container torch-left"><div class="flame"></div></div>
+    <div class="torch-container torch-right"><div class="flame"></div></div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="stone-panel p-12 text-center max-w-2xl w-full z-10">
+        <h1 class="title-font text-5xl md:text-6xl text-amber-500 mb-2 drop-shadow-lg tracking-wider">THỢ SĂN<br>PHƯƠNG TRÌNH</h1>
+        <h2 class="text-2xl text-orange-200 mb-8 tracking-widest uppercase">Kho Báu Bị Lãng Quên</h2>
+        
+        <div class="text-left bg-black/40 p-6 rounded mb-8 text-lg border border-amber-900/50">
+            <p class="mb-3 text-amber-100"><span class="text-2xl">📜</span> <b>Nhiệm vụ:</b> Giải mã 10 câu đố cổ xưa để mở cánh cửa kho báu.</p>
+            <p class="mb-3 text-amber-100"><span class="text-2xl">🗝️</span> <b>Chủ đề:</b> Phương trình tích & Phương trình chứa ẩn ở mẫu.</p>
+            <p class="text-amber-100"><span class="text-2xl">⚠️</span> <b>Cảnh báo:</b> Cẩn thận với các "nghiệm ngoại lai".</p>
+        </div>
+
+        <button onclick="startGame()" class="btn-relic px-12 py-4 rounded text-2xl font-bold w-full md:w-auto shadow-lg">
+            BẮT ĐẦU THÁM HIỂM 🕯️
+        </button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden w-full max-w-4xl z-10 flex-col h-full justify-center">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6 px-4 stone-panel py-3">
+            <div class="flex items-center gap-2">
+                <span class="text-3xl">🏺</span>
+                <div>
+                    <div class="text-xs text-amber-400 uppercase tracking-widest">Tiến độ</div>
+                    <div class="text-xl font-bold text-amber-100">Cửa <span id="q-number">1</span>/10</div>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-amber-400 uppercase tracking-widest">Kho báu</div>
+                <div class="text-2xl font-bold text-yellow-400" id="score">0</div>
+            </div>
+        </div>
+
+        <!-- Question Panel -->
+        <div class="stone-panel p-8 mb-6 relative min-h-[150px] flex flex-col justify-center items-center text-center">
+            <div id="question-text" class="text-2xl md:text-3xl font-bold text-amber-50 leading-relaxed drop-shadow-md">
+                Đang giải mã ký tự cổ...
+            </div>
+        </div>
+
+        <!-- Explanation Area (The Journal) -->
+        <div id="journal-box" class="rounded text-lg mb-6 relative w-full">
+            <h3 class="font-bold text-amber-900 border-b border-amber-800 mb-2 pb-1">📖 Nhật Ký Thám Hiểm:</h3>
+            <div id="explanation-content" class="leading-relaxed"></div>
+        </div>
+
+        <!-- Options Grid -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <!-- Buttons injected here -->
+        </div>
+
+        <!-- Next Button -->
+        <div id="next-btn-container" class="hidden text-center">
+            <button onclick="nextQuestion()" class="btn-relic px-10 py-3 rounded text-xl animate-bounce">
+                MỞ CỬA TIẾP THEO ➡
+            </button>
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/90">
+        <div class="stone-panel p-12 text-center max-w-2xl w-full border-amber-500">
+            <div class="text-8xl mb-6">💎</div>
+            <h2 class="title-font text-5xl text-yellow-400 mb-4">KHO BÁU ĐÃ MỞ!</h2>
+            <p class="text-xl text-amber-100 mb-8">Bạn là một thợ săn phương trình đại tài!</p>
+            
+            <div class="bg-black/40 p-6 rounded-lg mb-8 border border-amber-700 w-full inline-block">
+                <div class="text-sm text-amber-500 uppercase mb-2 tracking-widest">Tổng Giá Trị Thu Thập</div>
+                <div class="text-6xl font-bold text-white title-font" id="final-score">0</div>
+            </div>
+
+            <div>
+                <button onclick="location.reload()" class="btn-relic px-10 py-4 rounded text-xl w-full">
+                    CHƠI LẠI
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canvas for effects -->
+    <canvas id="effect-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+    <script>
+        // --- DATA ---
+        // Questions from "Thợ Săn Phương Trình" Context
+        const questions = [
+    {
+        q: "Phương trình nào sau đây được gọi là <b>phương trình tích</b>?",
+        a: [
+            "x(x + 1) = 2",
+            "(x - 1)(x + 2) = 0",
+            "<div class='fraction'><span class='numerator'>x</span><span class='denominator'>x+1</span></div> = 0",
+            "2x + 3 = 0"
+        ],
+        correct: 1,
+        rationale: "Phương trình tích có dạng A(x) . B(x) = 0.<br>Vế trái là tích các đa thức, vế phải bằng 0."
+    },
+    {
+        q: "Tập nghiệm của phương trình (x - 3)(2x + 1) = 0 là:",
+        a: [
+            "S = {3; 1/2}",
+            "S = {-3; -1/2}",
+            "S = {3}",
+            "S = {3; -1/2}"
+        ],
+        correct: 3,
+        rationale: "Giải x - 3 = 0 &rArr; x = 3.<br>Giải 2x + 1 = 0 &rArr; 2x = -1 &rArr; x = -1/2."
+    },
+    {
+        q: "Để giải phương trình x<sup>2</sup> - 4x = 0 bằng cách đưa về phương trình tích, ta phân tích vế trái thành:",
+        a: [
+            "x(x - 4) = 0",
+            "(x - 2)(x + 2) = 0",
+            "x(x + 4) = 0",
+            "(x - 2)<sup>2</sup> = 0"
+        ],
+        correct: 0,
+        rationale: "Đặt nhân tử chung là x: x<sup>2</sup> - 4x = x(x - 4)."
+    },
+    {
+        q: "Điều kiện xác định (ĐKXĐ) của phương trình <div class='fraction'><span class='numerator'>3</span><span class='denominator'>x+1</span></div> - <div class='fraction'><span class='numerator'>2</span><span class='denominator'>x-2</span></div> = 1 là:",
+        a: [
+            "x &ne; 1 và x &ne; -2",
+            "x &ne; -1 hoặc x &ne; 2",
+            "x &ne; -1 và x &ne; 2",
+            "x &ne; 0"
+        ],
+        correct: 2,
+        rationale: "Mẫu thức phải khác 0:<br>x + 1 &ne; 0 &rArr; x &ne; -1<br>x - 2 &ne; 0 &rArr; x &ne; 2."
+    },
+    {
+        q: "Phương trình (x<sup>2</sup> + 1)(x - 5) = 0 có bao nhiêu nghiệm thực?",
+        a: [
+            "2 nghiệm",
+            "1 nghiệm",
+            "3 nghiệm",
+            "Vô nghiệm"
+        ],
+        correct: 1,
+        rationale: "Vì x<sup>2</sup> + 1 &ge; 1 > 0 với mọi x (vô nghiệm).<br>Chỉ còn x - 5 = 0 &rArr; x = 5 (1 nghiệm)."
+    },
+    {
+        q: "Khi giải phương trình chứa ẩn ở mẫu, bước nào có thể dẫn đến 'nghiệm ngoại lai'?",
+        a: [
+            "Khử mẫu",
+            "Tìm ĐKXĐ",
+            "Chuyển vế",
+            "Rút gọn"
+        ],
+        correct: 0,
+        rationale: "Bước khử mẫu là phép biến đổi hệ quả (dấu &rArr;), có thể làm xuất hiện nghiệm không thỏa mãn ĐKXĐ."
+    },
+    {
+        q: "Giải phương trình <div class='fraction'><span class='numerator'>x<sup>2</sup> - 9</span><span class='denominator'>x - 3</span></div> = 0.",
+        a: [
+            "x = 3",
+            "Vô nghiệm",
+            "x = -3",
+            "x = &plusmn;3"
+        ],
+        correct: 2,
+        rationale: "Tử bằng 0: x<sup>2</sup> - 9 = 0 &rArr; x = &plusmn;3.<br>ĐKXĐ: x - 3 &ne; 0 &rArr; x &ne; 3.<br>Vậy loại x = 3, chỉ nhận x = -3."
+    },
+    {
+        q: "Tìm ĐKXĐ của phương trình <div class='fraction'><span class='numerator'>2x</span><span class='denominator'>2x - 4</span></div> + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>3</span></div> = <div class='fraction'><span class='numerator'>x</span><span class='denominator'>x - 2</span></div>.",
+        a: [
+            "x &ne; 0",
+            "x &ne; -2",
+            "x &ne; 4",
+            "x &ne; 2"
+        ],
+        correct: 3,
+        rationale: "2x - 4 &ne; 0 &rArr; 2x &ne; 4 &rArr; x &ne; 2.<br>x - 2 &ne; 0 &rArr; x &ne; 2.<br>Vậy ĐKXĐ là x &ne; 2."
+    },
+    {
+        q: "Nghiệm của phương trình <div class='fraction'><span class='numerator'>x</span><span class='denominator'>x - 1</span></div> = <div class='fraction'><span class='numerator'>1</span><span class='denominator'>x - 1</span></div> là:",
+        a: [
+            "x = 1",
+            "Vô nghiệm",
+            "x = 0",
+            "x = -1"
+        ],
+        correct: 1,
+        rationale: "Quy đồng khử mẫu: x = 1.<br>Đối chiếu ĐKXĐ (x &ne; 1) &rArr; x = 1 bị loại.<br>Vậy phương trình vô nghiệm."
+    },
+    {
+        q: "Biến đổi phương trình 3x<sup>2</sup> - 5x = 2x về dạng phương trình tích.",
+        a: [
+            "x(3x - 7) = 0",
+            "x(3x - 3) = 0",
+            "x(3x + 3) = 0",
+            "x(3x - 5) = 2"
+        ],
+        correct: 0,
+        rationale: "Chuyển vế: 3x<sup>2</sup> - 5x - 2x = 0<br>&rArr; 3x<sup>2</sup> - 7x = 0<br>&rArr; x(3x - 7) = 0."
+    }
+];
+        // --- GAME LOGIC ---
+        let currentQIndex = 0;
+        let score = 0;
+        
+        // Audio Setup
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'stone-move') { // Low rumble
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(50, now);
+                osc.frequency.linearRampToValueAtTime(20, now + 0.5);
+                gain.gain.setValueAtTime(0.5, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'correct') { // Magical chime
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.linearRampToValueAtTime(1000, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'wrong') { // Trap clunk
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') { // Treasure fanfare
+                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+                    let o = audioCtx.createOscillator();
+                    let g = audioCtx.createGain();
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.type = 'triangle';
+                    o.frequency.value = f;
+                    g.gain.setValueAtTime(0.1, now + i*0.15);
+                    g.gain.linearRampToValueAtTime(0, now + i*0.15 + 0.4);
+                    o.start(now + i*0.15);
+                    o.stop(now + i*0.15 + 0.4);
+                });
+            }
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+            
+            playSound('stone-move');
+            currentQIndex = 0;
+            score = 0;
+            updateUI();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQIndex];
+            
+            document.getElementById('q-number').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerHTML = q.q;
+            
+            // Reset Journal
+            const journal = document.getElementById('journal-box');
+            journal.classList.remove('show');
+            document.getElementById('next-btn-container').classList.add('hidden');
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            q.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-relic w-full p-4 rounded text-xl font-bold shadow-md";
+                btn.innerHTML = opt;
+                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selected, correct, btn) {
+            const btns = document.querySelectorAll('.btn-relic');
+            btns.forEach(b => b.disabled = true);
+
+            const q = questions[currentQIndex];
+            const journal = document.getElementById('journal-box');
+            const content = document.getElementById('explanation-content');
+            
+            content.innerHTML = q.rationale;
+            journal.classList.add('show');
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                score += 100;
+                playSound('correct');
+                fireConfetti(20);
+            } else {
+                btn.classList.add('wrong');
+                btns[correct].classList.add('correct');
+                playSound('wrong');
+            }
+
+            updateUI();
+            document.getElementById('next-btn-container').classList.remove('hidden');
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score;
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < questions.length) {
+                playSound('stone-move');
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            playSound('win');
+            fireConfetti(100);
+        }
+
+        // --- PARTICLES (Gold Dust) ---
+        const canvas = document.getElementById('effect-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+
+        function fireConfetti(amount) {
+            for (let i = 0; i < amount; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 15,
+                    vy: (Math.random() - 0.5) * 15,
+                    life: 100,
+                    size: Math.random() * 5 + 2,
+                    color: `hsl(${40 + Math.random()*20}, 100%, 50%)` // Gold colors
+                });
+            }
+            if(particles.length <= amount) requestAnimationFrame(animateParticles);
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.2; // Gravity
+                p.life--;
+                
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+    </script>
+</body>
+</html>
