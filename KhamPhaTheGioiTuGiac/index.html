@@ -59,9 +59,16 @@
         <!-- Khởi động/Kết quả -->
         <div id="start-screen" class="text-center">
             <h2 class="text-2xl font-semibold text-gray-800 mb-4">Chào mừng đến với Bài 2: Tứ Giác (Toán 8)</h2>
-            <p class="mb-6 text-gray-600">Trắc nghiệm này gồm 15 câu hỏi được xây dựng theo 4 mức độ: Nhận biết (6), Thông hiểu (5), Vận dụng (3), Vận dụng cao (1).</p>
-            <p class="mb-8 text-gray-600 font-medium">Sử dụng kiến thức về Tứ giác lồi để chinh phục thử thách này nhé!</p>
-            <button id="start-button" class="px-8 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-lg hover:bg-red-700 transition duration-300 transform hover:scale-105">Bắt Đầu Thử Thách</button>
+            <p class="mb-6 text-gray-600">
+                Trắc nghiệm này gồm <strong>21 câu hỏi</strong> được xây dựng theo 4 mức độ:
+                Nhận biết, Thông hiểu, Vận dụng, Vận dụng cao.
+            </p>
+            <p class="mb-8 text-gray-600 font-medium">
+                Sử dụng kiến thức về Tứ giác lồi để chinh phục thử thách này nhé!
+            </p>
+            <button id="start-button" class="px-8 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-lg hover:bg-red-700 transition duration-300 transform hover:scale-105">
+                Bắt Đầu Thử Thách
+            </button>
         </div>
 
         <!-- Phần Quiz -->
@@ -84,15 +91,21 @@
             </div>
 
             <!-- Nút Tiếp theo -->
-            <button id="next-button" class="hidden w-full px-4 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-300 mt-6">Câu Tiếp Theo</button>
+            <button id="next-button" class="hidden w-full px-4 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-300 mt-6">
+                Câu Tiếp Theo
+            </button>
         </div>
 
         <!-- Màn hình kết quả -->
         <div id="result-screen" class="hidden text-center">
             <h2 class="text-3xl font-bold text-red-700 mb-4">Hoàn Thành Thử Thách!</h2>
-            <p class="text-5xl font-extrabold text-green-600 mb-6"><span id="score-display">0</span>/15</p>
+            <p class="text-5xl font-extrabold text-green-600 mb-6">
+                <span id="score-display">0</span>/21
+            </p>
             <p id="result-message" class="text-xl text-gray-700 mb-8"></p>
-            <button id="restart-button" class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:bg-green-700 transition duration-300 transform hover:scale-105">Làm Lại</button>
+            <button id="restart-button" class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:bg-green-700 transition duration-300 transform hover:scale-105">
+                Làm Lại
+            </button>
         </div>
 
         <!-- Confetti Emitter -->
@@ -100,244 +113,249 @@
     </div>
 
     <script>
-        // Dữ liệu 15 câu hỏi
+        // Dữ liệu 21 câu hỏi
         const quizQuestions = [
-            // --- 6 CÂU NHẬN BIẾT ---
+            // --- NHẬN BIẾT ---
             {
                 level: "Nhận biết",
                 question: "Tứ giác là hình được tạo thành từ bao nhiêu đoạn thẳng, nối các điểm không thẳng hàng?",
                 options: [
-                    { text: "Hai đoạn thẳng", isCorrect: false, rationale: "Hai đoạn thẳng tạo thành góc hoặc một phần đường thẳng." },
-                    { text: "Ba đoạn thẳng", isCorrect: false, rationale: "Ba đoạn thẳng tạo thành tam giác." },
-                    { text: "Bốn đoạn thẳng", isCorrect: true, rationale: "Tứ giác là hình tạo thành từ bốn đoạn thẳng nối các đỉnh theo thứ tự." },
-                    { text: "Năm đoạn thẳng", isCorrect: false, rationale: "Năm đoạn thẳng tạo thành ngũ giác." }
+                    { text: "Hai đoạn thẳng", isCorrect: false, rationale: "Hai đoạn thẳng chỉ tạo thành một góc hoặc một phần đường gấp khúc, chưa tạo thành một hình kín." },
+                    { text: "Ba đoạn thẳng", isCorrect: false, rationale: "Ba đoạn thẳng nối lại tạo thành tam giác." },
+                    { text: "Bốn đoạn thẳng", isCorrect: true, rationale: "Tứ giác là hình được tạo thành từ bốn đoạn thẳng, nối bốn điểm không thẳng hàng theo thứ tự." },
+                    { text: "Năm đoạn thẳng", isCorrect: false, rationale: "Năm đoạn thẳng nối lại tạo thành một ngũ giác, không phải tứ giác." }
                 ],
                 hint: "Tên gọi 'tứ giác' đã gợi ý về số lượng cạnh và đỉnh."
             },
             {
                 level: "Nhận biết",
-                question: "Tổng các góc trong một tứ giác lồi bằng bao nhiêu?",
+                question: "Tổng các góc trong một tứ giác lồi bằng bao nhiêu độ?",
                 options: [
-                    { text: "$180^\\circ$", isCorrect: false, rationale: "Đây là tổng các góc trong tam giác." },
-                    { text: "$360^\\circ$", isCorrect: true, rationale: "Tổng các góc trong một tứ giác lồi luôn bằng $360^\\circ$." },
-                    { text: "$270^\\circ$", isCorrect: false, rationale: "Giá trị sai, không phản ánh quy tắc tổng góc trong tứ giác." },
-                    { text: "$90^\\circ$", isCorrect: false, rationale: "Đây là số đo một góc vuông." }
+                    { text: "180°", isCorrect: false, rationale: "180° là tổng các góc trong một tam giác." },
+                    { text: "360°", isCorrect: true, rationale: "Tổng các góc trong một tứ giác lồi luôn bằng 360°." },
+                    { text: "270°", isCorrect: false, rationale: "Giá trị này không phải tổng góc trong của tứ giác." },
+                    { text: "90°", isCorrect: false, rationale: "90° là số đo một góc vuông." }
                 ],
-                hint: "Hãy nhớ quy tắc chia tứ giác thành hai tam giác."
+                hint: "Hãy nhớ: tứ giác có thể chia thành hai tam giác."
             },
             {
                 level: "Nhận biết",
-                question: "Trong tứ giác $ABCD$, góc đối diện với đỉnh $A$ là góc nào?",
+                question: "Trong tứ giác ABCD, góc đối diện với đỉnh A là góc nào?",
                 options: [
-                    { text: "Góc $\\widehat{B}$", isCorrect: false, rationale: "Góc $\\widehat{B}$ là góc kề với $\\widehat{A}$." },
-                    { text: "Góc $\\widehat{C}$", isCorrect: true, rationale: "Góc đối diện với đỉnh $A$ là góc $\\widehat{C}$." },
-                    { text: "Góc $\\widehat{D}$", isCorrect: false, rationale: "Góc $\\widehat{D}$ là góc kề với $\\widehat{A}$." },
-                    { text: "Cả góc $\\widehat{B}$ và $\\widehat{D}$", isCorrect: false, rationale: "Chỉ có một góc đối diện." }
+                    { text: "Góc B", isCorrect: false, rationale: "Góc B là góc kề với góc A." },
+                    { text: "Góc C", isCorrect: true, rationale: "Góc C nằm đối diện với góc A, không chung cạnh với A." },
+                    { text: "Góc D", isCorrect: false, rationale: "Góc D là góc kề với góc A." },
+                    { text: "Cả góc B và góc D", isCorrect: false, rationale: "Chỉ có một góc đối diện với A là góc C." }
                 ],
-                hint: "Góc đối diện là góc không có chung cạnh với góc đang xét."
+                hint: "Góc đối diện là góc không có cạnh chung với góc đang xét."
             },
             {
                 level: "Nhận biết",
-                question: "Cho tứ giác $EFGH$. Hai đỉnh kề nhau là:",
+                question: "Cho tứ giác EFGH. Hai đỉnh kề nhau là:",
                 options: [
-                    { text: "$E$ và $G$", isCorrect: false, rationale: "Hai đỉnh $E$ và $G$ là hai đỉnh đối diện." },
-                    { text: "$F$ và $H$", isCorrect: false, rationale: "Hai đỉnh $F$ và $H$ là hai đỉnh đối diện." },
-                    { text: "$E$ và $F$", isCorrect: true, rationale: "Hai đỉnh $E$ và $F$ là hai đỉnh kề nhau vì chúng cùng nằm trên một cạnh $EF$." },
-                    { text: "$E, F, G, H$", isCorrect: false, rationale: "Đây là tất cả các đỉnh." }
+                    { text: "E và G", isCorrect: false, rationale: "E và G là hai đỉnh đối diện, không kề nhau." },
+                    { text: "F và H", isCorrect: false, rationale: "F và H cũng là hai đỉnh đối diện." },
+                    { text: "E và F", isCorrect: true, rationale: "E và F là hai đỉnh cùng nằm trên cạnh EF nên là hai đỉnh kề nhau." },
+                    { text: "E, F, G, H", isCorrect: false, rationale: "Đây là toàn bộ các đỉnh của tứ giác." }
                 ],
-                hint: "Hai đỉnh kề nhau cùng nằm trên một cạnh của tứ giác."
+                hint: "Hai đỉnh kề nhau là hai đỉnh cùng nằm trên một cạnh."
             },
             {
                 level: "Nhận biết",
-                question: "Đường chéo của tứ giác $MNPQ$ là đoạn thẳng nào?",
+                question: "Đường chéo của tứ giác MNPQ là đoạn thẳng nào?",
                 options: [
-                    { text: "$MN$", isCorrect: false, rationale: "Đây là một cạnh của tứ giác." },
-                    { text: "$MQ$", isCorrect: false, rationale: "Đây là một cạnh của tứ giác." },
-                    { text: "$MP$", isCorrect: true, rationale: "Đường chéo là đoạn thẳng nối hai đỉnh đối diện, ví dụ $MP$ hoặc $NQ$." },
-                    { text: "$NP$", isCorrect: false, rationale: "Đây là một cạnh của tứ giác." }
+                    { text: "MN", isCorrect: false, rationale: "MN là một cạnh của tứ giác." },
+                    { text: "MQ", isCorrect: false, rationale: "MQ là một cạnh của tứ giác." },
+                    { text: "MP", isCorrect: true, rationale: "Đường chéo nối hai đỉnh đối diện, ví dụ như MP hoặc NQ." },
+                    { text: "NP", isCorrect: false, rationale: "NP là một cạnh của tứ giác." }
                 ],
-                hint: "Đường chéo nối các đỉnh không kề nhau."
+                hint: "Đường chéo là đoạn thẳng nối hai đỉnh không kề nhau."
             },
             {
                 level: "Nhận biết",
                 question: "Tứ giác lồi là tứ giác mà:",
                 options: [
-                    { text: "Các cạnh bằng nhau.", isCorrect: false, rationale: "Đây là tính chất của hình thoi hoặc hình vuông." },
-                    { text: "Tất cả các góc đều là góc nhọn.", isCorrect: false, rationale: "Tổng các góc phải là $360^\\circ$." },
+                    { text: "Các cạnh bằng nhau.", isCorrect: false, rationale: "Đây là tính chất của một số tứ giác đặc biệt như hình thoi, hình vuông." },
+                    { text: "Tất cả các góc đều nhọn.", isCorrect: false, rationale: "Không nhất thiết tất cả các góc đều nhọn, nhưng tổng bốn góc vẫn là 360°." },
                     { text: "Nằm hoàn toàn về một phía của đường thẳng chứa bất kỳ cạnh nào của nó.", isCorrect: true, rationale: "Đây là định nghĩa chuẩn của tứ giác lồi trong sách giáo khoa." },
-                    { text: "Chỉ có hai đường chéo bằng nhau.", isCorrect: false, rationale: "Đây là tính chất của hình chữ nhật." }
+                    { text: "Chỉ có hai đường chéo bằng nhau.", isCorrect: false, rationale: "Hai đường chéo bằng nhau là tính chất của hình chữ nhật." }
                 ],
-                hint: "Hãy nhớ mối quan hệ giữa các cạnh và phần bên trong của tứ giác lồi."
+                hint: "Hãy nhớ mối quan hệ giữa các cạnh, các đỉnh và phần bên trong tứ giác lồi."
             },
-            // --- 5 CÂU THÔNG HIỂU ---
+
+            // --- THÔNG HIỂU ---
             {
                 level: "Thông hiểu",
-                question: "Cho tứ giác $ABCD$ có $\\widehat{A} = 75^\\circ$, $\\widehat{B} = 100^\\circ$, $\\widehat{C} = 85^\\circ$. Tính số đo góc $\\widehat{D}$?",
+                question: "Cho tứ giác ABCD có góc A = 75°, góc B = 100°, góc C = 85°. Tính số đo góc D.",
                 options: [
-                    { text: "$100^\\circ$", isCorrect: true, rationale: "Áp dụng tổng các góc trong tứ giác: $\\widehat{D} = 360^\\circ - (75^\\circ + 100^\\circ + 85^\\circ) = 360^\\circ - 260^\\circ = 100^\\circ$." },
-                    { text: "$90^\\circ$", isCorrect: false, rationale: "Sai, tổng các góc phải bằng $360^\\circ$." },
-                    { text: "$85^\\circ$", isCorrect: false, rationale: "Sai, góc $\\widehat{C}$ đã là $85^\\circ$." },
-                    { text: "$75^\\circ$", isCorrect: false, rationale: "Sai, tổng các góc phải bằng $360^\\circ$." }
+                    { text: "100°", isCorrect: true, rationale: "Tổng bốn góc tứ giác bằng 360°. Vậy góc D = 360° - (75° + 100° + 85°) = 360° - 260° = 100°." },
+                    { text: "90°", isCorrect: false, rationale: "90° là khoảng chênh lệch nếu cộng nhầm các góc." },
+                    { text: "85°", isCorrect: false, rationale: "85° là số đo góc C, không phải góc D." },
+                    { text: "75°", isCorrect: false, rationale: "75° là số đo góc A." }
                 ],
-                hint: "Tổng bốn góc của tứ giác là $360^\\circ$."
-            },
-            {
-                level: "Thông hiểu",
-                question: "Một tứ giác có ba góc lần lượt là $90^\\circ$, $110^\\circ$ và $70^\\circ$. Hỏi góc còn lại là góc gì?",
-                options: [
-                    { text: "Góc nhọn", isCorrect: false, rationale: "Góc nhọn có số đo nhỏ hơn $90^\\circ$." },
-                    { text: "Góc vuông", isCorrect: false, rationale: "Góc vuông có số đo là $90^\\circ$." },
-                    { text: "Góc tù", isCorrect: true, rationale: "Góc còn lại là $360^\\circ - (90^\\circ + 110^\\circ + 70^\\circ) = 360^\\circ - 270^\\circ = 90^\\circ$. Góc này là góc vuông." }, // Cần sửa lại rationale: 90 độ là góc vuông
-                    { text: "Góc bẹt", isCorrect: false, rationale: "Góc bẹt có số đo là $180^\\circ$." }
-                ],
-                hint: "Kết quả tính toán là $90^\\circ$. Số đo này tương ứng với loại góc nào?"
+                hint: "Tổng các góc trong một tứ giác là 360°."
             },
             {
                 level: "Thông hiểu",
-                question: "Trong một tứ giác, nếu hai góc kề nhau có tổng bằng $180^\\circ$, thì hai cạnh đối còn lại có mối quan hệ gì?",
+                question: "Một tứ giác có ba góc lần lượt là 90°, 110° và 70°. Hỏi góc còn lại là loại góc gì?",
                 options: [
-                    { text: "Chúng vuông góc với nhau.", isCorrect: false, rationale: "Tổng hai góc kề bằng $180^\\circ$ chỉ xảy ra trong hình thang, dẫn đến hai cạnh đối song song." },
-                    { text: "Chúng bằng nhau.", isCorrect: false, rationale: "Không thể kết luận các cạnh đối bằng nhau." },
-                    { text: "Chúng song song với nhau.", isCorrect: true, rationale: "Trong tứ giác, nếu hai góc kề có tổng $180^\\circ$, thì hai cạnh đối không nằm trên hai cạnh đó phải song song (định nghĩa của hình thang)." },
-                    { text: "Chúng tạo thành góc tù.", isCorrect: false, rationale: "Không thể kết luận như vậy." }
+                    { text: "Góc nhọn", isCorrect: false, rationale: "Góc nhọn có số đo nhỏ hơn 90°." },
+                    { text: "Góc vuông", isCorrect: true, rationale: "Góc còn lại bằng 360° - (90° + 110° + 70°) = 360° - 270° = 90°. Đó là góc vuông." },
+                    { text: "Góc tù", isCorrect: false, rationale: "Góc tù có số đo lớn hơn 90° nhưng nhỏ hơn 180°." },
+                    { text: "Góc bẹt", isCorrect: false, rationale: "Góc bẹt có số đo bằng 180°." }
                 ],
-                hint: "Hãy nhớ đến dấu hiệu nhận biết một loại tứ giác đặc biệt có hai cạnh song song."
+                hint: "Tính số đo góc còn lại rồi so sánh với 90°."
             },
             {
                 level: "Thông hiểu",
-                question: "Số đo các góc của tứ giác $ABCD$ tỉ lệ với $1:2:3:4$. Tính số đo góc lớn nhất.",
+                question: "Trong một tứ giác, nếu hai góc kề nhau có tổng bằng 180°, thì hai cạnh đối còn lại có mối quan hệ gì?",
                 options: [
-                    { text: "$144^\\circ$", isCorrect: true, rationale: "Tổng số phần là $1+2+3+4=10$. Tổng các góc là $360^\\circ$. Giá trị một phần là $360^\\circ / 10 = 36^\\circ$. Góc lớn nhất chiếm $4$ phần, nên số đo là $4 \\cdot 36^\\circ = 144^\\circ$." },
-                    { text: "$108^\\circ$", isCorrect: false, rationale: "Đây là số đo của góc chiếm $3$ phần." },
-                    { text: "$72^\\circ$", isCorrect: false, rationale: "Đây là số đo của góc chiếm $2$ phần." },
-                    { text: "$36^\\circ$", isCorrect: false, rationale: "Đây là số đo của góc nhỏ nhất (chiếm $1$ phần)." }
+                    { text: "Chúng vuông góc với nhau.", isCorrect: false, rationale: "Hai góc kề bù nhau không cho ta kết luận hai cạnh đối vuông góc." },
+                    { text: "Chúng bằng nhau.", isCorrect: false, rationale: "Không thể kết luận hai cạnh đối bằng nhau chỉ từ điều kiện hai góc kề bù nhau." },
+                    { text: "Chúng song song với nhau.", isCorrect: true, rationale: "Trong một số dạng tứ giác (như hình thang), nếu hai góc kề có tổng 180° thì hai cạnh đối còn lại song song." },
+                    { text: "Chúng tạo thành một góc tù.", isCorrect: false, rationale: "Không thể kết luận như vậy từ tổng hai góc kề." }
                 ],
-                hint: "Tổng số đo các góc là $360^\\circ$. Hãy chia tổng này cho tổng số phần tỉ lệ."
+                hint: "Hãy nhớ dấu hiệu nhận biết hình thang: một cặp cạnh đối song song khi hai góc cùng phía trong kề nhau bù nhau."
             },
             {
                 level: "Thông hiểu",
-                question: "Cho tứ giác $ABCD$ có $\\widehat{A} = 60^\\circ$, $\\widehat{B} = 100^\\circ$ và $\\widehat{C} = 2\\widehat{D}$. Tính số đo góc $\\widehat{D}$.",
+                question: "Số đo các góc của tứ giác ABCD tỉ lệ với 1 : 2 : 3 : 4. Tính số đo góc lớn nhất.",
                 options: [
-                    { text: "$60^\\circ$", isCorrect: false, rationale: "Giá trị sai, không thỏa mãn điều kiện $360^\\circ$." },
-                    { text: "$120^\\circ$", isCorrect: false, rationale: "Đây là số đo của $\\widehat{C}$ nếu $\\widehat{D} = 60^\\circ$." },
-                    { text: "$100^\\circ$", isCorrect: true, rationale: "Ta có $360^\\circ = 60^\\circ + 100^\\circ + 2\\widehat{D} + \\widehat{D}$. Suy ra $3\\widehat{D} = 360^\\circ - 160^\\circ = 200^\\circ$. $\\widehat{D} = 200^\\circ / 3 \\approx 66,67^\\circ$." }, // Sửa lại rationale: 3D = 200, D = 200/3 = 66.67.
-                    { text: "$66,67^\\circ$", isCorrect: true, rationale: "Ta có $\\widehat{A} + \\widehat{B} + \\widehat{C} + \\widehat{D} = 360^\\circ$. Thay $\\widehat{C} = 2\\widehat{D}$ vào, ta có $60^\\circ + 100^\\circ + 2\\widehat{D} + \\widehat{D} = 360^\\circ$, hay $160^\\circ + 3\\widehat{D} = 360^\\circ$. Do đó, $3\\widehat{D} = 200^\\circ$, suy ra $\\widehat{D} \\approx 66,67^\\circ$." }
+                    { text: "144°", isCorrect: true, rationale: "Tổng phần tỉ lệ là 1 + 2 + 3 + 4 = 10. Tổng góc là 360°. Một phần là 360° : 10 = 36°. Góc lớn nhất ứng với 4 phần nên bằng 4 × 36° = 144°." },
+                    { text: "108°", isCorrect: false, rationale: "108° là góc có 3 phần tỉ lệ, không phải lớn nhất." },
+                    { text: "72°", isCorrect: false, rationale: "72° là góc có 2 phần tỉ lệ." },
+                    { text: "36°", isCorrect: false, rationale: "36° là góc nhỏ nhất, ứng với 1 phần." }
                 ],
-                hint: "Đặt $\\widehat{D}$ là $x$ và áp dụng tổng bốn góc bằng $360^\\circ$ để tìm $x$."
+                hint: "Chia đều tổng 360° theo tổng số phần tỉ lệ."
             },
-            // --- 3 CÂU VẬN DỤNG ---
+            {
+                level: "Thông hiểu",
+                question: "Cho tứ giác ABCD có góc A = 60°, góc B = 100° và góc C = 2 lần góc D. Tính số đo góc D.",
+                options: [
+                    { text: "60°", isCorrect: false, rationale: "Nếu D = 60° thì C = 120°, tổng các góc sẽ vượt quá 360° nếu tính sai." },
+                    { text: "120°", isCorrect: false, rationale: "120° là số đo của góc C nếu D = 60°, không phải số đo của góc D." },
+                    { text: "100°", isCorrect: false, rationale: "Giá trị này không thỏa mãn phương trình tổng bốn góc." },
+                    { text: "66,67° (xấp xỉ)", isCorrect: true, rationale: "Đặt góc D = x, khi đó C = 2x. Tổng góc: 60° + 100° + 2x + x = 360°. Suy ra 3x = 200°, x ≈ 66,67°." }
+                ],
+                hint: "Đặt góc D là x rồi lập phương trình tổng bốn góc bằng 360°."
+            },
+
+            // --- VẬN DỤNG ---
             {
                 level: "Vận dụng",
-                question: "Một mảnh đất hình tứ giác có chu vi $100\\text{ m}$. Biết độ dài ba cạnh lần lượt là $20\\text{ m}$, $30\\text{ m}$ và $25\\text{ m}$. Tính độ dài cạnh còn lại.",
+                question: "Một mảnh đất hình tứ giác có chu vi 100 m. Biết độ dài ba cạnh lần lượt là 20 m, 30 m và 25 m. Tính độ dài cạnh còn lại.",
                 options: [
-                    { text: "$25\\text{ m}$", isCorrect: true, rationale: "Chu vi là tổng độ dài bốn cạnh: $C = a + b + c + d$. Cạnh còn lại là $d = C - (a + b + c) = 100 - (20 + 30 + 25) = 100 - 75 = 25\\text{ m}$." },
-                    { text: "$15\\text{ m}$", isCorrect: false, rationale: "Tính toán sai, tổng ba cạnh đã cho là $75\\text{ m}$." },
-                    { text: "$35\\text{ m}$", isCorrect: false, rationale: "Tính toán sai." },
-                    { text: "$40\\text{ m}$", isCorrect: false, rationale: "Tính toán sai." }
+                    { text: "25 m", isCorrect: true, rationale: "Chu vi C = a + b + c + d. Cạnh còn lại d = 100 - (20 + 30 + 25) = 100 - 75 = 25 m." },
+                    { text: "15 m", isCorrect: false, rationale: "15 m là kết quả tính sai do nhầm lẫn khi trừ." },
+                    { text: "35 m", isCorrect: false, rationale: "35 m không thỏa mãn điều kiện chu vi." },
+                    { text: "40 m", isCorrect: false, rationale: "40 m là kết quả của một phép trừ sai." }
                 ],
-                hint: "Chu vi của tứ giác là tổng độ dài của bốn cạnh."
+                hint: "Chu vi là tổng độ dài bốn cạnh."
             },
             {
                 level: "Vận dụng",
-                question: "Cho tứ giác $ABCD$ có $AB=AD$ và $CB=CD$. Nếu $\\widehat{ABC} = 70^\\circ$ và $\\widehat{ADC} = 110^\\circ$, tính số đo góc $\\widehat{A}$ biết $\\widehat{A} = \\widehat{C}$ (hình ảnh )",
+                question: "Cho tứ giác ABCD có AB = AD và CB = CD. Góc ABC = 70° và góc ADC = 110°. Hỏi có thể tính chính xác số đo góc A được không?",
                 options: [
-                    { text: "$90^\\circ$", isCorrect: false, rationale: "Trong tứ giác này (hình cái diều), $\\widehat{B} \\ne \\widehat{D}$. Ta có $\\widehat{A} + \\widehat{C} = 360^\\circ - (70^\\circ + 110^\\circ) = 360^\\circ - 180^\\circ = 180^\\circ$. Vì $\\widehat{A}$ và $\\widehat{C}$ không nhất thiết bằng nhau trong hình cái diều (chỉ có $\\widehat{B}$ và $\\widehat{D}$ đối diện các cạnh bằng nhau mới bằng nhau)." },
-                    { text: "$180^\\circ$", isCorrect: false, rationale: "Không thể có góc $180^\\circ$ trong tứ giác lồi." },
-                    { text: "$110^\\circ$", isCorrect: false, rationale: "Nếu $\\widehat{A} = 110^\\circ$, thì $\\widehat{C} = 180^\\circ - 110^\\circ = 70^\\circ$. Tổng các góc là $70^\\circ + 110^\\circ + 70^\\circ + 110^\\circ = 360^\\circ$." }, // Sửa lại rationale: Nếu A = 110, thì C = 70. Tổng A+C+B+D = 360 là đúng.
-                    { text: "Không đủ dữ kiện để tính $\\widehat{A}$", isCorrect: true, rationale: "Trong hình cái diều ($AB=AD, CB=CD$), ta có $\\widehat{ABC} = \\widehat{ADC}$ nếu $AB$ và $CB$ bằng nhau, điều này mâu thuẫn với $\\widehat{ABC}=70^\\circ$ và $\\widehat{ADC}=110^\\circ$. Do đó, tứ giác này là tứ giác bất kỳ. Ta có $\\widehat{A} + \\widehat{C} = 360^\\circ - 70^\\circ - 110^\\circ = 180^\\circ$. Nhưng không có dữ kiện nào cho biết $\\widehat{A} = \\widehat{C}$ nên không thể tính riêng $\\widehat{A}$." }
+                    { text: "Có, góc A = 90°", isCorrect: false, rationale: "Nếu giả sử góc A = 90° thì chưa khẳng định được từ các dữ kiện đã cho, vì tứ giác này không được xác định là tứ giác đặc biệt nào cụ thể." },
+                    { text: "Có, góc A = 180°", isCorrect: false, rationale: "Góc trong tứ giác lồi không thể bằng 180°." },
+                    { text: "Có, góc A = 110°", isCorrect: false, rationale: "Giả thiết không cho thấy góc A bằng góc D." },
+                    { text: "Không đủ dữ kiện để tính góc A", isCorrect: true, rationale: "Ta chỉ suy ra được góc A + góc C = 360° - (70° + 110°) = 180°, nhưng không có dữ kiện nào cho biết quan hệ cụ thể giữa góc A và góc C, nên không thể tính riêng góc A." }
                 ],
-                hint: "Hãy xem xét tính chất của tứ giác có hai cặp cạnh kề bằng nhau (hình cái diều)."
+                hint: "Hãy dùng tổng bốn góc trong tứ giác, rồi xem có mối liên hệ nào khác giữa A và C không."
             },
             {
                 level: "Vận dụng (Thực tế)",
-                question: "Một cánh cửa sổ hình tứ giác có ba góc lần lượt là $90^\\circ$, $90^\\circ$ và $100^\\circ$. Để cánh cửa sổ đóng khít, góc còn lại của khung cửa sổ phải có số đo là bao nhiêu?",
+                question: "Một cánh cửa sổ hình tứ giác có ba góc lần lượt là 90°, 90° và 100°. Để cánh cửa sổ đóng khít, góc còn lại của khung cửa sổ phải có số đo là bao nhiêu?",
                 options: [
-                    { text: "$80^\\circ$", isCorrect: true, rationale: "Tổng các góc phải là $360^\\circ$. Góc còn lại là $360^\\circ - (90^\\circ + 90^\\circ + 100^\\circ) = 360^\\circ - 280^\\circ = 80^\\circ$." },
-                    { text: "$90^\\circ$", isCorrect: false, rationale: "Nếu góc này là $90^\\circ$, tổng là $370^\\circ$, là sai." },
-                    { text: "$100^\\circ$", isCorrect: false, rationale: "Nếu góc này là $100^\\circ$, tổng là $380^\\circ$, là sai." },
-                    { text: "$110^\\circ$", isCorrect: false, rationale: "Nếu góc này là $110^\\circ$, tổng là $390^\\circ$, là sai." }
+                    { text: "80°", isCorrect: true, rationale: "Tổng bốn góc trong tứ giác là 360°. Góc còn lại = 360° - (90° + 90° + 100°) = 360° - 280° = 80°." },
+                    { text: "90°", isCorrect: false, rationale: "Nếu góc này là 90°, tổng bốn góc sẽ là 370°, vượt quá 360°." },
+                    { text: "100°", isCorrect: false, rationale: "Nếu góc này là 100°, tổng sẽ là 380°, không thể là tứ giác." },
+                    { text: "110°", isCorrect: false, rationale: "Nếu góc này là 110°, tổng sẽ là 390°, không đúng." }
                 ],
-                hint: "Cánh cửa sổ là một tứ giác. Áp dụng quy tắc tổng các góc."
+                hint: "Dù là bài toán thực tế, vẫn áp dụng quy tắc tổng bốn góc của tứ giác."
             },
-            // --- 1 CÂU VẬN DỤNG CAO ---
+
+            // --- VẬN DỤNG CAO ---
             {
                 level: "Vận dụng cao",
-                question: "Cho tứ giác $ABCD$. Các tia phân giác của $\\widehat{A}$ và $\\widehat{B}$ cắt nhau tại $I$. Biết $\\widehat{C} = 120^\\circ$ và $\\widehat{D} = 80^\\circ$. Tính số đo góc $\\widehat{AIB}$.",
+                question: "Cho tứ giác ABCD. Các tia phân giác của góc A và góc B cắt nhau tại I. Biết góc C = 120° và góc D = 80°. Tính số đo góc AIB.",
                 options: [
-                    { text: "$80^\\circ$", isCorrect: false, rationale: "Đây là $\\frac{\\widehat{C} + \\widehat{D}}{2} = 100^\\circ$." },
-                    { text: "$100^\\circ$", isCorrect: true, rationale: "Trong $\\triangle AIB$, $\\widehat{AIB} = 180^\\circ - (\\widehat{A}_1 + \\widehat{B}_1) = 180^\\circ - \\frac{\\widehat{A} + \\widehat{B}}{2}$. Ta có $\\widehat{A} + \\widehat{B} = 360^\\circ - (\\widehat{C} + \\widehat{D}) = 360^\\circ - (120^\\circ + 80^\\circ) = 160^\\circ$. Vậy $\\widehat{AIB} = 180^\\circ - \\frac{160^\\circ}{2} = 180^\\circ - 80^\\circ = 100^\\circ$." },
-                    { text: "$110^\\circ$", isCorrect: false, rationale: "Tính toán sai." },
-                    { text: "$130^\\circ$", isCorrect: false, rationale: "Tính toán sai." }
+                    { text: "80°", isCorrect: false, rationale: "80° là nửa tổng góc A và B, chưa phải số đo góc AIB." },
+                    { text: "100°", isCorrect: true, rationale: "Ta có A + B + C + D = 360°. Nên A + B = 360° - (120° + 80°) = 160°. Trong tam giác AIB, góc A1 = A/2, góc B1 = B/2 nên góc AIB = 180° - (A/2 + B/2) = 180° - (A + B)/2 = 180° - 160°/2 = 100°." },
+                    { text: "110°", isCorrect: false, rationale: "110° là một giá trị suy đoán nhưng không đúng theo công thức." },
+                    { text: "130°", isCorrect: false, rationale: "130° là giá trị lớn hơn kết quả đúng." }
                 ],
-                hint: "Sử dụng tổng các góc trong $\\triangle AIB$ và $\\widehat{A} + \\widehat{B} + \\widehat{C} + \\widehat{D} = 360^\\circ$."
+                hint: "Dùng tổng góc tứ giác để tìm A + B, rồi áp dụng tổng góc trong tam giác AIB."
             },
-            // --- 5 CÂU THÔNG HIỂU (còn lại) ---
+
+            // --- THÔNG HIỂU (còn lại) ---
             {
                 level: "Thông hiểu",
-                question: "Tứ giác $ABCD$ có $\\widehat{A} = 2x$, $\\widehat{B} = 3x$, $\\widehat{C} = x$, $\\widehat{D} = 4x$. Tính số đo góc $\\widehat{B}$.",
+                question: "Tứ giác ABCD có góc A = 2x, góc B = 3x, góc C = x, góc D = 4x. Tính số đo góc B.",
                 options: [
-                    { text: "$36^\\circ$", isCorrect: false, rationale: "Đây là số đo góc $\\widehat{C}$ ($x$)." },
-                    { text: "$72^\\circ$", isCorrect: false, rationale: "Đây là số đo góc $\\widehat{A}$ ($2x$)." },
-                    { text: "$108^\\circ$", isCorrect: true, rationale: "Tổng các góc là $2x + 3x + x + 4x = 10x = 360^\\circ$. Suy ra $x = 36^\\circ$. Góc $\\widehat{B} = 3x = 3 \\cdot 36^\\circ = 108^\\circ$." },
-                    { text: "$144^\\circ$", isCorrect: false, rationale: "Đây là số đo góc $\\widehat{D}$ ($4x$)." }
+                    { text: "36°", isCorrect: false, rationale: "36° là số đo của góc C, ứng với x." },
+                    { text: "72°", isCorrect: false, rationale: "72° là số đo của góc A, ứng với 2x." },
+                    { text: "108°", isCorrect: true, rationale: "Tổng góc: 2x + 3x + x + 4x = 10x = 360°. Suy ra x = 36°. Vậy góc B = 3x = 108°." },
+                    { text: "144°", isCorrect: false, rationale: "144° là số đo của góc D, ứng với 4x." }
                 ],
-                hint: "Thiết lập phương trình với tổng các góc bằng $360^\\circ$ để tìm $x$."
+                hint: "Tổng bốn góc của tứ giác là 360°, hãy tìm x trước."
             },
             {
                 level: "Thông hiểu",
-                question: "Cho tứ giác $ABCD$. Nếu $\\widehat{A} + \\widehat{C} = 190^\\circ$, thì $\\widehat{B} + \\widehat{D}$ bằng bao nhiêu?",
+                question: "Cho tứ giác ABCD. Nếu góc A + góc C = 190°, thì góc B + góc D bằng bao nhiêu?",
                 options: [
-                    { text: "$170^\\circ$", isCorrect: true, rationale: "Vì $\\widehat{A} + \\widehat{B} + \\widehat{C} + \\widehat{D} = 360^\\circ$, nên $\\widehat{B} + \\widehat{D} = 360^\\circ - (\\widehat{A} + \\widehat{C}) = 360^\\circ - 190^\\circ = 170^\\circ$." },
-                    { text: "$190^\\circ$", isCorrect: false, rationale: "Giá trị này bằng tổng $\\widehat{A} + \\widehat{C}$." },
-                    { text: "$200^\\circ$", isCorrect: false, rationale: "Tính toán sai." },
-                    { text: "$180^\\circ$", isCorrect: false, rationale: "Chỉ xảy ra trong tứ giác nội tiếp (lớp 9)." }
+                    { text: "170°", isCorrect: true, rationale: "Tổng các góc tứ giác là 360°. Do đó góc B + góc D = 360° - (góc A + góc C) = 360° - 190° = 170°." },
+                    { text: "190°", isCorrect: false, rationale: "190° là tổng của góc A và góc C, không phải của B và D." },
+                    { text: "200°", isCorrect: false, rationale: "Tính toán sai." },
+                    { text: "180°", isCorrect: false, rationale: "B + D = 180° chỉ xảy ra trong tứ giác nội tiếp đường tròn với A và C đối diện." }
                 ],
-                hint: "Luôn nhớ tổng bốn góc của một tứ giác."
+                hint: "Áp dụng công thức tổng bốn góc tứ giác."
             },
             {
                 level: "Thông hiểu",
                 question: "Tứ giác có bao nhiêu đường chéo?",
                 options: [
-                    { text: "Một đường chéo", isCorrect: false, rationale: "Một tứ giác cần nối hai cặp đỉnh đối diện." },
-                    { text: "Hai đường chéo", isCorrect: true, rationale: "Tứ giác $ABCD$ có hai đường chéo là $AC$ và $BD$." },
-                    { text: "Ba đường chéo", isCorrect: false, rationale: "Ba đường chéo thuộc về ngũ giác." },
-                    { text: "Bốn đường chéo", isCorrect: false, rationale: "Bốn là số cạnh hoặc số đỉnh." }
+                    { text: "Một đường chéo", isCorrect: false, rationale: "Một tứ giác luôn có hai đường chéo." },
+                    { text: "Hai đường chéo", isCorrect: true, rationale: "Tứ giác ABCD có hai đường chéo là AC và BD." },
+                    { text: "Ba đường chéo", isCorrect: false, rationale: "Ba đường chéo là của ngũ giác." },
+                    { text: "Bốn đường chéo", isCorrect: false, rationale: "Bốn là số cạnh của tứ giác, không phải số đường chéo." }
                 ],
-                hint: "Hãy đếm số cách nối hai đỉnh đối diện của tứ giác."
+                hint: "Hãy liệt kê các đoạn nối hai đỉnh không kề nhau."
             },
             {
                 level: "Thông hiểu",
-                question: "Trong tứ giác $ABCD$, nếu $\\widehat{A}$ và $\\widehat{B}$ là hai góc bù nhau (tổng bằng $180^\\circ$), thì điều gì có thể xảy ra?",
+                question: "Trong tứ giác ABCD, nếu góc A và góc B là hai góc bù nhau (tổng bằng 180°), thì điều gì có thể xảy ra?",
                 options: [
-                    { text: "Cạnh $AD$ song song với cạnh $BC$.", isCorrect: false, rationale: "Nếu $\\widehat{A}$ và $\\widehat{D}$ bù nhau, thì $AB \\parallel CD$." },
-                    { text: "Cạnh $AB$ song song với cạnh $CD$.", isCorrect: false, rationale: "Hai góc bù nhau kề nhau không đảm bảo có cặp cạnh song song." },
-                    { text: "Cạnh $AD$ và $BC$ không có mối quan hệ đặc biệt.", isCorrect: true, rationale: "Việc hai góc kề bù nhau không giúp suy ra mối quan hệ song song của hai cạnh đối còn lại." },
-                    { text: "Cả bốn góc đều bằng $90^\\circ$.", isCorrect: false, rationale: "Điều này chỉ xảy ra trong hình chữ nhật." }
+                    { text: "Cạnh AD song song với cạnh BC.", isCorrect: false, rationale: "Điều này chỉ đúng trong những trường hợp đặc biệt (như hình thang) với cấu hình cụ thể." },
+                    { text: "Cạnh AB song song với cạnh CD.", isCorrect: false, rationale: "Hai góc A và B bù nhau không đủ để kết luận AB song song CD." },
+                    { text: "Cạnh AD và cạnh BC không có mối quan hệ đặc biệt nào suy ra được.", isCorrect: true, rationale: "Từ điều kiện góc A và góc B bù nhau, ta không suy ra được quan hệ song song hay vuông góc chắc chắn giữa các cạnh còn lại." },
+                    { text: "Cả bốn góc đều bằng 90°.", isCorrect: false, rationale: "Khi đó tứ giác là hình chữ nhật, nhưng đề bài không cho đủ điều kiện." }
                 ],
-                hint: "Điều kiện để có cạnh song song là tổng hai góc *cùng phía* (kề cạnh bên) bằng $180^\\circ$."
+                hint: "Không phải mọi điều kiện về góc đều cho ta tứ giác đặc biệt."
             },
             {
                 level: "Thông hiểu",
-                question: "Số đo góc ngoài tại một đỉnh của tứ giác là $100^\\circ$. Tính số đo góc trong tại đỉnh đó.",
+                question: "Số đo góc ngoài tại một đỉnh của tứ giác là 100°. Tính số đo góc trong tại đỉnh đó.",
                 options: [
-                    { text: "$80^\\circ$", isCorrect: true, rationale: "Góc trong và góc ngoài tại cùng một đỉnh là hai góc kề bù, nên tổng của chúng là $180^\\circ$. Góc trong là $180^\\circ - 100^\\circ = 80^\\circ$." },
-                    { text: "$100^\\circ$", isCorrect: false, rationale: "Đây là số đo góc ngoài." },
-                    { text: "$90^\\circ$", isCorrect: false, rationale: "Giá trị sai, chỉ đúng nếu góc ngoài là $90^\\circ$." },
-                    { text: "$260^\\circ$", isCorrect: false, rationale: "Tính toán sai." }
+                    { text: "80°", isCorrect: true, rationale: "Góc trong và góc ngoài tại cùng một đỉnh là hai góc kề bù, nên tổng bằng 180°. Góc trong = 180° - 100° = 80°." },
+                    { text: "100°", isCorrect: false, rationale: "100° là số đo góc ngoài, không phải góc trong." },
+                    { text: "90°", isCorrect: false, rationale: "90° chỉ là một giá trị đặc biệt, không liên quan trực tiếp đến 100°." },
+                    { text: "260°", isCorrect: false, rationale: "260° là 180° + 80°, không phải số đo góc trong." }
                 ],
                 hint: "Góc trong và góc ngoài tại một đỉnh là hai góc kề bù."
             },
-            // --- 6 CÂU NHẬN BIẾT (còn lại) ---
+
+            // --- NHẬN BIẾT (còn lại) ---
             {
                 level: "Nhận biết",
-                question: "Cho tứ giác $IJKL$. Cặp cạnh đối nhau là:",
+                question: "Cho tứ giác IJKL. Cặp cạnh đối nhau là:",
                 options: [
-                    { text: "$IJ$ và $JK$", isCorrect: false, rationale: "Đây là hai cạnh kề nhau." },
-                    { text: "$KL$ và $LI$", isCorrect: false, rationale: "Đây là hai cạnh kề nhau." },
-                    { text: "$IJ$ và $IL$", isCorrect: false, rationale: "Đây là hai cạnh kề nhau." },
-                    { text: "$IJ$ và $LK$", isCorrect: true, rationale: "Hai cạnh đối nhau là hai cạnh không có điểm chung, ví dụ $IJ$ và $LK$." }
+                    { text: "IJ và JK", isCorrect: false, rationale: "IJ và JK là hai cạnh kề nhau, chung đỉnh J." },
+                    { text: "KL và LI", isCorrect: false, rationale: "KL và LI là hai cạnh kề nhau, chung đỉnh L." },
+                    { text: "IJ và IL", isCorrect: false, rationale: "IJ và IL là hai cạnh kề nhau, chung đỉnh I." },
+                    { text: "IJ và LK", isCorrect: true, rationale: "Hai cạnh đối nhau là hai cạnh không có điểm chung, ví dụ IJ và LK." }
                 ],
-                hint: "Cặp cạnh đối nhau là cặp cạnh không có đỉnh chung."
+                hint: "Cạnh đối là cạnh không chung đỉnh với nhau."
             }
         ];
 
@@ -448,7 +466,7 @@
                 currentQ.options.forEach((option, index) => {
                     const button = document.createElement('button');
                     button.className = 'option-button w-full text-left p-3 rounded-lg border-2 border-red-200 bg-white text-gray-700 font-medium hover:bg-red-100 transition duration-150';
-                    button.innerHTML = `<span>${String.fromCharCode(65 + index)}. </span>${option.text}`; // A, B, C, D
+                    button.innerHTML = `<span>${String.fromCharCode(65 + index)}. </span>${option.text}`;
                     button.onclick = () => handleAnswer(button, option.isCorrect, currentQ.options, currentQ.hint, currentQ.question, option.rationale);
                     answerOptionsContainer.appendChild(button);
                 });
@@ -519,7 +537,7 @@
             } else if (score >= total * 0.5) {
                 message = "Tốt! Bạn đã nắm được những kiến thức cơ bản. Hãy ôn tập thêm các câu vận dụng nhé.";
             } else {
-                message = "Bạn cần cố gắng hơn. Hãy xem lại các định nghĩa và quy tắc tính tổng góc trong Tứ giác nhé!";
+                message = "Bạn cần cố gắng hơn. Hãy xem lại các định nghĩa và quy tắc tổng góc trong Tứ giác nhé!";
             }
             resultMessage.textContent = message;
             
@@ -546,15 +564,14 @@
         // Khởi tạo trạng thái ban đầu (đảm bảo thanh tiến trình rỗng)
         progressBar.style.width = '0%';
         
-        // Kích hoạt trò chơi trên window.onload
+        // Kích hoạt vị trí confetti emitter sau khi load
         window.onload = () => {
-             // Đặt lại confetti emitter tại vị trí tương đối
-             const rect = quizContent.getBoundingClientRect();
-             confettiEmitter.style.position = 'absolute';
-             confettiEmitter.style.top = `${rect.top}px`;
-             confettiEmitter.style.left = `${rect.left}px`;
-             confettiEmitter.style.width = `${rect.width}px`;
-             confettiEmitter.style.height = `${rect.height}px`;
+            const rect = quizContent.getBoundingClientRect();
+            confettiEmitter.style.position = 'absolute';
+            confettiEmitter.style.top = `${rect.top}px`;
+            confettiEmitter.style.left = `${rect.left}px`;
+            confettiEmitter.style.width = `${rect.width}px`;
+            confettiEmitter.style.height = `${rect.height}px`;
         };
     </script>
 </body>
