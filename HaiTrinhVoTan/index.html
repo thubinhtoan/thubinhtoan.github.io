@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hải Trình Vô Tận - Toán 9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #001e26;
+            color: #e0f7fa;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .pirate-font {
+            font-family: 'Pirata One', cursive;
+            letter-spacing: 1px;
+        }
+
+        /* --- Dynamic Ocean Background --- */
+        #ocean {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: linear-gradient(to bottom, #4fc3f7 0%, #0288d1 40%, #01579b 100%);
+            overflow: hidden;
+        }
+
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200%;
+            height: 100px;
+            background: url('https://raw.githubusercontent.com/yagoestevez/fcc-portfolio/master/src/Components/Landing/wave.svg') repeat-x; 
+            background-size: 50% 100%;
+            opacity: 0.8;
+            animation: wave 10s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+            transform: translate3d(0, 0, 0);
+        }
+
+        .wave:nth-of-type(2) {
+            bottom: 10px;
+            animation: wave 7s cubic-bezier(0.36, 0.45, 0.63, 0.53) -.125s infinite, swell 7s ease -1.25s infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes wave {
+            0% { margin-left: 0; }
+            100% { margin-left: -100%; }
+        }
+
+        @keyframes swell {
+            0%, 100% { transform: translate3d(0, -25px, 0); }
+            50% { transform: translate3d(0, 5px, 0); }
+        }
+
+        /* --- Game Panel (Parchment) --- */
+        .parchment {
+            background: #fdf5e6; /* Old paper color */
+            background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');
+            color: #3e2723;
+            border: 8px solid #8d6e63;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 40px rgba(161, 136, 127, 0.6);
+            position: relative;
+        }
+
+        .parchment::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 2px dashed #5d4037;
+            margin: 6px;
+            pointer-events: none;
+        }
+
+        /* --- Buttons --- */
+        .btn-pirate {
+            background: #5d4037;
+            color: #fff8e1;
+            border: 2px solid #3e2723;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Pirata One', cursive;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+        }
+
+        .btn-pirate:hover {
+            background: #795548;
+            transform: scale(1.02);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+
+        .btn-pirate.correct {
+            background: #2e7d32 !important;
+            border-color: #1b5e20 !important;
+            box-shadow: 0 0 15px #4caf50;
+        }
+
+        .btn-pirate.wrong {
+            background: #c62828 !important;
+            border-color: #b71c1c !important;
+            animation: shake 0.4s;
+        }
+
+        /* --- Explanation Box (Captain's Log) --- */
+        #log-box {
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            transition: all 0.5s ease;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            padding: 0 1rem;
+        }
+
+        #log-box.show {
+            max-height: 300px;
+            opacity: 1;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* --- Math Display --- */
+        .system-eq {
+            display: inline-flex;
+            flex-direction: column;
+            text-align: left;
+            border-left: 3px solid currentColor;
+            padding-left: 8px;
+            border-radius: 4px 0 0 4px;
+            vertical-align: middle;
+            line-height: 1.4;
+        }
+
+        /* --- Animations --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        #ship {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 5rem;
+            animation: float-ship 3s ease-in-out infinite;
+            z-index: -1;
+            filter: drop-shadow(0 10px 5px rgba(0,0,0,0.3));
+        }
+
+        @keyframes float-ship {
+            0%, 100% { transform: translateX(-50%) rotate(2deg) translateY(0); }
+            50% { transform: translateX(-50%) rotate(-2deg) translateY(-10px); }
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Ocean Background -->
+    <div id="ocean">
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+    <div id="ship">🏴‍☠️</div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="parchment p-10 text-center max-w-2xl w-full z-10">
+        <h1 class="pirate-font text-6xl text-amber-900 mb-2 drop-shadow-sm">HẢI TRÌNH VÔ TẬN</h1>
+        <h2 class="text-xl text-amber-800 mb-6 font-bold uppercase tracking-widest">Kho Báu Đại Dương</h2>
+        
+        <p class="text-lg text-brown-900 mb-8 leading-relaxed font-serif italic">
+            "Hỡi người thủy thủ can trường! Bản đồ kho báu được mã hóa bằng các <b>Hệ Phương Trình</b>. 
+            Hãy giải mã 15 câu đố để tìm ra hòn đảo vàng!"
+        </p>
+
+        <div class="grid grid-cols-2 gap-4 text-left bg-orange-100/50 p-4 rounded mb-8 border border-amber-300">
+            <div class="text-green-800 font-bold">⚓ 6 Câu Nhận Biết</div>
+            <div class="text-blue-800 font-bold">🧭 5 Câu Thông Hiểu</div>
+            <div class="text-purple-800 font-bold">💣 3 Câu Vận Dụng</div>
+            <div class="text-red-800 font-bold">👑 1 Câu Vận Dụng Cao</div>
+        </div>
+
+        <button onclick="startGame()" class="btn-pirate px-10 py-4 rounded text-2xl shadow-lg w-full md:w-auto">
+            NHỔ NEO RA KHƠI! 🌊
+        </button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden w-full max-w-4xl z-10 flex-col h-full justify-center">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6 px-2">
+            <div class="parchment px-4 py-2 rounded shadow-md">
+                <div class="text-xs text-amber-800 uppercase font-bold">Thử thách</div>
+                <div class="text-xl font-bold text-amber-900 pirate-font">Câu <span id="q-number">1</span>/15</div>
+            </div>
+            <div class="parchment px-4 py-2 rounded shadow-md">
+                <div class="text-xs text-amber-800 uppercase font-bold">Kho báu</div>
+                <div class="text-xl font-bold text-yellow-600" id="score">0</div>
+            </div>
+        </div>
+
+        <!-- Question Panel -->
+        <div class="parchment p-8 mb-4 relative min-h-[160px] flex flex-col justify-center items-center text-center">
+            <div id="level-badge" class="absolute -top-3 bg-amber-800 text-white px-3 py-1 text-xs rounded shadow uppercase font-bold">Nhận Biết</div>
+            <div id="question-text" class="text-2xl font-bold text-amber-900 leading-relaxed">
+                Loading map data...
+            </div>
+        </div>
+
+        <!-- Explanation (Log) -->
+        <div id="log-box">
+            <div class="text-yellow-400 font-bold mb-1 border-b border-yellow-600 pb-1 pirate-font tracking-wide">📖 NHẬT KÝ THUYỀN TRƯỞNG:</div>
+            <div id="log-content" class="text-gray-200 font-light leading-relaxed"></div>
+        </div>
+
+        <!-- Options -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <!-- Buttons injected here -->
+        </div>
+
+        <!-- Next Button -->
+        <div id="next-btn-container" class="hidden text-center pb-4">
+            <button onclick="nextQuestion()" class="btn-pirate px-12 py-3 rounded text-xl animate-bounce bg-blue-700 border-blue-900">
+                TIẾP TỤC HÀNH TRÌNH ➜
+            </button>
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/80">
+        <div class="parchment p-10 text-center max-w-2xl w-full mx-4">
+            <div class="text-7xl mb-4">🏝️</div>
+            <h2 class="pirate-font text-5xl text-amber-800 mb-4">TÌM THẤY ĐẢO GIẤU VÀNG!</h2>
+            <p class="text-xl text-amber-900 mb-6 font-serif italic">"Chúc mừng thuyền trưởng! Ngươi đã chinh phục Đại dương Toán học."</p>
+            
+            <div class="bg-orange-100 p-4 rounded border border-amber-300 inline-block mb-8 w-full">
+                <div class="text-sm text-amber-700 uppercase mb-1">Tổng Số Vàng Thu Được</div>
+                <div class="text-6xl font-bold text-yellow-600 pirate-font" id="final-score">0</div>
+            </div>
+
+            <div>
+                <button onclick="location.reload()" class="btn-pirate px-8 py-3 rounded text-xl w-full">
+                    CHƠI LẠI TỪ ĐẦU
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+    <script>
+        // --- DATA ---
+        // 15 Questions: Linear Equations & Systems (Toán 9 - Chương 1 - Bài 2)
+        // Đáp án đã được phân bố đều A/B/C/D.
+
+        const questions = [
+            // LEVEL 1: NHẬN BIẾT (6 câu)
+            {
+                q: "Phương trình nào sau đây là phương trình bậc nhất hai ẩn?",
+                a: [
+                    "2x + y = 3",          // ĐÚNG (giữ ở A)
+                    "0x + 0y = 5",
+                    "x<sup>2</sup> + y = 1",
+                    "3x - 1 = 0"
+                ],
+                correct: 0,
+                rationale: "Phương trình bậc nhất hai ẩn có dạng ax + by = c với a, b không đồng thời bằng 0.<br>2x + y = 3 thỏa mãn (a=2, b=1).",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Cặp số (1; -2) là nghiệm của phương trình nào sau đây?",
+                a: [
+                    "x - y = 1",
+                    "2x + y = 0",         // ĐÚNG (đặt ở B)
+                    "x + y = 3",
+                    "3x - y = 1"
+                ],
+                correct: 1,
+                rationale: "Thay x=1, y=-2 vào 2x + y = 0:<br>2(1) + (-2) = 2 - 2 = 0 (Đúng).",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Hệ phương trình bậc nhất hai ẩn có dạng tổng quát là:",
+                a: [
+                    "ax + by = c",  // chỉ 1 phương trình
+                    "<div class='system-eq'><span>ax<sup>2</sup> + by = c</span><span>a'x + b'y = c'</span></div>",
+                    "<div class='system-eq'><span>ax + by = c</span><span>a'x + b'y = c'</span></div>",  // ĐÚNG (C)
+                    "<div class='system-eq'><span>ax + by = c</span><span>a'x + b'y<sup>2</sup> = c'</span></div>"
+                ],
+                correct: 2,
+                rationale: "Hệ hai phương trình bậc nhất hai ẩn gồm hai phương trình bậc nhất hai ẩn ax+by=c và a'x+b'y=c'.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Trong các hệ phương trình sau, hệ nào là hệ phương trình bậc nhất hai ẩn?",
+                a: [
+                    "<div class='system-eq'><span>x + y = 3</span><span>x<sup>2</sup> - y = 1</span></div>",
+                    "<div class='system-eq'><span>x + y = 3</span><span>xy = 1</span></div>",
+                    "<div class='system-eq'><span>1/x + y = 3</span><span>x - y = 1</span></div>",
+                    "<div class='system-eq'><span>x + y = 3</span><span>2x - y = 1</span></div>"  // ĐÚNG (D)
+                ],
+                correct: 3,
+                rationale: "Hệ D gồm các phương trình bậc nhất (bậc 1) đối với x và y.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Phương trình 3x - 2y = 6 có bao nhiêu nghiệm?",
+                a: [
+                    "Vô số nghiệm",        // ĐÚNG (A)
+                    "1 nghiệm duy nhất",
+                    "2 nghiệm",
+                    "Vô nghiệm"
+                ],
+                correct: 0,
+                rationale: "Mọi phương trình bậc nhất hai ẩn ax + by = c (với a, b không đồng thời bằng 0) đều có vô số nghiệm.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Cho hệ phương trình <div class='system-eq'><span>x = 2</span><span>y = 3</span></div>. Nghiệm của hệ là:",
+                a: [
+                    "(3; 2)",
+                    "(2; 3)",  // ĐÚNG (B)
+                    "x = 2",
+                    "y = 3"
+                ],
+                correct: 1,
+                rationale: "Nghiệm của hệ được viết dưới dạng cặp số (x; y). Vậy nghiệm là (2; 3).",
+                level: "NHẬN BIẾT"
+            },
+
+            // LEVEL 2: THÔNG HIỂU (5 câu)
+            {
+                q: "Biểu diễn y theo x từ phương trình 4x - 2y = 6, ta được:",
+                a: [
+                    "y = 4x - 6",
+                    "y = 2x + 3",
+                    "y = 2x - 3",  // ĐÚNG (C)
+                    "y = -2x + 3"
+                ],
+                correct: 2,
+                rationale: "4x - 2y = 6 &rArr; -2y = -4x + 6 &rArr; y = 2x - 3.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Cặp số nào sau đây là nghiệm của hệ phương trình <div class='system-eq'><span>x + y = 5</span><span>x - y = 1</span></div>?",
+                a: [
+                    "(2; 3)",
+                    "(4; 1)",
+                    "(1; 4)",
+                    "(3; 2)"  // ĐÚNG (D)
+                ],
+                correct: 3,
+                rationale: "Thử (3; 2):<br>3 + 2 = 5 (Đúng)<br>3 - 2 = 1 (Đúng)<br>Vậy (3; 2) là nghiệm.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Tìm giá trị của m để phương trình mx - y = 2 nhận cặp số (1; -1) làm nghiệm.",
+                a: [
+                    "m = 1",   // ĐÚNG (A)
+                    "m = 3",
+                    "m = -1",
+                    "m = 2"
+                ],
+                correct: 0,
+                rationale: "Thay x = 1, y = -1 vào phương trình:<br>m(1) - (-1) = 2 &rArr; m + 1 = 2 &rArr; m = 1.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Hệ phương trình <div class='system-eq'><span>2x - y = 3</span><span>4x - 2y = 6</span></div> có bao nhiêu nghiệm?",
+                a: [
+                    "Vô nghiệm",
+                    "Vô số nghiệm",   // ĐÚNG (B)
+                    "1 nghiệm duy nhất",
+                    "2 nghiệm"
+                ],
+                correct: 1,
+                rationale: "Ta thấy phương trình 2 là phương trình 1 nhân với 2 (4x - 2y = 6 &hArr; 2(2x - y) = 2(3)).<br>Hai phương trình tương đương nên hệ có vô số nghiệm.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Trên mặt phẳng tọa độ, tập nghiệm của phương trình x - 2y = 0 được biểu diễn bởi đường thẳng nào?",
+                a: [
+                    "Song song với trục hoành",
+                    "Đi qua điểm (0; 2)",
+                    "Đi qua gốc tọa độ O(0;0)",  // ĐÚNG (C)
+                    "Song song với trục tung"
+                ],
+                correct: 2,
+                rationale: "Thay (0; 0) vào phương trình: 0 - 2(0) = 0 (Đúng).<br>Vậy đường thẳng đi qua gốc tọa độ.",
+                level: "THÔNG HIỂU"
+            },
+
+            // LEVEL 3: VẬN DỤNG (3 câu)
+            {
+                q: "(Thực tế) Tổng số tuổi của mẹ và con là 36. Tuổi mẹ gấp 5 lần tuổi con. Gọi x là tuổi mẹ, y là tuổi con. Hệ phương trình mô tả bài toán là:",
+                a: [
+                    "<div class='system-eq'><span>x - y = 36</span><span>x = 5y</span></div>",
+                    "<div class='system-eq'><span>x + y = 36</span><span>y = 5x</span></div>",
+                    "<div class='system-eq'><span>xy = 36</span><span>x = 5y</span></div>",
+                    "<div class='system-eq'><span>x + y = 36</span><span>x = 5y</span></div>"  // ĐÚNG (D)
+                ],
+                correct: 3,
+                rationale: "Tổng tuổi: x + y = 36.<br>Mẹ gấp 5 lần con: x = 5y.",
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "Tìm a và b để đường thẳng y = ax + b đi qua hai điểm A(1; 3) và B(2; 5).",
+                a: [
+                    "a = 2, b = 1",   // ĐÚNG (A)
+                    "a = 1, b = 2",
+                    "a = 2, b = -1",
+                    "a = -2, b = 5"
+                ],
+                correct: 0,
+                rationale: "Thay A(1;3): 3 = a + b (1)<br>Thay B(2;5): 5 = 2a + b (2)<br>Lấy (2) trừ (1): a = 2 &rArr; b = 1.",
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "Không cần giải hệ, hãy xác định số nghiệm của hệ: <div class='system-eq'><span>x + y = 2</span><span>x + y = 5</span></div>",
+                a: [
+                    "1 nghiệm duy nhất",
+                    "Vô nghiệm",       // ĐÚNG (B)
+                    "Vô số nghiệm",
+                    "2 nghiệm"
+                ],
+                correct: 1,
+                rationale: "Vế trái giống nhau (x+y) nhưng vế phải khác nhau (2 &ne; 5).<br>Điều này vô lý nên hệ vô nghiệm (hai đường thẳng song song).",
+                level: "VẬN DỤNG"
+            },
+
+            // LEVEL 4: VẬN DỤNG CAO (1 câu)
+            {
+                q: "Cho hệ phương trình <div class='system-eq'><span>mx + y = 1</span><span>x + my = 1</span></div>. Tìm m để hệ có nghiệm duy nhất.",
+                a: [
+                    "m = 1",
+                    "m &ne; 0",
+                    "m &ne; &plusmn;1",  // ĐÚNG (C)
+                    "m = -1"
+                ],
+                correct: 2,
+                rationale: "Hệ có nghiệm duy nhất khi: a/a' &ne; b/b'<br>&rArr; m/1 &ne; 1/m &rArr; m<sup>2</sup> &ne; 1 &rArr; m &ne; 1 và m &ne; -1.",
+                level: "VẬN DỤNG CAO"
+            }
+        ];
+
+        // --- GAME STATE ---
+        let currentQIndex = 0;
+        let score = 0;
+
+        // --- AUDIO ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'cannon') { // Boom
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.exponentialRampToValueAtTime(10, now + 0.3);
+                gain.gain.setValueAtTime(0.5, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'splash') { // Noise
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(50, now);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'correct') { // Ding
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.linearRampToValueAtTime(1000, now + 0.1);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'win') { // Victory
+                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+                    setTimeout(() => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'square';
+                        o.frequency.value = f;
+                        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+                        o.start();
+                        o.stop(audioCtx.currentTime + 0.3);
+                    }, i * 200);
+                });
+            }
+        }
+
+        // --- GAME LOGIC ---
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+            
+            playSound('cannon');
+            currentQIndex = 0;
+            score = 0;
+            updateUI();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQIndex];
+            
+            document.getElementById('q-number').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerHTML = q.q;
+            document.getElementById('level-badge').innerText = q.level;
+            
+            // Reset Log
+            const logBox = document.getElementById('log-box');
+            logBox.classList.remove('show');
+            document.getElementById('next-btn-container').classList.add('hidden');
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            q.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-pirate w-full p-4 rounded shadow-md min-h-[80px]";
+                btn.innerHTML = opt;
+                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selected, correct, btn) {
+            const btns = document.querySelectorAll('.btn-pirate');
+            btns.forEach(b => b.disabled = true);
+
+            const q = questions[currentQIndex];
+            const logBox = document.getElementById('log-box');
+            const content = document.getElementById('log-content');
+            
+            content.innerHTML = q.rationale;
+            logBox.classList.add('show');
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                score += 100;
+                playSound('correct');
+                fireConfetti(30);
+            } else {
+                btn.classList.add('wrong');
+                btns[correct].classList.add('correct');
+                playSound('splash');
+            }
+
+            updateUI();
+            document.getElementById('next-btn-container').classList.remove('hidden');
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score;
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < questions.length) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            playSound('win');
+            setInterval(() => fireConfetti(50), 1000);
+        }
+
+        // --- PARTICLES (Gold Coins) ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+
+        function fireConfetti(amount) {
+            for (let i = 0; i < amount; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20,
+                    life: 100,
+                    size: Math.random() * 6 + 3,
+                    color: '#ffd700' // Gold
+                });
+            }
+            if(particles.length <= amount) requestAnimationFrame(animateParticles);
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.3; // Gravity
+                p.life--;
+                
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Shine effect
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+    </script>
+</body>
+</html>
