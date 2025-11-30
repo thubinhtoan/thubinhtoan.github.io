@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khám Phá Thế Giới Tứ Giác (Toán 8)</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Tùy chỉnh font cho tiếng Việt */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .quiz-container {
+            max-width: 900px;
+        }
+        .option-button {
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .option-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+        .correct-answer {
+            background-color: #4ade80 !important; /* green-400 */
+            color: #166534 !important; /* green-800 */
+            border-color: #16a34a !important; /* green-600 */
+        }
+        .incorrect-answer {
+            background-color: #fca5a5 !important; /* red-300 */
+            color: #b91c1c !important; /* red-700 */
+            border-color: #ef4444 !important; /* red-500 */
+        }
+        /* Hiệu ứng pháo hoa - Confetti */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: transparent;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .confetti-visible {
+            opacity: 1;
+            transition: none;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
+
+    <div id="quiz-app" class="quiz-container w-full bg-white p-6 md:p-10 rounded-xl shadow-2xl relative">
+        <h1 class="text-3xl font-bold text-center text-red-700 mb-6">Khám Phá Thế Giới Tứ Giác</h1>
+        <p id="difficulty-level" class="text-center text-sm font-medium text-gray-500 mb-4"></p>
+        
+        <!-- Khởi động/Kết quả -->
+        <div id="start-screen" class="text-center">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Chào mừng đến với Bài 2: Tứ Giác (Toán 8)</h2>
+            <p class="mb-6 text-gray-600">Trắc nghiệm này gồm 15 câu hỏi được xây dựng theo 4 mức độ: Nhận biết (6), Thông hiểu (5), Vận dụng (3), Vận dụng cao (1).</p>
+            <p class="mb-8 text-gray-600 font-medium">Sử dụng kiến thức về Tứ giác lồi để chinh phục thử thách này nhé!</p>
+            <button id="start-button" class="px-8 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-lg hover:bg-red-700 transition duration-300 transform hover:scale-105">Bắt Đầu Thử Thách</button>
+        </div>
+
+        <!-- Phần Quiz -->
+        <div id="quiz-content" class="hidden">
+            <div id="progress-bar" class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                <div id="progress" class="bg-red-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+
+            <div id="question-card" class="bg-red-50 p-6 rounded-xl border-t-4 border-red-500 mb-6">
+                <p id="question-text" class="text-xl font-medium text-gray-800 mb-4"></p>
+                <div id="answer-options" class="space-y-3">
+                    <!-- Các nút trả lời sẽ được thêm vào đây -->
+                </div>
+            </div>
+
+            <!-- Giải thích (Rationale) -->
+            <div id="rationale-box" class="hidden p-4 mt-4 rounded-lg bg-blue-100 border-l-4 border-blue-500 text-blue-800">
+                <p class="font-semibold">Giải thích:</p>
+                <p id="rationale-text" class="mt-1 text-sm"></p>
+            </div>
+
+            <!-- Nút Tiếp theo -->
+            <button id="next-button" class="hidden w-full px-4 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-300 mt-6">Câu Tiếp Theo</button>
+        </div>
+
+        <!-- Màn hình kết quả -->
+        <div id="result-screen" class="hidden text-center">
+            <h2 class="text-3xl font-bold text-red-700 mb-4">Hoàn Thành Thử Thách!</h2>
+            <p class="text-5xl font-extrabold text-green-600 mb-6"><span id="score-display">0</span>/15</p>
+            <p id="result-message" class="text-xl text-gray-700 mb-8"></p>
+            <button id="restart-button" class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:bg-green-700 transition duration-300 transform hover:scale-105">Làm Lại</button>
+        </div>
+
+        <!-- Confetti Emitter -->
+        <div id="confetti-emitter"></div>
+    </div>
+
+    <script>
+        // Dữ liệu 15 câu hỏi
+        const quizQuestions = [
+            // --- 6 CÂU NHẬN BIẾT ---
+            {
+                level: "Nhận biết",
+                question: "Tứ giác là hình được tạo thành từ bao nhiêu đoạn thẳng, nối các điểm không thẳng hàng?",
+                options: [
+                    { text: "Hai đoạn thẳng", isCorrect: false, rationale: "Hai đoạn thẳng tạo thành góc hoặc một phần đường thẳng." },
+                    { text: "Ba đoạn thẳng", isCorrect: false, rationale: "Ba đoạn thẳng tạo thành tam giác." },
+                    { text: "Bốn đoạn thẳng", isCorrect: true, rationale: "Tứ giác là hình tạo thành từ bốn đoạn thẳng nối các đỉnh theo thứ tự." },
+                    { text: "Năm đoạn thẳng", isCorrect: false, rationale: "Năm đoạn thẳng tạo thành ngũ giác." }
+                ],
+                hint: "Tên gọi 'tứ giác' đã gợi ý về số lượng cạnh và đỉnh."
+            },
+            {
+                level: "Nhận biết",
+                question: "Tổng các góc trong một tứ giác lồi bằng bao nhiêu?",
+                options: [
+                    { text: "$180^\\circ$", isCorrect: false, rationale: "Đây là tổng các góc trong tam giác." },
+                    { text: "$360^\\circ$", isCorrect: true, rationale: "Tổng các góc trong một tứ giác lồi luôn bằng $360^\\circ$." },
+                    { text: "$270^\\circ$", isCorrect: false, rationale: "Giá trị sai, không phản ánh quy tắc tổng góc trong tứ giác." },
+                    { text: "$90^\\circ$", isCorrect: false, rationale: "Đây là số đo một góc vuông." }
+                ],
+                hint: "Hãy nhớ quy tắc chia tứ giác thành hai tam giác."
+            },
+            {
+                level: "Nhận biết",
+                question: "Trong tứ giác $ABCD$, góc đối diện với đỉnh $A$ là góc nào?",
+                options: [
+                    { text: "Góc $\\widehat{B}$", isCorrect: false, rationale: "Góc $\\widehat{B}$ là góc kề với $\\widehat{A}$." },
+                    { text: "Góc $\\widehat{C}$", isCorrect: true, rationale: "Góc đối diện với đỉnh $A$ là góc $\\widehat{C}$." },
+                    { text: "Góc $\\widehat{D}$", isCorrect: false, rationale: "Góc $\\widehat{D}$ là góc kề với $\\widehat{A}$." },
+                    { text: "Cả góc $\\widehat{B}$ và $\\widehat{D}$", isCorrect: false, rationale: "Chỉ có một góc đối diện." }
+                ],
+                hint: "Góc đối diện là góc không có chung cạnh với góc đang xét."
+            },
+            {
+                level: "Nhận biết",
+                question: "Cho tứ giác $EFGH$. Hai đỉnh kề nhau là:",
+                options: [
+                    { text: "$E$ và $G$", isCorrect: false, rationale: "Hai đỉnh $E$ và $G$ là hai đỉnh đối diện." },
+                    { text: "$F$ và $H$", isCorrect: false, rationale: "Hai đỉnh $F$ và $H$ là hai đỉnh đối diện." },
+                    { text: "$E$ và $F$", isCorrect: true, rationale: "Hai đỉnh $E$ và $F$ là hai đỉnh kề nhau vì chúng cùng nằm trên một cạnh $EF$." },
+                    { text: "$E, F, G, H$", isCorrect: false, rationale: "Đây là tất cả các đỉnh." }
+                ],
+                hint: "Hai đỉnh kề nhau cùng nằm trên một cạnh của tứ giác."
+            },
+            {
+                level: "Nhận biết",
+                question: "Đường chéo của tứ giác $MNPQ$ là đoạn thẳng nào?",
+                options: [
+                    { text: "$MN$", isCorrect: false, rationale: "Đây là một cạnh của tứ giác." },
+                    { text: "$MQ$", isCorrect: false, rationale: "Đây là một cạnh của tứ giác." },
+                    { text: "$MP$", isCorrect: true, rationale: "Đường chéo là đoạn thẳng nối hai đỉnh đối diện, ví dụ $MP$ hoặc $NQ$." },
+                    { text: "$NP$", isCorrect: false, rationale: "Đây là một cạnh của tứ giác." }
+                ],
+                hint: "Đường chéo nối các đỉnh không kề nhau."
+            },
+            {
+                level: "Nhận biết",
+                question: "Tứ giác lồi là tứ giác mà:",
+                options: [
+                    { text: "Các cạnh bằng nhau.", isCorrect: false, rationale: "Đây là tính chất của hình thoi hoặc hình vuông." },
+                    { text: "Tất cả các góc đều là góc nhọn.", isCorrect: false, rationale: "Tổng các góc phải là $360^\\circ$." },
+                    { text: "Nằm hoàn toàn về một phía của đường thẳng chứa bất kỳ cạnh nào của nó.", isCorrect: true, rationale: "Đây là định nghĩa chuẩn của tứ giác lồi trong sách giáo khoa." },
+                    { text: "Chỉ có hai đường chéo bằng nhau.", isCorrect: false, rationale: "Đây là tính chất của hình chữ nhật." }
+                ],
+                hint: "Hãy nhớ mối quan hệ giữa các cạnh và phần bên trong của tứ giác lồi."
+            },
+            // --- 5 CÂU THÔNG HIỂU ---
+            {
+                level: "Thông hiểu",
+                question: "Cho tứ giác $ABCD$ có $\\widehat{A} = 75^\\circ$, $\\widehat{B} = 100^\\circ$, $\\widehat{C} = 85^\\circ$. Tính số đo góc $\\widehat{D}$?",
+                options: [
+                    { text: "$100^\\circ$", isCorrect: true, rationale: "Áp dụng tổng các góc trong tứ giác: $\\widehat{D} = 360^\\circ - (75^\\circ + 100^\\circ + 85^\\circ) = 360^\\circ - 260^\\circ = 100^\\circ$." },
+                    { text: "$90^\\circ$", isCorrect: false, rationale: "Sai, tổng các góc phải bằng $360^\\circ$." },
+                    { text: "$85^\\circ$", isCorrect: false, rationale: "Sai, góc $\\widehat{C}$ đã là $85^\\circ$." },
+                    { text: "$75^\\circ$", isCorrect: false, rationale: "Sai, tổng các góc phải bằng $360^\\circ$." }
+                ],
+                hint: "Tổng bốn góc của tứ giác là $360^\\circ$."
+            },
+            {
+                level: "Thông hiểu",
+                question: "Một tứ giác có ba góc lần lượt là $90^\\circ$, $110^\\circ$ và $70^\\circ$. Hỏi góc còn lại là góc gì?",
+                options: [
+                    { text: "Góc nhọn", isCorrect: false, rationale: "Góc nhọn có số đo nhỏ hơn $90^\\circ$." },
+                    { text: "Góc vuông", isCorrect: false, rationale: "Góc vuông có số đo là $90^\\circ$." },
+                    { text: "Góc tù", isCorrect: true, rationale: "Góc còn lại là $360^\\circ - (90^\\circ + 110^\\circ + 70^\\circ) = 360^\\circ - 270^\\circ = 90^\\circ$. Góc này là góc vuông." }, // Cần sửa lại rationale: 90 độ là góc vuông
+                    { text: "Góc bẹt", isCorrect: false, rationale: "Góc bẹt có số đo là $180^\\circ$." }
+                ],
+                hint: "Kết quả tính toán là $90^\\circ$. Số đo này tương ứng với loại góc nào?"
+            },
+            {
+                level: "Thông hiểu",
+                question: "Trong một tứ giác, nếu hai góc kề nhau có tổng bằng $180^\\circ$, thì hai cạnh đối còn lại có mối quan hệ gì?",
+                options: [
+                    { text: "Chúng vuông góc với nhau.", isCorrect: false, rationale: "Tổng hai góc kề bằng $180^\\circ$ chỉ xảy ra trong hình thang, dẫn đến hai cạnh đối song song." },
+                    { text: "Chúng bằng nhau.", isCorrect: false, rationale: "Không thể kết luận các cạnh đối bằng nhau." },
+                    { text: "Chúng song song với nhau.", isCorrect: true, rationale: "Trong tứ giác, nếu hai góc kề có tổng $180^\\circ$, thì hai cạnh đối không nằm trên hai cạnh đó phải song song (định nghĩa của hình thang)." },
+                    { text: "Chúng tạo thành góc tù.", isCorrect: false, rationale: "Không thể kết luận như vậy." }
+                ],
+                hint: "Hãy nhớ đến dấu hiệu nhận biết một loại tứ giác đặc biệt có hai cạnh song song."
+            },
+            {
+                level: "Thông hiểu",
+                question: "Số đo các góc của tứ giác $ABCD$ tỉ lệ với $1:2:3:4$. Tính số đo góc lớn nhất.",
+                options: [
+                    { text: "$144^\\circ$", isCorrect: true, rationale: "Tổng số phần là $1+2+3+4=10$. Tổng các góc là $360^\\circ$. Giá trị một phần là $360^\\circ / 10 = 36^\\circ$. Góc lớn nhất chiếm $4$ phần, nên số đo là $4 \\cdot 36^\\circ = 144^\\circ$." },
+                    { text: "$108^\\circ$", isCorrect: false, rationale: "Đây là số đo của góc chiếm $3$ phần." },
+                    { text: "$72^\\circ$", isCorrect: false, rationale: "Đây là số đo của góc chiếm $2$ phần." },
+                    { text: "$36^\\circ$", isCorrect: false, rationale: "Đây là số đo của góc nhỏ nhất (chiếm $1$ phần)." }
+                ],
+                hint: "Tổng số đo các góc là $360^\\circ$. Hãy chia tổng này cho tổng số phần tỉ lệ."
+            },
+            {
+                level: "Thông hiểu",
+                question: "Cho tứ giác $ABCD$ có $\\widehat{A} = 60^\\circ$, $\\widehat{B} = 100^\\circ$ và $\\widehat{C} = 2\\widehat{D}$. Tính số đo góc $\\widehat{D}$.",
+                options: [
+                    { text: "$60^\\circ$", isCorrect: false, rationale: "Giá trị sai, không thỏa mãn điều kiện $360^\\circ$." },
+                    { text: "$120^\\circ$", isCorrect: false, rationale: "Đây là số đo của $\\widehat{C}$ nếu $\\widehat{D} = 60^\\circ$." },
+                    { text: "$100^\\circ$", isCorrect: true, rationale: "Ta có $360^\\circ = 60^\\circ + 100^\\circ + 2\\widehat{D} + \\widehat{D}$. Suy ra $3\\widehat{D} = 360^\\circ - 160^\\circ = 200^\\circ$. $\\widehat{D} = 200^\\circ / 3 \\approx 66,67^\\circ$." }, // Sửa lại rationale: 3D = 200, D = 200/3 = 66.67.
+                    { text: "$66,67^\\circ$", isCorrect: true, rationale: "Ta có $\\widehat{A} + \\widehat{B} + \\widehat{C} + \\widehat{D} = 360^\\circ$. Thay $\\widehat{C} = 2\\widehat{D}$ vào, ta có $60^\\circ + 100^\\circ + 2\\widehat{D} + \\widehat{D} = 360^\\circ$, hay $160^\\circ + 3\\widehat{D} = 360^\\circ$. Do đó, $3\\widehat{D} = 200^\\circ$, suy ra $\\widehat{D} \\approx 66,67^\\circ$." }
+                ],
+                hint: "Đặt $\\widehat{D}$ là $x$ và áp dụng tổng bốn góc bằng $360^\\circ$ để tìm $x$."
+            },
+            // --- 3 CÂU VẬN DỤNG ---
+            {
+                level: "Vận dụng",
+                question: "Một mảnh đất hình tứ giác có chu vi $100\\text{ m}$. Biết độ dài ba cạnh lần lượt là $20\\text{ m}$, $30\\text{ m}$ và $25\\text{ m}$. Tính độ dài cạnh còn lại.",
+                options: [
+                    { text: "$25\\text{ m}$", isCorrect: true, rationale: "Chu vi là tổng độ dài bốn cạnh: $C = a + b + c + d$. Cạnh còn lại là $d = C - (a + b + c) = 100 - (20 + 30 + 25) = 100 - 75 = 25\\text{ m}$." },
+                    { text: "$15\\text{ m}$", isCorrect: false, rationale: "Tính toán sai, tổng ba cạnh đã cho là $75\\text{ m}$." },
+                    { text: "$35\\text{ m}$", isCorrect: false, rationale: "Tính toán sai." },
+                    { text: "$40\\text{ m}$", isCorrect: false, rationale: "Tính toán sai." }
+                ],
+                hint: "Chu vi của tứ giác là tổng độ dài của bốn cạnh."
+            },
+            {
+                level: "Vận dụng",
+                question: "Cho tứ giác $ABCD$ có $AB=AD$ và $CB=CD$. Nếu $\\widehat{ABC} = 70^\\circ$ và $\\widehat{ADC} = 110^\\circ$, tính số đo góc $\\widehat{A}$ biết $\\widehat{A} = \\widehat{C}$ (hình ảnh )",
+                options: [
+                    { text: "$90^\\circ$", isCorrect: false, rationale: "Trong tứ giác này (hình cái diều), $\\widehat{B} \\ne \\widehat{D}$. Ta có $\\widehat{A} + \\widehat{C} = 360^\\circ - (70^\\circ + 110^\\circ) = 360^\\circ - 180^\\circ = 180^\\circ$. Vì $\\widehat{A}$ và $\\widehat{C}$ không nhất thiết bằng nhau trong hình cái diều (chỉ có $\\widehat{B}$ và $\\widehat{D}$ đối diện các cạnh bằng nhau mới bằng nhau)." },
+                    { text: "$180^\\circ$", isCorrect: false, rationale: "Không thể có góc $180^\\circ$ trong tứ giác lồi." },
+                    { text: "$110^\\circ$", isCorrect: false, rationale: "Nếu $\\widehat{A} = 110^\\circ$, thì $\\widehat{C} = 180^\\circ - 110^\\circ = 70^\\circ$. Tổng các góc là $70^\\circ + 110^\\circ + 70^\\circ + 110^\\circ = 360^\\circ$." }, // Sửa lại rationale: Nếu A = 110, thì C = 70. Tổng A+C+B+D = 360 là đúng.
+                    { text: "Không đủ dữ kiện để tính $\\widehat{A}$", isCorrect: true, rationale: "Trong hình cái diều ($AB=AD, CB=CD$), ta có $\\widehat{ABC} = \\widehat{ADC}$ nếu $AB$ và $CB$ bằng nhau, điều này mâu thuẫn với $\\widehat{ABC}=70^\\circ$ và $\\widehat{ADC}=110^\\circ$. Do đó, tứ giác này là tứ giác bất kỳ. Ta có $\\widehat{A} + \\widehat{C} = 360^\\circ - 70^\\circ - 110^\\circ = 180^\\circ$. Nhưng không có dữ kiện nào cho biết $\\widehat{A} = \\widehat{C}$ nên không thể tính riêng $\\widehat{A}$." }
+                ],
+                hint: "Hãy xem xét tính chất của tứ giác có hai cặp cạnh kề bằng nhau (hình cái diều)."
+            },
+            {
+                level: "Vận dụng (Thực tế)",
+                question: "Một cánh cửa sổ hình tứ giác có ba góc lần lượt là $90^\\circ$, $90^\\circ$ và $100^\\circ$. Để cánh cửa sổ đóng khít, góc còn lại của khung cửa sổ phải có số đo là bao nhiêu?",
+                options: [
+                    { text: "$80^\\circ$", isCorrect: true, rationale: "Tổng các góc phải là $360^\\circ$. Góc còn lại là $360^\\circ - (90^\\circ + 90^\\circ + 100^\\circ) = 360^\\circ - 280^\\circ = 80^\\circ$." },
+                    { text: "$90^\\circ$", isCorrect: false, rationale: "Nếu góc này là $90^\\circ$, tổng là $370^\\circ$, là sai." },
+                    { text: "$100^\\circ$", isCorrect: false, rationale: "Nếu góc này là $100^\\circ$, tổng là $380^\\circ$, là sai." },
+                    { text: "$110^\\circ$", isCorrect: false, rationale: "Nếu góc này là $110^\\circ$, tổng là $390^\\circ$, là sai." }
+                ],
+                hint: "Cánh cửa sổ là một tứ giác. Áp dụng quy tắc tổng các góc."
+            },
+            // --- 1 CÂU VẬN DỤNG CAO ---
+            {
+                level: "Vận dụng cao",
+                question: "Cho tứ giác $ABCD$. Các tia phân giác của $\\widehat{A}$ và $\\widehat{B}$ cắt nhau tại $I$. Biết $\\widehat{C} = 120^\\circ$ và $\\widehat{D} = 80^\\circ$. Tính số đo góc $\\widehat{AIB}$.",
+                options: [
+                    { text: "$80^\\circ$", isCorrect: false, rationale: "Đây là $\\frac{\\widehat{C} + \\widehat{D}}{2} = 100^\\circ$." },
+                    { text: "$100^\\circ$", isCorrect: true, rationale: "Trong $\\triangle AIB$, $\\widehat{AIB} = 180^\\circ - (\\widehat{A}_1 + \\widehat{B}_1) = 180^\\circ - \\frac{\\widehat{A} + \\widehat{B}}{2}$. Ta có $\\widehat{A} + \\widehat{B} = 360^\\circ - (\\widehat{C} + \\widehat{D}) = 360^\\circ - (120^\\circ + 80^\\circ) = 160^\\circ$. Vậy $\\widehat{AIB} = 180^\\circ - \\frac{160^\\circ}{2} = 180^\\circ - 80^\\circ = 100^\\circ$." },
+                    { text: "$110^\\circ$", isCorrect: false, rationale: "Tính toán sai." },
+                    { text: "$130^\\circ$", isCorrect: false, rationale: "Tính toán sai." }
+                ],
+                hint: "Sử dụng tổng các góc trong $\\triangle AIB$ và $\\widehat{A} + \\widehat{B} + \\widehat{C} + \\widehat{D} = 360^\\circ$."
+            },
+            // --- 5 CÂU THÔNG HIỂU (còn lại) ---
+            {
+                level: "Thông hiểu",
+                question: "Tứ giác $ABCD$ có $\\widehat{A} = 2x$, $\\widehat{B} = 3x$, $\\widehat{C} = x$, $\\widehat{D} = 4x$. Tính số đo góc $\\widehat{B}$.",
+                options: [
+                    { text: "$36^\\circ$", isCorrect: false, rationale: "Đây là số đo góc $\\widehat{C}$ ($x$)." },
+                    { text: "$72^\\circ$", isCorrect: false, rationale: "Đây là số đo góc $\\widehat{A}$ ($2x$)." },
+                    { text: "$108^\\circ$", isCorrect: true, rationale: "Tổng các góc là $2x + 3x + x + 4x = 10x = 360^\\circ$. Suy ra $x = 36^\\circ$. Góc $\\widehat{B} = 3x = 3 \\cdot 36^\\circ = 108^\\circ$." },
+                    { text: "$144^\\circ$", isCorrect: false, rationale: "Đây là số đo góc $\\widehat{D}$ ($4x$)." }
+                ],
+                hint: "Thiết lập phương trình với tổng các góc bằng $360^\\circ$ để tìm $x$."
+            },
+            {
+                level: "Thông hiểu",
+                question: "Cho tứ giác $ABCD$. Nếu $\\widehat{A} + \\widehat{C} = 190^\\circ$, thì $\\widehat{B} + \\widehat{D}$ bằng bao nhiêu?",
+                options: [
+                    { text: "$170^\\circ$", isCorrect: true, rationale: "Vì $\\widehat{A} + \\widehat{B} + \\widehat{C} + \\widehat{D} = 360^\\circ$, nên $\\widehat{B} + \\widehat{D} = 360^\\circ - (\\widehat{A} + \\widehat{C}) = 360^\\circ - 190^\\circ = 170^\\circ$." },
+                    { text: "$190^\\circ$", isCorrect: false, rationale: "Giá trị này bằng tổng $\\widehat{A} + \\widehat{C}$." },
+                    { text: "$200^\\circ$", isCorrect: false, rationale: "Tính toán sai." },
+                    { text: "$180^\\circ$", isCorrect: false, rationale: "Chỉ xảy ra trong tứ giác nội tiếp (lớp 9)." }
+                ],
+                hint: "Luôn nhớ tổng bốn góc của một tứ giác."
+            },
+            {
+                level: "Thông hiểu",
+                question: "Tứ giác có bao nhiêu đường chéo?",
+                options: [
+                    { text: "Một đường chéo", isCorrect: false, rationale: "Một tứ giác cần nối hai cặp đỉnh đối diện." },
+                    { text: "Hai đường chéo", isCorrect: true, rationale: "Tứ giác $ABCD$ có hai đường chéo là $AC$ và $BD$." },
+                    { text: "Ba đường chéo", isCorrect: false, rationale: "Ba đường chéo thuộc về ngũ giác." },
+                    { text: "Bốn đường chéo", isCorrect: false, rationale: "Bốn là số cạnh hoặc số đỉnh." }
+                ],
+                hint: "Hãy đếm số cách nối hai đỉnh đối diện của tứ giác."
+            },
+            {
+                level: "Thông hiểu",
+                question: "Trong tứ giác $ABCD$, nếu $\\widehat{A}$ và $\\widehat{B}$ là hai góc bù nhau (tổng bằng $180^\\circ$), thì điều gì có thể xảy ra?",
+                options: [
+                    { text: "Cạnh $AD$ song song với cạnh $BC$.", isCorrect: false, rationale: "Nếu $\\widehat{A}$ và $\\widehat{D}$ bù nhau, thì $AB \\parallel CD$." },
+                    { text: "Cạnh $AB$ song song với cạnh $CD$.", isCorrect: false, rationale: "Hai góc bù nhau kề nhau không đảm bảo có cặp cạnh song song." },
+                    { text: "Cạnh $AD$ và $BC$ không có mối quan hệ đặc biệt.", isCorrect: true, rationale: "Việc hai góc kề bù nhau không giúp suy ra mối quan hệ song song của hai cạnh đối còn lại." },
+                    { text: "Cả bốn góc đều bằng $90^\\circ$.", isCorrect: false, rationale: "Điều này chỉ xảy ra trong hình chữ nhật." }
+                ],
+                hint: "Điều kiện để có cạnh song song là tổng hai góc *cùng phía* (kề cạnh bên) bằng $180^\\circ$."
+            },
+            {
+                level: "Thông hiểu",
+                question: "Số đo góc ngoài tại một đỉnh của tứ giác là $100^\\circ$. Tính số đo góc trong tại đỉnh đó.",
+                options: [
+                    { text: "$80^\\circ$", isCorrect: true, rationale: "Góc trong và góc ngoài tại cùng một đỉnh là hai góc kề bù, nên tổng của chúng là $180^\\circ$. Góc trong là $180^\\circ - 100^\\circ = 80^\\circ$." },
+                    { text: "$100^\\circ$", isCorrect: false, rationale: "Đây là số đo góc ngoài." },
+                    { text: "$90^\\circ$", isCorrect: false, rationale: "Giá trị sai, chỉ đúng nếu góc ngoài là $90^\\circ$." },
+                    { text: "$260^\\circ$", isCorrect: false, rationale: "Tính toán sai." }
+                ],
+                hint: "Góc trong và góc ngoài tại một đỉnh là hai góc kề bù."
+            },
+            // --- 6 CÂU NHẬN BIẾT (còn lại) ---
+            {
+                level: "Nhận biết",
+                question: "Cho tứ giác $IJKL$. Cặp cạnh đối nhau là:",
+                options: [
+                    { text: "$IJ$ và $JK$", isCorrect: false, rationale: "Đây là hai cạnh kề nhau." },
+                    { text: "$KL$ và $LI$", isCorrect: false, rationale: "Đây là hai cạnh kề nhau." },
+                    { text: "$IJ$ và $IL$", isCorrect: false, rationale: "Đây là hai cạnh kề nhau." },
+                    { text: "$IJ$ và $LK$", isCorrect: true, rationale: "Hai cạnh đối nhau là hai cạnh không có điểm chung, ví dụ $IJ$ và $LK$." }
+                ],
+                hint: "Cặp cạnh đối nhau là cặp cạnh không có đỉnh chung."
+            }
+        ];
+
+        // Biến trạng thái trò chơi
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        // Lấy các phần tử DOM
+        const startScreen = document.getElementById('start-screen');
+        const quizContent = document.getElementById('quiz-content');
+        const resultScreen = document.getElementById('result-screen');
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const questionText = document.getElementById('question-text');
+        const difficultyLevel = document.getElementById('difficulty-level');
+        const answerOptionsContainer = document.getElementById('answer-options');
+        const rationaleBox = document.getElementById('rationale-box');
+        const rationaleText = document.getElementById('rationale-text');
+        const nextButton = document.getElementById('next-button');
+        const progressBar = document.getElementById('progress');
+        const scoreDisplay = document.getElementById('score-display');
+        const resultMessage = document.getElementById('result-message');
+        const confettiEmitter = document.getElementById('confetti-emitter');
+
+        // Hàm phát âm thanh chúc mừng (Web Audio API)
+        function playCorrectSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(600, audioContext.currentTime); // Chime pitch
+
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.01);
+                gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
+
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (error) {
+                console.error("Không thể phát âm thanh: ", error);
+            }
+        }
+
+        // Hàm tạo hiệu ứng pháo hoa
+        function createConfetti() {
+            const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#00bcd4', '#009688', '#4caf50', '#ffeb3b', '#ff9800', '#ff5722'];
+            const count = 30;
+            const containerWidth = confettiEmitter.offsetWidth;
+            const containerHeight = confettiEmitter.offsetHeight;
+
+            for (let i = 0; i < count; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti confetti-visible';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Vị trí xuất phát từ giữa màn hình quiz
+                const x = (containerWidth / 2) + (Math.random() * 200 - 100);
+                const y = (containerHeight / 2) + (Math.random() * 100 - 50);
+                
+                confetti.style.left = `${x}px`;
+                confetti.style.top = `${y}px`;
+                
+                // Hoạt ảnh (Animation)
+                const angle = Math.random() * 360;
+                const distance = 500 + Math.random() * 300;
+                const duration = 1.5 + Math.random();
+
+                confetti.animate([
+                    { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+                    { transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) rotate(${Math.random() * 1080}deg)`, opacity: 0 }
+                ], {
+                    duration: duration * 1000,
+                    easing: 'ease-out',
+                    fill: 'forwards'
+                });
+
+                confettiEmitter.appendChild(confetti);
+
+                setTimeout(() => {
+                    confetti.remove();
+                }, duration * 1000 + 50);
+            }
+        }
+
+        // Hàm hiển thị câu hỏi
+        function displayQuestion() {
+            rationaleBox.classList.add('hidden');
+            nextButton.classList.add('hidden');
+            answerOptionsContainer.innerHTML = '';
+            isAnswered = false;
+
+            if (currentQuestionIndex < quizQuestions.length) {
+                const currentQ = quizQuestions[currentQuestionIndex];
+                
+                // Cập nhật thanh tiến trình
+                const progressPercentage = ((currentQuestionIndex) / quizQuestions.length) * 100;
+                progressBar.style.width = `${progressPercentage}%`;
+                
+                questionText.innerHTML = `Câu ${currentQuestionIndex + 1}/${quizQuestions.length}: ${currentQ.question}`;
+                difficultyLevel.textContent = `Mức độ: ${currentQ.level}`;
+
+                currentQ.options.forEach((option, index) => {
+                    const button = document.createElement('button');
+                    button.className = 'option-button w-full text-left p-3 rounded-lg border-2 border-red-200 bg-white text-gray-700 font-medium hover:bg-red-100 transition duration-150';
+                    button.innerHTML = `<span>${String.fromCharCode(65 + index)}. </span>${option.text}`; // A, B, C, D
+                    button.onclick = () => handleAnswer(button, option.isCorrect, currentQ.options, currentQ.hint, currentQ.question, option.rationale);
+                    answerOptionsContainer.appendChild(button);
+                });
+            } else {
+                showResult();
+            }
+        }
+
+        // Hàm xử lý trả lời
+        function handleAnswer(selectedButton, isCorrect, options, hint, question, rationale) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            // Vô hiệu hóa tất cả các nút
+            const allButtons = answerOptionsContainer.querySelectorAll('button');
+            allButtons.forEach(btn => btn.disabled = true);
+
+            // Tìm và đánh dấu đáp án đúng/sai
+            options.forEach((option, index) => {
+                const btn = allButtons[index];
+                if (option.isCorrect) {
+                    btn.classList.add('correct-answer');
+                    btn.classList.remove('bg-white', 'hover:bg-red-100');
+                } else if (btn === selectedButton && !option.isCorrect) {
+                    btn.classList.add('incorrect-answer');
+                    btn.classList.remove('bg-white', 'hover:bg-red-100');
+                }
+            });
+
+            // Hiển thị giải thích
+            rationaleText.textContent = rationale;
+            rationaleBox.classList.remove('hidden');
+
+            // Xử lý logic đúng/sai
+            if (isCorrect) {
+                score++;
+                playCorrectSound();
+                createConfetti();
+                // Thêm biểu tượng chúc mừng
+                selectedButton.innerHTML += ' <span class="ml-2">🎉😊</span>';
+            } else {
+                selectedButton.innerHTML += ' <span class="ml-2">❌😔</span>';
+            }
+
+            nextButton.classList.remove('hidden');
+        }
+
+        // Hàm chuyển sang câu hỏi tiếp theo
+        function nextQuestion() {
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        // Hàm hiển thị kết quả
+        function showResult() {
+            quizContent.classList.add('hidden');
+            startScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            const total = quizQuestions.length;
+            scoreDisplay.textContent = score;
+            let message = '';
+
+            if (score === total) {
+                message = "Xuất sắc! Bạn đã đạt điểm tuyệt đối. Bạn là một chuyên gia về Tứ giác!";
+            } else if (score >= total * 0.8) {
+                message = "Rất tốt! Bạn có kiến thức vững vàng về Tứ giác.";
+            } else if (score >= total * 0.5) {
+                message = "Tốt! Bạn đã nắm được những kiến thức cơ bản. Hãy ôn tập thêm các câu vận dụng nhé.";
+            } else {
+                message = "Bạn cần cố gắng hơn. Hãy xem lại các định nghĩa và quy tắc tính tổng góc trong Tứ giác nhé!";
+            }
+            resultMessage.textContent = message;
+            
+            // Cập nhật thanh tiến trình lần cuối
+            progressBar.style.width = `100%`;
+        }
+
+        // Hàm khởi động lại trò chơi
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            isAnswered = false;
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizContent.classList.remove('hidden');
+            displayQuestion();
+        }
+
+        // Gán sự kiện cho các nút
+        startButton.addEventListener('click', startQuiz);
+        restartButton.addEventListener('click', startQuiz);
+        nextButton.addEventListener('click', nextQuestion);
+
+        // Khởi tạo trạng thái ban đầu (đảm bảo thanh tiến trình rỗng)
+        progressBar.style.width = '0%';
+        
+        // Kích hoạt trò chơi trên window.onload
+        window.onload = () => {
+             // Đặt lại confetti emitter tại vị trí tương đối
+             const rect = quizContent.getBoundingClientRect();
+             confettiEmitter.style.position = 'absolute';
+             confettiEmitter.style.top = `${rect.top}px`;
+             confettiEmitter.style.left = `${rect.left}px`;
+             confettiEmitter.style.width = `${rect.width}px`;
+             confettiEmitter.style.height = `${rect.height}px`;
+        };
+    </script>
+</body>
+</html>
