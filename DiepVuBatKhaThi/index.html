@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Điệp Vụ Bất Khả Thi - Toán 9</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -91,7 +91,7 @@
             height: 0;
             opacity: 0;
         }
-        
+
         #explanation-box.show {
             transform: scaleY(1);
             height: auto;
@@ -141,7 +141,6 @@
             20% { clip: rect(10px, 9999px, 50px, 0); }
             100% { clip: rect(30px, 9999px, 70px, 0); }
         }
-
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -152,12 +151,12 @@
     <div id="start-screen" class="terminal-panel p-10 text-center max-w-3xl w-full z-10">
         <h1 class="glitch text-6xl md:text-7xl mb-4 font-bold tracking-tighter" data-text="MISSION: IMPOSSIBLE">MISSION: IMPOSSIBLE</h1>
         <h2 class="text-2xl text-green-400 mb-8 font-mono">CODE: GIẢI MÃ BẤT PHƯƠNG TRÌNH</h2>
-        
+
         <div class="text-left bg-black/50 p-6 rounded mb-8 font-mono text-lg border-l-4 border-green-500">
-            <p class="mb-2">> TARGET: Giải mã 15 mật thư toán học.</p>
-            <p class="mb-2">> SUBJECT: Bất phương trình bậc nhất một ẩn.</p>
-            <p class="mb-2">> WARNING: Sai lầm sẽ kích hoạt báo động.</p>
-            <p class="text-yellow-400 blink">> WAITING FOR AGENT INPUT...</p>
+            <p class="mb-2">&gt; TARGET: Giải mã 15 mật thư toán học.</p>
+            <p class="mb-2">&gt; SUBJECT: Bất phương trình bậc nhất một ẩn.</p>
+            <p class="mb-2">&gt; WARNING: Sai lầm sẽ kích hoạt báo động.</p>
+            <p class="text-yellow-400"> &gt; WAITING FOR AGENT INPUT...</p>
         </div>
 
         <button onclick="startGame()" class="btn-hack px-12 py-4 rounded text-2xl font-bold w-full md:w-auto">
@@ -187,20 +186,16 @@
             </div>
         </div>
 
-        <!-- Explanation Area (Hidden by default) -->
-        <div id="explanation-box" class="bg-black/80 text-green-300 text-lg mb-6 border-green-500 rounded font-mono">
-            <!-- Explanation content -->
-        </div>
+        <!-- Explanation Area -->
+        <div id="explanation-box" class="bg-black/80 text-green-300 text-lg mb-6 border-green-500 rounded font-mono"></div>
 
         <!-- Options Grid -->
-        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <!-- Buttons injected here -->
-        </div>
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"></div>
 
-        <!-- Next Button (Hidden by default) -->
+        <!-- Next Button -->
         <div id="next-btn-container" class="hidden text-center">
             <button onclick="nextQuestion()" class="btn-hack px-8 py-3 rounded text-xl">
-                >> TIẾP TỤC GIẢI MÃ >>
+                &gt;&gt; TIẾP TỤC GIẢI MÃ &gt;&gt;
             </button>
         </div>
     </div>
@@ -211,7 +206,7 @@
             <div class="text-8xl mb-6">🔓</div>
             <h2 class="text-5xl font-bold text-green-400 mb-4 font-mono">MẬT MÃ ĐÃ MỞ!</h2>
             <p class="text-xl text-green-200 mb-8">Điệp viên xuất sắc. Dữ liệu đã được bảo vệ.</p>
-            
+
             <div class="inline-block bg-green-900/30 p-6 rounded-lg mb-8 border border-green-500 w-full">
                 <div class="text-sm text-green-600 uppercase mb-2">Độ chính xác nhiệm vụ</div>
                 <div class="text-7xl font-bold text-white font-mono" id="final-score">0%</div>
@@ -226,228 +221,228 @@
     </div>
 
     <script>
-        // --- DATA WITH RATIONALE ---
-        // 15 Questions: Math 9 Chapter 2 Lesson 2 (Linear Inequalities)
-        // Đã phân bố đáp án đúng A/B/C/D tương đối đều.
+        // --- QUESTIONS: 15 câu, chia đều ABCD ---
         const questions = [
-            // LEVEL 1: NHẬN BIẾT
+            // 1 – NB, đúng A
             {
                 q: "Bất phương trình nào sau đây là bất phương trình bậc nhất một ẩn?",
                 a: [
-                    "0x + 3 < 0",
-                    "2x - 5 > 0",
+                    "2x - 5 &gt; 0",
+                    "0x + 3 &lt; 0",
                     "x<sup>2</sup> + 1 &ge; 0",
                     "1/x - 2 &le; 0"
                 ],
-                correct: 1, // B
-                rationale: "<b>Giải thích:</b> Bất phương trình bậc nhất một ẩn có dạng ax + b &gt;, &lt;, &ge;, &le; 0 với a &ne; 0.<br>Trong 4 lựa chọn, chỉ có 2x - 5 &gt; 0 có vế trái là biểu thức bậc nhất theo x.",
+                correct: 0,
+                rationale: "<b>Giải thích:</b> Dạng tổng quát: ax + b &gt; 0 với a &ne; 0. Chỉ phương án A có hệ số của x khác 0.",
                 level: "NHẬN BIẾT"
             },
+            // 2 – NB, đúng B
             {
                 q: "Giá trị x = 2 là nghiệm của bất phương trình nào?",
                 a: [
-                    "2x - 5 > 0",
-                    "4 - x < 1",
-                    "x + 3 &le; 4",
-                    "3x + 1 > 5"
+                    "3x + 1 &gt; 7",
+                    "2x - 1 &gt; 2",
+                    "4 - x &lt; 1",
+                    "x + 3 &le; 4"
                 ],
-                correct: 3, // D
-                rationale: "<b>Kiểm tra x = 2:</b><br>Với 3x + 1 &gt; 5 ta có 3.2 + 1 = 7 &gt; 5 (đúng).<br>Các bất phương trình còn lại đều sai, nên 3x + 1 &gt; 5 là bất phương trình nhận x = 2 làm nghiệm.",
+                correct: 1,
+                rationale: "<b>Kiểm tra x = 2:</b> A: 3·2 + 1 = 7 &not;&gt; 7; B: 2·2 - 1 = 3 &gt; 2 (đúng); C: 4 - 2 = 2 &not;&lt; 1; D: 2 + 3 = 5 &not;&le; 4.",
                 level: "NHẬN BIẾT"
             },
+            // 3 – NB, đúng C
             {
-                q: "Hệ số a và b của bất phương trình -3x + 4 &le; 0 lần lượt là:",
+                q: "Hệ số a và b của bất phương trình -2x + 5 &ge; 0 lần lượt là:",
                 a: [
-                    "a = -3, b = 4",
-                    "a = 3, b = 4",
-                    "a = 4, b = -3",
-                    "a = -3, b = -4"
+                    "a = 2, b = 5",
+                    "a = -2, b = -5",
+                    "a = -2, b = 5",
+                    "a = 5, b = -2"
                 ],
-                correct: 0, // A
-                rationale: "<b>Giải thích:</b> Dạng tổng quát ax + b &le; 0.<br>Hệ số đi liền với x là a = -3, hệ số tự do là b = 4.",
+                correct: 2,
+                rationale: "<b>Giải thích:</b> So với dạng ax + b &ge; 0, ta có a = -2 (hệ số của x), b = 5 (hằng số).",
                 level: "NHẬN BIẾT"
             },
+            // 4 – NB, đúng D
             {
-                q: "Phép biến đổi nào ĐÚNG khi giải x - 3 > 5?",
+                q: "Giải bất phương trình x - 3 &gt; 5.",
                 a: [
-                    "x > 5 - 3",
-                    "x < 5 + 3",
-                    "x > 5 + 3",
-                    "x > 5 . 3"
+                    "x &gt; 2",
+                    "x &gt; 5",
+                    "x &lt; 8",
+                    "x &gt; 8"
                 ],
-                correct: 2, // C
-                rationale: "<b>Quy tắc chuyển vế:</b> Chuyển hạng tử -3 sang vế phải phải đổi dấu thành +3, nên x &gt; 5 + 3.",
+                correct: 3,
+                rationale: "<b>Giải:</b> x - 3 &gt; 5 &hArr; x &gt; 8.",
                 level: "NHẬN BIẾT"
             },
+            // 5 – NB, đúng A
             {
-                q: "Khi nhân hai vế của bất phương trình -2x < 6 với -1/2, ta được:",
+                q: "Khi nhân hai vế của bất phương trình -2x &lt; 6 với -1/2, ta được:",
                 a: [
-                    "x < -3",
-                    "x > -3",
-                    "x > 3",
-                    "x < 3"
+                    "x &gt; -3",
+                    "x &lt; -3",
+                    "x &gt; 3",
+                    "x &lt; 3"
                 ],
-                correct: 1, // B
-                rationale: "<b>Lưu ý:</b> Nhân với số âm (-1/2) phải ĐỔI CHIỀU bất phương trình (&lt; thành &gt;).<br>(-2x).(-1/2) &gt; 6.(-1/2) &hArr; x &gt; -3.",
+                correct: 0,
+                rationale: "<b>Lưu ý:</b> Nhân với số âm làm <b>đổi chiều</b> bất phương trình. Ta có x &gt; -3.",
                 level: "NHẬN BIẾT"
             },
-           {
-               q: "Dạng tổng quát của bất phương trình bậc nhất một ẩn là:",
-               a: [
-                   "ax + b > 0 (a = 0)",
-                   "ax + b &le; 0 (a &ne; 0)",
-                   "ax + b &ge; 0 (a = 0)",
-                   "ax<sup>2</sup> + b < 0"
-              ],
-              correct: 1,
-              rationale: "<b>Giải thích:</b> Bất phương trình bậc nhất một ẩn có dạng ax + b &gt;, &lt;, &ge;, &le; 0 với a &ne; 0.",
-              level: "NHẬN BIẾT"
-              },
-                correct: 3, // D
-                rationale: "<b>Giải thích:</b> Biểu thức bậc nhất theo x có dạng ax + b với a &ne; 0.<br>Trong 4 lựa chọn, chỉ có 3x - 5 &le; 0 có vế trái dạng ax + b (a = 3, b = -5).",
-                level: "NHẬN BIẾT"
-            },
-
-            // LEVEL 2: THÔNG HIỂU
+            // 6 – NB, đúng B
             {
-                q: "Nghiệm của bất phương trình 2x - 8 > 0 là:",
+                q: "Phát biểu nào sau đây ĐÚNG về tập nghiệm của bất phương trình bậc nhất một ẩn?",
                 a: [
-                    "x > 4",
-                    "x < 4",
-                    "x > -4",
-                    "x > 16"
+                    "Luôn chỉ có một số duy nhất",
+                    "Có thể là một khoảng, một nửa khoảng hoặc một điểm",
+                    "Luôn là tập tất cả các số nguyên",
+                    "Luôn không có nghiệm"
                 ],
-                correct: 0, // A
-                rationale: "<b>Giải:</b> 2x - 8 &gt; 0 &hArr; 2x &gt; 8 &hArr; x &gt; 4 (Chia cho 2 &gt; 0 giữ nguyên chiều).",
+                correct: 1,
+                rationale: "<b>Giải thích:</b> Tập nghiệm của bất phương trình bậc nhất thường là một khoảng, nửa khoảng hoặc một điểm (trường hợp biên).",
+                level: "NHẬN BIẾT"
+            },
+            // 7 – TH, đúng C
+            {
+                q: "Nghiệm của bất phương trình 2x - 8 &gt; 0 là:",
+                a: [
+                    "x &lt; 4",
+                    "x &ge; 4",
+                    "x &gt; 4",
+                    "x &gt; 8"
+                ],
+                correct: 2,
+                rationale: "<b>Giải:</b> 2x - 8 &gt; 0 &hArr; 2x &gt; 8 &hArr; x &gt; 4.",
                 level: "THÔNG HIỂU"
             },
+            // 8 – TH, đúng D
             {
                 q: "Giải bất phương trình 5 - x &le; 2:",
                 a: [
                     "x &le; 3",
-                    "x &ge; -3",
-                    "x &ge; 3",
-                    "x &le; 7"
+                    "x &gt; 3",
+                    "x &lt; 3",
+                    "x &ge; 3"
                 ],
-                correct: 2, // C
-                rationale: "<b>Giải:</b> 5 - x &le; 2 &hArr; -x &le; 2 - 5 &hArr; -x &le; -3 &hArr; x &ge; 3 (Nhân với -1 đổi chiều).",
+                correct: 3,
+                rationale: "<b>Giải:</b> 5 - x &le; 2 &hArr; -x &le; -3 &hArr; x &ge; 3 (nhân với -1 đổi chiều).",
                 level: "THÔNG HIỂU"
             },
+            // 9 – TH, đúng A
             {
-                q: "Tập nghiệm của bất phương trình 3x + 4 < x - 2 là:",
+                q: "Tập nghiệm của bất phương trình 3x + 4 &lt; x - 2 là:",
                 a: [
-                    "x > -3",
-                    "x < 1",
-                    "x < -1",
-                    "x < -3"
+                    "x &lt; -3",
+                    "x &gt; -3",
+                    "x &lt; 1",
+                    "x &lt; -1"
                 ],
-                correct: 3, // D
-                rationale: "<b>Giải:</b> 3x + 4 &lt; x - 2 &hArr; 3x - x &lt; -2 - 4 &hArr; 2x &lt; -6 &hArr; x &lt; -3.",
+                correct: 0,
+                rationale: "<b>Giải:</b> 3x - x &lt; -2 - 4 &hArr; 2x &lt; -6 &hArr; x &lt; -3.",
                 level: "THÔNG HIỂU"
             },
+            // 10 – TH, đúng B
             {
-                q: "Giải bất phương trình 2(x+1) - 3(2x-1) > 1:",
+                q: "Giải bất phương trình 2(x+1) - 3(2x-1) &gt; 1:",
                 a: [
-                    "x < -1",
-                    "x < 1",
-                    "x > -1",
-                    "x > 1"
+                    "x &gt; 1",
+                    "x &lt; 1",
+                    "x &ge; 1",
+                    "x &le; 1"
                 ],
-                correct: 1, // B
-                rationale: "<b>Giải:</b> 2x + 2 - 6x + 3 &gt; 1 &hArr; -4x + 5 &gt; 1 &hArr; -4x &gt; -4 &hArr; x &lt; 1 (Chia cho -4 đổi chiều).",
+                correct: 1,
+                rationale: "<b>Giải:</b> 2x + 2 - 6x + 3 &gt; 1 &hArr; -4x + 5 &gt; 1 &hArr; -4x &gt; -4 &hArr; x &lt; 1.",
                 level: "THÔNG HIỂU"
             },
+            // 11 – TH, đúng C
             {
-                q: "Số nguyên dương nào thỏa mãn 3x - 5 < 2?",
+                q: "Số nguyên dương nào thỏa mãn 3x - 5 &lt; 2?",
                 a: [
+                    "x = 1",
+                    "x = 2",
                     "x &in; {1; 2}",
-                    "x &in; {0; 1; 2}",
-                    "x &in; {1; 2; 3}",
-                    "x = 1"
+                    "x &in; {0; 1; 2}"
                 ],
-                correct: 0, // A
-                rationale: "<b>Giải:</b> 3x - 5 &lt; 2 &hArr; 3x &lt; 7 &hArr; x &lt; 7/3 &approx; 2,33.<br>Số nguyên dương nhỏ hơn 2,33 là 1 và 2.",
+                correct: 2,
+                rationale: "<b>Giải:</b> 3x &lt; 7 &hArr; x &lt; 7/3 &approx; 2,33. Số nguyên dương thỏa là 1 và 2.",
                 level: "THÔNG HIỂU"
             },
-
-            // LEVEL 3: VẬN DỤNG
+            // 12 – VD, đúng D
             {
-                q: "Giải bất phương trình: <div class='fraction'><span class='numerator'>x</span><span class='denominator'>2</span></div> - <div class='fraction'><span class='numerator'>x-1</span><span class='denominator'>3</span></div> > 1",
+                q: "Giải bất phương trình: <div class='fraction'><span class='numerator'>x</span><span class='denominator'>2</span></div> - <div class='fraction'><span class='numerator'>x-1</span><span class='denominator'>3</span></div> &gt; 1",
                 a: [
-                    "x > 1",
-                    "x < 4",
-                    "x > 4",
-                    "x > 2"
+                    "x &gt; 1",
+                    "x &lt; 4",
+                    "x &gt; 2",
+                    "x &gt; 4"
                 ],
-                correct: 2, // C
+                correct: 3,
                 rationale: "<b>Quy đồng mẫu 6:</b> 3x - 2(x-1) &gt; 6 &hArr; 3x - 2x + 2 &gt; 6 &hArr; x &gt; 4.",
                 level: "VẬN DỤNG"
             },
+            // 13 – VD, đúng A
             {
                 q: "(Thực tế) Hình chữ nhật có chiều dài 15m. Tìm chiều rộng x để chu vi không nhỏ hơn 50m.",
                 a: [
-                    "x &le; 10",
                     "x &ge; 10",
-                    "x > 10",
+                    "x &le; 10",
+                    "x &gt; 10",
                     "x &ge; 20"
                 ],
-                correct: 1, // B
-                rationale: "<b>Thiết lập:</b> Chu vi = 2(15 + x).<br>2(15 + x) &ge; 50 &hArr; 15 + x &ge; 25 &hArr; x &ge; 10.",
+                correct: 0,
+                rationale: "<b>Thiết lập:</b> Chu vi P = 2(15 + x). Điều kiện P &ge; 50 &hArr; 15 + x &ge; 25 &hArr; x &ge; 10.",
                 level: "VẬN DỤNG"
             },
+            // 14 – VD, đúng B
             {
-                q: "Tìm x để căn thức &radic;(3x - 9) có nghĩa:",
+                q: "Tìm x để căn thức &radic;(2x - 1) xác định:",
                 a: [
-                    "x &gt; 3",
-                    "x &le; 3",
-                    "x &ge; -3",
-                    "x &ge; 3"
+                    "x &gt; 1/2",
+                    "x &ge; 1/2",
+                    "x &le; 1/2",
+                    "x &ge; -1/2"
                 ],
-                correct: 3, // D
-                rationale: "<b>Điều kiện:</b> Biểu thức trong căn &ge; 0.<br>3x - 9 &ge; 0 &hArr; 3x &ge; 9 &hArr; x &ge; 3.",
+                correct: 1,
+                rationale: "<b>Điều kiện có nghĩa:</b> 2x - 1 &ge; 0 &hArr; x &ge; 1/2.",
                 level: "VẬN DỤNG"
             },
-
-            // LEVEL 4: VẬN DỤNG CAO
+            // 15 – VDC, đúng C
             {
-                q: "Tìm m để phương trình 2x + m = x - 3 có nghiệm x > 2.",
+                q: "Tìm m để phương trình 2x + m = x - 3 có nghiệm x &gt; 2.",
                 a: [
-                    "m < -5",
-                    "m > -5",
-                    "m < 5",
-                    "m > 5"
+                    "m &gt; -5",
+                    "m &lt; 5",
+                    "m &lt; -5",
+                    "m &gt; 5"
                 ],
-                correct: 0, // A
-                rationale: "<b>Giải:</b> Tìm x theo m: 2x + m = x - 3 &rArr; x = -m - 3.<br>Để x &gt; 2 thì -m - 3 &gt; 2 &hArr; -m &gt; 5 &hArr; m &lt; -5.",
+                correct: 2,
+                rationale: "<b>Giải:</b> 2x + m = x - 3 &hArr; x = -m - 3. Điều kiện x &gt; 2 &hArr; -m - 3 &gt; 2 &hArr; -m &gt; 5 &hArr; m &lt; -5.",
                 level: "VẬN DỤNG CAO"
             }
         ];
 
-        // --- GAME LOGIC ---
+        // --- GAME STATE ---
         let currentQIndex = 0;
         let score = 0;
         let correctCount = 0;
 
-        // Audio Setup
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
+
         function playSound(type) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-
             const now = audioCtx.currentTime;
-            
-            if (type === 'type') { // Typing sound
+
+            if (type === 'type') {
                 osc.type = 'square';
                 osc.frequency.setValueAtTime(800, now);
                 gain.gain.setValueAtTime(0.05, now);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
                 osc.start(now);
                 osc.stop(now + 0.05);
-            } else if (type === 'correct') { // Data unlocked
+            } else if (type === 'correct') {
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(600, now);
                 osc.frequency.linearRampToValueAtTime(1200, now + 0.1);
@@ -455,7 +450,7 @@
                 gain.gain.linearRampToValueAtTime(0, now + 0.3);
                 osc.start(now);
                 osc.stop(now + 0.3);
-            } else if (type === 'wrong') { // Access denied
+            } else if (type === 'wrong') {
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(150, now);
                 osc.frequency.linearRampToValueAtTime(100, now + 0.2);
@@ -463,19 +458,18 @@
                 gain.gain.linearRampToValueAtTime(0, now + 0.3);
                 osc.start(now);
                 osc.stop(now + 0.3);
-            } else if (type === 'win') { // Mission complete
-                // Arpeggio
+            } else if (type === 'win') {
                 [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
-                    let o = audioCtx.createOscillator();
-                    let g = audioCtx.createGain();
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
                     o.connect(g);
                     g.connect(audioCtx.destination);
                     o.type = 'triangle';
                     o.frequency.value = f;
-                    g.gain.setValueAtTime(0.2, now + i*0.15);
-                    g.gain.exponentialRampToValueAtTime(0.001, now + i*0.15 + 0.5);
-                    o.start(now + i*0.15);
-                    o.stop(now + i*0.15 + 0.5);
+                    g.gain.setValueAtTime(0.2, now + i * 0.15);
+                    g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 0.5);
+                    o.start(now + i * 0.15);
+                    o.stop(now + i * 0.15 + 0.5);
                 });
             }
         }
@@ -484,7 +478,7 @@
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
             document.getElementById('game-screen').classList.add('flex');
-            
+
             currentQIndex = 0;
             score = 0;
             correctCount = 0;
@@ -493,28 +487,24 @@
 
         function loadQuestion() {
             const q = questions[currentQIndex];
-            
-            // UI Updates
+
             document.getElementById('q-number').innerText = (currentQIndex + 1).toString().padStart(2, '0');
             document.getElementById('level-badge').innerText = q.level;
             document.getElementById('question-text').innerHTML = q.q;
-            
-            // Hide previous explanation and next button
-            const expBox = document.getElementById('explanation-box');
-            expBox.classList.remove('show');
-            document.getElementById('next-btn-container').classList.add('hidden');
 
-            // Difficulty Color
             const badge = document.getElementById('level-badge');
             if (q.level === "NHẬN BIẾT") badge.className = "text-xl font-bold text-green-400";
             else if (q.level === "THÔNG HIỂU") badge.className = "text-xl font-bold text-blue-400";
             else if (q.level === "VẬN DỤNG") badge.className = "text-xl font-bold text-yellow-400";
             else badge.className = "text-xl font-bold text-red-500";
 
-            // Options
+            const expBox = document.getElementById('explanation-box');
+            expBox.classList.remove('show');
+            document.getElementById('next-btn-container').classList.add('hidden');
+
             const grid = document.getElementById('options-grid');
             grid.innerHTML = '';
-            
+
             q.a.forEach((opt, idx) => {
                 const btn = document.createElement('button');
                 btn.className = "btn-hack w-full p-4 rounded text-xl";
@@ -525,13 +515,12 @@
         }
 
         function handleAnswer(selected, correct, btn) {
-            const btns = document.querySelectorAll('.btn-hack');
-            btns.forEach(b => b.disabled = true); // Lock buttons
+            const btns = document.querySelectorAll('#options-grid .btn-hack');
+            btns.forEach(b => b.disabled = true);
 
             const q = questions[currentQIndex];
             const expBox = document.getElementById('explanation-box');
-            
-            // Show Explanation
+
             expBox.innerHTML = q.rationale;
             expBox.classList.add('show');
 
@@ -545,13 +534,12 @@
                 expBox.classList.remove('border-red-500');
             } else {
                 btn.classList.add('wrong');
-                btns[correct].classList.add('correct'); // Show correct
+                btns[correct].classList.add('correct');
                 playSound('wrong');
                 expBox.classList.add('border-red-500');
                 expBox.classList.remove('border-green-500');
             }
 
-            // Show Next Button
             document.getElementById('next-btn-container').classList.remove('hidden');
         }
 
@@ -583,10 +571,9 @@
         const alphabet = katakana.split('');
 
         const fontSize = 16;
-        const columns = canvas.width/fontSize;
-
+        const columns = canvas.width / fontSize;
         const drops = [];
-        for(let x = 0; x < columns; x++) drops[x] = 1;
+        for (let x = 0; x < columns; x++) drops[x] = 1;
 
         function draw() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
@@ -595,13 +582,13 @@
             ctx.fillStyle = '#0F0';
             ctx.font = fontSize + 'px monospace';
 
-            for(let i = 0; i < drops.length; i++) {
-                const text = alphabet[Math.floor(Math.random()*alphabet.length)];
-                ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+            for (let i = 0; i < drops.length; i++) {
+                const text = alphabet[Math.floor(Math.random() * alphabet.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-                if(drops[i]*fontSize > canvas.height && Math.random() > 0.975)
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
                     drops[i] = 0;
-
+                }
                 drops[i]++;
             }
         }
@@ -612,7 +599,6 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
-
     </script>
 </body>
 </html>
