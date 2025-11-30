@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đấu Trường Robot - Toán 8 Bài 4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0b0e14;
+            color: #00e5ff;
+            overflow: hidden;
+            margin: 0;
+            user-select: none;
+        }
+
+        .mech-font {
+            font-family: 'Chakra Petch', sans-serif;
+        }
+
+        /* --- Sci-Fi Background --- */
+        #mech-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: 
+                linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center;
+        }
+
+        .hex-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%2300e5ff' fill-opacity='0.05' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-7.8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        /* --- Game Interface --- */
+        .hud-panel {
+            background: rgba(11, 14, 20, 0.9);
+            border: 2px solid #00e5ff;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3), inset 0 0 20px rgba(0, 229, 255, 0.1);
+            clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+            position: relative;
+        }
+
+        .hud-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 20px; width: 40%; height: 2px;
+            background: #00e5ff;
+            box-shadow: 0 0 10px #00e5ff;
+        }
+
+        /* --- Robot Assembly Area --- */
+        #robot-container {
+            position: relative;
+            height: 300px;
+            width: 300px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .robot-part {
+            position: absolute;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            opacity: 0;
+            transform: scale(0) rotate(45deg);
+            filter: drop-shadow(0 0 10px #00e5ff);
+            font-size: 8rem;
+        }
+
+        .robot-part.assembled {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        /* --- Buttons --- */
+        .btn-mech {
+            background: linear-gradient(180deg, #0a1a2a 0%, #050a10 100%);
+            border: 1px solid #00e5ff;
+            color: #00e5ff;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .btn-mech:hover {
+            background: rgba(0, 229, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+            transform: translateY(-2px);
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .btn-mech.correct {
+            background: rgba(0, 255, 100, 0.2) !important;
+            border-color: #00ff66 !important;
+            color: #00ff66 !important;
+            box-shadow: 0 0 20px #00ff66;
+        }
+
+        .btn-mech.wrong {
+            background: rgba(255, 0, 85, 0.2) !important;
+            border-color: #ff0055 !important;
+            color: #ff0055 !important;
+            box-shadow: 0 0 20px #ff0055;
+            animation: glitch 0.3s;
+        }
+
+        /* --- Explanation Box --- */
+        #data-log {
+            background: rgba(0, 0, 0, 0.95);
+            border-left: 4px solid #ffaa00;
+            color: #e0e0e0;
+            transition: all 0.5s ease;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        #data-log.show {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 1rem;
+            padding: 1rem;
+            box-shadow: 0 0 20px rgba(255, 170, 0, 0.3);
+        }
+
+        /* --- Animations --- */
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            25% { transform: translate(-5px, 5px) }
+            50% { transform: translate(5px, -5px) }
+            75% { transform: translate(-5px, -5px) }
+            100% { transform: translate(0) }
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        .scan-effect {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(0, 229, 255, 0.2), transparent);
+            animation: scanline 2s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* --- Progress Bar --- */
+        .power-bar-container {
+            width: 100%;
+            height: 12px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            transform: skewX(-20deg);
+            overflow: hidden;
+        }
+        .power-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00e5ff, #00ff66);
+            transition: width 0.5s;
+            box-shadow: 0 0 10px #00e5ff;
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div id="mech-bg">
+        <div class="hex-overlay"></div>
+    </div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="hud-panel p-12 text-center max-w-2xl w-full z-10 relative">
+        <div class="scan-effect"></div>
+        <h1 class="mech-font text-5xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-b from-cyan-300 to-blue-600 mb-4 drop-shadow-[0_0_10px_rgba(0,229,255,0.8)]">
+            ĐẤU TRƯỜNG<br>ROBOT
+        </h1>
+        <h2 class="text-2xl text-yellow-400 mb-8 font-bold uppercase tracking-widest">Giải Mã Nhân Tử</h2>
+        
+        <div class="text-left bg-black/60 p-6 mb-8 border-l-4 border-cyan-500 text-lg">
+            <p class="mb-3 text-cyan-100"><span class="text-xl">🤖</span> <b>Nhiệm vụ:</b> Phân tích các mã nguồn (đa thức) thành nhân tử để kích hoạt 15 bộ phận Chiến Binh Robot.</p>
+            <p class="mb-3 text-cyan-100"><span class="text-xl">🔧</span> <b>Công cụ:</b> Nhân tử chung, Hằng đẳng thức, Nhóm hạng tử.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-8 text-sm font-bold text-gray-400 font-mono">
+            <div><span class="text-green-400">█</span> 6 Nhận Biết</div>
+            <div><span class="text-blue-400">██</span> 5 Thông Hiểu</div>
+            <div><span class="text-purple-400">███</span> 3 Vận Dụng</div>
+            <div><span class="text-red-400">████</span> 1 Vận Dụng Cao</div>
+        </div>
+
+        <button onclick="startGame()" class="btn-mech px-12 py-5 w-full md:w-auto text-2xl shadow-[0_0_20px_rgba(0,229,255,0.5)]">
+            KÍCH HOẠT HỆ THỐNG
+        </button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden w-full max-w-4xl z-10 flex-col h-full justify-center">
+        <!-- Header -->
+        <div class="flex justify-between items-end mb-4 px-2">
+            <div>
+                <div class="text-xs text-cyan-600 uppercase tracking-widest mb-1">Assembly Stage</div>
+                <div class="text-2xl font-bold text-white mech-font">PART <span id="q-number">1</span>/15</div>
+            </div>
+            <div class="flex-grow mx-8">
+                 <div class="text-xs text-right text-green-400 mb-1 uppercase">Năng lượng lõi</div>
+                 <div class="power-bar-container">
+                     <div id="progress-bar" class="power-bar"></div>
+                 </div>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-cyan-600 uppercase tracking-widest mb-1">Score</div>
+                <div class="text-2xl font-bold text-yellow-400 mech-font" id="score">0</div>
+            </div>
+        </div>
+
+        <!-- Robot Display Area -->
+        <div id="robot-container">
+            <div id="robot-part-display" class="text-9xl transition-all duration-500">⚙️</div>
+        </div>
+
+        <!-- Question Panel -->
+        <div class="hud-panel p-8 mb-4 relative min-h-[160px] flex flex-col justify-center items-center text-center">
+            <div id="level-badge" class="absolute top-0 left-0 bg-cyan-900 text-cyan-100 px-4 py-1 text-xs font-bold" style="clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);">NHẬN BIẾT</div>
+            
+            <div id="question-text" class="text-2xl md:text-3xl font-bold text-white leading-relaxed mt-4 font-mono">
+                Decrypting polynomial...
+            </div>
+        </div>
+
+        <!-- Explanation (Data Log) -->
+        <div id="data-log" class="rounded shadow-lg mb-4">
+            <div class="text-yellow-500 font-bold mb-2 border-b border-yellow-900 pb-1 mech-font tracking-wide flex items-center gap-2">
+                <span>📂</span> DỮ LIỆU GIẢI MÃ:
+            </div>
+            <div id="log-content" class="text-cyan-100 leading-relaxed text-lg"></div>
+        </div>
+
+        <!-- Options Grid -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <!-- Buttons injected here -->
+        </div>
+
+        <!-- Next Button -->
+        <div id="next-btn-container" class="hidden text-center pb-4">
+            <button onclick="nextQuestion()" class="btn-mech px-10 py-3 text-xl bg-blue-900/50">
+                TIẾP TỤC LẮP RÁP &rarr;
+            </button>
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/95">
+        <div class="hud-panel p-12 text-center max-w-2xl w-full mx-4 border-green-500">
+            <div class="text-8xl mb-6 animate-bounce">🤖</div>
+            <h2 class="mech-font text-5xl text-green-400 mb-4">CHIẾN BINH HOÀN THIỆN!</h2>
+            <p class="text-xl text-white mb-8">Hệ thống phân tích nhân tử đã hoạt động 100% công suất.</p>
+            
+            <div class="bg-green-900/20 p-6 border border-green-500 inline-block mb-8 w-full">
+                <div class="text-sm text-green-300 uppercase mb-2 tracking-widest">Tổng Điểm</div>
+                <div class="text-7xl font-bold text-white mech-font" id="final-score">0</div>
+            </div>
+
+            <div>
+                <button onclick="location.reload()" class="btn-mech px-10 py-4 text-xl w-full">
+                    TÁI KHỞI ĐỘNG
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Overlay -->
+    <div id="feedback-overlay" class="fixed inset-0 pointer-events-none flex justify-center items-center z-50">
+        <div id="feedback-emoji" class="text-9xl opacity-0 transform scale-0 transition-all duration-300 filter drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]"></div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+    <script>
+        // --- DATA ---
+        // 15 Questions: Math 8 Chapter 1 Lesson 4 (Factorizing Polynomials)
+        // 4 Levels: 6 NB, 5 TH, 3 VD, 1 VDC
+const questions = [
+    // LEVEL 1: NHẬN BIẾT (6 câu)
+    {
+        q: "Nhân tử chung của đa thức 3x + 12 là:",
+        a: ["x", "3", "4", "12"],
+        correct: 1,
+        rationale: "Ta thấy 3x = 3.x và 12 = 3.4. Nhân tử chung là 3.<br>3x + 12 = 3(x + 4).",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Phân tích đa thức x<sup>2</sup> - 25 thành nhân tử, ta được:",
+        a: ["(x - 5)<sup>2</sup>", "(x + 5)<sup>2</sup>", "(x - 5)(x + 5)", "x(x - 25)"],
+        correct: 2,
+        rationale: "Sử dụng hằng đẳng thức hiệu hai bình phương: A<sup>2</sup> - B<sup>2</sup> = (A - B)(A + B).<br>x<sup>2</sup> - 25 = x<sup>2</sup> - 5<sup>2</sup> = (x - 5)(x + 5).",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Đa thức x<sup>2</sup> + 4x + 4 được viết dưới dạng bình phương là:",
+        a: ["(x - 2)<sup>2</sup>", "x<sup>2</sup> + 4", "(x + 4)<sup>2</sup>", "(x + 2)<sup>2</sup>"],
+        correct: 3,
+        rationale: "Dạng A<sup>2</sup> + 2AB + B<sup>2</sup> = (A + B)<sup>2</sup>.<br>x<sup>2</sup> + 2.x.2 + 2<sup>2</sup> = (x + 2)<sup>2</sup>.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Nhân tử chung của hai đơn thức 2x<sup>2</sup>y và 4xy là:",
+        a: ["2xy", "2x", "4y", "x<sup>2</sup>y"],
+        correct: 0,
+        rationale: "Hệ số chung: 2. Biến chung: x (mũ 1) và y (mũ 1).<br>Nhân tử chung: 2xy.",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Phân tích đa thức x<sup>3</sup> - 1 thành nhân tử:",
+        a: ["(x - 1)(x<sup>2</sup> - x + 1)", "(x - 1)(x<sup>2</sup> + x + 1)", "(x - 1)<sup>3</sup>", "(x + 1)(x<sup>2</sup> - x + 1)"],
+        correct: 1,
+        rationale: "Hằng đẳng thức hiệu hai lập phương: A<sup>3</sup> - B<sup>3</sup> = (A - B)(A<sup>2</sup> + AB + B<sup>2</sup>).",
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Phương pháp nào được sử dụng để phân tích đa thức x<sup>2</sup> - xy + x - y thành nhân tử?",
+        a: ["Đặt nhân tử chung ngay từ đầu", "Dùng hằng đẳng thức số 1", "Nhóm hạng tử", "Dùng hằng đẳng thức số 3"],
+        correct: 2,
+        rationale: "Ta nhóm (x<sup>2</sup> - xy) + (x - y) để xuất hiện nhân tử chung.",
+        level: "NHẬN BIẾT"
+    },
+
+    // LEVEL 2: THÔNG HIỂU (5 câu)
+    {
+        q: "Phân tích đa thức 5x<sup>2</sup> - 10x thành nhân tử:",
+        a: ["5x(x - 2)", "5(x<sup>2</sup> - 2x)", "x(5x - 10)", "5x(x + 2)"],
+        correct: 0,
+        rationale: "Đặt nhân tử chung 5x ra ngoài: 5x<sup>2</sup> - 10x = 5x(x - 2).",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Phân tích đa thức 8 - x<sup>3</sup> thành nhân tử:",
+        a: ["(2 - x)<sup>3</sup>", "(x - 2)(x<sup>2</sup> + 2x + 4)", "(2 - x)(4 - 2x + x<sup>2</sup>)", "(2 - x)(4 + 2x + x<sup>2</sup>)"],
+        correct: 3,
+        rationale: "8 - x<sup>3</sup> = 2<sup>3</sup> - x<sup>3</sup> = (2 - x)(2<sup>2</sup> + 2.x + x<sup>2</sup>) = (2 - x)(4 + 2x + x<sup>2</sup>).",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Phân tích đa thức x<sup>2</sup> - 2xy + y<sup>2</sup> - z<sup>2</sup> thành nhân tử:",
+        a: ["(x + y - z)(x + y + z)", "(x - y - z)(x - y + z)", "(x - y - z)<sup>2</sup>", "(x - y)(x + y - z)"],
+        correct: 1,
+        rationale: "Nhóm ba hạng tử đầu: (x - y)<sup>2</sup> - z<sup>2</sup>.<br>Dùng hiệu hai bình phương: (x - y - z)(x - y + z).",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Phân tích đa thức x<sup>2</sup> - 3x + xy - 3y thành nhân tử:",
+        a: ["(x - y)(x + 3)", "(x + y)(x + 3)", "(x + y)(x - 3)", "x(x - 3 + y)"],
+        correct: 2,
+        rationale: "Nhóm (x<sup>2</sup> - 3x) + (xy - 3y) = x(x - 3) + y(x - 3) = (x - 3)(x + y).",
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Tính nhanh giá trị biểu thức 85<sup>2</sup> - 15<sup>2</sup>:",
+        a: ["6000", "6400", "7200", "7000"],
+        correct: 3,
+        rationale: "85<sup>2</sup> - 15<sup>2</sup> = (85 - 15)(85 + 15) = 70 . 100 = 7000.",
+        level: "THÔNG HIỂU"
+    },
+
+    // LEVEL 3: VẬN DỤNG (3 câu)
+    {
+        q: "Tìm x biết: x(x - 2) - x + 2 = 0",
+        a: ["x = 1 hoặc x = 2", "x = 2", "x = -1 hoặc x = 2", "x = 0"],
+        correct: 0,
+        rationale: "x(x - 2) - (x - 2) = 0 &rarr; (x - 2)(x - 1) = 0.<br>Suy ra x = 2 hoặc x = 1.",
+        level: "VẬN DỤNG"
+    },
+    {
+        q: "Phân tích đa thức x<sup>2</sup> - 5x + 6 thành nhân tử:",
+        a: ["(x + 2)(x + 3)", "(x - 2)(x - 3)", "(x - 1)(x - 6)", "(x + 1)(x - 6)"],
+        correct: 1,
+        rationale: "Tách -5x = -2x - 3x.<br>x<sup>2</sup> - 2x - 3x + 6 = x(x - 2) - 3(x - 2) = (x - 2)(x - 3).",
+        level: "VẬN DỤNG"
+    },
+    {
+        q: "(Thực tế) Diện tích của một mảnh vườn hình chữ nhật được tính bằng biểu thức S = x<sup>2</sup> + 3x. Nếu chiều rộng là x, thì chiều dài là:",
+        a: ["3x", "3", "x + 3", "x - 3"],
+        correct: 2,
+        rationale: "S = x(x + 3). Vì chiều rộng là x nên chiều dài là (x + 3).",
+        level: "VẬN DỤNG"
+    },
+
+    // LEVEL 4: VẬN DỤNG CAO (1 câu)
+    {
+        q: "Chứng minh rằng biểu thức n<sup>3</sup> - n luôn chia hết cho số nào sau đây với mọi số nguyên n?",
+        a: ["4", "5", "7", "6"],
+        correct: 3,
+        rationale: "n<sup>3</sup> - n = n(n<sup>2</sup> - 1) = n(n - 1)(n + 1).<br>Đây là tích 3 số nguyên liên tiếp nên chia hết cho 2 và 3.<br>Do đó chia hết cho 6.",
+        level: "VẬN DỤNG CAO"
+    }
+];
+
+        // --- GAME LOGIC ---
+        let currentQIndex = 0;
+        let score = 0;
+        const robotParts = ["⚙️", "🦾", "🦿", "🔋", "🔌", "🛡️", "⚔️", "🧠", "👁️", "🤖", "🚀", "🛸", "🛰️", "🗼", "🏯"];
+        
+        // Audio Setup
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'scan') { // Sci-fi scan
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'correct') { // Success beep
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(660, now); 
+                osc.frequency.setValueAtTime(880, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'wrong') { // Error buzz
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') { // Power up
+                [440, 554, 659, 880].forEach((f, i) => {
+                    setTimeout(() => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.value = f;
+                        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                        o.start();
+                        o.stop(audioCtx.currentTime + 0.5);
+                    }, i * 100);
+                });
+            }
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+            
+            playSound('scan');
+            currentQIndex = 0;
+            score = 0;
+            updateUI();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQIndex];
+            
+            document.getElementById('q-number').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerHTML = q.q;
+            
+            // Level Badge
+            const badge = document.getElementById('level-badge');
+            badge.innerText = q.level;
+            if (q.level === "NHẬN BIẾT") badge.style.backgroundColor = "#008000";
+            else if (q.level === "THÔNG HIỂU") badge.style.backgroundColor = "#0055aa";
+            else if (q.level === "VẬN DỤNG CAO") badge.style.backgroundColor = "#aa0000";
+            else badge.style.backgroundColor = "#aa00aa";
+
+            // Robot Part Display
+            const robotDisp = document.getElementById('robot-part-display');
+            robotDisp.innerText = robotParts[currentQIndex % robotParts.length];
+            robotDisp.className = 'robot-part'; // Reset animation
+
+            // Reset Log
+            const logBox = document.getElementById('data-log');
+            logBox.classList.remove('show');
+            document.getElementById('next-btn-container').classList.add('hidden');
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            q.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-mech w-full p-4 rounded min-h-[80px] font-mono";
+                btn.innerHTML = opt;
+                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selected, correct, btn) {
+const btns = document.querySelectorAll('#options-grid .btn-mech');
+            btns.forEach(b => b.disabled = true);
+            const q = questions[currentQIndex];
+            const logBox = document.getElementById('data-log');
+            const content = document.getElementById('log-content');
+            
+            content.innerHTML = q.rationale;
+            logBox.classList.add('show');
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                score += 100;
+                playSound('correct');
+                showFeedback("🤖"); 
+                fireConfetti(30);
+                
+                // Assemble Part Animation
+                document.getElementById('robot-part-display').classList.add('assembled');
+            } else {
+                btn.classList.add('wrong');
+                btns[correct].classList.add('correct');
+                playSound('wrong');
+                showFeedback("⚠️");
+            }
+
+            updateUI();
+            document.getElementById('next-btn-container').classList.remove('hidden');
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score;
+            const progress = ((currentQIndex + 1) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        function showFeedback(emoji) {
+            const el = document.getElementById('feedback-emoji');
+            el.innerText = emoji;
+            el.style.opacity = '1';
+            el.style.transform = 'scale(1.5)';
+            
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transform = 'scale(0)';
+            }, 800);
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < questions.length) {
+                playSound('scan');
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            playSound('win');
+            setInterval(() => fireConfetti(50), 1000);
+        }
+
+        // --- CONFETTI (Neon Parts) ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+
+        function fireConfetti(amount) {
+            for (let i = 0; i < amount; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20,
+                    life: 100,
+                    size: Math.random() * 3 + 2,
+                    color: `hsl(${Math.random() * 120 + 120}, 100%, 50%)` // Cyan/Green/Blue
+                });
+            }
+            if(particles.length <= amount) requestAnimationFrame(animateParticles);
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.2;
+                p.life--;
+                
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+    </script>
+</body>
+</html>
