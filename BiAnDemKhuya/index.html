@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bí Ẩn Đêm Khuya - Toán 9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #050505;
+            color: #e0e0e0;
+            overflow: hidden;
+            margin: 0;
+            user-select: none;
+        }
+
+        .spooky-font {
+            font-family: 'Creepster', cursive;
+            letter-spacing: 2px;
+        }
+
+        /* --- Background Atmosphere --- */
+        #night-sky {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at 50% 20%, #1a237e 0%, #000000 80%);
+        }
+
+        .moon {
+            position: absolute;
+            top: 5%;
+            right: 10%;
+            width: 100px;
+            height: 100px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 40px #fff, 0 0 80px #aaa;
+            opacity: 0.8;
+        }
+
+        /* Fireflies */
+        .firefly {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background-color: #ffff00;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ffff00;
+            animation: float 5s infinite alternate;
+            opacity: 0;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)); opacity: 0; }
+        }
+
+        /* --- Game Panel (Magic Tome) --- */
+        .magic-panel {
+            background: rgba(20, 10, 30, 0.9);
+            border: 2px solid #7c4dff;
+            box-shadow: 0 0 20px rgba(124, 77, 255, 0.4), inset 0 0 50px rgba(0,0,0,0.8);
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .magic-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, transparent, #7c4dff, transparent);
+        }
+
+        /* --- Buttons --- */
+        .btn-spell {
+            background: linear-gradient(145deg, #311b92, #4527a0);
+            border: 1px solid #7c4dff;
+            color: #ede7f6;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .btn-spell:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px #b388ff;
+            border-color: #b388ff;
+            cursor: pointer;
+        }
+
+        .btn-spell:active { transform: translateY(1px); }
+
+        .btn-spell.correct {
+            background: linear-gradient(145deg, #1b5e20, #2e7d32) !important;
+            border-color: #69f0ae !important;
+            box-shadow: 0 0 20px #69f0ae;
+        }
+
+        .btn-spell.wrong {
+            background: linear-gradient(145deg, #b71c1c, #c62828) !important;
+            border-color: #ff5252 !important;
+            opacity: 0.7;
+        }
+
+        /* --- Explanation Box (Grimoire) --- */
+        #grimoire-box {
+            background: #263238;
+            color: #b0bec5;
+            border-left: 4px solid #7c4dff;
+            border-radius: 4px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            margin-top: 0;
+        }
+
+        #grimoire-box.show {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .math-expr {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-size: 1.1em;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(124, 77, 255, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(124, 77, 255, 0.8); }
+        }
+        
+        .glow-effect { animation: pulse-glow 2s infinite; }
+
+        /* --- Lantern Progress --- */
+        .lantern-container {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        .lantern {
+            width: 15px; height: 15px;
+            background: #333;
+            border-radius: 50%;
+            border: 1px solid #555;
+            transition: all 0.5s;
+        }
+        .lantern.lit {
+            background: #ffeb3b;
+            box-shadow: 0 0 10px #ffeb3b;
+            border-color: #fff;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Atmosphere -->
+    <div id="night-sky">
+        <div class="moon"></div>
+    </div>
+    <div id="fireflies-container"></div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="magic-panel p-12 text-center max-w-2xl w-full z-10 glow-effect">
+        <h1 class="spooky-font text-6xl md:text-7xl text-purple-400 mb-2 text-shadow-lg">BÍ ẨN<br>ĐÊM KHUYA</h1>
+        <h2 class="text-2xl text-indigo-200 mb-8 font-light tracking-widest">Thử Thách Bất Đẳng Thức</h2>
+        
+        <p class="text-lg text-gray-300 mb-8 leading-relaxed">
+            Màn đêm đã buông xuống. Hãy dùng trí tuệ của bạn để giải mã 15 bùa chú cổ đại và thắp sáng con đường dẫn đến Thư Viện Ánh Sáng.
+        </p>
+
+        <div class="grid grid-cols-2 gap-4 text-left bg-black/40 p-6 rounded-lg mb-8 border border-purple-900">
+            <div class="text-green-400">🌙 6 Câu Nhận Biết</div>
+            <div class="text-blue-400">📜 5 Câu Thông Hiểu</div>
+            <div class="text-yellow-400">✨ 3 Câu Vận Dụng</div>
+            <div class="text-red-400">🔮 1 Câu Vận Dụng Cao</div>
+        </div>
+
+        <button onclick="startGame()" class="btn-spell px-12 py-4 rounded-full text-2xl font-bold w-full md:w-auto shadow-lg border-2 border-purple-500">
+            BẮT ĐẦU GIẢI MÃ 🕯️
+        </button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden w-full max-w-4xl z-10 flex-col h-full justify-center">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-4 px-4">
+            <div class="text-purple-200 font-bold text-xl uppercase tracking-widest" id="level-text">Cấp độ: Nhận Biết</div>
+            <div class="bg-black/50 px-4 py-2 rounded-full border border-purple-500">
+                <span class="text-sm text-purple-300">PHÉP THUẬT:</span> 
+                <span id="score" class="text-2xl font-bold text-yellow-400 ml-2">0</span>
+            </div>
+        </div>
+
+        <!-- Lantern Progress -->
+        <div class="lantern-container" id="lanterns"></div>
+
+        <!-- Question Panel -->
+        <div class="magic-panel p-8 mb-6 relative min-h-[160px] flex flex-col justify-center items-center text-center">
+            <div class="absolute -top-4 bg-indigo-900 border border-purple-500 text-purple-100 px-4 py-1 rounded-full text-sm font-bold shadow-lg">
+                MẬT MÃ SỐ <span id="q-number">1</span>
+            </div>
+            <div id="question-text" class="text-2xl md:text-3xl font-medium text-purple-50 leading-relaxed mt-2">
+                Loading spell...
+            </div>
+        </div>
+
+        <!-- Explanation Area (Grimoire) -->
+        <div id="grimoire-box" class="w-full relative">
+            <h3 class="font-bold text-purple-400 border-b border-purple-800 mb-2 pb-1 text-lg flex items-center gap-2">
+                <span>📖</span> Lời Giải Của Phù Thủy:
+            </h3>
+            <div id="explanation-content" class="text-lg leading-relaxed text-gray-300"></div>
+        </div>
+
+        <!-- Options Grid -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 mt-4"></div>
+
+        <!-- Next Button -->
+        <div id="next-btn-container" class="hidden text-center pb-8">
+            <button onclick="nextQuestion()" class="btn-spell px-12 py-3 rounded-lg text-xl font-bold animate-bounce bg-indigo-600">
+                TIẾP TỤC ➜
+            </button>
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/90 backdrop-blur-md">
+        <div class="magic-panel p-12 text-center max-w-2xl w-full border-2 border-yellow-500">
+            <div class="text-8xl mb-6">🌞</div>
+            <h2 class="spooky-font text-5xl text-yellow-400 mb-4">BÌNH MINH ĐÃ LÊN!</h2>
+            <p class="text-xl text-purple-100 mb-8">Bạn đã giải mã thành công mọi bí ẩn và xua tan bóng tối.</p>
+            
+            <div class="bg-indigo-900/50 p-6 rounded-xl mb-8 border border-indigo-500 inline-block w-full">
+                <div class="text-sm text-indigo-300 uppercase mb-2 tracking-widest">Tổng Điểm Phép Thuật</div>
+                <div class="text-7xl font-bold text-white spooky-font" id="final-score">0</div>
+            </div>
+
+            <div>
+                <button onclick="location.reload()" class="btn-spell px-10 py-4 rounded-full text-xl w-full hover:scale-105 transform transition">
+                    CHƠI LẠI TỪ ĐẦU
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Overlay -->
+    <div id="feedback-overlay" class="fixed inset-0 pointer-events-none flex justify-center items-center z-50">
+        <div id="feedback-emoji" class="text-9xl opacity-0 transform scale-0 transition-all duration-500 ease-out"></div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+    <script>
+        // --- DATA ---
+        // Đã phân bổ đều đáp án A/B/C/D
+        const questions = [
+            // LEVEL 1: NHẬN BIẾT (6 câu)
+            {
+                q: "Ký hiệu nào sau đây diễn tả bất đẳng thức 'a nhỏ hơn hoặc bằng b'?",
+                a: ["a &le; b", "a < b", "a &ge; b", "a > b"],
+                correct: 0,
+                rationale: "Ký hiệu &le; đọc là 'nhỏ hơn hoặc bằng'."
+            },
+            {
+                q: "Trong bất đẳng thức 2x - 5 > 3, vế trái là biểu thức nào?",
+                a: ["3", "2x - 5", "2x", "-5"],
+                correct: 1,
+                rationale: "Vế trái là toàn bộ biểu thức nằm bên trái dấu so sánh (>), ở đây là 2x - 5."
+            },
+            {
+                q: "Khẳng định nào sau đây là ĐÚNG khi so sánh hai số thực?",
+                a: ["-5 > -2", "2 < -5", "-5 < -2", "0 < -2"],
+                correct: 2,
+                rationale: "Trên trục số, -5 nằm bên trái -2 nên -5 nhỏ hơn -2."
+            },
+            {
+                q: "Theo tính chất cộng, nếu a < b thì khẳng định nào sau đây đúng với mọi số c?",
+                a: ["a + c > b + c", "a + c = b + c", "a + c &ge; b + c", "a + c < b + c"],
+                correct: 3,
+                rationale: "Khi cộng cùng một số vào cả hai vế của bất đẳng thức, chiều của bất đẳng thức không đổi."
+            },
+            {
+                q: "Cho số c > 0. Nếu a > b thì khẳng định nào sau đây đúng?",
+                a: ["ac > bc", "ac < bc", "ac = bc", "ac &le; bc"],
+                correct: 0,
+                rationale: "Khi nhân cả hai vế với một số DƯƠNG (c > 0), chiều bất đẳng thức giữ nguyên."
+            },
+            {
+                q: "Cho số c < 0. Nếu a > b thì khẳng định nào sau đây đúng?",
+                a: ["ac > bc", "ac < bc", "ac = bc", "ac &ge; bc"],
+                correct: 1,
+                rationale: "Khi nhân cả hai vế với một số ÂM (c < 0), chiều bất đẳng thức phải ĐỔI CHIỀU."
+            },
+
+            // LEVEL 2: THÔNG HIỂU (5 câu)
+            {
+                q: "Cho a > b. Khẳng định nào sau đây đúng khi áp dụng tính chất cộng?",
+                a: ["a - 3 < b - 3", "3 - a > 3 - b", "a - 3 > b - 3", "a + 3 < b + 3"],
+                correct: 2,
+                rationale: "Trừ cả hai vế cho 3 (cộng với -3) thì chiều bất đẳng thức giữ nguyên: a - 3 > b - 3."
+            },
+            {
+                q: "Cho x < y và số thực z bất kỳ. Khẳng định nào sau đây luôn đúng?",
+                a: ["xz < yz", "x - z > y - z", "x<sup>2</sup> < y<sup>2</sup>", "x + z < y + z"],
+                correct: 3,
+                rationale: "Tính chất liên hệ giữa thứ tự và phép cộng đúng với mọi số thực z: x < y &rArr; x + z < y + z."
+            },
+            {
+                q: "Cho m &ge; n. Hãy so sánh -3m và -3n.",
+                a: ["-3m &le; -3n", "-3m &ge; -3n", "3m &le; 3n", "m - 3 &le; n - 3"],
+                correct: 0,
+                rationale: "Nhân hai vế với số âm (-3), bất đẳng thức đổi chiều từ &ge; sang &le;."
+            },
+            {
+                q: "Biết x > y và y > z. Theo tính chất bắc cầu, kết luận nào sau đây đúng?",
+                a: ["x < z", "x > z", "x = z", "x &le; z"],
+                correct: 1,
+                rationale: "Nếu x lớn hơn y, mà y lại lớn hơn z, thì x chắc chắn lớn hơn z."
+            },
+            {
+                q: "Cho a < b. Hãy so sánh 2a + 1 và 2b + 1.",
+                a: ["2a + 1 > 2b + 1", "2a + 1 = 2b + 1", "2a + 1 < 2b + 1", "2a + 1 &ge; 2b + 1"],
+                correct: 2,
+                rationale: "Nhân với 2 (dương) giữ nguyên chiều (2a < 2b), cộng thêm 1 vẫn giữ nguyên chiều."
+            },
+
+            // LEVEL 3: VẬN DỤNG (3 câu)
+            {
+                q: "Cho a > b. Hãy so sánh 5 - 2a và 5 - 2b.",
+                a: ["5 - 2a > 5 - 2b", "5 - 2a = 5 - 2b", "5 - 2a &ge; 5 - 2b", "5 - 2a < 5 - 2b"],
+                correct: 3,
+                rationale: "Nhân với -2 làm đổi chiều (a > b &rArr; -2a < -2b). Cộng 5 giữ nguyên chiều: 5 - 2a < 5 - 2b."
+            },
+            {
+                q: "Lan có x đồng, Mai có y đồng. Sau khi mỗi bạn tiêu 10.000đ, Lan vẫn còn nhiều tiền hơn Mai. Hỏi ban đầu ai nhiều tiền hơn?",
+                a: ["x > y (Lan)", "x < y (Mai)", "x = y", "Không so sánh được"],
+                correct: 0,
+                rationale: "Ta có: x - 10000 > y - 10000. Cộng 10000 vào hai vế &rArr; x > y nên Lan nhiều tiền hơn."
+            },
+            {
+                q: "Cho x < y. So sánh -4x + 3 và -4y + 3.",
+                a: ["-4x + 3 < -4y + 3", "-4x + 3 > -4y + 3", "-4x + 3 = -4y + 3", "Không xác định"],
+                correct: 1,
+                rationale: "Nhân với -4 (số âm) đổi chiều: -4x > -4y. Cộng 3 giữ nguyên: -4x + 3 > -4y + 3."
+            },
+
+            // LEVEL 4: VẬN DỤNG CAO (1 câu)
+            {
+                q: "Với hai số thực không âm a, b. Bất đẳng thức Cô-si (Cauchy) nào sau đây đúng?",
+                a: ["a + b &le; 2&radic;(ab)", "a + b < &radic;(ab)", "a + b &ge; 2&radic;(ab)", "a + b > 2ab"],
+                correct: 2,
+                rationale: "Bất đẳng thức Cô-si: (a + b)/2 &ge; &radic;(ab) &hArr; a + b &ge; 2&radic;(ab)."
+            }
+        ];
+
+        // --- GAME LOGIC ---
+        let currentQIndex = 0;
+        let score = 0;
+        
+        // Fireflies Generator
+        const fireflyContainer = document.getElementById('fireflies-container');
+        for(let i=0; i<30; i++){
+            let f = document.createElement('div');
+            f.className = 'firefly';
+            f.style.left = Math.random() * 100 + '%';
+            f.style.top = Math.random() * 100 + '%';
+            f.style.setProperty('--tx', (Math.random() * 200 - 100) + 'px');
+            f.style.setProperty('--ty', (Math.random() * 200 - 100) + 'px');
+            f.style.animationDelay = Math.random() * 5 + 's';
+            fireflyContainer.appendChild(f);
+        }
+
+        // Lanterns Generator
+        const lanternContainer = document.getElementById('lanterns');
+        for(let i=0; i<questions.length; i++){
+            let l = document.createElement('div');
+            l.className = 'lantern';
+            l.id = `lantern-${i}`;
+            lanternContainer.appendChild(l);
+        }
+
+        // Audio
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'magic') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.linearRampToValueAtTime(1200, now + 0.5);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.setValueAtTime(800, now + 0.1);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+                    setTimeout(() => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'square';
+                        o.frequency.value = f;
+                        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                        o.start();
+                        o.stop(audioCtx.currentTime + 0.5);
+                    }, i * 200);
+                });
+            }
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+            
+            playSound('magic');
+            currentQIndex = 0;
+            score = 0;
+            updateUI();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQIndex];
+            
+            document.getElementById('q-number').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerHTML = q.q;
+            
+            const grimoire = document.getElementById('grimoire-box');
+            grimoire.classList.remove('show');
+            document.getElementById('next-btn-container').classList.add('hidden');
+
+            let lvl = "Nhận Biết";
+            if (currentQIndex >= 6) lvl = "Thông Hiểu";
+            if (currentQIndex >= 11) lvl = "Vận Dụng";
+            if (currentQIndex >= 14) lvl = "Vận Dụng Cao";
+            document.getElementById('level-text').innerText = "Cấp độ: " + lvl;
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            q.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-spell w-full p-4 rounded-lg font-medium min-h-[80px]";
+                btn.innerHTML = opt;
+                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selected, correct, btn) {
+            // chỉ khóa các nút đáp án trong options-grid
+            const btns = document.querySelectorAll('#options-grid .btn-spell');
+            btns.forEach(b => b.disabled = true);
+
+            const q = questions[currentQIndex];
+            const grimoire = document.getElementById('grimoire-box');
+            const content = document.getElementById('explanation-content');
+            
+            content.innerHTML = q.rationale;
+            grimoire.classList.add('show');
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                score += 100;
+                playSound('correct');
+                showFeedback("✨");
+                fireConfetti(30);
+                document.getElementById(`lantern-${currentQIndex}`).classList.add('lit');
+            } else {
+                btn.classList.add('wrong');
+                btns[correct].classList.add('correct');
+                playSound('wrong');
+                showFeedback("🕸️");
+            }
+
+            updateUI();
+            document.getElementById('next-btn-container').classList.remove('hidden');
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score;
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < questions.length) {
+                playSound('magic');
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            playSound('win');
+            setInterval(() => fireConfetti(50), 1000);
+        }
+
+        function showFeedback(emoji) {
+            const el = document.getElementById('feedback-emoji');
+            el.innerText = emoji;
+            el.style.opacity = '1';
+            el.style.transform = 'scale(1.5)';
+            
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transform = 'scale(0)';
+            }, 800);
+        }
+
+        // --- PARTICLES (Magic Dust) ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+
+        function fireConfetti(amount) {
+            for (let i = 0; i < amount; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 15,
+                    vy: (Math.random() - 0.5) * 15,
+                    life: 100,
+                    size: Math.random() * 4 + 2,
+                    color: `hsl(${Math.random() * 60 + 240}, 100%, 70%)`
+                });
+            }
+            if(particles.length <= amount) requestAnimationFrame(animateParticles);
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.1;
+                p.life--;
+                
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (Math.random() > 0.9) ctx.clearRect(p.x-1, p.y-1, 2, 2);
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
