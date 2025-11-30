@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điệp Vụ Bất Khả Thi - Toán 9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: #0d0d0d;
+            color: #00ff41;
+            overflow: hidden;
+            margin: 0;
+            user-select: none;
+        }
+
+        /* --- Matrix Background --- */
+        #matrix-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+        }
+
+        /* --- Game Panels --- */
+        .terminal-panel {
+            background: rgba(0, 20, 0, 0.95);
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .terminal-panel::before {
+            content: "TOP SECRET // CLASSIFIED";
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #0d0d0d;
+            padding: 0 10px;
+            font-size: 0.8rem;
+            color: #00ff41;
+            font-weight: bold;
+        }
+
+        /* --- Buttons --- */
+        .btn-hack {
+            background: #001a00;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-hack:hover {
+            background: #003300;
+            box-shadow: 0 0 10px #00ff41;
+            cursor: pointer;
+        }
+
+        .btn-hack:active { transform: scale(0.98); }
+
+        .btn-hack.correct {
+            background: #004d00 !important;
+            border-color: #00ff41 !important;
+            box-shadow: inset 0 0 20px #00ff41;
+            color: #fff;
+        }
+
+        .btn-hack.wrong {
+            background: #4d0000 !important;
+            border-color: #ff0000 !important;
+            box-shadow: inset 0 0 20px #ff0000;
+            color: #ffaaaa;
+        }
+
+        /* --- Explanation Box --- */
+        #explanation-box {
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+            transform: scaleY(0);
+            transform-origin: top;
+            height: 0;
+            opacity: 0;
+        }
+        
+        #explanation-box.show {
+            transform: scaleY(1);
+            height: auto;
+            opacity: 1;
+            margin-top: 1rem;
+            padding: 1rem;
+        }
+
+        /* --- Math Display --- */
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 2px;
+            font-size: 0.9em;
+        }
+        .fraction > span { display: block; padding: 0.1em; }
+        .fraction span.numerator { border-bottom: 1px solid currentColor; }
+        .fraction span.denominator { border-top: 1px solid transparent; }
+
+        /* --- Glitch Effect for Title --- */
+        .glitch {
+            position: relative;
+            color: #00ff41;
+        }
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+        }
+        .glitch::before {
+            left: 2px; text-shadow: -1px 0 #ff0000; clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -2px; text-shadow: -1px 0 #0000ff; clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim {
+            0% { clip: rect(10px, 9999px, 30px, 0); }
+            20% { clip: rect(80px, 9999px, 100px, 0); }
+            40% { clip: rect(10px, 9999px, 50px, 0); }
+            100% { clip: rect(60px, 9999px, 80px, 0); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(60px, 9999px, 90px, 0); }
+            20% { clip: rect(10px, 9999px, 50px, 0); }
+            100% { clip: rect(30px, 9999px, 70px, 0); }
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <canvas id="matrix-bg"></canvas>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="terminal-panel p-10 text-center max-w-3xl w-full z-10">
+        <h1 class="glitch text-6xl md:text-7xl mb-4 font-bold tracking-tighter" data-text="MISSION: IMPOSSIBLE">MISSION: IMPOSSIBLE</h1>
+        <h2 class="text-2xl text-green-400 mb-8 font-mono">CODE: GIẢI MÃ BẤT PHƯƠNG TRÌNH</h2>
+        
+        <div class="text-left bg-black/50 p-6 rounded mb-8 font-mono text-lg border-l-4 border-green-500">
+            <p class="mb-2">> TARGET: Giải mã 15 mật thư toán học.</p>
+            <p class="mb-2">> SUBJECT: Bất phương trình bậc nhất một ẩn.</p>
+            <p class="mb-2">> WARNING: Sai lầm sẽ kích hoạt báo động.</p>
+            <p class="text-yellow-400 blink">> WAITING FOR AGENT INPUT...</p>
+        </div>
+
+        <button onclick="startGame()" class="btn-hack px-12 py-4 rounded text-2xl font-bold w-full md:w-auto">
+            [ CHẤP NHẬN NHIỆM VỤ ]
+        </button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden w-full max-w-5xl z-10 flex-col h-full justify-center">
+        <!-- Header -->
+        <div class="flex justify-between items-end mb-4 px-2 font-mono">
+            <div>
+                <div class="text-xs text-green-700">DIFFICULTY LEVEL</div>
+                <div id="level-badge" class="text-xl font-bold text-green-400">NHẬN BIẾT</div>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-green-700">DATA DECRYPTED</div>
+                <div class="text-3xl font-bold text-green-400"><span id="score">0</span>%</div>
+            </div>
+        </div>
+
+        <!-- Question Panel -->
+        <div class="terminal-panel p-6 md:p-8 mb-6 relative min-h-[150px] flex flex-col justify-center">
+            <div class="absolute top-4 right-4 text-xs text-green-800 font-mono">ID: Q-<span id="q-number">01</span></div>
+            <div id="question-text" class="text-2xl md:text-3xl font-bold text-green-100 text-center leading-relaxed">
+                Initializing...
+            </div>
+        </div>
+
+        <!-- Explanation Area (Hidden by default) -->
+        <div id="explanation-box" class="bg-black/80 text-green-300 text-lg mb-6 border-green-500 rounded font-mono">
+            <!-- Explanation content -->
+        </div>
+
+        <!-- Options Grid -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <!-- Buttons injected here -->
+        </div>
+
+        <!-- Next Button (Hidden by default) -->
+        <div id="next-btn-container" class="hidden text-center">
+            <button onclick="nextQuestion()" class="btn-hack px-8 py-3 rounded text-xl">
+                >> TIẾP TỤC GIẢI MÃ >>
+            </button>
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/90">
+        <div class="terminal-panel p-12 text-center max-w-2xl w-full border-4 border-green-500">
+            <div class="text-8xl mb-6">🔓</div>
+            <h2 class="text-5xl font-bold text-green-400 mb-4 font-mono">MẬT MÃ ĐÃ MỞ!</h2>
+            <p class="text-xl text-green-200 mb-8">Điệp viên xuất sắc. Dữ liệu đã được bảo vệ.</p>
+            
+            <div class="inline-block bg-green-900/30 p-6 rounded-lg mb-8 border border-green-500 w-full">
+                <div class="text-sm text-green-600 uppercase mb-2">Độ chính xác nhiệm vụ</div>
+                <div class="text-7xl font-bold text-white font-mono" id="final-score">0%</div>
+            </div>
+
+            <div>
+                <button onclick="location.reload()" class="btn-hack px-10 py-4 rounded text-xl w-full">
+                    [ TÁI KHỞI ĐỘNG ]
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA WITH RATIONALE ---
+        // 15 Questions: Math 9 Chapter 2 Lesson 2 (Linear Inequalities)
+        // Đã phân bố đáp án đúng A/B/C/D tương đối đều.
+        const questions = [
+            // LEVEL 1: NHẬN BIẾT
+            {
+                q: "Bất phương trình nào sau đây là bất phương trình bậc nhất một ẩn?",
+                a: [
+                    "0x + 3 < 0",
+                    "2x - 5 > 0",
+                    "x<sup>2</sup> + 1 &ge; 0",
+                    "1/x - 2 &le; 0"
+                ],
+                correct: 1, // B
+                rationale: "<b>Giải thích:</b> Bất phương trình bậc nhất một ẩn có dạng ax + b &gt;, &lt;, &ge;, &le; 0 với a &ne; 0.<br>Trong 4 lựa chọn, chỉ có 2x - 5 &gt; 0 có vế trái là biểu thức bậc nhất theo x.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Giá trị x = 2 là nghiệm của bất phương trình nào?",
+                a: [
+                    "2x - 5 > 0",
+                    "4 - x < 1",
+                    "x + 3 &le; 4",
+                    "3x + 1 > 5"
+                ],
+                correct: 3, // D
+                rationale: "<b>Kiểm tra x = 2:</b><br>Với 3x + 1 &gt; 5 ta có 3.2 + 1 = 7 &gt; 5 (đúng).<br>Các bất phương trình còn lại đều sai, nên 3x + 1 &gt; 5 là bất phương trình nhận x = 2 làm nghiệm.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Hệ số a và b của bất phương trình -3x + 4 &le; 0 lần lượt là:",
+                a: [
+                    "a = -3, b = 4",
+                    "a = 3, b = 4",
+                    "a = 4, b = -3",
+                    "a = -3, b = -4"
+                ],
+                correct: 0, // A
+                rationale: "<b>Giải thích:</b> Dạng tổng quát ax + b &le; 0.<br>Hệ số đi liền với x là a = -3, hệ số tự do là b = 4.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Phép biến đổi nào ĐÚNG khi giải x - 3 > 5?",
+                a: [
+                    "x > 5 - 3",
+                    "x < 5 + 3",
+                    "x > 5 + 3",
+                    "x > 5 . 3"
+                ],
+                correct: 2, // C
+                rationale: "<b>Quy tắc chuyển vế:</b> Chuyển hạng tử -3 sang vế phải phải đổi dấu thành +3, nên x &gt; 5 + 3.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Khi nhân hai vế của bất phương trình -2x < 6 với -1/2, ta được:",
+                a: [
+                    "x < -3",
+                    "x > -3",
+                    "x > 3",
+                    "x < 3"
+                ],
+                correct: 1, // B
+                rationale: "<b>Lưu ý:</b> Nhân với số âm (-1/2) phải ĐỔI CHIỀU bất phương trình (&lt; thành &gt;).<br>(-2x).(-1/2) &gt; 6.(-1/2) &hArr; x &gt; -3.",
+                level: "NHẬN BIẾT"
+            },
+           {
+               q: "Dạng tổng quát của bất phương trình bậc nhất một ẩn là:",
+               a: [
+                   "ax + b > 0 (a = 0)",
+                   "ax + b &le; 0 (a &ne; 0)",
+                   "ax + b &ge; 0 (a = 0)",
+                   "ax<sup>2</sup> + b < 0"
+              ],
+              correct: 1,
+              rationale: "<b>Giải thích:</b> Bất phương trình bậc nhất một ẩn có dạng ax + b &gt;, &lt;, &ge;, &le; 0 với a &ne; 0.",
+              level: "NHẬN BIẾT"
+              },
+                correct: 3, // D
+                rationale: "<b>Giải thích:</b> Biểu thức bậc nhất theo x có dạng ax + b với a &ne; 0.<br>Trong 4 lựa chọn, chỉ có 3x - 5 &le; 0 có vế trái dạng ax + b (a = 3, b = -5).",
+                level: "NHẬN BIẾT"
+            },
+
+            // LEVEL 2: THÔNG HIỂU
+            {
+                q: "Nghiệm của bất phương trình 2x - 8 > 0 là:",
+                a: [
+                    "x > 4",
+                    "x < 4",
+                    "x > -4",
+                    "x > 16"
+                ],
+                correct: 0, // A
+                rationale: "<b>Giải:</b> 2x - 8 &gt; 0 &hArr; 2x &gt; 8 &hArr; x &gt; 4 (Chia cho 2 &gt; 0 giữ nguyên chiều).",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Giải bất phương trình 5 - x &le; 2:",
+                a: [
+                    "x &le; 3",
+                    "x &ge; -3",
+                    "x &ge; 3",
+                    "x &le; 7"
+                ],
+                correct: 2, // C
+                rationale: "<b>Giải:</b> 5 - x &le; 2 &hArr; -x &le; 2 - 5 &hArr; -x &le; -3 &hArr; x &ge; 3 (Nhân với -1 đổi chiều).",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Tập nghiệm của bất phương trình 3x + 4 < x - 2 là:",
+                a: [
+                    "x > -3",
+                    "x < 1",
+                    "x < -1",
+                    "x < -3"
+                ],
+                correct: 3, // D
+                rationale: "<b>Giải:</b> 3x + 4 &lt; x - 2 &hArr; 3x - x &lt; -2 - 4 &hArr; 2x &lt; -6 &hArr; x &lt; -3.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Giải bất phương trình 2(x+1) - 3(2x-1) > 1:",
+                a: [
+                    "x < -1",
+                    "x < 1",
+                    "x > -1",
+                    "x > 1"
+                ],
+                correct: 1, // B
+                rationale: "<b>Giải:</b> 2x + 2 - 6x + 3 &gt; 1 &hArr; -4x + 5 &gt; 1 &hArr; -4x &gt; -4 &hArr; x &lt; 1 (Chia cho -4 đổi chiều).",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Số nguyên dương nào thỏa mãn 3x - 5 < 2?",
+                a: [
+                    "x &in; {1; 2}",
+                    "x &in; {0; 1; 2}",
+                    "x &in; {1; 2; 3}",
+                    "x = 1"
+                ],
+                correct: 0, // A
+                rationale: "<b>Giải:</b> 3x - 5 &lt; 2 &hArr; 3x &lt; 7 &hArr; x &lt; 7/3 &approx; 2,33.<br>Số nguyên dương nhỏ hơn 2,33 là 1 và 2.",
+                level: "THÔNG HIỂU"
+            },
+
+            // LEVEL 3: VẬN DỤNG
+            {
+                q: "Giải bất phương trình: <div class='fraction'><span class='numerator'>x</span><span class='denominator'>2</span></div> - <div class='fraction'><span class='numerator'>x-1</span><span class='denominator'>3</span></div> > 1",
+                a: [
+                    "x > 1",
+                    "x < 4",
+                    "x > 4",
+                    "x > 2"
+                ],
+                correct: 2, // C
+                rationale: "<b>Quy đồng mẫu 6:</b> 3x - 2(x-1) &gt; 6 &hArr; 3x - 2x + 2 &gt; 6 &hArr; x &gt; 4.",
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "(Thực tế) Hình chữ nhật có chiều dài 15m. Tìm chiều rộng x để chu vi không nhỏ hơn 50m.",
+                a: [
+                    "x &le; 10",
+                    "x &ge; 10",
+                    "x > 10",
+                    "x &ge; 20"
+                ],
+                correct: 1, // B
+                rationale: "<b>Thiết lập:</b> Chu vi = 2(15 + x).<br>2(15 + x) &ge; 50 &hArr; 15 + x &ge; 25 &hArr; x &ge; 10.",
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "Tìm x để căn thức &radic;(3x - 9) có nghĩa:",
+                a: [
+                    "x &gt; 3",
+                    "x &le; 3",
+                    "x &ge; -3",
+                    "x &ge; 3"
+                ],
+                correct: 3, // D
+                rationale: "<b>Điều kiện:</b> Biểu thức trong căn &ge; 0.<br>3x - 9 &ge; 0 &hArr; 3x &ge; 9 &hArr; x &ge; 3.",
+                level: "VẬN DỤNG"
+            },
+
+            // LEVEL 4: VẬN DỤNG CAO
+            {
+                q: "Tìm m để phương trình 2x + m = x - 3 có nghiệm x > 2.",
+                a: [
+                    "m < -5",
+                    "m > -5",
+                    "m < 5",
+                    "m > 5"
+                ],
+                correct: 0, // A
+                rationale: "<b>Giải:</b> Tìm x theo m: 2x + m = x - 3 &rArr; x = -m - 3.<br>Để x &gt; 2 thì -m - 3 &gt; 2 &hArr; -m &gt; 5 &hArr; m &lt; -5.",
+                level: "VẬN DỤNG CAO"
+            }
+        ];
+
+        // --- GAME LOGIC ---
+        let currentQIndex = 0;
+        let score = 0;
+        let correctCount = 0;
+
+        // Audio Setup
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+            
+            if (type === 'type') { // Typing sound
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(800, now);
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } else if (type === 'correct') { // Data unlocked
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.linearRampToValueAtTime(1200, now + 0.1);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'wrong') { // Access denied
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') { // Mission complete
+                // Arpeggio
+                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+                    let o = audioCtx.createOscillator();
+                    let g = audioCtx.createGain();
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.type = 'triangle';
+                    o.frequency.value = f;
+                    g.gain.setValueAtTime(0.2, now + i*0.15);
+                    g.gain.exponentialRampToValueAtTime(0.001, now + i*0.15 + 0.5);
+                    o.start(now + i*0.15);
+                    o.stop(now + i*0.15 + 0.5);
+                });
+            }
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+            
+            currentQIndex = 0;
+            score = 0;
+            correctCount = 0;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQIndex];
+            
+            // UI Updates
+            document.getElementById('q-number').innerText = (currentQIndex + 1).toString().padStart(2, '0');
+            document.getElementById('level-badge').innerText = q.level;
+            document.getElementById('question-text').innerHTML = q.q;
+            
+            // Hide previous explanation and next button
+            const expBox = document.getElementById('explanation-box');
+            expBox.classList.remove('show');
+            document.getElementById('next-btn-container').classList.add('hidden');
+
+            // Difficulty Color
+            const badge = document.getElementById('level-badge');
+            if (q.level === "NHẬN BIẾT") badge.className = "text-xl font-bold text-green-400";
+            else if (q.level === "THÔNG HIỂU") badge.className = "text-xl font-bold text-blue-400";
+            else if (q.level === "VẬN DỤNG") badge.className = "text-xl font-bold text-yellow-400";
+            else badge.className = "text-xl font-bold text-red-500";
+
+            // Options
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            q.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-hack w-full p-4 rounded text-xl";
+                btn.innerHTML = opt;
+                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selected, correct, btn) {
+            const btns = document.querySelectorAll('.btn-hack');
+            btns.forEach(b => b.disabled = true); // Lock buttons
+
+            const q = questions[currentQIndex];
+            const expBox = document.getElementById('explanation-box');
+            
+            // Show Explanation
+            expBox.innerHTML = q.rationale;
+            expBox.classList.add('show');
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                playSound('correct');
+                correctCount++;
+                score = Math.round((correctCount / questions.length) * 100);
+                document.getElementById('score').innerText = score;
+                expBox.classList.add('border-green-500');
+                expBox.classList.remove('border-red-500');
+            } else {
+                btn.classList.add('wrong');
+                btns[correct].classList.add('correct'); // Show correct
+                playSound('wrong');
+                expBox.classList.add('border-red-500');
+                expBox.classList.remove('border-green-500');
+            }
+
+            // Show Next Button
+            document.getElementById('next-btn-container').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < questions.length) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score + "%";
+            playSound('win');
+        }
+
+        // --- MATRIX RAIN EFFECT ---
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポvu0123456789XYZ';
+        const alphabet = katakana.split('');
+
+        const fontSize = 16;
+        const columns = canvas.width/fontSize;
+
+        const drops = [];
+        for(let x = 0; x < columns; x++) drops[x] = 1;
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+
+            for(let i = 0; i < drops.length; i++) {
+                const text = alphabet[Math.floor(Math.random()*alphabet.length)];
+                ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+
+                if(drops[i]*fontSize > canvas.height && Math.random() > 0.975)
+                    drops[i] = 0;
+
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 33);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+    </script>
+</body>
+</html>
