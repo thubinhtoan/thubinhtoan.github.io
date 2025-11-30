@@ -318,7 +318,7 @@
         // --- GAME DATA ---
         // 15 Questions: Chapter 1 Lesson 7 Math 8 (Mult/Div Algebraic Fractions)
         // No $ symbols. Using HTML entities.
-       const questions = [
+    const questions = [
     // LEVEL 1: NHẬN BIẾT (6 câu)
     {
         q: "Muốn nhân hai phân thức, ta thực hiện như thế nào?",
@@ -522,7 +522,6 @@
         level: "VẬN DỤNG CAO"
     }
 ];
-
         // --- GAME LOGIC ---
         let currentQIndex = 0;
         let score = 0;
@@ -705,44 +704,47 @@
             setTimeout(() => explosion.remove(), 500);
         }
 
-        function handleAnswer(selected, correct, btn) {
-            if (isAnswering) return;
-            isAnswering = true;
+      function handleAnswer(selected, correct, btn) {
+    if (isAnswering) return;
+    isAnswering = true;
 
-            const allBtns = document.querySelectorAll('.btn-option');
-            
-            const q = questions[currentQIndex];
-            const logBox = document.getElementById('data-log');
-            const content = document.getElementById('log-content');
-            content.innerHTML = q.rationale;
-            logBox.classList.add('show');
+    // KHÓA tất cả nút đáp án để HS không bấm lại
+    const allBtns = document.querySelectorAll('#options-grid .btn-option');
+    allBtns.forEach(b => b.disabled = true);
 
-            if (selected === correct) {
-                btn.classList.add('correct');
-                score += 100;
-                
-                // Visual & Audio effects
-                fireLaser();
-                setTimeout(() => {
-                    playSound('correct');
-                    showFeedback("🎯");
-                    fireConfetti(30);
-                }, 400);
+    const q = questions[currentQIndex];
+    const logBox = document.getElementById('data-log');
+    const content = document.getElementById('log-content');
+    content.innerHTML = q.rationale;
+    logBox.classList.add('show');
 
-            } else {
-                btn.classList.add('wrong');
-                allBtns[correct].classList.add('correct');
-                playSound('wrong');
-                showFeedback("⚠️");
-                
-                // Shake screen
-                document.getElementById('game-area').classList.add('shake');
-                setTimeout(() => document.getElementById('game-area').classList.remove('shake'), 500);
-            }
+    if (selected === correct) {
+        btn.classList.add('correct');
+        score += 100;
+        
+        // Hiệu ứng bắn laser + trúng
+        fireLaser();
+        setTimeout(() => {
+            playSound('correct');
+            showFeedback("🎯");
+            fireConfetti(30);
+        }, 400);
 
-            updateUI();
-            document.getElementById('next-btn-container').classList.remove('hidden');
-        }
+    } else {
+        btn.classList.add('wrong');
+        allBtns[correct].classList.add('correct');
+        playSound('wrong');
+        showFeedback("⚠️");
+        
+        // Rung màn hình
+        const area = document.getElementById('game-area');
+        area.classList.add('shake');
+        setTimeout(() => area.classList.remove('shake'), 500);
+    }
+
+    updateUI();
+    document.getElementById('next-btn-container').classList.remove('hidden');
+}
 
         function nextQuestion() {
             currentQIndex++;
