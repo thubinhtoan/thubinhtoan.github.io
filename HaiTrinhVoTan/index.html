@@ -586,36 +586,36 @@
   }
 
   function handleAnswer(selectedOriginalIndex, correctIndex, btn) {
-    const btns = document.querySelectorAll(".btn-pirate");
-    btns.forEach(b => (b.disabled = true));
+  // CHỈ lấy các nút đáp án trong #options-grid
+  const btns = document.querySelectorAll("#options-grid .btn-pirate");
+  btns.forEach(b => (b.disabled = true));
 
-    const q = questions[currentQIndex];
-    const logBox = document.getElementById("log-box");
-    const content = document.getElementById("log-content");
+  const q = questions[currentQIndex];
+  const logBox = document.getElementById("log-box");
+  const content = document.getElementById("log-content");
 
-    content.innerHTML = q.rationale;
-    logBox.classList.add("show");
+  content.innerHTML = q.rationale;
+  logBox.classList.add("show");
 
-    if (selectedOriginalIndex === correctIndex) {
-      btn.classList.add("correct");
-      score += 100;
-      playSound("correct");
-      fireConfetti(30);
-    } else {
-      btn.classList.add("wrong");
-      // Tô màu đáp án đúng theo chỉ số gốc
-      const correctBtn = Array.from(btns).find(
-        b => Number(b.dataset.originalIndex) === correctIndex
-      );
-      if (correctBtn) correctBtn.classList.add("correct");
-      playSound("splash");
-    }
-
-    updateUI();
-    document
-      .getElementById("next-btn-container")
-      .classList.remove("hidden");
+  if (selectedOriginalIndex === correctIndex) {
+    btn.classList.add("correct");
+    score += 100;
+    playSound("correct");
+    fireConfetti(30);
+  } else {
+    btn.classList.add("wrong");
+    const correctBtn = Array.from(btns).find(
+      b => Number(b.dataset.originalIndex) === correctIndex
+    );
+    if (correctBtn) correctBtn.classList.add("correct");
+    playSound("splash");
   }
+
+  updateUI();
+  document
+    .getElementById("next-btn-container")
+    .classList.remove("hidden");
+}
 
   function updateUI() {
     document.getElementById("score").innerText = score;
