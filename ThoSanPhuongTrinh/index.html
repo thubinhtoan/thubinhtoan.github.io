@@ -252,7 +252,7 @@
     <!-- Canvas for effects -->
     <canvas id="effect-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
 
-    <script>
+  <script>
   // --- DATA ---
   const questions = [
     {
@@ -457,7 +457,8 @@
   }
 
   function handleAnswer(selectedOriginalIndex, correctIndex, btn) {
-    const btns = document.querySelectorAll(".btn-relic");
+    // ❗ Chỉ disable CÁC NÚT ĐÁP ÁN trong options-grid
+    const btns = document.querySelectorAll("#options-grid .btn-relic");
     btns.forEach(b => (b.disabled = true));
 
     const q = questions[currentQIndex];
@@ -559,12 +560,6 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   });
-
-  // GẮN SỰ KIỆN CHO NÚT "MỞ CỬA TIẾP THEO"
-  const nextBtn = document.getElementById("next-btn");
-  if (nextBtn) {
-    nextBtn.addEventListener("click", nextQuestion);
-  }
 </script>
 </body>
 </html>
