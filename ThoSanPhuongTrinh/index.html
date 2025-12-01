@@ -253,308 +253,318 @@
     <canvas id="effect-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
 
     <script>
-        // --- DATA ---
-        // Questions from "Thợ Săn Phương Trình" Context
-        const questions = [
+  // --- DATA ---
+  const questions = [
     {
-        q: "Phương trình nào sau đây được gọi là <b>phương trình tích</b>?",
-        a: [
-            "x(x + 1) = 2",
-            "(x - 1)(x + 2) = 0",
-            "<div class='fraction'><span class='numerator'>x</span><span class='denominator'>x+1</span></div> = 0",
-            "2x + 3 = 0"
-        ],
-        correct: 1,
-        rationale: "Phương trình tích có dạng A(x) . B(x) = 0.<br>Vế trái là tích các đa thức, vế phải bằng 0."
+      q: "Phương trình nào sau đây được gọi là <b>phương trình tích</b>?",
+      a: [
+        "x(x + 1) = 2",
+        "(x - 1)(x + 2) = 0",
+        "<div class='fraction'><span class='numerator'>x</span><span class='denominator'>x+1</span></div> = 0",
+        "2x + 3 = 0"
+      ],
+      correct: 1,
+      rationale:
+        "Phương trình tích có dạng A(x) . B(x) = 0.<br>Vế trái là tích các đa thức, vế phải bằng 0."
     },
     {
-        q: "Tập nghiệm của phương trình (x - 3)(2x + 1) = 0 là:",
-        a: [
-            "S = {3; 1/2}",
-            "S = {-3; -1/2}",
-            "S = {3}",
-            "S = {3; -1/2}"
-        ],
-        correct: 3,
-        rationale: "Giải x - 3 = 0 &rArr; x = 3.<br>Giải 2x + 1 = 0 &rArr; 2x = -1 &rArr; x = -1/2."
+      q: "Tập nghiệm của phương trình (x - 3)(2x + 1) = 0 là:",
+      a: ["S = {3; 1/2}", "S = {-3; -1/2}", "S = {3}", "S = {3; -1/2}"],
+      correct: 3,
+      rationale:
+        "Giải x - 3 = 0 &rArr; x = 3.<br>Giải 2x + 1 = 0 &rArr; 2x = -1 &rArr; x = -1/2."
     },
     {
-        q: "Để giải phương trình x<sup>2</sup> - 4x = 0 bằng cách đưa về phương trình tích, ta phân tích vế trái thành:",
-        a: [
-            "x(x - 4) = 0",
-            "(x - 2)(x + 2) = 0",
-            "x(x + 4) = 0",
-            "(x - 2)<sup>2</sup> = 0"
-        ],
-        correct: 0,
-        rationale: "Đặt nhân tử chung là x: x<sup>2</sup> - 4x = x(x - 4)."
+      q: "Để giải phương trình x<sup>2</sup> - 4x = 0 bằng cách đưa về phương trình tích, ta phân tích vế trái thành:",
+      a: [
+        "x(x - 4) = 0",
+        "(x - 2)(x + 2) = 0",
+        "x(x + 4) = 0",
+        "(x - 2)<sup>2</sup> = 0"
+      ],
+      correct: 0,
+      rationale: "Đặt nhân tử chung là x: x<sup>2</sup> - 4x = x(x - 4)."
     },
     {
-        q: "Điều kiện xác định (ĐKXĐ) của phương trình <div class='fraction'><span class='numerator'>3</span><span class='denominator'>x+1</span></div> - <div class='fraction'><span class='numerator'>2</span><span class='denominator'>x-2</span></div> = 1 là:",
-        a: [
-            "x &ne; 1 và x &ne; -2",
-            "x &ne; -1 hoặc x &ne; 2",
-            "x &ne; -1 và x &ne; 2",
-            "x &ne; 0"
-        ],
-        correct: 2,
-        rationale: "Mẫu thức phải khác 0:<br>x + 1 &ne; 0 &rArr; x &ne; -1<br>x - 2 &ne; 0 &rArr; x &ne; 2."
+      q: "Điều kiện xác định (ĐKXĐ) của phương trình <div class='fraction'><span class='numerator'>3</span><span class='denominator'>x+1</span></div> - <div class='fraction'><span class='numerator'>2</span><span class='denominator'>x-2</span></div> = 1 là:",
+      a: [
+        "x &ne; 1 và x &ne; -2",
+        "x &ne; -1 hoặc x &ne; 2",
+        "x &ne; -1 và x &ne; 2",
+        "x &ne; 0"
+      ],
+      correct: 2,
+      rationale:
+        "Mẫu thức phải khác 0:<br>x + 1 &ne; 0 &rArr; x &ne; -1<br>x - 2 &ne; 0 &rArr; x &ne; 2."
     },
     {
-        q: "Phương trình (x<sup>2</sup> + 1)(x - 5) = 0 có bao nhiêu nghiệm thực?",
-        a: [
-            "2 nghiệm",
-            "1 nghiệm",
-            "3 nghiệm",
-            "Vô nghiệm"
-        ],
-        correct: 1,
-        rationale: "Vì x<sup>2</sup> + 1 &ge; 1 > 0 với mọi x (vô nghiệm).<br>Chỉ còn x - 5 = 0 &rArr; x = 5 (1 nghiệm)."
+      q: "Phương trình (x<sup>2</sup> + 1)(x - 5) = 0 có bao nhiêu nghiệm thực?",
+      a: ["2 nghiệm", "1 nghiệm", "3 nghiệm", "Vô nghiệm"],
+      correct: 1,
+      rationale:
+        "Vì x<sup>2</sup> + 1 &ge; 1 > 0 với mọi x (vô nghiệm).<br>Chỉ còn x - 5 = 0 &rArr; x = 5 (1 nghiệm)."
     },
     {
-        q: "Khi giải phương trình chứa ẩn ở mẫu, bước nào có thể dẫn đến 'nghiệm ngoại lai'?",
-        a: [
-            "Khử mẫu",
-            "Tìm ĐKXĐ",
-            "Chuyển vế",
-            "Rút gọn"
-        ],
-        correct: 0,
-        rationale: "Bước khử mẫu là phép biến đổi hệ quả (dấu &rArr;), có thể làm xuất hiện nghiệm không thỏa mãn ĐKXĐ."
+      q: "Khi giải phương trình chứa ẩn ở mẫu, bước nào có thể dẫn đến 'nghiệm ngoại lai'?",
+      a: ["Khử mẫu", "Tìm ĐKXĐ", "Chuyển vế", "Rút gọn"],
+      correct: 0,
+      rationale:
+        "Bước khử mẫu là phép biến đổi hệ quả (dấu &rArr;), có thể làm xuất hiện nghiệm không thỏa mãn ĐKXĐ."
     },
     {
-        q: "Giải phương trình <div class='fraction'><span class='numerator'>x<sup>2</sup> - 9</span><span class='denominator'>x - 3</span></div> = 0.",
-        a: [
-            "x = 3",
-            "Vô nghiệm",
-            "x = -3",
-            "x = &plusmn;3"
-        ],
-        correct: 2,
-        rationale: "Tử bằng 0: x<sup>2</sup> - 9 = 0 &rArr; x = &plusmn;3.<br>ĐKXĐ: x - 3 &ne; 0 &rArr; x &ne; 3.<br>Vậy loại x = 3, chỉ nhận x = -3."
+      q: "Giải phương trình <div class='fraction'><span class='numerator'>x<sup>2</sup> - 9</span><span class='denominator'>x - 3</span></div> = 0.",
+      a: ["x = 3", "Vô nghiệm", "x = -3", "x = &plusmn;3"],
+      correct: 2,
+      rationale:
+        "Tử bằng 0: x<sup>2</sup> - 9 = 0 &rArr; x = &plusmn;3.<br>ĐKXĐ: x - 3 &ne; 0 &rArr; x &ne; 3.<br>Vậy loại x = 3, chỉ nhận x = -3."
     },
     {
-        q: "Tìm ĐKXĐ của phương trình <div class='fraction'><span class='numerator'>2x</span><span class='denominator'>2x - 4</span></div> + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>3</span></div> = <div class='fraction'><span class='numerator'>x</span><span class='denominator'>x - 2</span></div>.",
-        a: [
-            "x &ne; 0",
-            "x &ne; -2",
-            "x &ne; 4",
-            "x &ne; 2"
-        ],
-        correct: 3,
-        rationale: "2x - 4 &ne; 0 &rArr; 2x &ne; 4 &rArr; x &ne; 2.<br>x - 2 &ne; 0 &rArr; x &ne; 2.<br>Vậy ĐKXĐ là x &ne; 2."
+      q: "Tìm ĐKXĐ của phương trình <div class='fraction'><span class='numerator'>2x</span><span class='denominator'>2x - 4</span></div> + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>3</span></div> = <div class='fraction'><span class='numerator'>x</span><span class='denominator'>x - 2</span></div>.",
+      a: ["x &ne; 0", "x &ne; -2", "x &ne; 4", "x &ne; 2"],
+      correct: 3,
+      rationale:
+        "2x - 4 &ne; 0 &rArr; 2x &ne; 4 &rArr; x &ne; 2.<br>x - 2 &ne; 0 &rArr; x &ne; 2.<br>Vậy ĐKXĐ là x &ne; 2."
     },
     {
-        q: "Nghiệm của phương trình <div class='fraction'><span class='numerator'>x</span><span class='denominator'>x - 1</span></div> = <div class='fraction'><span class='numerator'>1</span><span class='denominator'>x - 1</span></div> là:",
-        a: [
-            "x = 1",
-            "Vô nghiệm",
-            "x = 0",
-            "x = -1"
-        ],
-        correct: 1,
-        rationale: "Quy đồng khử mẫu: x = 1.<br>Đối chiếu ĐKXĐ (x &ne; 1) &rArr; x = 1 bị loại.<br>Vậy phương trình vô nghiệm."
+      q: "Nghiệm của phương trình <div class='fraction'><span class='numerator'>x</span><span class='denominator'>x - 1</span></div> = <div class='fraction'><span class='numerator'>1</span><span class='denominator'>x - 1</span></div> là:",
+      a: ["x = 1", "Vô nghiệm", "x = 0", "x = -1"],
+      correct: 1,
+      rationale:
+        "Quy đồng khử mẫu: x = 1.<br>Đối chiếu ĐKXĐ (x &ne; 1) &rArr; x = 1 bị loại.<br>Vậy phương trình vô nghiệm."
     },
     {
-        q: "Biến đổi phương trình 3x<sup>2</sup> - 5x = 2x về dạng phương trình tích.",
-        a: [
-            "x(3x - 7) = 0",
-            "x(3x - 3) = 0",
-            "x(3x + 3) = 0",
-            "x(3x - 5) = 2"
-        ],
-        correct: 0,
-        rationale: "Chuyển vế: 3x<sup>2</sup> - 5x - 2x = 0<br>&rArr; 3x<sup>2</sup> - 7x = 0<br>&rArr; x(3x - 7) = 0."
+      q: "Biến đổi phương trình 3x<sup>2</sup> - 5x = 2x về dạng phương trình tích.",
+      a: [
+        "x(3x - 7) = 0",
+        "x(3x - 3) = 0",
+        "x(3x + 3) = 0",
+        "x(3x - 5) = 2"
+      ],
+      correct: 0,
+      rationale:
+        "Chuyển vế: 3x<sup>2</sup> - 5x - 2x = 0<br>&rArr; 3x<sup>2</sup> - 7x = 0<br>&rArr; x(3x - 7) = 0."
     }
-];
-        // --- GAME LOGIC ---
-        let currentQIndex = 0;
-        let score = 0;
-        
-        // Audio Setup
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
+  ];
 
-            if (type === 'stone-move') { // Low rumble
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(50, now);
-                osc.frequency.linearRampToValueAtTime(20, now + 0.5);
-                gain.gain.setValueAtTime(0.5, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.5);
-                osc.start(now);
-                osc.stop(now + 0.5);
-            } else if (type === 'correct') { // Magical chime
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, now);
-                osc.frequency.linearRampToValueAtTime(1000, now + 0.2);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.5);
-                osc.start(now);
-                osc.stop(now + 0.5);
-            } else if (type === 'wrong') { // Trap clunk
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(100, now);
-                osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.3);
-                osc.start(now);
-                osc.stop(now + 0.3);
-            } else if (type === 'win') { // Treasure fanfare
-                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
-                    let o = audioCtx.createOscillator();
-                    let g = audioCtx.createGain();
-                    o.connect(g);
-                    g.connect(audioCtx.destination);
-                    o.type = 'triangle';
-                    o.frequency.value = f;
-                    g.gain.setValueAtTime(0.1, now + i*0.15);
-                    g.gain.linearRampToValueAtTime(0, now + i*0.15 + 0.4);
-                    o.start(now + i*0.15);
-                    o.stop(now + i*0.15 + 0.4);
-                });
-            }
-        }
+  // --- GAME LOGIC ---
+  let currentQIndex = 0;
+  let score = 0;
 
-        function startGame() {
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
-            document.getElementById('game-screen').classList.add('flex');
-            
-            playSound('stone-move');
-            currentQIndex = 0;
-            score = 0;
-            updateUI();
-            loadQuestion();
-        }
+  // Audio Setup
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        function loadQuestion() {
-            const q = questions[currentQIndex];
-            
-            document.getElementById('q-number').innerText = currentQIndex + 1;
-            document.getElementById('question-text').innerHTML = q.q;
-            
-            // Reset Journal
-            const journal = document.getElementById('journal-box');
-            journal.classList.remove('show');
-            document.getElementById('next-btn-container').classList.add('hidden');
+  function playSound(type) {
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    const now = audioCtx.currentTime;
 
-            const grid = document.getElementById('options-grid');
-            grid.innerHTML = '';
-            
-            q.a.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = "btn-relic w-full p-4 rounded text-xl font-bold shadow-md";
-                btn.innerHTML = opt;
-                btn.onclick = () => handleAnswer(idx, q.correct, btn);
-                grid.appendChild(btn);
-            });
-        }
+    if (type === "stone-move") {
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(50, now);
+      osc.frequency.linearRampToValueAtTime(20, now + 0.5);
+      gain.gain.setValueAtTime(0.5, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.5);
+      osc.start(now);
+      osc.stop(now + 0.5);
+    } else if (type === "correct") {
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(600, now);
+      osc.frequency.linearRampToValueAtTime(1000, now + 0.2);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.5);
+      osc.start(now);
+      osc.stop(now + 0.5);
+    } else if (type === "wrong") {
+      osc.type = "square";
+      osc.frequency.setValueAtTime(100, now);
+      osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.3);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    } else if (type === "win") {
+      [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+        let o = audioCtx.createOscillator();
+        let g = audioCtx.createGain();
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.type = "triangle";
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0.1, now + i * 0.15);
+        g.gain.linearRampToValueAtTime(0, now + i * 0.15 + 0.4);
+        o.start(now + i * 0.15);
+        o.stop(now + i * 0.15 + 0.4);
+      });
+    }
+  }
 
-        function handleAnswer(selected, correct, btn) {
-            const btns = document.querySelectorAll('.btn-relic');
-            btns.forEach(b => b.disabled = true);
+  function startGame() {
+    document.getElementById("start-screen").classList.add("hidden");
+    document.getElementById("game-screen").classList.remove("hidden");
+    document.getElementById("game-screen").classList.add("flex");
 
-            const q = questions[currentQIndex];
-            const journal = document.getElementById('journal-box');
-            const content = document.getElementById('explanation-content');
-            
-            content.innerHTML = q.rationale;
-            journal.classList.add('show');
+    playSound("stone-move");
+    currentQIndex = 0;
+    score = 0;
+    updateUI();
+    loadQuestion();
+  }
 
-            if (selected === correct) {
-                btn.classList.add('correct');
-                score += 100;
-                playSound('correct');
-                fireConfetti(20);
-            } else {
-                btn.classList.add('wrong');
-                btns[correct].classList.add('correct');
-                playSound('wrong');
-            }
+  // --- HÀM TRỢ GIÚP: TRỘN THỨ TỰ ĐÁP ÁN ---
+  function shuffleArray(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
 
-            updateUI();
-            document.getElementById('next-btn-container').classList.remove('hidden');
-        }
+  function loadQuestion() {
+    const q = questions[currentQIndex];
 
-        function updateUI() {
-            document.getElementById('score').innerText = score;
-        }
+    document.getElementById("q-number").innerText = currentQIndex + 1;
+    document.getElementById("question-text").innerHTML = q.q;
 
-        function nextQuestion() {
-            currentQIndex++;
-            if (currentQIndex < questions.length) {
-                playSound('stone-move');
-                loadQuestion();
-            } else {
-                endGame();
-            }
-        }
+    // Reset Journal
+    const journal = document.getElementById("journal-box");
+    journal.classList.remove("show");
+    document.getElementById("next-btn-container").classList.add("hidden");
 
-        function endGame() {
-            document.getElementById('game-screen').classList.remove('flex');
-            document.getElementById('game-screen').classList.add('hidden');
-            document.getElementById('end-screen').classList.remove('hidden');
-            document.getElementById('final-score').innerText = score;
-            playSound('win');
-            fireConfetti(100);
-        }
+    const grid = document.getElementById("options-grid");
+    grid.innerHTML = "";
 
-        // --- PARTICLES (Gold Dust) ---
-        const canvas = document.getElementById('effect-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        let particles = [];
+    // Tạo mảng chứa (chỉ số gốc + nội dung), rồi shuffle
+    const optionObjs = q.a.map((text, idx) => ({
+      text,
+      originalIndex: idx
+    }));
+    const shuffled = shuffleArray(optionObjs);
 
-        function fireConfetti(amount) {
-            for (let i = 0; i < amount; i++) {
-                particles.push({
-                    x: window.innerWidth / 2,
-                    y: window.innerHeight / 2,
-                    vx: (Math.random() - 0.5) * 15,
-                    vy: (Math.random() - 0.5) * 15,
-                    life: 100,
-                    size: Math.random() * 5 + 2,
-                    color: `hsl(${40 + Math.random()*20}, 100%, 50%)` // Gold colors
-                });
-            }
-            if(particles.length <= amount) requestAnimationFrame(animateParticles);
-        }
+    shuffled.forEach(optObj => {
+      const btn = document.createElement("button");
+      btn.className = "btn-relic w-full p-4 rounded text-xl font-bold shadow-md";
+      btn.innerHTML = optObj.text;
+      // lưu chỉ số gốc để tìm lại đáp án đúng
+      btn.dataset.originalIndex = optObj.originalIndex;
+      btn.onclick = () =>
+        handleAnswer(optObj.originalIndex, q.correct, btn);
+      grid.appendChild(btn);
+    });
+  }
 
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particles.length; i++) {
-                let p = particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += 0.2; // Gravity
-                p.life--;
-                
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
+  function handleAnswer(selectedOriginalIndex, correctIndex, btn) {
+    const btns = document.querySelectorAll(".btn-relic");
+    btns.forEach(b => (b.disabled = true));
 
-                if (p.life <= 0) {
-                    particles.splice(i, 1);
-                    i--;
-                }
-            }
-            if (particles.length > 0) requestAnimationFrame(animateParticles);
-        }
+    const q = questions[currentQIndex];
+    const journal = document.getElementById("journal-box");
+    const content = document.getElementById("explanation-content");
 
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
+    content.innerHTML = q.rationale;
+    journal.classList.add("show");
 
-    </script>
+    if (selectedOriginalIndex === correctIndex) {
+      btn.classList.add("correct");
+      score += 100;
+      playSound("correct");
+      fireConfetti(20);
+    } else {
+      btn.classList.add("wrong");
+      // Tìm nút có chỉ số gốc = correctIndex để tô màu đúng
+      const correctBtn = Array.from(btns).find(
+        b => Number(b.dataset.originalIndex) === correctIndex
+      );
+      if (correctBtn) {
+        correctBtn.classList.add("correct");
+      }
+      playSound("wrong");
+    }
+
+    updateUI();
+    document.getElementById("next-btn-container").classList.remove("hidden");
+  }
+
+  function updateUI() {
+    document.getElementById("score").innerText = score;
+  }
+
+  function nextQuestion() {
+    currentQIndex++;
+    if (currentQIndex < questions.length) {
+      playSound("stone-move");
+      loadQuestion();
+    } else {
+      endGame();
+    }
+  }
+
+  function endGame() {
+    document.getElementById("game-screen").classList.remove("flex");
+    document.getElementById("game-screen").classList.add("hidden");
+    document.getElementById("end-screen").classList.remove("hidden");
+    document.getElementById("final-score").innerText = score;
+    playSound("win");
+    fireConfetti(100);
+  }
+
+  // --- PARTICLES (Gold Dust) ---
+  const canvas = document.getElementById("effect-canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let particles = [];
+
+  function fireConfetti(amount) {
+    for (let i = 0; i < amount; i++) {
+      particles.push({
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+        vx: (Math.random() - 0.5) * 15,
+        vy: (Math.random() - 0.5) * 15,
+        life: 100,
+        size: Math.random() * 5 + 2,
+        color: `hsl(${40 + Math.random() * 20}, 100%, 50%)`
+      });
+    }
+    if (particles.length <= amount) requestAnimationFrame(animateParticles);
+  }
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < particles.length; i++) {
+      let p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.2; // Gravity
+      p.life--;
+
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (p.life <= 0) {
+        particles.splice(i, 1);
+        i--;
+      }
+    }
+    if (particles.length > 0) requestAnimationFrame(animateParticles);
+  }
+
+  window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  // GẮN SỰ KIỆN CHO NÚT "MỞ CỬA TIẾP THEO"
+  const nextBtn = document.getElementById("next-btn");
+  if (nextBtn) {
+    nextBtn.addEventListener("click", nextQuestion);
+  }
+</script>
 </body>
 </html>
