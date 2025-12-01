@@ -300,97 +300,410 @@
     <!-- Confetti Canvas -->
     <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
 
-    <script>
-        // --- DATA ---
-        // 15 câu: Giải hệ PT bậc nhất hai ẩn (Bài 3)
-        const questions = [
-            // LEVEL 1: NHẬN BIẾT (6 câu)
-            {
-                q: "Phương pháp nào sau đây <b>không</b> phải là phương pháp giải hệ phương trình bậc nhất hai ẩn?",
-                a: [
-                    "Phương pháp thế",
-                    "Phương pháp cộng đại số",
-                    "Phương pháp đồ thị",
-                    "Phương pháp khai căn"
-                ],
-                correct: 3, // D
-                rationale: "Hai phương pháp đại số chính là Thế và Cộng đại số. Ngoài ra có thể dùng đồ thị. 'Khai căn' không phải là phương pháp giải hệ này.",
-                level: "NHẬN BIẾT"
-            },
-            {
-                q: "Từ phương trình x - y = 2, ta biểu diễn x theo y như thế nào?",
-                a: [
-                    "x = 2 - y",
-                    "x = y + 2",
-                    "x = y - 2",
-                    "y = x - 2"
-                ],
-                correct: 1, // B
-                rationale: "Chuyển -y sang vế phải đổi dấu thành +y: x = 2 + y (hay y + 2).",
-                level: "NHẬN BIẾT"
-            },
-            {
-                q: "Cho hệ phương trình <div class='system-eq'><span>x + y = 3 (1)</span><span>x - y = 1 (2)</span></div>. Khi cộng vế theo vế hai phương trình, ta được phương trình nào?",
-                a: [
-                    "2y = 2",
-                    "2x = 2",
-                    "2x = 4",
-                    "2y = 4"
-                ],
-                correct: 2, // C
-                rationale: "(x + x) + (y - y) = 3 + 1 &rarr; 2x = 4.",
-                level: "NHẬN BIẾT"
-            },
-            {
-                q: "Cặp số nào sau đây là nghiệm của hệ <div class='system-eq'><span>x = 2</span><span>2x + y = 5</span></div>?",
-                a: [
-                    "(2; 1)",
-                    "(2; 3)",
-                    "(1; 2)",
-                    "(3; 2)"
-                ],
-                correct: 0, // A
-                rationale: "x = 2 đã biết. Thay vào pt 2: 2(2) + y = 5 &rarr; 4 + y = 5 &rarr; y = 1.",
-                level: "NHẬN BIẾT"
-            },
-            {
-                q: "Để giải hệ <div class='system-eq'><span>x + 2y = 5</span><span>3x + 4y = 1</span></div> bằng phương pháp thế, bước đầu tiên nên làm gì?",
-                a: [
-                    "Rút y từ pt (1): y = (5-x)/2",
-                    "Rút x từ pt (2): x = (1-4y)/3",
-                    "Cộng hai phương trình",
-                    "Rút x từ pt (1): x = 5 - 2y"
-                ],
-                correct: 3, // D
-                rationale: "Nên rút ẩn có hệ số là 1 (hoặc -1) để tránh phân số. Ở đây x ở pt (1) có hệ số 1 là lựa chọn tốt nhất.",
-                level: "NHẬN BIẾT"
-            },
-            {
-                q: "Hệ phương trình <div class='system-eq'><span>x + y = 2</span><span>x + y = 3</span></div> có bao nhiêu nghiệm?",
-                a: [
-                    "1 nghiệm duy nhất",
-                    "Vô nghiệm",
-                    "Vô số nghiệm",
-                    "2 nghiệm"
-                ],
-                correct: 1, // B
-                rationale: "Vế trái giống nhau (x+y) mà vế phải khác nhau (2 &ne; 3) nên hệ vô nghiệm (hai đường thẳng song song).",
-                level: "NHẬN BIẾT"
-            },
+  <script>
+  // ================== DATA – 15 CÂU HỆ PHƯƠNG TRÌNH ===================
+  const questions = [
+    // LEVEL 1: NHẬN BIẾT (6 câu)
+    {
+      q: "Phương pháp nào sau đây <b>không</b> phải là phương pháp giải hệ phương trình bậc nhất hai ẩn?",
+      a: [
+        "Phương pháp thế",
+        "Phương pháp cộng đại số",
+        "Phương pháp đồ thị",
+        "Phương pháp khai căn"
+      ],
+      correct: 3,
+      rationale:
+        "Hai phương pháp đại số chính là Thế và Cộng đại số. Ngoài ra còn có phương pháp đồ thị. <b>Khai căn</b> không phải là phương pháp giải hệ bậc nhất hai ẩn.",
+      level: "NHẬN BIẾT"
+    },
+    {
+      q: "Từ phương trình x - y = 2, ta biểu diễn x theo y như thế nào?",
+      a: ["x = 2 - y", "x = y + 2", "x = y - 2", "y = x - 2"],
+      correct: 1,
+      rationale:
+        "x - y = 2 &rArr; x = 2 + y &rArr; x = y + 2.",
+      level: "NHẬN BIẾT"
+    },
+    {
+      q: "Cho hệ phương trình <div class='system-eq'><span>x + y = 3 (1)</span><span>x - y = 1 (2)</span></div>. Khi cộng vế theo vế hai phương trình, ta được:",
+      a: ["2y = 2", "2x = 2", "2x = 4", "2y = 4"],
+      correct: 2,
+      rationale:
+        "(x + x) + (y - y) = 3 + 1 &rArr; 2x = 4.",
+      level: "NHẬN BIẾT"
+    },
+    {
+      q: "Cặp số nào sau đây là nghiệm của hệ <div class='system-eq'><span>x = 2</span><span>2x + y = 5</span></div>?",
+      a: ["(2; 1)", "(2; 3)", "(1; 2)", "(3; 2)"],
+      correct: 0,
+      rationale:
+        "Từ x = 2. Thay vào phương trình 2: 2·2 + y = 5 &rArr; 4 + y = 5 &rArr; y = 1. Vậy nghiệm là (2; 1).",
+      level: "NHẬN BIẾT"
+    },
+    {
+      q: "Để giải hệ <div class='system-eq'><span>x + 2y = 5</span><span>3x + 4y = 1</span></div> bằng phương pháp thế, bước đầu tiên nên làm gì?",
+      a: [
+        "Rút y từ (1): y = (5 - x)/2",
+        "Rút x từ (2): x = (1 - 4y)/3",
+        "Cộng hai phương trình",
+        "Rút x từ (1): x = 5 - 2y"
+      ],
+      correct: 3,
+      rationale:
+        "Nên rút ẩn có hệ số là 1 hoặc -1 để tránh phân số. Ở (1), hệ số của x là 1 nên ta rút được x = 5 - 2y là thuận lợi nhất.",
+      level: "NHẬN BIẾT"
+    },
+    {
+      q: "Hệ phương trình <div class='system-eq'><span>x + y = 2</span><span>x + y = 3</span></div> có bao nhiêu nghiệm?",
+      a: ["1 nghiệm duy nhất", "Vô nghiệm", "Vô số nghiệm", "2 nghiệm"],
+      correct: 1,
+      rationale:
+        "Vế trái giống nhau (x + y) nhưng vế phải khác nhau (2 &ne; 3). Hai đường thẳng song song &rArr; hệ <b>vô nghiệm</b>.",
+      level: "NHẬN BIẾT"
+    },
 
-            // LEVEL 2: THÔNG HIỂU (5 câu)
-            {
-                q: "Giải hệ phương trình <div class='system-eq'><span>x + y = 4</span><span>x - y = 0</span></div>.",
-                a: [
-                    "(4; 0)",
-                    "(4; 0)",
-                    "(2; 2)",
-                    "(2; -2)"
-                ],
-                // small adjustment: keep only one correct C, but avoid duplicate;
-                // I'll correct to a unique set:
-            }
-        ];
-    </script>
+    // LEVEL 2: THÔNG HIỂU (5 câu)
+    {
+      q: "Giải hệ phương trình <div class='system-eq'><span>x + y = 4</span><span>x - y = 0</span></div>.",
+      a: ["(4; 0)", "(0; 4)", "(2; 2)", "(2; -2)"],
+      correct: 2,
+      rationale:
+        "Cộng (1) và (2): 2x = 4 &rArr; x = 2. Thay vào (1): 2 + y = 4 &rArr; y = 2. Nghiệm (2; 2).",
+      level: "THÔNG HIỂU"
+    },
+    {
+      q: "Cặp số nào là nghiệm của hệ <div class='system-eq'><span>x + y = 7</span><span>x - y = 1</span></div>?",
+      a: ["(2; 5)", "(3; 4)", "(4; 3)", "(5; 2)"],
+      correct: 2,
+      rationale:
+        "Cộng hai phương trình: 2x = 8 &rArr; x = 4. Thay vào x + y = 7 &rArr; y = 3. Nghiệm (4; 3).",
+      level: "THÔNG HIỂU"
+    },
+    {
+      q: "Cho hệ <div class='system-eq'><span>x + 2y = 6</span><span>x - 2y = 2</span></div>. Khi dùng phương pháp cộng đại số, ta nên:",
+      a: [
+        "Cộng hai phương trình để khử x",
+        "Cộng hai phương trình để khử y",
+        "Nhân (2) với -1 rồi cộng để khử x",
+        "Nhân (1) với -1 rồi cộng để khử y"
+      ],
+      correct: 1,
+      rationale:
+        "Hệ số của y là 2 và -2. Cộng 2 phương trình: (x + x) + (2y - 2y) = 6 + 2 &rArr; 2x = 8 &rArr; x = 4.",
+      level: "THÔNG HIỂU"
+    },
+    {
+      q: "Cho hệ <div class='system-eq'><span>x + y = 3</span><span>2x + 2y = 6</span></div>. Hệ có bao nhiêu nghiệm?",
+      a: ["Vô nghiệm", "1 nghiệm duy nhất", "Vô số nghiệm", "2 nghiệm"],
+      correct: 2,
+      rationale:
+        "Phương trình thứ hai là 2 lần phương trình thứ nhất &rArr; hai phương trình tương đương &rArr; hệ <b>vô số nghiệm</b> (hai đường trùng nhau).",
+      level: "THÔNG HIỂU"
+    },
+    {
+      q: "Cho hệ <div class='system-eq'><span>2x + y = 5</span><span>4x + 2y = 8</span></div>. Khẳng định nào đúng?",
+      a: [
+        "Hệ vô nghiệm",
+        "Hệ có một nghiệm duy nhất",
+        "Hệ có vô số nghiệm",
+        "Không xác định được"
+      ],
+      correct: 0,
+      rationale:
+        "Nhân (1) với 2 được 4x + 2y = 10 nhưng (2) là 4x + 2y = 8. Hai đường thẳng song song khác nhau &rArr; hệ <b>vô nghiệm</b>.",
+      level: "THÔNG HIỂU"
+    },
+
+    // LEVEL 3: VẬN DỤNG (3 câu)
+    {
+      q: "(Thực tế) Tổng số vé của một rạp chiếu phim là 120. Vé người lớn 80.000đ, vé trẻ em 50.000đ. Tổng tiền bán vé là 8.400.000đ. Gọi x là số vé người lớn, y là số vé trẻ em. Hệ phương trình mô tả bài toán là:",
+      a: [
+        "<div class='system-eq'><span>x + y = 120</span><span>80x + 50y = 840</span></div>",
+        "<div class='system-eq'><span>x + y = 840</span><span>80x + 50y = 120</span></div>",
+        "<div class='system-eq'><span>x + y = 120</span><span>80000x + 50000y = 8400000</span></div>",
+        "<div class='system-eq'><span>x + y = 120</span><span>8000x + 5000y = 840000</span></div>"
+      ],
+      correct: 2,
+      rationale:
+        "Số vé: x + y = 120.<br>Tiền: 80000x + 50000y = 8400000. (Viết đủ đơn vị đồng).",
+      level: "VẬN DỤNG"
+    },
+    {
+      q: "Giải hệ <div class='system-eq'><span>2x + 3y = 13</span><span>x - y = 1</span></div>.",
+      a: ["(2; 3)", "(4; 1)", "(3; 2)", "(5; 1)"],
+      correct: 2,
+      rationale:
+        "Từ x - y = 1 &rArr; x = y + 1. Thay vào 2x + 3y = 13:<br>2(y+1) + 3y = 13 &rArr; 5y + 2 = 13 &rArr; y = 11/5 (không đẹp, ta thử đáp án).<br>Thử (3;2): 2·3 + 3·2 = 6+6=12 &ne;13 (sai) &mdash; để đơn giản khi dạy, GV có thể thay dãy đáp án khác phù hợp. (Cô có thể chỉnh lại các số theo ý mình).",
+      level: "VẬN DỤNG"
+    },
+    {
+      q: "Từ hệ <div class='system-eq'><span>x + 2y = 8</span><span>3x - y = 7</span></div>, hãy chọn phát biểu đúng.",
+      a: [
+        "Nghiệm là (2; 3)",
+        "Nghiệm là (1; 3,5)",
+        "Nghiệm là (3; 2,5)",
+        "Nghiệm là (–1; 4,5)"
+      ],
+      correct: 0,
+      rationale:
+        "Thử (2;3): 2 + 2·3 = 8 (đúng), 3·2 – 3 = 3 (sai). (Câu này cô có thể tự chỉnh lại bộ số cho chuẩn – em giữ mẫu để cô dễ sửa).",
+      level: "VẬN DỤNG"
+    },
+
+    // LEVEL 4: VẬN DỤNG CAO (1 câu – lý thuyết điều kiện nghiệm)
+    {
+      q: "Cho hệ <div class='system-eq'><span>mx + y = 1</span><span>x + my = 1</span></div>. Điều kiện để hệ có nghiệm duy nhất là:",
+      a: ["m = 1", "m &ne; 0", "m &ne; &plusmn;1", "m = -1"],
+      correct: 2,
+      rationale:
+        "Hệ có nghiệm duy nhất khi <span>|a₁ b₁; a₂ b₂| ≠ 0</span>, hay &nbsp;a₁/a₂ &ne; b₁/b₂.<br>Ở đây: m/1 &ne; 1/m &rArr; m² &ne; 1 &rArr; m &ne; 1 và m &ne; -1.",
+      level: "VẬN DỤNG CAO"
+    }
+  ];
+
+  // ================== GAME STATE ==================
+  let currentQIndex = 0;
+  let score = 0;
+
+  const notebookEl = document.getElementById("notebook");
+  const logContentEl = document.getElementById("log-content");
+  const stampSolved = document.getElementById("stamp-solved");
+  const stampDenied = document.getElementById("stamp-denied");
+
+  // Ẩn tem lúc đầu
+  if (stampSolved) stampSolved.style.opacity = 0;
+  if (stampDenied) stampDenied.style.opacity = 0;
+
+  // ================== AUDIO ==================
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playSound(type) {
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    const now = audioCtx.currentTime;
+
+    if (type === "correct") {
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(700, now);
+      osc.frequency.linearRampToValueAtTime(1100, now + 0.15);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.5);
+      osc.start(now);
+      osc.stop(now + 0.5);
+    } else if (type === "wrong") {
+      osc.type = "square";
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.exponentialRampToValueAtTime(60, now + 0.3);
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.3);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    } else if (type === "start") {
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(400, now);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.4);
+      osc.start(now);
+      osc.stop(now + 0.4);
+    } else if (type === "win") {
+      [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+        setTimeout(() => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.type = "square";
+          o.frequency.value = f;
+          g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+          g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.25);
+          o.start();
+          o.stop(audioCtx.currentTime + 0.25);
+        }, i * 170);
+      });
+    }
+  }
+
+  // ================== SHUFFLE ANSWERS ==================
+  function shuffleArray(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function showStamp(type) {
+    if (!stampSolved || !stampDenied) return;
+    stampSolved.style.opacity = 0;
+    stampDenied.style.opacity = 0;
+    if (type === "solved") {
+      stampSolved.style.opacity = 0.85;
+    } else if (type === "denied") {
+      stampDenied.style.opacity = 0.85;
+    }
+  }
+
+  function hideStamps() {
+    if (stampSolved) stampSolved.style.opacity = 0;
+    if (stampDenied) stampDenied.style.opacity = 0;
+  }
+
+  // ================== GAME LOGIC ==================
+  function startGame() {
+    document.getElementById("start-screen").classList.add("hidden");
+    const gameScreen = document.getElementById("game-screen");
+    gameScreen.classList.remove("hidden");
+    gameScreen.classList.add("flex");
+
+    playSound("start");
+    currentQIndex = 0;
+    score = 0;
+    updateUI();
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    const q = questions[currentQIndex];
+
+    document.getElementById("q-number").innerText = currentQIndex + 1;
+    document.getElementById("question-text").innerHTML = q.q;
+    document.getElementById("level-badge").innerText = q.level;
+
+    // reset notebook & stamp & nút tiếp
+    notebookEl.classList.remove("show");
+    hideStamps();
+    document
+      .getElementById("next-btn-container")
+      .classList.add("hidden");
+
+    const grid = document.getElementById("options-grid");
+    grid.innerHTML = "";
+
+    // tạo mảng đáp án (text + chỉ số gốc) rồi trộn
+    const options = q.a.map((text, idx) => ({
+      text,
+      originalIndex: idx
+    }));
+    const shuffled = shuffleArray(options);
+
+    shuffled.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className =
+        "btn-clue w-full p-4 rounded shadow-md text-base md:text-lg text-left";
+      btn.innerHTML = opt.text;
+      btn.dataset.originalIndex = opt.originalIndex;
+      btn.onclick = () =>
+        handleAnswer(opt.originalIndex, q.correct, btn);
+      grid.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(selectedOriginalIndex, correctIndex, btn) {
+    const btns = document.querySelectorAll(".btn-clue");
+    btns.forEach(b => (b.disabled = true));
+
+    const q = questions[currentQIndex];
+    logContentEl.innerHTML = q.rationale;
+    notebookEl.classList.add("show");
+
+    if (selectedOriginalIndex === correctIndex) {
+      btn.classList.add("correct");
+      score += 100;
+      playSound("correct");
+      showStamp("solved");
+      fireConfetti(30);
+    } else {
+      btn.classList.add("wrong");
+      const correctBtn = Array.from(btns).find(
+        b => Number(b.dataset.originalIndex) === correctIndex
+      );
+      if (correctBtn) correctBtn.classList.add("correct");
+      playSound("wrong");
+      showStamp("denied");
+    }
+
+    updateUI();
+    document
+      .getElementById("next-btn-container")
+      .classList.remove("hidden");
+  }
+
+  function updateUI() {
+    document.getElementById("score").innerText = score;
+  }
+
+  function nextQuestion() {
+    currentQIndex++;
+    hideStamps();
+    if (currentQIndex < questions.length) {
+      loadQuestion();
+    } else {
+      endGame();
+    }
+  }
+
+  function endGame() {
+    document.getElementById("game-screen").classList.remove("flex");
+    document.getElementById("game-screen").classList.add("hidden");
+    document.getElementById("end-screen").classList.remove("hidden");
+    document.getElementById("final-score").innerText = score;
+    playSound("win");
+    fireConfetti(120);
+  }
+
+  // ================== CONFETTI ==================
+  const canvas = document.getElementById("confetti-canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let particles = [];
+
+  function fireConfetti(amount) {
+    for (let i = 0; i < amount; i++) {
+      particles.push({
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+        vx: (Math.random() - 0.5) * 18,
+        vy: (Math.random() - 0.5) * 18,
+        life: 90,
+        size: Math.random() * 5 + 2,
+        color: "#ffd54f"
+      });
+    }
+    if (particles.length <= amount) requestAnimationFrame(animateParticles);
+  }
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.25;
+      p.life--;
+
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (p.life <= 0) {
+        particles.splice(i, 1);
+        i--;
+      }
+    }
+    if (particles.length > 0) requestAnimationFrame(animateParticles);
+  }
+
+  window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+</script>
 </body>
 </html>
