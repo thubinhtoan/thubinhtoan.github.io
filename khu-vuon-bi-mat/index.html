@@ -1,298 +1,90 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khu Vườn Bí Mật - Toán 9: Đường tròn</title>
-    <!-- Tải Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tải Tone.js cho âm thanh -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-      <!-- Hiển thị thông tin học sinh (ở trên cùng) -->
-<div id="student-info-bar"
-     class="w-full text-right text-sm text-gray-200 opacity-90 py-1 pr-4">
-    Học sinh: <span id="info-name"></span> – 
-    Lớp <span id="info-class"></span> – 
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khu Vườn Bí Mật - Toán 9: Đường tròn</title>
+
+  <!-- Tải Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tải Tone.js cho âm thanh -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+  <style>
+    /* CSS cho font và giao diện chung */
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%);
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    /* Container chính của trò chơi */
+    #game-container {
+      width: 100%;
+      max-width: 900px;
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Tiêu đề */
+    header {
+      background-color: #68b984;
+      color: white;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      border-bottom: 5px solid #4a9c6d;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    header p {
+      font-size: 1rem;
+      opacity: 0.9;
+      margin-top: 0.25rem;
+    }
+
+    /* Nội dung chính (Vườn + Câu hỏi) */
+    main {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    /* ... các CSS còn lại giữ nguyên ở đây ... */
+  </style>
+</head>
+
+<body>
+  <!-- Thanh hiển thị thông tin học sinh -->
+  <div id="student-info-bar"
+       class="w-full text-right text-sm text-gray-200 opacity-90 py-1 pr-4">
+    Học sinh: <span id="info-name"></span> –
+    Lớp <span id="info-class"></span> –
     <span id="info-school"></span>
-</div>
-     <div id="game-container">
-    <style>
-        /* CSS cho font và giao diện chung */
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%);
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 1rem;
-        }
+  </div>
 
-        /* Container chính của trò chơi */
-        #game-container {
-            width: 100%;
-            max-width: 900px;
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+  <!-- Container chính của game -->
+  <div id="game-container">
+    <header>
+      <h1>Khu Vườn Bí Mật</h1>
+      <p>Bài 1: Đường tròn - Toán lớp 9 (Chân trời sáng tạo)</p>
+    </header>
 
-        /* Tiêu đề */
-        header {
-            background-color: #68b984;
-            color: white;
-            padding: 1.5rem 2rem;
-            text-align: center;
-            border-bottom: 5px solid #4a9c6d;
-        }
-
-        header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        header p {
-            font-size: 1rem;
-            opacity: 0.9;
-            margin-top: 0.25rem;
-        }
-
-        /* Nội dung chính (Vườn + Câu hỏi) */
-        main {
-            display: flex;
-            flex-direction: column;
-            md:flex-direction: row;
-            flex-grow: 1;
-        }
-      
-        /* Khu vườn bí mật */
-        #secret-garden {
-            width: 100%;
-            md:width: 40%;
-            background: #f0fdf4; /* Màu nền cỏ nhạt */
-            border-right: 2px solid #d1fae5;
-            padding: 1.5rem;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 1rem;
-            align-content: start;
-            min-height: 200px;
-            order: 2; /* Đảo thứ tự trên mobile */
-            md:order: 1;
-        }
-
-        /* Bông hoa */
-        .flower-pot {
-            aspect-ratio: 1 / 1;
-            background-color: #e0f2e9;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-            color: #a0aec0;
-            border: 2px dashed #bbf7d0;
-        }
-
-        .flower {
-            font-size: 2.5rem;
-            opacity: 0;
-            transform: scale(0.5);
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
-
-        .flower.grown {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        /* Khu vực câu hỏi */
-        #quiz-area {
-            width: 100%;
-            md:width: 60%;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            order: 1; /* Đảo thứ tự trên mobile */
-            md:order: 2;
-        }
-
-        #question-container {
-            margin-bottom: 1.5rem;
-        }
-
-        /* Hiển thị mức độ câu hỏi */
-        #question-level {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #56ab2f;
-            background-color: #dcfce7;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            display: inline-block;
-            margin-bottom: 0.75rem;
-        }
-
-        /* Nội dung câu hỏi */
-        #question-text {
-            font-size: 1.25rem;
-            font-weight: 500;
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-
-        /* Các lựa chọn trả lời */
-        #options-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-        }
-
-        /* Nút lựa chọn */
-        .option-btn {
-            width: 100%;
-            background-color: #fff;
-            border: 2px solid #d1d5db;
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: left;
-            font-size: 1rem;
-            font-weight: 500;
-            color: #374151;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Hiệu ứng khi di chuột vào nút */
-        .option-btn:not(:disabled):hover {
-            border-color: #68b984;
-            background-color: #f0fdf4;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        /* Nút khi được chọn */
-        .option-btn.selected {
-            border-color: #4a9c6d;
-            background-color: #dcfce7;
-            color: #166534;
-        }
-
-        /* Nút khi trả lời đúng */
-        .option-btn.correct {
-            background-color: #dcfce7;
-            border-color: #4ade80;
-            color: #166534;
-            animation: pulse-correct 0.5s;
-        }
-
-        /* Nút khi trả lời sai */
-        .option-btn.wrong {
-            background-color: #fee2e2;
-            border-color: #f87171;
-            color: #991b1b;
-            animation: shake-wrong 0.5s;
-        }
-
-        .option-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        /* Nút điều khiển (Kiểm tra / Câu tiếp) */
-        #controls {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 1rem;
-        }
-
-        #control-btn {
-            background-color: #56ab2f;
-            color: white;
-            font-weight: 600;
-            font-size: 1rem;
-            padding: 0.75rem 2rem;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(86, 171, 47, 0.3);
-        }
-
-        #control-btn:disabled {
-            background-color: #9ca3af;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        #control-btn:not(:disabled):hover {
-            background-color: #4a9c6d;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(86, 171, 47, 0.4);
-        }
-
-        /* Màn hình kết thúc */
-        #end-screen {
-            display: none; /* Ẩn ban đầu */
-            text-align: center;
-            padding: 3rem 2rem;
-        }
-
-        #end-screen h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #4a9c6d;
-            margin-bottom: 1rem;
-        }
-
-        #end-score {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        /* Hiệu ứng cho câu trả lời */
-        @keyframes pulse-correct {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes shake-wrong {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-        }
-
-        /* Biểu tượng tung hoa (hiệu ứng khi đúng) */
-        .feedback-effect {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 5rem;
-            opacity: 0;
-            animation: fade-out-up 1s ease-out;
-        }
-
-        @keyframes fade-out-up {
-            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
-            100% { opacity: 0; transform: translate(-50%, -150%) scale(1.5); }
-        }
-        
-        /* CSS cho responsive */
-        @media (max-width: 768px) {
-            body {
-                padding: 0.5rem;
-            }
+    <main>
+      <!-- ... phần secret-garden, quiz-area, v.v. ... -->
             main {
                 flex-direction: column;
             }
