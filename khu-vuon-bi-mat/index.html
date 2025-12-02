@@ -8,6 +8,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Tải Tone.js cho âm thanh -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+      <!-- Hiển thị thông tin học sinh (ở trên cùng) -->
+<div id="student-info-bar"
+     class="w-full text-right text-sm text-gray-200 opacity-90 py-1 pr-4">
+    Học sinh: <span id="info-name"></span> – 
+    Lớp <span id="info-class"></span> – 
+    <span id="info-school"></span>
+</div>
+     <div id="game-container">
     <style>
         /* CSS cho font và giao diện chung */
         body {
@@ -61,13 +69,7 @@
             md:flex-direction: row;
             flex-grow: 1;
         }
-        <!-- Hiển thị thông tin học sinh (ở trên cùng) -->
-<div id="student-info-bar"
-     class="w-full text-right text-sm text-gray-200 opacity-90 py-1 pr-4">
-    Học sinh: <span id="info-name"></span> – 
-    Lớp <span id="info-class"></span> – 
-    <span id="info-school"></span>
-</div>
+      
         /* Khu vườn bí mật */
         #secret-garden {
             width: 100%;
@@ -397,10 +399,7 @@
             </div>
         </main>
     </div>
-
-    <script>
-        // ========================
-<script>
+  <script>
   // ========================
   //  THÔNG TIN HỌC SINH DÙNG CHUNG CHO TẤT CẢ GAME
   // ========================
