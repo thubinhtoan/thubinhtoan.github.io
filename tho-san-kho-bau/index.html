@@ -62,207 +62,269 @@
     const { useState, useEffect } = React;
 
     // --- DỮ LIỆU CÂU HỎI ---
-    const questions = [
-      // Nhận biết
-      {
-        id: 1,
-        level: "Nhận biết",
-        text: "Công thức khử mẫu của biểu thức lấy căn $\\sqrt{\\frac{A}{B}}$ với $AB \\ge 0$ và $B \\ne 0$ là gì?",
-        options: [
-          "$\\frac{\\sqrt{AB}}{B}$",
-          "$\\frac{\\sqrt{AB}}{|B|}$",
-          "$\\frac{A\\sqrt{B}}{B}$",
-          "$A\\sqrt{B}$"
-        ],
-        correct: 1,
-        rationale: "Theo quy tắc khử mẫu, ta nhân cả tử và mẫu với $B$ để mẫu trở thành bình phương: $\\sqrt{\\frac{A}{B}} = \\sqrt{\\frac{AB}{B^2}} = \\frac{\\sqrt{AB}}{|B|}$."
-      },
-      {
-        id: 2,
-        level: "Nhận biết",
-        text: "Biểu thức liên hợp của biểu thức $\\sqrt{3} - 1$ dùng để trục căn thức ở mẫu là gì?",
-        options: [
-          "$\\sqrt{3} - 1$",
-          "$-\\sqrt{3} + 1$",
-          "$\\sqrt{3} + 1$",
-          "$\\sqrt{3}$"
-        ],
-        correct: 2,
-        rationale: "Để tạo ra hằng đẳng thức hiệu hai bình phương $A^2 - B^2$, biểu thức liên hợp của $\\sqrt{A} - B$ là $\\sqrt{A} + B$. Vậy liên hợp của $\\sqrt{3}-1$ là $\\sqrt{3}+1$."
-      },
-      {
-        id: 3,
-        level: "Nhận biết",
-        text: "Kết quả của phép đưa thừa số ra ngoài dấu căn của $\\sqrt{12}$ là:",
-        options: [
-          "$2\\sqrt{3}$",
-          "$3\\sqrt{2}$",
-          "$4\\sqrt{3}$",
-          "$6\\sqrt{2}$"
-        ],
-        correct: 0,
-        rationale: "Ta phân tích $12 = 4\\cdot3 = 2^2\\cdot3$. Đưa thừa số $2$ ra ngoài dấu căn ta được $2\\sqrt{3}$."
-      },
-      {
-        id: 4,
-        level: "Nhận biết",
-        text: "Đưa thừa số vào trong dấu căn của biểu thức $3\\sqrt{2}$ ta được:",
-        options: [
-          "$\\sqrt{6}$",
-          "$\\sqrt{12}$",
-          "$\\sqrt{18}$",
-          "$\\sqrt{36}$"
-        ],
-        correct: 2,
-        rationale: "Đưa thừa số dương vào trong căn: $3\\sqrt{2} = \\sqrt{3^2\\cdot2} = \\sqrt{9\\cdot2} = \\sqrt{18}$."
-      },
-      {
-        id: 5,
-        level: "Nhận biết",
-        text: "Khẳng định nào sau đây là SAI về phép trục căn thức ở mẫu?",
-        options: [
-          "$\\frac{2}{\\sqrt{3}} = \\frac{2\\sqrt{3}}{3}$",
-          "$\\frac{1}{2+\\sqrt{3}} = 2-\\sqrt{3}$",
-          "$\\frac{a}{\\sqrt{b}} = \\frac{a\\sqrt{b}}{b} (b>0)$",
-          "$\\frac{1}{\\sqrt{5}} = \\frac{1}{5}$"
-        ],
-        correct: 3,
-        rationale: "Khẳng định D sai. Đúng phải là: $\\frac{1}{\\sqrt{5}} = \\frac{\\sqrt{5}}{5}$."
-      },
-      {
-        id: 6,
-        level: "Nhận biết",
-        text: "Với $x \\ge 0$, biểu thức $\\sqrt{x}(\\sqrt{x} + 2)$ bằng:",
-        options: [
-          "$x + 2$",
-          "$\\sqrt{x} + 2\\sqrt{x}$",
-          "$2x$",
-          "$x + 2\\sqrt{x}$"
-        ],
-        correct: 3,
-        rationale: "$\\sqrt{x}(\\sqrt{x}+2) = (\\sqrt{x})^2 + 2\\sqrt{x} = x + 2\\sqrt{x}$."
-      },
-      // Thông hiểu
-      {
-        id: 7,
-        level: "Thông hiểu",
-        text: "Rút gọn biểu thức $M = 2\\sqrt{3} + \\sqrt{27} - \\sqrt{12}$ ta được:",
-        options: [
-          "$3\\sqrt{3}$",
-          "$4\\sqrt{3}$",
-          "$\\sqrt{3}$",
-          "$5\\sqrt{3}$"
-        ],
-        correct: 0,
-        rationale: "$M = 2\\sqrt{3} + \\sqrt{9\\cdot3} - \\sqrt{4\\cdot3} = 2\\sqrt{3} + 3\\sqrt{3} - 2\\sqrt{3} = 3\\sqrt{3}$."
-      },
-      {
-        id: 8,
-        level: "Thông hiểu",
-        text: "Trục căn thức ở mẫu của biểu thức $\\frac{4}{\\sqrt{5}-1}$ ta được kết quả là:",
-        options: [
-          "$4(\\sqrt{5}+1)$",
-          "$\\sqrt{5}+1$",
-          "$\\sqrt{5}-1$",
-          "$2(\\sqrt{5}+1)$"
-        ],
-        correct: 1,
-        rationale: "$\\frac{4}{\\sqrt{5}-1} = \\frac{4(\\sqrt{5}+1)}{5-1} = \\sqrt{5}+1$."
-      },
-      {
-        id: 9,
-        level: "Thông hiểu",
-        text: "Rút gọn biểu thức $\\sqrt{18a^2}$ với $a < 0$:",
-        options: [
-          "$3a\\sqrt{2}$",
-          "$-3a\\sqrt{2}$",
-          "$3\\sqrt{2a}$",
-          "$-3\\sqrt{2a}$"
-        ],
-        correct: 1,
-        rationale: "$\\sqrt{18a^2} = \\sqrt{9\\cdot2\\cdot a^2} = 3\\sqrt{2}|a|$. Vì $a<0$ nên $|a|=-a$, được $-3a\\sqrt{2}$."
-      },
-      {
-        id: 10,
-        level: "Thông hiểu",
-        text: "Giá trị của biểu thức $(\\sqrt{3}-2)(\\sqrt{3}+2)$ là:",
-        options: [
-          "7",
-          "1",
-          "-1",
-          "-7"
-        ],
-        correct: 2,
-        rationale: "$(\\sqrt{3}-2)(\\sqrt{3}+2) = (\\sqrt{3})^2 - 2^2 = 3-4 = -1$."
-      },
-      {
-        id: 11,
-        level: "Thông hiểu",
-        text: "Khử mẫu của biểu thức $\\sqrt{\\frac{5a}{2}}$ với $a > 0$ ta được:",
-        options: [
-          "$\\frac{5\\sqrt{a}}{2}$",
-          "$\\frac{\\sqrt{5a}}{2}$",
-          "$\\frac{\\sqrt{10a}}{4}$",
-          "$\\frac{\\sqrt{10a}}{2}$"
-        ],
-        correct: 3,
-        rationale: "$\\sqrt{\\frac{5a}{2}} = \\sqrt{\\frac{5a\\cdot2}{2\\cdot2}} = \\frac{\\sqrt{10a}}{\\sqrt{4}} = \\frac{\\sqrt{10a}}{2}$."
-      },
-      // Vận dụng
-      {
-        id: 12,
-        level: "Vận dụng",
-        text: "Rút gọn biểu thức $P = \\frac{a - \\sqrt{a}}{\\sqrt{a} - 1}$ với $a \\ge 0, a \\ne 1$:",
-        options: [
-          "$\\sqrt{a}$",
-          "$\\sqrt{a} + 1$",
-          "$\\sqrt{a} - 1$",
-          "$a$"
-        ],
-        correct: 0,
-        rationale: "$a-\\sqrt{a} = \\sqrt{a}(\\sqrt{a}-1)$ nên $P = \\sqrt{a}$."
-      },
-      {
-        id: 13,
-        level: "Vận dụng",
-        text: "Tìm $x$ biết: $\\sqrt{4x} + \\sqrt{x} = 6$ (với $x \\ge 0$)",
-        options: [
-          "$x = 2$",
-          "$x = 4$",
-          "$x = 9$",
-          "$x = 16$"
-        ],
-        correct: 1,
-        rationale: "$\\sqrt{4x}=2\\sqrt{x}$ nên $3\\sqrt{x}=6 \\Rightarrow \\sqrt{x}=2 \\Rightarrow x=4$."
-      },
-      {
-        id: 14,
-        level: "Vận dụng (Thực tế)",
-        text: "Một mảnh vườn hình chữ nhật có chiều dài $\\sqrt{32}$m và chiều rộng $\\sqrt{8}$m. Diện tích của mảnh vườn là:",
-        options: [
-          "$8 m^2$",
-          "$12 m^2$",
-          "$16 m^2$",
-          "$32 m^2$"
-        ],
-        correct: 2,
-        rationale: "Diện tích $=\\sqrt{32}\\cdot\\sqrt{8}=\\sqrt{256}=16\\,m^2$."
-      },
-      // Vận dụng cao
-      {
-        id: 15,
-        level: "Vận dụng cao",
-        text: "Tính giá trị của biểu thức $A = \\frac{1}{\\sqrt{2}+1} + \\frac{1}{\\sqrt{3}+\\sqrt{2}} + \\frac{1}{\\sqrt{4}+\\sqrt{3}}$.",
-        options: [
-          "1",
-          "2",
-          "3",
-          "$\\sqrt{2}$"
-        ],
-        correct: 0,
-        rationale: "Trục căn: $A=(\\sqrt{2}-1)+ (\\sqrt{3}-\\sqrt{2}) + (\\sqrt{4}-\\sqrt{3}) = -1+2 = 1$."
-      }
-    ];
+   const questions = [
+  // Nhận biết
+  {
+    id: 1,
+    level: "Nhận biết",
+    text:
+      "Công thức khử mẫu của biểu thức:<br/>" +
+      "\\[\\sqrt{\\frac{A}{B}}\\]<br/>" +
+      "với $AB \\ge 0$ và $B \\ne 0$ là gì?",
+    options: [
+      "$\\frac{\\sqrt{AB}}{B}$",
+      "$\\frac{\\sqrt{AB}}{|B|}$",
+      "$\\frac{A\\sqrt{B}}{B}$",
+      "$A\\sqrt{B}$"
+    ],
+    correct: 1,
+    rationale:
+      "Theo quy tắc khử mẫu, ta nhân cả tử và mẫu với $B$ để mẫu trở thành bình phương: " +
+      "$\\sqrt{\\frac{A}{B}} = \\sqrt{\\frac{AB}{B^2}} = \\frac{\\sqrt{AB}}{|B|}$."
+  },
+  {
+    id: 2,
+    level: "Nhận biết",
+    text:
+      "Biểu thức liên hợp của biểu thức:<br/>" +
+      "\\[\\sqrt{3} - 1\\]<br/>" +
+      "dùng để trục căn thức ở mẫu là gì?",
+    options: [
+      "$\\sqrt{3} - 1$",
+      "$-\\sqrt{3} + 1$",
+      "$\\sqrt{3} + 1$",
+      "$\\sqrt{3}$"
+    ],
+    correct: 2,
+    rationale:
+      "Để tạo ra hằng đẳng thức hiệu hai bình phương $A^2 - B^2$, biểu thức liên hợp của " +
+      "$\\sqrt{A} - B$ là $\\sqrt{A} + B$. Vậy liên hợp của $\\sqrt{3}-1$ là $\\sqrt{3}+1$."
+  },
+  {
+    id: 3,
+    level: "Nhận biết",
+    text:
+      "Kết quả của phép đưa thừa số ra ngoài dấu căn của biểu thức:<br/>" +
+      "\\[\\sqrt{12}\\]<br/>" +
+      "là:",
+    options: [
+      "$2\\sqrt{3}$",
+      "$3\\sqrt{2}$",
+      "$4\\sqrt{3}$",
+      "$6\\sqrt{2}$"
+    ],
+    correct: 0,
+    rationale:
+      "Ta phân tích $12 = 4\\cdot3 = 2^2\\cdot3$. Đưa thừa số $2$ ra ngoài dấu căn ta được $2\\sqrt{3}$."
+  },
+  {
+    id: 4,
+    level: "Nhận biết",
+    text:
+      "Đưa thừa số vào trong dấu căn của biểu thức:<br/>" +
+      "\\[3\\sqrt{2}\\]<br/>" +
+      "ta được:",
+    options: [
+      "$\\sqrt{6}$",
+      "$\\sqrt{12}$",
+      "$\\sqrt{18}$",
+      "$\\sqrt{36}$"
+    ],
+    correct: 2,
+    rationale:
+      "Đưa thừa số dương vào trong căn: $3\\sqrt{2} = \\sqrt{3^2\\cdot2} = \\sqrt{9\\cdot2} = \\sqrt{18}$."
+  },
+  {
+    id: 5,
+    level: "Nhận biết",
+    text:
+      "Khẳng định nào sau đây là SAI về phép trục căn thức ở mẫu?",
+    options: [
+      "$\\frac{2}{\\sqrt{3}} = \\frac{2\\sqrt{3}}{3}$",
+      "$\\frac{1}{2+\\sqrt{3}} = 2-\\sqrt{3}$",
+      "$\\frac{a}{\\sqrt{b}} = \\frac{a\\sqrt{b}}{b} (b>0)$",
+      "$\\frac{1}{\\sqrt{5}} = \\frac{1}{5}$"
+    ],
+    correct: 3,
+    rationale:
+      "Khẳng định D sai. Đúng phải là: $\\frac{1}{\\sqrt{5}} = \\frac{\\sqrt{5}}{5}$."
+  },
+  {
+    id: 6,
+    level: "Nhận biết",
+    text:
+      "Với $x \\ge 0$, giá trị của biểu thức:<br/>" +
+      "\\[\\sqrt{x}(\\sqrt{x} + 2)\\]<br/>" +
+      "bằng:",
+    options: [
+      "$x + 2$",
+      "$\\sqrt{x} + 2\\sqrt{x}$",
+      "$2x$",
+      "$x + 2\\sqrt{x}$"
+    ],
+    correct: 3,
+    rationale:
+      "$\\sqrt{x}(\\sqrt{x}+2) = (\\sqrt{x})^2 + 2\\sqrt{x} = x + 2\\sqrt{x}$."
+  },
+
+  // Thông hiểu
+  {
+    id: 7,
+    level: "Thông hiểu",
+    text:
+      "Rút gọn biểu thức:<br/>" +
+      "\\[M = 2\\sqrt{3} + \\sqrt{27} - \\sqrt{12}\\]<br/>" +
+      "ta được:",
+    options: [
+      "$3\\sqrt{3}$",
+      "$4\\sqrt{3}$",
+      "$\\sqrt{3}$",
+      "$5\\sqrt{3}$"
+    ],
+    correct: 0,
+    rationale:
+      "$M = 2\\sqrt{3} + \\sqrt{9\\cdot3} - \\sqrt{4\\cdot3} = 2\\sqrt{3} + 3\\sqrt{3} - 2\\sqrt{3} = 3\\sqrt{3}$."
+  },
+  {
+    id: 8,
+    level: "Thông hiểu",
+    text:
+      "Trục căn thức ở mẫu của biểu thức:<br/>" +
+      "\\[\\frac{4}{\\sqrt{5}-1}\\]<br/>" +
+      "ta được kết quả là:",
+    options: [
+      "$4(\\sqrt{5}+1)$",
+      "$\\sqrt{5}+1$",
+      "$\\sqrt{5}-1$",
+      "$2(\\sqrt{5}+1)$"
+    ],
+    correct: 1,
+    rationale:
+      "$\\frac{4}{\\sqrt{5}-1} = \\frac{4(\\sqrt{5}+1)}{5-1} = \\sqrt{5}+1$."
+  },
+  {
+    id: 9,
+    level: "Thông hiểu",
+    text:
+      "Rút gọn biểu thức:<br/>" +
+      "\\[\\sqrt{18a^2}\\]<br/>" +
+      "với $a < 0$.",
+    options: [
+      "$3a\\sqrt{2}$",
+      "$-3a\\sqrt{2}$",
+      "$3\\sqrt{2a}$",
+      "$-3\\sqrt{2a}$"
+    ],
+    correct: 1,
+    rationale:
+      "$\\sqrt{18a^2} = \\sqrt{9\\cdot2\\cdot a^2} = 3\\sqrt{2}|a|$. Vì $a<0$ nên $|a|=-a$, được $-3a\\sqrt{2}$."
+  },
+  {
+    id: 10,
+    level: "Thông hiểu",
+    text:
+      "Giá trị của biểu thức:<br/>" +
+      "\\[(\\sqrt{3}-2)(\\sqrt{3}+2)\\]<br/>" +
+      "là:",
+    options: [
+      "7",
+      "1",
+      "-1",
+      "-7"
+    ],
+    correct: 2,
+    rationale:
+      "$(\\sqrt{3}-2)(\\sqrt{3}+2) = (\\sqrt{3})^2 - 2^2 = 3-4 = -1$."
+  },
+  {
+    id: 11,
+    level: "Thông hiểu",
+    text:
+      "Khử mẫu của biểu thức:<br/>" +
+      "\\[\\sqrt{\\frac{5a}{2}}\\]<br/>" +
+      "với $a > 0$ ta được:",
+    options: [
+      "$\\frac{5\\sqrt{a}}{2}$",
+      "$\\frac{\\sqrt{5a}}{2}$",
+      "$\\frac{\\sqrt{10a}}{4}$",
+      "$\\frac{\\sqrt{10a}}{2}$"
+    ],
+    correct: 3,
+    rationale:
+      "$\\sqrt{\\frac{5a}{2}} = \\sqrt{\\frac{5a\\cdot2}{2\\cdot2}} = \\frac{\\sqrt{10a}}{\\sqrt{4}} = \\frac{\\sqrt{10a}}{2}$."
+  },
+
+  // Vận dụng
+  {
+    id: 12,
+    level: "Vận dụng",
+    text:
+      "Rút gọn biểu thức:<br/>" +
+      "\\[P = \\frac{a - \\sqrt{a}}{\\sqrt{a} - 1}\\]<br/>" +
+      "với $a \\ge 0, a \\ne 1$.",
+    options: [
+      "$\\sqrt{a}$",
+      "$\\sqrt{a} + 1$",
+      "$\\sqrt{a} - 1$",
+      "$a$"
+    ],
+    correct: 0,
+    rationale:
+      "$a-\\sqrt{a} = \\sqrt{a}(\\sqrt{a}-1)$ nên $P = \\sqrt{a}$."
+  },
+  {
+    id: 13,
+    level: "Vận dụng",
+    text:
+      "Tìm $x$ biết:<br/>" +
+      "\\[\\sqrt{4x} + \\sqrt{x} = 6\\]<br/>" +
+      "(với $x \\ge 0$).",
+    options: [
+      "$x = 2$",
+      "$x = 4$",
+      "$x = 9$",
+      "$x = 16$"
+    ],
+    correct: 1,
+    rationale:
+      "$\\sqrt{4x}=2\\sqrt{x}$ nên $3\\sqrt{x}=6 \\Rightarrow \\sqrt{x}=2 \\Rightarrow x=4$."
+  },
+  {
+    id: 14,
+    level: "Vận dụng (Thực tế)",
+    text:
+      "Một mảnh vườn hình chữ nhật có:<br/>" +
+      "Chiều dài $\\sqrt{32}$ m, chiều rộng $\\sqrt{8}$ m.<br/>" +
+      "Diện tích của mảnh vườn là:",
+    options: [
+      "$8 m^2$",
+      "$12 m^2$",
+      "$16 m^2$",
+      "$32 m^2$"
+    ],
+    correct: 2,
+    rationale:
+      "Diện tích $=\\sqrt{32}\\cdot\\sqrt{8}=\\sqrt{256}=16\\,m^2$."
+  },
+
+  // Vận dụng cao
+  {
+    id: 15,
+    level: "Vận dụng cao",
+    text:
+      "Tính giá trị của biểu thức:<br/>" +
+      "\\[A = \\frac{1}{\\sqrt{2}+1} + \\frac{1}{\\sqrt{3}+\\sqrt{2}} + \\frac{1}{\\sqrt{4}+\\sqrt{3}}\\]",
+    options: [
+      "1",
+      "2",
+      "3",
+      "$\\sqrt{2}$"
+    ],
+    correct: 0,
+    rationale:
+      "Trục căn: $A=(\\sqrt{2}-1)+ (\\sqrt{3}-\\sqrt{2}) + (\\sqrt{4}-\\sqrt{3}) = -1+2 = 1$."
+  }
+];
 
     // --- ÂM THANH ---
     const playSound = (type) => {
