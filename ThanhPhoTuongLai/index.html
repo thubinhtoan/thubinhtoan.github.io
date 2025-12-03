@@ -596,11 +596,47 @@
         }
 
         function loadQuestion() {
-            const q = questions[currentQIndex];
-            
-            document.getElementById('q-number').innerText = currentQIndex + 1;
-            document.getElementById('question-text').innerHTML = q.q;
-            
+    const q = questions[currentQIndex];
+
+    document.getElementById('q-number').innerText = currentQIndex + 1;
+    document.getElementById('question-text').innerHTML = q.q;
+
+    // Level Badge Color
+    const badge = document.getElementById('level-badge');
+    badge.innerText = q.level;
+    if (q.level === "NHẬN BIẾT")
+        badge.className = "absolute top-0 left-0 bg-green-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
+    else if (q.level === "THÔNG HIỂU")
+        badge.className = "absolute top-0 left-0 bg-blue-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
+    else if (q.level === "VẬN DỤNG CAO")
+        badge.className = "absolute top-0 left-0 bg-red-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
+    else
+        badge.className = "absolute top-0 left-0 bg-purple-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
+
+    // Reset Log + ẩn nút tiếp tục
+    const logBox = document.getElementById('tech-log');
+    logBox.classList.remove('show');
+    document.getElementById('next-btn-container').classList.add('hidden');
+
+    const grid = document.getElementById('options-grid');
+    grid.innerHTML = '';
+
+    // Tạo mảng index và xáo trộn: [0,1,2,3] → random
+    const indices = q.a.map((_, idx) => idx);
+    indices.sort(() => Math.random() - 0.5);
+
+    // Tạo các nút đáp án theo thứ tự đã xáo trộn
+    indices.forEach(optIndex => {
+        const btn = document.createElement('button');
+        btn.className = "btn-cyber w-full p-4 rounded min-h-[80px]";
+        btn.innerHTML = q.a[optIndex];
+        // lưu lại "index gốc" của đáp án để check đúng/sai
+        btn.dataset.index = optIndex;
+        btn.onclick = () => handleAnswer(optIndex, q.correct, btn);
+        grid.appendChild(btn);
+    });
+}
+           
             // Level Badge Color
             const badge = document.getElementById('level-badge');
             badge.innerText = q.level;
@@ -626,36 +662,43 @@
             });
         }
 
-        function handleAnswer(selected, correct, btn) {
-            const btns = document.querySelectorAll('.btn-cyber');
-            btns.forEach(b => b.disabled = true);
+       function handleAnswer(selected, correct, btn) {
+    // Chỉ khóa các nút đáp án trong options-grid
+    const btns = document.querySelectorAll('#options-grid .btn-cyber');
+    btns.forEach(b => b.disabled = true);
 
-            const q = questions[currentQIndex];
-            const logBox = document.getElementById('tech-log');
-            const content = document.getElementById('log-content');
-            
-            content.innerHTML = q.rationale;
-            logBox.classList.add('show');
+    const q = questions[currentQIndex];
+    const logBox = document.getElementById('tech-log');
+    const content = document.getElementById('log-content');
 
-            if (selected === correct) {
-                btn.classList.add('correct');
-                score += 100;
-                playSound('correct');
-                showFeedback("🏗️"); // Building crane emoji
-                fireConfetti(30);
-                
-                // Build Building
-                document.getElementById(`building-${currentQIndex}`).classList.add('built');
-            } else {
-                btn.classList.add('wrong');
-                btns[correct].classList.add('correct');
-                playSound('wrong');
-                showFeedback("💥");
+    content.innerHTML = q.rationale;
+    logBox.classList.add('show');
+
+    if (selected === correct) {
+        // ĐÚNG
+        btn.classList.add('correct');
+        score += 100;
+        playSound('correct');
+        showFeedback("🏗️");
+        fireConfetti(30);
+
+        // Xây tòa nhà tương ứng
+        document.getElementById(`building-${currentQIndex}`).classList.add('built');
+    } else {
+        // SAI: tô đỏ nút chọn, tô xanh nút đúng (dù đã random)
+        btn.classList.add('wrong');
+        btns.forEach(b => {
+            if (parseInt(b.dataset.index, 10) === correct) {
+                b.classList.add('correct');
             }
+        });
+        playSound('wrong');
+        showFeedback("💥");
+    }
 
-            updateUI();
-            document.getElementById('next-btn-container').classList.remove('hidden');
-        }
+    updateUI();
+    document.getElementById('next-btn-container').classList.remove('hidden');
+}
 
         function updateUI() {
             document.getElementById('score').innerText = score;
