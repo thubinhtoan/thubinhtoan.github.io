@@ -307,247 +307,404 @@
     <script>
         // ================== CÂU HỎI GỐC (giữ nguyên đáp án đúng) ==================
        const questions = [
-    // ===================== NHẬN BIẾT =====================
-    {
-        id: 1,
-        level: "Nhận biết",
-        question: "Biểu thức nào sau đây là một <b>phân thức đại số</b>?",
-        options: [
-            `<div class="fraction"><span class="numerator">x+1</span><span class="denominator">0</span></div>`,
-            `<div class="fraction"><span class="numerator">2x - 1</span><span class="denominator">x + 3</span></div>`,
-            `<div class="fraction"><span class="numerator">√x</span><span class="denominator">2</span></div> (với x là biến)`,
-            `<div class="fraction"><span class="numerator">1</span><span class="denominator">√y</span></div> (với y là biến)`
-        ],
-        correct: 1,
-        rationale:
-            "Phân thức đại số phải có dạng A/B với A, B đều là đa thức và B khác 0. Biểu thức (2x − 1)/(x + 3) thỏa điều kiện."
-    },
+  // ===== NHẬN BIẾT (6 câu) =====
+  {
+    id: 1,
+    level: "Nhận biết",
+    question: (
+      <span>
+        Biểu thức nào sau đây là một <b>phân thức đại số</b>?
+      </span>
+    ),
+    options: [
+      (
+        <span>
+          <span className="fraction">
+            <span className="numerator">x + 1</span>
+            <span className="denominator">0</span>
+          </span>
+        </span>
+      ),
+      (
+        <span>
+          <span className="fraction">
+            <span className="numerator">2x - 1</span>
+            <span className="denominator">x + 3</span>
+          </span>
+        </span>
+      ),
+      (
+        <span>
+          <span className="fraction">
+            <span className="numerator">√x</span>
+            <span className="denominator">2</span>
+          </span>
+          {" (với x là biến)"}
+        </span>
+      ),
+      (
+        <span>
+          <span className="fraction">
+            <span className="numerator">1</span>
+            <span className="denominator">√y</span>
+          </span>
+          {" (với y là biến)"}
+        </span>
+      )
+    ],
+    correct: 1,
+    rationale:
+      "Phân thức đại số phải có dạng A/B với A, B đều là đa thức và B khác 0. Biểu thức (2x − 1)/(x + 3) thỏa điều kiện; các biểu thức còn lại không có mẫu là đa thức khác 0."
+  },
+  {
+    id: 2,
+    level: "Nhận biết",
+    question: (
+      <span>
+        Điều kiện xác định của phân thức{" "}
+        <span className="fraction">
+          <span className="numerator">A</span>
+          <span className="denominator">B</span>
+        </span>{" "}
+        là gì?
+      </span>
+    ),
+    options: ["B ≠ 0", "A ≠ 0", "A = 0", "B = 0"],
+    correct: 0,
+    rationale: "Phân thức chỉ xác định khi mẫu thức B khác 0."
+  },
+  {
+    id: 3,
+    level: "Nhận biết",
+    question: (
+      <span>
+        Hai phân thức{" "}
+        <span className="fraction">
+          <span className="numerator">A</span>
+          <span className="denominator">B</span>
+        </span>{" "}
+        và{" "}
+        <span className="fraction">
+          <span className="numerator">C</span>
+          <span className="denominator">D</span>
+        </span>{" "}
+        bằng nhau khi:
+      </span>
+    ),
+    options: [
+      "A·C = B·D",
+      "A·B = C·D",
+      "A·D = B·C",
+      "A + D = B + C"
+    ],
+    correct: 2,
+    rationale: "Theo định nghĩa: A/B = C/D khi và chỉ khi A·D = B·C."
+  },
+  {
+    id: 4,
+    level: "Nhận biết",
+    question: "Đa thức nào dưới đây được coi là phân thức đại số?",
+    options: [
+      "Chỉ có số 0",
+      "Chỉ có số 1",
+      "Mọi đa thức đều là phân thức với mẫu bằng 1",
+      "Không đa thức nào là phân thức"
+    ],
+    correct: 2,
+    rationale: "Mỗi đa thức P luôn được coi là một phân thức P/1."
+  },
+  {
+    id: 5,
+    level: "Nhận biết",
+    question: (
+      <span>
+        Tính chất cơ bản của phân thức: Nhân cả tử và mẫu của phân thức{" "}
+        <span className="fraction">
+          <span className="numerator">A</span>
+          <span className="denominator">B</span>
+        </span>{" "}
+        với đa thức M (M ≠ 0) ta được:
+      </span>
+    ),
+    options: [
+      "Phân thức đối",
+      "Phân thức nghịch đảo",
+      "Một phân thức bằng phân thức ban đầu",
+      "Phân thức bằng 1"
+    ],
+    correct: 2,
+    rationale:
+      "Ta có A/B = (A·M)/(B·M) khi M là đa thức khác 0. Đây là tính chất cơ bản dùng để quy đồng mẫu."
+  },
+  {
+    id: 6,
+    level: "Nhận biết",
+    question: (
+      <span>
+        Tìm đa thức P sao cho{" "}
+        <span className="fraction">
+          <span className="numerator">x</span>
+          <span className="denominator">y</span>
+        </span>{" "}
+        ={" "}
+        <span className="fraction">
+          <span className="numerator">xP</span>
+          <span className="denominator">yP</span>
+        </span>
+        .
+      </span>
+    ),
+    options: [
+      "P phải là đơn thức",
+      "P tùy ý",
+      "P phải là đa thức khác 0",
+      "P phải là số nguyên"
+    ],
+    correct: 2,
+    rationale:
+      "P phải là đa thức khác 0 để phân thức mới xác định và bằng phân thức ban đầu."
+  },
 
-    {
-        id: 2,
-        level: "Nhận biết",
-        question:
-            "Điều kiện xác định của phân thức <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> là gì?",
-        options: [
-            "B ≠ 0",
-            "A ≠ 0",
-            "A = 0",
-            "B = 0"
-        ],
-        correct: 0,
-        rationale:
-            "Phân thức chỉ xác định khi mẫu thức khác 0."
-    },
+  // ===== THÔNG HIỂU (5 câu) =====
+  {
+    id: 7,
+    level: "Thông hiểu",
+    question: (
+      <span>
+        Điều kiện xác định của phân thức{" "}
+        <span className="fraction">
+          <span className="numerator">3x − 1</span>
+          <span className="denominator">x − 2</span>
+        </span>{" "}
+        là:
+      </span>
+    ),
+    options: ["x ≠ -2", "x ≠ 1/3", "x = 2", "x ≠ 2"],
+    correct: 3,
+    rationale: "Mẫu x − 2 ≠ 0 nên x ≠ 2."
+  },
+  {
+    id: 8,
+    level: "Thông hiểu",
+    question: (
+      <span>
+        Rút gọn phân thức{" "}
+        <span className="fraction">
+          <span className="numerator">15x²y</span>
+          <span className="denominator">5xy</span>
+        </span>{" "}
+        ta được:
+      </span>
+    ),
+    options: ["3y", "3x", "5x", "3"],
+    correct: 1,
+    rationale:
+      "Chia cả tử và mẫu cho nhân tử chung 5xy: (15x²y)/(5xy) = 3x."
+  },
+  {
+    id: 9,
+    level: "Thông hiểu",
+    question: (
+      <span>
+        Giá trị của phân thức{" "}
+        <span className="fraction">
+          <span className="numerator">x − 3</span>
+          <span className="denominator">x + 3</span>
+        </span>{" "}
+        tại x = 3 là:
+      </span>
+    ),
+    options: ["1", "-1", "Không xác định", "0"],
+    correct: 3,
+    rationale: "(3 − 3)/(3 + 3) = 0/6 = 0."
+  },
+  {
+    id: 10,
+    level: "Thông hiểu",
+    question: (
+      <span>
+        Phân thức{" "}
+        <span className="fraction">
+          <span className="numerator">x² − 1</span>
+          <span className="denominator">x + 1</span>
+        </span>{" "}
+        bằng phân thức nào?
+      </span>
+    ),
+    options: ["x − 1", "x + 1", "1 − x", "(x − 1)²"],
+    correct: 0,
+    rationale:
+      "x² − 1 = (x − 1)(x + 1). Rút gọn với mẫu x + 1 ta được x − 1."
+  },
+  {
+    id: 11,
+    level: "Thông hiểu",
+    question: (
+      <span>
+        Điền vào chỗ trống:{" "}
+        <span className="fraction">
+          <span className="numerator">2x</span>
+          <span className="denominator">x − 1</span>
+        </span>{" "}
+        ={" "}
+        <span className="fraction">
+          <span className="numerator">...</span>
+          <span className="denominator">x(x − 1)</span>
+        </span>
+        .
+      </span>
+    ),
+    options: ["2x", "2x²", "2", "x"],
+    correct: 1,
+    rationale:
+      "Mẫu nhân thêm x nên tử cũng nhân thêm x: 2x · x = 2x²."
+  },
 
-    {
-        id: 3,
-        level: "Nhận biết",
-        question:
-            "Hai phân thức <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> và <div class='fraction'><span class='numerator'>C</span><span class='denominator'>D</span></div> bằng nhau khi:",
-        options: [
-            "A · C = B · D",
-            "A · B = C · D",
-            "A · D = B · C",
-            "A + D = B + C"
-        ],
-        correct: 2,
-        rationale:
-            "Theo định nghĩa: A/B = C/D khi và chỉ khi A·D = B·C."
-    },
+  // ===== VẬN DỤNG (3 câu) =====
+  {
+    id: 12,
+    level: "Vận dụng",
+    question: (
+      <span>
+        Rút gọn phân thức{" "}
+        <span className="fraction">
+          <span className="numerator">x² + 2xy + y²</span>
+          <span className="denominator">x² − y²</span>
+        </span>{" "}
+        ta được:
+      </span>
+    ),
+    options: [
+      (
+        <span>
+          <span className="fraction">
+            <span className="numerator">x + y</span>
+            <span className="denominator">x − y</span>
+          </span>
+        </span>
+      ),
+      (
+        <span>
+          <span className="fraction">
+            <span className="numerator">x − y</span>
+            <span className="denominator">x + y</span>
+          </span>
+        </span>
+      ),
+      "1",
+      (
+        <span>
+          <span className="fraction">
+            <span className="numerator">1</span>
+            <span className="denominator">x − y</span>
+          </span>
+        </span>
+      )
+    ],
+    correct: 0,
+    rationale:
+      "Tử = (x + y)², mẫu = (x − y)(x + y). Rút gọn được (x + y)/(x − y)."
+  },
+  {
+    id: 13,
+    level: "Vận dụng (Thực tế)",
+    question: (
+      <span>
+        Một ca nô đi xuôi dòng với vận tốc x (km/h) và ngược dòng với vận tốc y
+        (km/h). Quãng đường AB dài s (km). Tổng thời gian đi và về là:
+      </span>
+    ),
+    options: [
+      (
+        <span>
+          <span className="fraction">
+            <span className="numerator">s</span>
+            <span className="denominator">x + y</span>
+          </span>
+        </span>
+      ),
+      (
+        <span>
+          <span className="fraction">
+            <span className="numerator">2s</span>
+            <span className="denominator">x + y</span>
+          </span>
+        </span>
+      ),
+      (
+        <span>
+          <span className="fraction">
+            <span className="numerator">x</span>
+            <span className="denominator">s</span>
+          </span>
+          {" + "}
+          <span className="fraction">
+            <span className="numerator">y</span>
+            <span className="denominator">s</span>
+          </span>
+        </span>
+      ),
+      (
+        <span>
+          <span className="fraction">
+            <span className="numerator">s</span>
+            <span className="denominator">x</span>
+          </span>
+          {" + "}
+          <span className="fraction">
+            <span className="numerator">s</span>
+            <span className="denominator">y</span>
+          </span>
+        </span>
+      )
+    ],
+    correct: 3,
+    rationale:
+      "Thời gian đi: s/x. Thời gian về: s/y. Tổng thời gian là s/x + s/y."
+  },
+  {
+    id: 14,
+    level: "Vận dụng",
+    question: (
+      <span>
+        Tìm giá trị của x để phân thức{" "}
+        <span className="fraction">
+          <span className="numerator">3</span>
+          <span className="denominator">x² − 4x + 4</span>
+        </span>{" "}
+        xác định.
+      </span>
+    ),
+    options: ["x ≠ 2", "x ≠ -2", "x ≠ 4", "Mọi x"],
+    correct: 0,
+    rationale:
+      "Mẫu x² − 4x + 4 = (x − 2)². Phân thức xác định khi (x − 2)² ≠ 0 ⇒ x ≠ 2."
+  },
 
-    {
-        id: 4,
-        level: "Nhận biết",
-        question: "Đa thức nào dưới đây được coi là phân thức đại số?",
-        options: [
-            "Chỉ có số 0",
-            "Chỉ có số 1",
-            "Mọi đa thức đều là phân thức với mẫu bằng 1",
-            "Không đa thức nào là phân thức"
-        ],
-        correct: 2,
-        rationale:
-            "Mỗi đa thức P luôn được coi là phân thức P/1."
-    },
-
-    {
-        id: 5,
-        level: "Nhận biết",
-        question:
-            "Tính chất cơ bản của phân thức: Nhân cả tử và mẫu của phân thức <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> với đa thức M (M ≠ 0) cho ta:",
-        options: [
-            "Phân thức đối",
-            "Phân thức nghịch đảo",
-            "Một phân thức bằng phân thức ban đầu",
-            "Phân thức bằng 1"
-        ],
-        correct: 2,
-        rationale:
-            "A/B = (A·M)/(B·M) khi M ≠ 0. Đây là tính chất dùng để quy đồng mẫu."
-    },
-
-    {
-        id: 6,
-        level: "Nhận biết",
-        question:
-            "Tìm đa thức P sao cho: <div class='fraction'><span class='numerator'>x</span><span class='denominator'>y</span></div> = <div class='fraction'><span class='numerator'>xP</span><span class='denominator'>yP</span></div>",
-        options: [
-            "P phải là đơn thức",
-            "P tùy ý",
-            "P phải là đa thức khác 0",
-            "P là số nguyên"
-        ],
-        correct: 2,
-        rationale:
-            "P phải là đa thức khác 0 để phân thức mới xác định và bằng phân thức cũ."
-    },
-
-    // ===================== THÔNG HIỂU =====================
-    {
-        id: 7,
-        level: "Thông hiểu",
-        question:
-            "Điều kiện xác định của phân thức <div class='fraction'><span class='numerator'>3x - 1</span><span class='denominator'>x - 2</span></div> là:",
-        options: [
-            "x ≠ -2",
-            "x ≠ 1/3",
-            "x = 2",
-            "x ≠ 2"
-        ],
-        correct: 3,
-        rationale:
-            "Mẫu x − 2 ≠ 0 ⇒ x ≠ 2."
-    },
-
-    {
-        id: 8,
-        level: "Thông hiểu",
-        question:
-            "Rút gọn phân thức <div class='fraction'><span class='numerator'>15x²y</span><span class='denominator'>5xy</span></div> ta được:",
-        options: [
-            "3y",
-            "3x",
-            "5x",
-            "3"
-        ],
-        correct: 1,
-        rationale:
-            "Chia tử và mẫu cho 5xy: (15x²y)/(5xy) = 3x."
-    },
-
-    {
-        id: 9,
-        level: "Thông hiểu",
-        question:
-            "Giá trị phân thức <div class='fraction'><span class='numerator'>x - 3</span><span class='denominator'>x + 3</span></div> tại x = 3 là:",
-        options: [
-            "1",
-            "-1",
-            "Không xác định",
-            "0"
-        ],
-        correct: 3,
-        rationale:
-            "(3 - 3)/(3 + 3) = 0/6 = 0."
-    },
-
-    {
-        id: 10,
-        level: "Thông hiểu",
-        question:
-            "Phân thức <div class='fraction'><span class='numerator'>x² - 1</span><span class='denominator'>x + 1</span></div> bằng phân thức nào?",
-        options: [
-            "x - 1",
-            "x + 1",
-            "1 - x",
-            "(x - 1)²"
-        ],
-        correct: 0,
-        rationale:
-            "x² − 1 = (x - 1)(x + 1). Rút gọn với mẫu x + 1 được x - 1."
-    },
-
-    {
-        id: 11,
-        level: "Thông hiểu",
-        question:
-            "Điền vào chỗ trống: <div class='fraction'><span class='numerator'>2x</span><span class='denominator'>x - 1</span></div> = <div class='fraction'><span class='numerator'>...</span><span class='denominator'>x(x - 1)</span></div>",
-        options: [
-            "2x",
-            "2x²",
-            "2",
-            "x"
-        ],
-        correct: 1,
-        rationale:
-            "Mẫu được nhân thêm x, nên tử cũng phải nhân x: 2x·x = 2x²."
-    },
-
-    // ===================== VẬN DỤNG =====================
-    {
-        id: 12,
-        level: "Vận dụng",
-        question:
-            "Rút gọn phân thức <div class='fraction'><span class='numerator'>x² + 2xy + y²</span><span class='denominator'>x² - y²</span></div> là:",
-        options: [
-            `<div class='fraction'><span class='numerator'>x + y</span><span class='denominator'>x - y</span></div>`,
-            `<div class='fraction'><span class='numerator'>x - y</span><span class='denominator'>x + y</span></div>`,
-            "1",
-            `<div class='fraction'><span class='numerator'>1</span><span class='denominator'>x - y</span></div>`
-        ],
-        correct: 0,
-        rationale:
-            "Tử = (x + y)²; mẫu = (x - y)(x + y). Rút gọn được (x + y)/(x - y)."
-    },
-
-    {
-        id: 13,
-        level: "Vận dụng (Thực tế)",
-        question:
-            "Một ca nô đi xuôi dòng với vận tốc x (km/h) và ngược dòng với vận tốc y (km/h). Quãng đường AB dài s (km). Tổng thời gian đi và về là:",
-        options: [
-            `<div class='fraction'><span class='numerator'>s</span><span class='denominator'>x + y</span></div>`,
-            `<div class='fraction'><span class='numerator'>2s</span><span class='denominator'>x + y</span></div>`,
-            `<div class='fraction'><span class='numerator'>x</span><span class='denominator'>s</span></div> + <div class='fraction'><span class='numerator'>y</span><span class='denominator'>s</span></div>`,
-            `<div class='fraction'><span class='numerator'>s</span><span class='denominator'>x</span></div> + <div class='fraction'><span class='numerator'>s</span><span class='denominator'>y</span></div>`
-        ],
-        correct: 3,
-        rationale:
-            "Thời gian đi = s/x; thời gian về = s/y. Tổng thời gian là s/x + s/y."
-    },
-
-    {
-        id: 14,
-        level: "Vận dụng",
-        question:
-            "Tìm giá trị của x để phân thức <div class='fraction'><span class='numerator'>3</span><span class='denominator'>x² - 4x + 4</span></div> xác định:",
-        options: [
-            "x ≠ 2",
-            "x ≠ -2",
-            "x ≠ 4",
-            "Mọi x"
-        ],
-        correct: 0,
-        rationale:
-            "Mẫu = (x − 2)². Điều kiện xác định là x − 2 ≠ 0 ⇒ x ≠ 2."
-    },
-
-    // ===================== VẬN DỤNG CAO =====================
-    {
-        id: 15,
-        level: "Vận dụng cao",
-        question:
-            "Tìm giá trị nguyên của x để phân thức <div class='fraction'><span class='numerator'>2x + 1</span><span class='denominator'>x - 1</span></div> nhận giá trị nguyên.",
-        options: [
-            "x ∈ {0; 2; 4}",
-            "x ∈ {-2; 0; 2; 4}",
-            "x ∈ {0; 2}",
-            "x ∈ {-1; 1}"
-        ],
-        correct: 1,
-        rationale:
-            "Tách phân thức: (2x+1)/(x−1) = 2 + 3/(x−1). Để nguyên thì (x−1) phải là ước của 3 ⇒ x ∈ {−2, 0, 2, 4}."
-    }
+  // ===== VẬN DỤNG CAO (1 câu) =====
+  {
+    id: 15,
+    level: "Vận dụng cao",
+    question: (
+      <span>
+        Tìm các giá trị nguyên của x để phân thức{" "}
+        <span className="fraction">
+          <span className="numerator">2x + 1</span>
+          <span className="denominator">x − 1</span>
+        </span>{" "}
+        nhận giá trị nguyên.
+      </span>
+    ),
+    options: [
+      "x ∈ {0; 2; 4}",
+      "x ∈ {-2; 0; 2; 4}",
+      "x ∈ {0; 2}",
+      "x ∈ {-1; 1}"
+    ],
+    correct: 1,
+    rationale:
+      "Ta tách: (2x + 1)/(x − 1) = 2 + 3/(x − 1). Để giá trị là số nguyên, (x − 1) phải là ước của 3 ⇒ x ∈ {-2, 0, 2, 4}."
+  }
 ];
 
         // ======= RANDOM THỨ TỰ ĐÁP ÁN NHƯNG GIỮ ĐÚNG/Sai =======
