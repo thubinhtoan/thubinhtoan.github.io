@@ -712,6 +712,16 @@
     if (isAnswering) return;
     isAnswering = true;
 
+    const nextContainer = document.getElementById('next-btn-container');
+    nextContainer.classList.remove('hidden');
+
+    // Tự cuộn xuống cho thấy nút TIẾP TỤC
+    nextContainer.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+    });
+}
+
     // KHÓA tất cả nút đáp án để HS không bấm lại
     const allBtns = document.querySelectorAll('#options-grid .btn-option');
     allBtns.forEach(b => b.disabled = true);
