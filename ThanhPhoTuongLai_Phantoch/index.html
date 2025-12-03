@@ -271,11 +271,11 @@
         <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"></div>
 
         <!-- Next button -->
-        <div id="next-btn-container" class="hidden text-center pb-4">
-            <button onclick="nextQuestion()" class="btn-cyber px-10 py-3 text-xl bg-blue-900/50">
-                TIẾP TỤC XÂY DỰNG →
-            </button>
-        </div>
+       <div id="next-btn-container" class="hidden text-center pb-4">
+    <button id="next-btn" class="btn-cyber px-10 py-3 text-xl bg-blue-900/50">
+        TIẾP TỤC XỬ LÝ →
+    </button>
+</div>
     </div>
 
     <!-- End Screen -->
@@ -637,7 +637,11 @@
                 endGame();
             }
         }
-
+// Gắn sự kiện click cho nút "TIẾP TỤC XỬ LÝ"
+const nextBtnEl = document.getElementById("next-btn");
+if (nextBtnEl) {
+    nextBtnEl.addEventListener("click", nextQuestion);
+}
         function endGame() {
             const gameScreen = document.getElementById('game-screen');
             gameScreen.classList.remove('flex');
