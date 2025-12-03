@@ -608,14 +608,10 @@
 
         function startGame() {
             document.getElementById('start-screen').classList.add('hidden');
-           const nextContainer = document.getElementById('next-btn-container');
-           nextContainer.classList.remove('hidden');
+            nextContainer.classList.remove('hidden');
 
           // Tự cuộn xuống cho thấy nút TIẾP TỤC
-          nextContainer.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
-          });
+        
             document.getElementById('game-screen').classList.add('flex');
             
             currentQIndex = 0;
