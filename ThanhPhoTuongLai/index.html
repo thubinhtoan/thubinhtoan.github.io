@@ -52,7 +52,7 @@
             bottom: 100px;
             left: 0;
             width: 100%;
-            height: 0; /* Grows with progress */
+            height: 0;
             display: flex;
             align-items: flex-end;
             justify-content: space-around;
@@ -79,7 +79,12 @@
             content: '';
             position: absolute;
             top: 5px; left: 5px; right: 5px; bottom: 5px;
-            background: repeating-linear-gradient(transparent 0px, transparent 10px, rgba(0,243,255,0.2) 10px, rgba(0,243,255,0.2) 12px);
+            background: repeating-linear-gradient(
+                transparent 0px,
+                transparent 10px,
+                rgba(0,243,255,0.2) 10px,
+                rgba(0,243,255,0.2) 12px
+            );
         }
 
         /* --- Game Interface --- */
@@ -208,7 +213,6 @@
             transition: width 0.5s;
             box-shadow: 0 0 10px #00f3ff;
         }
-
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -254,10 +258,10 @@
                 <div class="text-2xl font-bold text-white cyber-font">LEVEL <span id="q-number">1</span></div>
             </div>
             <div class="flex-grow mx-4">
-                 <div class="text-xs text-right text-pink-500 mb-1 uppercase">Năng lượng tích lũy</div>
-                 <div class="energy-bar-container">
-                     <div id="progress-bar" class="energy-bar"></div>
-                 </div>
+                <div class="text-xs text-right text-pink-500 mb-1 uppercase">Năng lượng tích lũy</div>
+                <div class="energy-bar-container">
+                    <div id="progress-bar" class="energy-bar"></div>
+                </div>
             </div>
             <div class="text-right">
                 <div class="text-xs text-cyan-600 uppercase tracking-widest">Score</div>
@@ -322,217 +326,218 @@
     <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
 
     <script>
-        // --- DATA ---
-        // 15 Questions: Math 8 Chapter 1 Lesson 1 (Monomials & Polynomials)
-        // 4 Levels: 6 NB, 5 TH, 3 VD, 1 VDC
-       const questions = [
-    // LEVEL 1: NHẬN BIẾT (6 câu)
-    {
-        q: "Biểu thức nào sau đây là <b>đơn thức</b>?",
-        a: [
-            "2x<sup>2</sup>y", 
-            "x + y", 
-            "2x - 3", 
-            "<div class='fraction'><span class='numerator'>x</span><span class='denominator'>y</span></div>"
-        ],
-        correct: 0, // A
-        rationale: "Đơn thức là biểu thức đại số chỉ gồm một số, hoặc một biến, hoặc một tích giữa các số và các biến.<br>2x<sup>2</sup>y là tích của số và biến.",
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Trong các biểu thức sau, biểu thức nào là <b>đa thức</b>?",
-        a: [
-            "<div class='fraction'><span class='numerator'>1</span><span class='denominator'>x</span></div>",
-            "x<sup>2</sup> - 2xy + y<sup>2</sup>",
-            "&radic;x",
-            "x + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>y</span></div>"
-        ],
-        correct: 1, // B
-        rationale: "Đa thức là một tổng của những đơn thức.<br>x<sup>2</sup> - 2xy + y<sup>2</sup> là tổng của các đơn thức x<sup>2</sup>, -2xy, y<sup>2</sup>.",
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Hệ số của đơn thức -5x<sup>2</sup>y<sup>3</sup> là:",
-        a: [
-            "5",
-            "3",
-            "-5",
-            "2"
-        ],
-        correct: 2, // C
-        rationale: "Hệ số là phần số của đơn thức. Ở đây là -5.",
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Bậc của đơn thức 3x<sup>2</sup>yz<sup>4</sup> là:",
-        a: [
-            "6",
-            "4",
-            "2",
-            "7"
-        ],
-        correct: 3, // D
-        rationale: "Bậc của đơn thức là tổng số mũ của các biến.<br>x<sup>2</sup> (mũ 2) + y<sup>1</sup> (mũ 1) + z<sup>4</sup> (mũ 4) = 2 + 1 + 4 = 7.",
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Đơn thức nào sau đây đồng dạng với đơn thức 3x<sup>2</sup>y?",
-        a: [
-            "-7x<sup>2</sup>y",
-            "3xy<sup>2</sup>",
-            "3x<sup>2</sup>",
-            "xy"
-        ],
-        correct: 0, // A
-        rationale: "Hai đơn thức đồng dạng là hai đơn thức có hệ số khác 0 và có <b>cùng phần biến</b>.<br>Phần biến ở đây là x<sup>2</sup>y.",
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Giá trị của đơn thức 2x tại x = -1 là:",
-        a: [
-            "1",
-            "-2",
-            "0",
-            "2"
-        ],
-        correct: 1, // B
-        rationale: "Thay x = -1 vào biểu thức: 2 . (-1) = -2.",
-        level: "NHẬN BIẾT"
-    },
+        // =============================
+        //        CÂU HỎI TRẮC NGHIỆM
+        // =============================
+        const questions = [
+            // LEVEL 1: NHẬN BIẾT (6 câu)
+            {
+                q: "Biểu thức nào sau đây là <b>đơn thức</b>?",
+                a: [
+                    "2x<sup>2</sup>y", 
+                    "x + y", 
+                    "2x - 3", 
+                    "<div class='fraction'><span class='numerator'>x</span><span class='denominator'>y</span></div>"
+                ],
+                correct: 0, // A
+                rationale: "Đơn thức là biểu thức đại số chỉ gồm một số, hoặc một biến, hoặc một tích giữa các số và các biến.<br>2x<sup>2</sup>y là tích của số và biến.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Trong các biểu thức sau, biểu thức nào là <b>đa thức</b>?",
+                a: [
+                    "<div class='fraction'><span class='numerator'>1</span><span class='denominator'>x</span></div>",
+                    "x<sup>2</sup> - 2xy + y<sup>2</sup>",
+                    "&radic;x",
+                    "x + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>y</span></div>"
+                ],
+                correct: 1, // B
+                rationale: "Đa thức là một tổng của những đơn thức.<br>x<sup>2</sup> - 2xy + y<sup>2</sup> là tổng của các đơn thức x<sup>2</sup>, -2xy, y<sup>2</sup>.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Hệ số của đơn thức -5x<sup>2</sup>y<sup>3</sup> là:",
+                a: [
+                    "5",
+                    "3",
+                    "-5",
+                    "2"
+                ],
+                correct: 2, // C
+                rationale: "Hệ số là phần số của đơn thức. Ở đây là -5.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Bậc của đơn thức 3x<sup>2</sup>yz<sup>4</sup> là:",
+                a: [
+                    "6",
+                    "4",
+                    "2",
+                    "7"
+                ],
+                correct: 3, // D
+                rationale: "Bậc của đơn thức là tổng số mũ của các biến.<br>x<sup>2</sup> (mũ 2) + y<sup>1</sup> (mũ 1) + z<sup>4</sup> (mũ 4) = 2 + 1 + 4 = 7.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Đơn thức nào sau đây đồng dạng với đơn thức 3x<sup>2</sup>y?",
+                a: [
+                    "-7x<sup>2</sup>y",
+                    "3xy<sup>2</sup>",
+                    "3x<sup>2</sup>",
+                    "xy"
+                ],
+                correct: 0, // A
+                rationale: "Hai đơn thức đồng dạng là hai đơn thức có hệ số khác 0 và có <b>cùng phần biến</b>.<br>Phần biến ở đây là x<sup>2</sup>y.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Giá trị của đơn thức 2x tại x = -1 là:",
+                a: [
+                    "1",
+                    "-2",
+                    "0",
+                    "2"
+                ],
+                correct: 1, // B
+                rationale: "Thay x = -1 vào biểu thức: 2 . (-1) = -2.",
+                level: "NHẬN BIẾT"
+            },
 
-    // LEVEL 2: THÔNG HIỂU (5 câu)
-    {
-        q: "Thu gọn đơn thức A = (2x<sup>2</sup>y) . (-3xy<sup>3</sup>) ta được:",
-        a: [
-            "6x<sup>2</sup>y<sup>3</sup>",
-            "-x<sup>3</sup>y<sup>4</sup>",
-            "-6x<sup>3</sup>y<sup>4</sup>",
-            "-6x<sup>2</sup>y<sup>3</sup>"
-        ],
-        correct: 2, // C
-        rationale: "Nhân hệ số: 2 . (-3) = -6.<br>Nhân phần biến: x<sup>2</sup>.x = x<sup>3</sup>; y.y<sup>3</sup> = y<sup>4</sup>.<br>Kết quả: -6x<sup>3</sup>y<sup>4</sup>.",
-        level: "THÔNG HIỂU"
-    },
-    {
-        q: "Tổng của hai đơn thức 3xy<sup>2</sup> và 4xy<sup>2</sup> là:",
-        a: [
-            "12xy<sup>2</sup>",
-            "7x<sup>2</sup>y<sup>4</sup>",
-            "xy<sup>2</sup>",
-            "7xy<sup>2</sup>"
-        ],
-        correct: 3, // D
-        rationale: "Cộng hệ số, giữ nguyên phần biến: (3 + 4)xy<sup>2</sup> = 7xy<sup>2</sup>.",
-        level: "THÔNG HIỂU"
-    },
-    {
-        q: "Bậc của đa thức M = x<sup>5</sup> - 2x<sup>3</sup> + x<sup>5</sup> - x<sup>5</sup> + 1 sau khi thu gọn là:",
-        a: [
-            "5",
-            "3",
-            "1",
-            "0"
-        ],
-        correct: 0, // A
-        rationale: "Thu gọn M: (x<sup>5</sup> + x<sup>5</sup> - x<sup>5</sup>) - 2x<sup>3</sup> + 1 = x<sup>5</sup> - 2x<sup>3</sup> + 1.<br>Hạng tử có bậc cao nhất là x<sup>5</sup> (bậc 5).",
-        level: "THÔNG HIỂU"
-    },
-    {
-        q: "Thu gọn đa thức P = 3x + 2y - x - 5y ta được:",
-        a: [
-            "4x + 7y",
-            "2x - 3y",
-            "2x - 7y",
-            "2x + 3y"
-        ],
-        correct: 1, // B
-        rationale: "Nhóm hạng tử đồng dạng: (3x - x) + (2y - 5y) = 2x - 3y.",
-        level: "THÔNG HIỂU"
-    },
-    {
-        q: "Hệ số của hạng tử có bậc cao nhất trong đa thức Q = -2x<sup>3</sup> + 4x - 5 là:",
-        a: [
-            "4",
-            "3",
-            "-2",
-            "-5"
-        ],
-        correct: 2, // C
-        rationale: "Hạng tử có bậc cao nhất là -2x<sup>3</sup> (bậc 3). Hệ số của nó là -2.",
-        level: "THÔNG HIỂU"
-    },
+            // LEVEL 2: THÔNG HIỂU (5 câu)
+            {
+                q: "Thu gọn đơn thức A = (2x<sup>2</sup>y) . (-3xy<sup>3</sup>) ta được:",
+                a: [
+                    "6x<sup>2</sup>y<sup>3</sup>",
+                    "-x<sup>3</sup>y<sup>4</sup>",
+                    "-6x<sup>3</sup>y<sup>4</sup>",
+                    "-6x<sup>2</sup>y<sup>3</sup>"
+                ],
+                correct: 2, // C
+                rationale: "Nhân hệ số: 2 . (-3) = -6.<br>Nhân phần biến: x<sup>2</sup>.x = x<sup>3</sup>; y.y<sup>3</sup> = y<sup>4</sup>.<br>Kết quả: -6x<sup>3</sup>y<sup>4</sup>.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Tổng của hai đơn thức 3xy<sup>2</sup> và 4xy<sup>2</sup> là:",
+                a: [
+                    "12xy<sup>2</sup>",
+                    "7x<sup>2</sup>y<sup>4</sup>",
+                    "xy<sup>2</sup>",
+                    "7xy<sup>2</sup>"
+                ],
+                correct: 3, // D
+                rationale: "Cộng hệ số, giữ nguyên phần biến: (3 + 4)xy<sup>2</sup> = 7xy<sup>2</sup>.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Bậc của đa thức M = x<sup>5</sup> - 2x<sup>3</sup> + x<sup>5</sup> - x<sup>5</sup> + 1 sau khi thu gọn là:",
+                a: [
+                    "5",
+                    "3",
+                    "1",
+                    "0"
+                ],
+                correct: 0, // A
+                rationale: "Thu gọn M: (x<sup>5</sup> + x<sup>5</sup> - x<sup>5</sup>) - 2x<sup>3</sup> + 1 = x<sup>5</sup> - 2x<sup>3</sup> + 1.<br>Hạng tử có bậc cao nhất là x<sup>5</sup> (bậc 5).",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Thu gọn đa thức P = 3x + 2y - x - 5y ta được:",
+                a: [
+                    "4x + 7y",
+                    "2x - 3y",
+                    "2x - 7y",
+                    "2x + 3y"
+                ],
+                correct: 1, // B
+                rationale: "Nhóm hạng tử đồng dạng: (3x - x) + (2y - 5y) = 2x - 3y.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Hệ số của hạng tử có bậc cao nhất trong đa thức Q = -2x<sup>3</sup> + 4x - 5 là:",
+                a: [
+                    "4",
+                    "3",
+                    "-2",
+                    "-5"
+                ],
+                correct: 2, // C
+                rationale: "Hạng tử có bậc cao nhất là -2x<sup>3</sup> (bậc 3). Hệ số của nó là -2.",
+                level: "THÔNG HIỂU"
+            },
 
-    // LEVEL 3: VẬN DỤNG (3 câu)
-    {
-        q: "Tính giá trị của đa thức A = x<sup>2</sup> - 2xy + y<sup>2</sup> tại x = 12, y = 2.",
-        a: [
-            "4",
-            "144",
-            "120",
-            "100"
-        ],
-        correct: 3, // D
-        rationale: "Cách 1: Thay số trực tiếp: 12<sup>2</sup> - 2.12.2 + 2<sup>2</sup> = 144 - 48 + 4 = 100.<br>Cách 2 (HĐT): A = (x - y)<sup>2</sup> = (12 - 2)<sup>2</sup> = 10<sup>2</sup> = 100.",
-        level: "VẬN DỤNG"
-    },
-    {
-        q: "(Thực tế) Một hình hộp chữ nhật có chiều dài 2x, chiều rộng 3y và chiều cao z. Biểu thức tính thể tích hình hộp là:",
-        a: [
-            "6xyz",
-            "5x+y+z",
-            "2x+3y+z",
-            "6(x+y+z)"
-        ],
-        correct: 0, // A
-        rationale: "Thể tích = Dài x Rộng x Cao = (2x) . (3y) . (z) = 6xyz.",
-        level: "VẬN DỤNG"
-    },
-    {
-        q: "Cho đa thức A = 5xy<sup>2</sup> + xy - xy<sup>2</sup> - <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy. Thu gọn A ta được:",
-        a: [
-            "4xy<sup>2</sup> - <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy",
-            "4xy<sup>2</sup> + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy",
-            "5xy<sup>2</sup>",
-            "6xy<sup>2</sup> + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy"
-        ],
-        correct: 1, // B
-        rationale: "Nhóm: (5xy<sup>2</sup> - xy<sup>2</sup>) + (xy - 1/2xy) = 4xy<sup>2</sup> + 1/2xy.",
-        level: "VẬN DỤNG"
-    },
+            // LEVEL 3: VẬN DỤNG (3 câu)
+            {
+                q: "Tính giá trị của đa thức A = x<sup>2</sup> - 2xy + y<sup>2</sup> tại x = 12, y = 2.",
+                a: [
+                    "4",
+                    "144",
+                    "120",
+                    "100"
+                ],
+                correct: 3, // D
+                rationale: "Cách 1: Thay số trực tiếp: 12<sup>2</sup> - 2.12.2 + 2<sup>2</sup> = 144 - 48 + 4 = 100.<br>Cách 2 (HĐT): A = (x - y)<sup>2</sup> = (12 - 2)<sup>2</sup> = 10<sup>2</sup> = 100.",
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "(Thực tế) Một hình hộp chữ nhật có chiều dài 2x, chiều rộng 3y và chiều cao z. Biểu thức tính thể tích hình hộp là:",
+                a: [
+                    "6xyz",
+                    "5x+y+z",
+                    "2x+3y+z",
+                    "6(x+y+z)"
+                ],
+                correct: 0, // A
+                rationale: "Thể tích = Dài x Rộng x Cao = (2x) . (3y) . (z) = 6xyz.",
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "Cho đa thức A = 5xy<sup>2</sup> + xy - xy<sup>2</sup> - <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy. Thu gọn A ta được:",
+                a: [
+                    "4xy<sup>2</sup> - <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy",
+                    "4xy<sup>2</sup> + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy",
+                    "5xy<sup>2</sup>",
+                    "6xy<sup>2</sup> + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy"
+                ],
+                correct: 1, // B
+                rationale: "Nhóm: (5xy<sup>2</sup> - xy<sup>2</sup>) + (xy - 1/2xy) = 4xy<sup>2</sup> + 1/2xy.",
+                level: "VẬN DỤNG"
+            },
 
-    // LEVEL 4: VẬN DỤNG CAO (1 câu)
-    {
-        q: "Tìm giá trị của m để đa thức P = mx<sup>2</sup>y - 3x<sup>2</sup>y + 5xy có bậc là 2.",
-        a: [
-            "m = 0",
-            "m &ne; 3",
-            "m = 3",
-            "m = -3"
-        ],
-        correct: 2, // C
-        rationale: "Hạng tử mx<sup>2</sup>y và -3x<sup>2</sup>y có bậc 3. Hạng tử 5xy có bậc 2.<br>Để đa thức có bậc 2, các hạng tử bậc 3 phải triệt tiêu nhau (tổng hệ số = 0).<br>m - 3 = 0 &rArr; m = 3.",
-        level: "VẬN DỤNG CAO"
-    }
-];
+            // LEVEL 4: VẬN DỤNG CAO (1 câu)
+            {
+                q: "Tìm giá trị của m để đa thức P = mx<sup>2</sup>y - 3x<sup>2</sup>y + 5xy có bậc là 2.",
+                a: [
+                    "m = 0",
+                    "m &ne; 3",
+                    "m = 3",
+                    "m = -3"
+                ],
+                correct: 2, // C
+                rationale: "Hạng tử mx<sup>2</sup>y và -3x<sup>2</sup>y có bậc 3. Hạng tử 5xy có bậc 2.<br>Để đa thức có bậc 2, các hạng tử bậc 3 phải triệt tiêu nhau (tổng hệ số = 0).<br>m - 3 = 0 &rArr; m = 3.",
+                level: "VẬN DỤNG CAO"
+            }
+        ];
 
-        // --- GAME LOGIC ---
+        // =============================
+        //        GAME LOGIC
+        // =============================
         let currentQIndex = 0;
         let score = 0;
-        
-        // Init Skyline
+
+        // Khởi tạo skyline với số tòa nhà bằng số câu hỏi
         const skyline = document.getElementById('city-skyline');
-        for(let i=0; i<questions.length; i++) {
+        for (let i = 0; i < questions.length; i++) {
             const b = document.createElement('div');
             b.className = 'building';
             b.id = `building-${i}`;
-            // Random height
             b.style.height = Math.floor(Math.random() * 100 + 50) + 'px';
             skyline.appendChild(b);
         }
 
-        // Audio Setup
+        // Audio
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
+
         function playSound(type) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
@@ -541,7 +546,7 @@
             gain.connect(audioCtx.destination);
             const now = audioCtx.currentTime;
 
-            if (type === 'construct') { // Mechanical clank
+            if (type === 'construct') {
                 osc.type = 'square';
                 osc.frequency.setValueAtTime(100, now);
                 osc.frequency.linearRampToValueAtTime(50, now + 0.1);
@@ -549,7 +554,7 @@
                 gain.gain.linearRampToValueAtTime(0, now + 0.2);
                 osc.start(now);
                 osc.stop(now + 0.2);
-            } else if (type === 'correct') { // High tech chime
+            } else if (type === 'correct') {
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(880, now); 
                 osc.frequency.exponentialRampToValueAtTime(1760, now + 0.1);
@@ -557,7 +562,7 @@
                 gain.gain.linearRampToValueAtTime(0, now + 0.5);
                 osc.start(now);
                 osc.stop(now + 0.5);
-            } else if (type === 'wrong') { // Glitch noise
+            } else if (type === 'wrong') {
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(100, now);
                 osc.frequency.linearRampToValueAtTime(50, now + 0.3);
@@ -565,7 +570,7 @@
                 gain.gain.linearRampToValueAtTime(0, now + 0.3);
                 osc.start(now);
                 osc.stop(now + 0.3);
-            } else if (type === 'win') { // Synth fanfare
+            } else if (type === 'win') {
                 [440, 554, 659, 880].forEach((f, i) => {
                     setTimeout(() => {
                         const o = audioCtx.createOscillator();
@@ -585,9 +590,10 @@
 
         function startGame() {
             document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
-            document.getElementById('game-screen').classList.add('flex');
-            
+            const gameScreen = document.getElementById('game-screen');
+            gameScreen.classList.remove('hidden');
+            gameScreen.classList.add('flex');
+
             playSound('construct');
             currentQIndex = 0;
             score = 0;
@@ -595,110 +601,84 @@
             loadQuestion();
         }
 
+        // ===== LOAD QUESTION (có random đáp án) =====
         function loadQuestion() {
-    const q = questions[currentQIndex];
+            const q = questions[currentQIndex];
 
-    document.getElementById('q-number').innerText = currentQIndex + 1;
-    document.getElementById('question-text').innerHTML = q.q;
+            document.getElementById('q-number').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerHTML = q.q;
 
-    // Level Badge Color
-    const badge = document.getElementById('level-badge');
-    badge.innerText = q.level;
-    if (q.level === "NHẬN BIẾT")
-        badge.className = "absolute top-0 left-0 bg-green-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
-    else if (q.level === "THÔNG HIỂU")
-        badge.className = "absolute top-0 left-0 bg-blue-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
-    else if (q.level === "VẬN DỤNG CAO")
-        badge.className = "absolute top-0 left-0 bg-red-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
-    else
-        badge.className = "absolute top-0 left-0 bg-purple-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
-
-    // Reset Log + ẩn nút tiếp tục
-    const logBox = document.getElementById('tech-log');
-    logBox.classList.remove('show');
-    document.getElementById('next-btn-container').classList.add('hidden');
-
-    const grid = document.getElementById('options-grid');
-    grid.innerHTML = '';
-
-    // Tạo mảng index và xáo trộn: [0,1,2,3] → random
-    const indices = q.a.map((_, idx) => idx);
-    indices.sort(() => Math.random() - 0.5);
-
-    // Tạo các nút đáp án theo thứ tự đã xáo trộn
-    indices.forEach(optIndex => {
-        const btn = document.createElement('button');
-        btn.className = "btn-cyber w-full p-4 rounded min-h-[80px]";
-        btn.innerHTML = q.a[optIndex];
-        // lưu lại "index gốc" của đáp án để check đúng/sai
-        btn.dataset.index = optIndex;
-        btn.onclick = () => handleAnswer(optIndex, q.correct, btn);
-        grid.appendChild(btn);
-    });
-}
-           
-            // Level Badge Color
+            // Badge mức độ
             const badge = document.getElementById('level-badge');
             badge.innerText = q.level;
-            if (q.level === "NHẬN BIẾT") badge.className = "absolute top-0 left-0 bg-green-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
-            else if (q.level === "THÔNG HIỂU") badge.className = "absolute top-0 left-0 bg-blue-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
-            else if (q.level === "VẬN DỤNG CAO") badge.className = "absolute top-0 left-0 bg-red-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
-            else badge.className = "absolute top-0 left-0 bg-purple-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
+            if (q.level === "NHẬN BIẾT")
+                badge.className = "absolute top-0 left-0 bg-green-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
+            else if (q.level === "THÔNG HIỂU")
+                badge.className = "absolute top-0 left-0 bg-blue-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
+            else if (q.level === "VẬN DỤNG CAO")
+                badge.className = "absolute top-0 left-0 bg-red-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
+            else
+                badge.className = "absolute top-0 left-0 bg-purple-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
 
-            // Reset Log
+            // Ẩn giải thích + nút tiếp tục
             const logBox = document.getElementById('tech-log');
             logBox.classList.remove('show');
             document.getElementById('next-btn-container').classList.add('hidden');
 
             const grid = document.getElementById('options-grid');
             grid.innerHTML = '';
-            
-            q.a.forEach((opt, idx) => {
+
+            // 🔀 Random đáp án nhưng vẫn biết đáp án đúng
+            const shuffledOptions = q.a
+                .map((text, idx) => ({
+                    text,
+                    isCorrect: idx === q.correct
+                }))
+                .sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = "btn-cyber w-full p-4 rounded min-h-[80px]";
-                btn.innerHTML = opt;
-                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                btn.innerHTML = opt.text;
+                btn.dataset.correct = opt.isCorrect ? "true" : "false";
+                btn.onclick = () => handleAnswer(opt.isCorrect, btn);
                 grid.appendChild(btn);
             });
         }
 
-       function handleAnswer(selected, correct, btn) {
-    // Chỉ khóa các nút đáp án trong options-grid
-    const btns = document.querySelectorAll('#options-grid .btn-cyber');
-    btns.forEach(b => b.disabled = true);
+        // ===== HANDLE ANSWER =====
+        function handleAnswer(isCorrect, clickedBtn) {
+            const btns = document.querySelectorAll('#options-grid button');
+            btns.forEach(b => b.disabled = true);
 
-    const q = questions[currentQIndex];
-    const logBox = document.getElementById('tech-log');
-    const content = document.getElementById('log-content');
+            const q = questions[currentQIndex];
+            const logBox = document.getElementById('tech-log');
+            const content = document.getElementById('log-content');
 
-    content.innerHTML = q.rationale;
-    logBox.classList.add('show');
+            content.innerHTML = q.rationale;
+            logBox.classList.add('show');
 
-    if (selected === correct) {
-        // ĐÚNG
-        btn.classList.add('correct');
-        score += 100;
-        playSound('correct');
-        showFeedback("🏗️");
-        fireConfetti(30);
-
-        // Xây tòa nhà tương ứng
-        document.getElementById(`building-${currentQIndex}`).classList.add('built');
-    } else {
-        // SAI: tô đỏ nút chọn, tô xanh nút đúng (dù đã random)
-        btn.classList.add('wrong');
-        btns.forEach(b => {
-            if (parseInt(b.dataset.index, 10) === correct) {
-                b.classList.add('correct');
+            if (isCorrect) {
+                clickedBtn.classList.add('correct');
+                score += 100;
+                playSound('correct');
+                showFeedback("🏗️");
+                fireConfetti(30);
+                document.getElementById(`building-${currentQIndex}`).classList.add('built');
+            } else {
+                clickedBtn.classList.add('wrong');
+                btns.forEach(b => {
+                    if (b.dataset.correct === "true") {
+                        b.classList.add('correct');
+                    }
+                });
+                playSound('wrong');
+                showFeedback("💥");
             }
-        });
-        playSound('wrong');
-        showFeedback("💥");
-    }
 
-    updateUI();
-    document.getElementById('next-btn-container').classList.remove('hidden');
-}
+            updateUI();
+            document.getElementById('next-btn-container').classList.remove('hidden');
+        }
 
         function updateUI() {
             document.getElementById('score').innerText = score;
@@ -711,7 +691,7 @@
             el.innerText = emoji;
             el.style.opacity = '1';
             el.style.transform = 'scale(1.5)';
-            
+
             setTimeout(() => {
                 el.style.opacity = '0';
                 el.style.transform = 'scale(0)';
@@ -729,15 +709,18 @@
         }
 
         function endGame() {
-            document.getElementById('game-screen').classList.remove('flex');
-            document.getElementById('game-screen').classList.add('hidden');
+            const gameScreen = document.getElementById('game-screen');
+            gameScreen.classList.remove('flex');
+            gameScreen.classList.add('hidden');
             document.getElementById('end-screen').classList.remove('hidden');
             document.getElementById('final-score').innerText = score;
             playSound('win');
             setInterval(() => fireConfetti(50), 1000);
         }
 
-        // --- CONFETTI (Neon Sparks) ---
+        // =============================
+        //            CONFETTI
+        // =============================
         const canvas = document.getElementById('confetti-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -753,21 +736,21 @@
                     vy: (Math.random() - 0.5) * 20,
                     life: 100,
                     size: Math.random() * 3 + 1,
-                    color: `hsl(${Math.random() * 60 + 160}, 100%, 50%)` // Cyan/Blue
+                    color: `hsl(${Math.random() * 60 + 160}, 100%, 50%)`
                 });
             }
-            if(particles.length <= amount) requestAnimationFrame(animateParticles);
+            if (particles.length <= amount) requestAnimationFrame(animateParticles);
         }
 
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (let i = 0; i < particles.length; i++) {
-                let p = particles[i];
+                const p = particles[i];
                 p.x += p.vx;
                 p.y += p.vy;
                 p.vy += 0.2;
                 p.life--;
-                
+
                 ctx.fillStyle = p.color;
                 ctx.fillRect(p.x, p.y, p.size, p.size);
 
@@ -783,7 +766,6 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
-
     </script>
 </body>
 </html>
