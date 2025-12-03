@@ -304,652 +304,469 @@
     <!-- Confetti Canvas -->
     <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
 
-    <script>
-        // ================== CÂU HỎI GỐC (giữ nguyên đáp án đúng) ==================
-       const questions = [
-  // ===== NHẬN BIẾT (6 câu) =====
-  {
-    id: 1,
-    level: "Nhận biết",
-    question: (
-      <span>
-        Biểu thức nào sau đây là một <b>phân thức đại số</b>?
-      </span>
-    ),
-    options: [
-      (
-        <span>
-          <span className="fraction">
-            <span className="numerator">x + 1</span>
-            <span className="denominator">0</span>
-          </span>
-        </span>
-      ),
-      (
-        <span>
-          <span className="fraction">
-            <span className="numerator">2x - 1</span>
-            <span className="denominator">x + 3</span>
-          </span>
-        </span>
-      ),
-      (
-        <span>
-          <span className="fraction">
-            <span className="numerator">√x</span>
-            <span className="denominator">2</span>
-          </span>
-          {" (với x là biến)"}
-        </span>
-      ),
-      (
-        <span>
-          <span className="fraction">
-            <span className="numerator">1</span>
-            <span className="denominator">√y</span>
-          </span>
-          {" (với y là biến)"}
-        </span>
-      )
-    ],
-    correct: 1,
-    rationale:
-      "Phân thức đại số phải có dạng A/B với A, B đều là đa thức và B khác 0. Biểu thức (2x − 1)/(x + 3) thỏa điều kiện; các biểu thức còn lại không có mẫu là đa thức khác 0."
-  },
-  {
-    id: 2,
-    level: "Nhận biết",
-    question: (
-      <span>
-        Điều kiện xác định của phân thức{" "}
-        <span className="fraction">
-          <span className="numerator">A</span>
-          <span className="denominator">B</span>
-        </span>{" "}
-        là gì?
-      </span>
-    ),
-    options: ["B ≠ 0", "A ≠ 0", "A = 0", "B = 0"],
-    correct: 0,
-    rationale: "Phân thức chỉ xác định khi mẫu thức B khác 0."
-  },
-  {
-    id: 3,
-    level: "Nhận biết",
-    question: (
-      <span>
-        Hai phân thức{" "}
-        <span className="fraction">
-          <span className="numerator">A</span>
-          <span className="denominator">B</span>
-        </span>{" "}
-        và{" "}
-        <span className="fraction">
-          <span className="numerator">C</span>
-          <span className="denominator">D</span>
-        </span>{" "}
-        bằng nhau khi:
-      </span>
-    ),
-    options: [
-      "A·C = B·D",
-      "A·B = C·D",
-      "A·D = B·C",
-      "A + D = B + C"
-    ],
-    correct: 2,
-    rationale: "Theo định nghĩa: A/B = C/D khi và chỉ khi A·D = B·C."
-  },
-  {
-    id: 4,
-    level: "Nhận biết",
-    question: "Đa thức nào dưới đây được coi là phân thức đại số?",
-    options: [
-      "Chỉ có số 0",
-      "Chỉ có số 1",
-      "Mọi đa thức đều là phân thức với mẫu bằng 1",
-      "Không đa thức nào là phân thức"
-    ],
-    correct: 2,
-    rationale: "Mỗi đa thức P luôn được coi là một phân thức P/1."
-  },
-  {
-    id: 5,
-    level: "Nhận biết",
-    question: (
-      <span>
-        Tính chất cơ bản của phân thức: Nhân cả tử và mẫu của phân thức{" "}
-        <span className="fraction">
-          <span className="numerator">A</span>
-          <span className="denominator">B</span>
-        </span>{" "}
-        với đa thức M (M ≠ 0) ta được:
-      </span>
-    ),
-    options: [
-      "Phân thức đối",
-      "Phân thức nghịch đảo",
-      "Một phân thức bằng phân thức ban đầu",
-      "Phân thức bằng 1"
-    ],
-    correct: 2,
-    rationale:
-      "Ta có A/B = (A·M)/(B·M) khi M là đa thức khác 0. Đây là tính chất cơ bản dùng để quy đồng mẫu."
-  },
-  {
-    id: 6,
-    level: "Nhận biết",
-    question: (
-      <span>
-        Tìm đa thức P sao cho{" "}
-        <span className="fraction">
-          <span className="numerator">x</span>
-          <span className="denominator">y</span>
-        </span>{" "}
-        ={" "}
-        <span className="fraction">
-          <span className="numerator">xP</span>
-          <span className="denominator">yP</span>
-        </span>
-        .
-      </span>
-    ),
-    options: [
-      "P phải là đơn thức",
-      "P tùy ý",
-      "P phải là đa thức khác 0",
-      "P phải là số nguyên"
-    ],
-    correct: 2,
-    rationale:
-      "P phải là đa thức khác 0 để phân thức mới xác định và bằng phân thức ban đầu."
-  },
+     <script>
+    // ============= DỮ LIỆU CÂU HỎI GỐC (giữ đúng đáp án) =============
+    const rawQuestions = [
+        // ===== NHẬN BIẾT (6 câu) =====
+        {
+            id: 1,
+            level: "Nhận biết",
+            q: 'Biểu thức nào sau đây là một <b>phân thức đại số</b>?',
+            a: [
+                '<span class="fraction"><span class="numerator">x + 1</span><span class="denominator">0</span></span>',
+                '<span class="fraction"><span class="numerator">2x - 1</span><span class="denominator">x + 3</span></span>',
+                '<span class="fraction"><span class="numerator">√x</span><span class="denominator">2</span></span> (với x là biến)',
+                '<span class="fraction"><span class="numerator">1</span><span class="denominator">√y</span></span> (với y là biến)'
+            ],
+            correct: 1,
+            rationale:
+                "Phân thức đại số phải có dạng A/B với A, B đều là đa thức và B khác 0. Biểu thức (2x − 1)/(x + 3) thỏa điều kiện; các biểu thức còn lại không có mẫu là đa thức khác 0."
+        },
+        {
+            id: 2,
+            level: "Nhận biết",
+            q: 'Điều kiện xác định của phân thức <span class="fraction"><span class="numerator">A</span><span class="denominator">B</span></span> là gì?',
+            a: [
+                "B ≠ 0",
+                "A ≠ 0",
+                "A = 0",
+                "B = 0"
+            ],
+            correct: 0,
+            rationale: "Phân thức chỉ xác định khi mẫu thức B khác 0."
+        },
+        {
+            id: 3,
+            level: "Nhận biết",
+            q: 'Hai phân thức <span class="fraction"><span class="numerator">A</span><span class="denominator">B</span></span> và <span class="fraction"><span class="numerator">C</span><span class="denominator">D</span></span> bằng nhau khi:',
+            a: [
+                "A·C = B·D",
+                "A·B = C·D",
+                "A·D = B·C",
+                "A + D = B + C"
+            ],
+            correct: 2,
+            rationale: "Theo định nghĩa: A/B = C/D khi và chỉ khi A·D = B·C."
+        },
+        {
+            id: 4,
+            level: "Nhận biết",
+            q: "Đa thức nào dưới đây được coi là phân thức đại số?",
+            a: [
+                "Chỉ có số 0",
+                "Chỉ có số 1",
+                "Mọi đa thức đều là phân thức với mẫu bằng 1",
+                "Không đa thức nào là phân thức"
+            ],
+            correct: 2,
+            rationale: "Mỗi đa thức P luôn được coi là một phân thức P/1."
+        },
+        {
+            id: 5,
+            level: "Nhận biết",
+            q: 'Tính chất cơ bản của phân thức: Nhân cả tử và mẫu của phân thức <span class="fraction"><span class="numerator">A</span><span class="denominator">B</span></span> với đa thức M (M ≠ 0) ta được:',
+            a: [
+                "Phân thức đối",
+                "Phân thức nghịch đảo",
+                "Một phân thức bằng phân thức ban đầu",
+                "Phân thức bằng 1"
+            ],
+            correct: 2,
+            rationale:
+                "Ta có A/B = (A·M)/(B·M) khi M là đa thức khác 0. Đây là tính chất cơ bản dùng để quy đồng mẫu."
+        },
+        {
+            id: 6,
+            level: "Nhận biết",
+            q: 'Tìm đa thức P sao cho <span class="fraction"><span class="numerator">x</span><span class="denominator">y</span></span> = <span class="fraction"><span class="numerator">xP</span><span class="denominator">yP</span></span>.',
+            a: [
+                "P phải là đơn thức",
+                "P tùy ý",
+                "P phải là đa thức khác 0",
+                "P phải là số nguyên"
+            ],
+            correct: 2,
+            rationale: "P phải là đa thức khác 0 để phân thức mới xác định và bằng phân thức ban đầu."
+        },
 
-  // ===== THÔNG HIỂU (5 câu) =====
-  {
-    id: 7,
-    level: "Thông hiểu",
-    question: (
-      <span>
-        Điều kiện xác định của phân thức{" "}
-        <span className="fraction">
-          <span className="numerator">3x − 1</span>
-          <span className="denominator">x − 2</span>
-        </span>{" "}
-        là:
-      </span>
-    ),
-    options: ["x ≠ -2", "x ≠ 1/3", "x = 2", "x ≠ 2"],
-    correct: 3,
-    rationale: "Mẫu x − 2 ≠ 0 nên x ≠ 2."
-  },
-  {
-    id: 8,
-    level: "Thông hiểu",
-    question: (
-      <span>
-        Rút gọn phân thức{" "}
-        <span className="fraction">
-          <span className="numerator">15x²y</span>
-          <span className="denominator">5xy</span>
-        </span>{" "}
-        ta được:
-      </span>
-    ),
-    options: ["3y", "3x", "5x", "3"],
-    correct: 1,
-    rationale:
-      "Chia cả tử và mẫu cho nhân tử chung 5xy: (15x²y)/(5xy) = 3x."
-  },
-  {
-    id: 9,
-    level: "Thông hiểu",
-    question: (
-      <span>
-        Giá trị của phân thức{" "}
-        <span className="fraction">
-          <span className="numerator">x − 3</span>
-          <span className="denominator">x + 3</span>
-        </span>{" "}
-        tại x = 3 là:
-      </span>
-    ),
-    options: ["1", "-1", "Không xác định", "0"],
-    correct: 3,
-    rationale: "(3 − 3)/(3 + 3) = 0/6 = 0."
-  },
-  {
-    id: 10,
-    level: "Thông hiểu",
-    question: (
-      <span>
-        Phân thức{" "}
-        <span className="fraction">
-          <span className="numerator">x² − 1</span>
-          <span className="denominator">x + 1</span>
-        </span>{" "}
-        bằng phân thức nào?
-      </span>
-    ),
-    options: ["x − 1", "x + 1", "1 − x", "(x − 1)²"],
-    correct: 0,
-    rationale:
-      "x² − 1 = (x − 1)(x + 1). Rút gọn với mẫu x + 1 ta được x − 1."
-  },
-  {
-    id: 11,
-    level: "Thông hiểu",
-    question: (
-      <span>
-        Điền vào chỗ trống:{" "}
-        <span className="fraction">
-          <span className="numerator">2x</span>
-          <span className="denominator">x − 1</span>
-        </span>{" "}
-        ={" "}
-        <span className="fraction">
-          <span className="numerator">...</span>
-          <span className="denominator">x(x − 1)</span>
-        </span>
-        .
-      </span>
-    ),
-    options: ["2x", "2x²", "2", "x"],
-    correct: 1,
-    rationale:
-      "Mẫu nhân thêm x nên tử cũng nhân thêm x: 2x · x = 2x²."
-  },
+        // ===== THÔNG HIỂU (5 câu) =====
+        {
+            id: 7,
+            level: "Thông hiểu",
+            q: 'Điều kiện xác định của phân thức <span class="fraction"><span class="numerator">3x - 1</span><span class="denominator">x - 2</span></span> là:',
+            a: [
+                "x ≠ -2",
+                "x ≠ 1/3",
+                "x = 2",
+                "x ≠ 2"
+            ],
+            correct: 3,
+            rationale: "Mẫu x - 2 ≠ 0 nên x ≠ 2."
+        },
+        {
+            id: 8,
+            level: "Thông hiểu",
+            q: 'Rút gọn phân thức <span class="fraction"><span class="numerator">15x²y</span><span class="denominator">5xy</span></span> ta được:',
+            a: [
+                "3y",
+                "3x",
+                "5x",
+                "3"
+            ],
+            correct: 1,
+            rationale: "Chia cả tử và mẫu cho nhân tử chung 5xy: (15x²y)/(5xy) = 3x."
+        },
+        {
+            id: 9,
+            level: "Thông hiểu",
+            q: 'Giá trị của phân thức <span class="fraction"><span class="numerator">x - 3</span><span class="denominator">x + 3</span></span> tại x = 3 là:',
+            a: [
+                "1",
+                "-1",
+                "Không xác định",
+                "0"
+            ],
+            correct: 3,
+            rationale: "(3 - 3)/(3 + 3) = 0/6 = 0."
+        },
+        {
+            id: 10,
+            level: "Thông hiểu",
+            q: 'Phân thức <span class="fraction"><span class="numerator">x² - 1</span><span class="denominator">x + 1</span></span> bằng phân thức nào?',
+            a: [
+                "x - 1",
+                "x + 1",
+                "1 - x",
+                "(x - 1)²"
+            ],
+            correct: 0,
+            rationale: "x² - 1 = (x - 1)(x + 1). Rút gọn với mẫu x + 1 ta được x - 1."
+        },
+        {
+            id: 11,
+            level: "Thông hiểu",
+            q: 'Điền vào chỗ trống: <span class="fraction"><span class="numerator">2x</span><span class="denominator">x - 1</span></span> = <span class="fraction"><span class="numerator">...</span><span class="denominator">x(x - 1)</span></span>.',
+            a: [
+                "2x",
+                "2x²",
+                "2",
+                "x"
+            ],
+            correct: 1,
+            rationale: "Mẫu nhân thêm x nên tử cũng nhân thêm x: 2x · x = 2x²."
+        },
 
-  // ===== VẬN DỤNG (3 câu) =====
-  {
-    id: 12,
-    level: "Vận dụng",
-    question: (
-      <span>
-        Rút gọn phân thức{" "}
-        <span className="fraction">
-          <span className="numerator">x² + 2xy + y²</span>
-          <span className="denominator">x² − y²</span>
-        </span>{" "}
-        ta được:
-      </span>
-    ),
-    options: [
-      (
-        <span>
-          <span className="fraction">
-            <span className="numerator">x + y</span>
-            <span className="denominator">x − y</span>
-          </span>
-        </span>
-      ),
-      (
-        <span>
-          <span className="fraction">
-            <span className="numerator">x − y</span>
-            <span className="denominator">x + y</span>
-          </span>
-        </span>
-      ),
-      "1",
-      (
-        <span>
-          <span className="fraction">
-            <span className="numerator">1</span>
-            <span className="denominator">x − y</span>
-          </span>
-        </span>
-      )
-    ],
-    correct: 0,
-    rationale:
-      "Tử = (x + y)², mẫu = (x − y)(x + y). Rút gọn được (x + y)/(x − y)."
-  },
-  {
-    id: 13,
-    level: "Vận dụng (Thực tế)",
-    question: (
-      <span>
-        Một ca nô đi xuôi dòng với vận tốc x (km/h) và ngược dòng với vận tốc y
-        (km/h). Quãng đường AB dài s (km). Tổng thời gian đi và về là:
-      </span>
-    ),
-    options: [
-      (
-        <span>
-          <span className="fraction">
-            <span className="numerator">s</span>
-            <span className="denominator">x + y</span>
-          </span>
-        </span>
-      ),
-      (
-        <span>
-          <span className="fraction">
-            <span className="numerator">2s</span>
-            <span className="denominator">x + y</span>
-          </span>
-        </span>
-      ),
-      (
-        <span>
-          <span className="fraction">
-            <span className="numerator">x</span>
-            <span className="denominator">s</span>
-          </span>
-          {" + "}
-          <span className="fraction">
-            <span className="numerator">y</span>
-            <span className="denominator">s</span>
-          </span>
-        </span>
-      ),
-      (
-        <span>
-          <span className="fraction">
-            <span className="numerator">s</span>
-            <span className="denominator">x</span>
-          </span>
-          {" + "}
-          <span className="fraction">
-            <span className="numerator">s</span>
-            <span className="denominator">y</span>
-          </span>
-        </span>
-      )
-    ],
-    correct: 3,
-    rationale:
-      "Thời gian đi: s/x. Thời gian về: s/y. Tổng thời gian là s/x + s/y."
-  },
-  {
-    id: 14,
-    level: "Vận dụng",
-    question: (
-      <span>
-        Tìm giá trị của x để phân thức{" "}
-        <span className="fraction">
-          <span className="numerator">3</span>
-          <span className="denominator">x² − 4x + 4</span>
-        </span>{" "}
-        xác định.
-      </span>
-    ),
-    options: ["x ≠ 2", "x ≠ -2", "x ≠ 4", "Mọi x"],
-    correct: 0,
-    rationale:
-      "Mẫu x² − 4x + 4 = (x − 2)². Phân thức xác định khi (x − 2)² ≠ 0 ⇒ x ≠ 2."
-  },
+        // ===== VẬN DỤNG (3 câu) =====
+        {
+            id: 12,
+            level: "Vận dụng",
+            q: 'Rút gọn phân thức <span class="fraction"><span class="numerator">x² + 2xy + y²</span><span class="denominator">x² - y²</span></span> ta được:',
+            a: [
+                '<span class="fraction"><span class="numerator">x + y</span><span class="denominator">x - y</span></span>',
+                '<span class="fraction"><span class="numerator">x - y</span><span class="denominator">x + y</span></span>',
+                "1",
+                '<span class="fraction"><span class="numerator">1</span><span class="denominator">x - y</span></span>'
+            ],
+            correct: 0,
+            rationale: "Tử = (x + y)², mẫu = (x - y)(x + y). Rút gọn được (x + y)/(x - y)."
+        },
+        {
+            id: 13,
+            level: "Vận dụng (Thực tế)",
+            q: "Một ca nô đi xuôi dòng với vận tốc x (km/h) và ngược dòng với vận tốc y (km/h). Quãng đường AB dài s (km). Tổng thời gian đi và về là:",
+            a: [
+                '<span class="fraction"><span class="numerator">s</span><span class="denominator">x + y</span></span>',
+                '<span class="fraction"><span class="numerator">2s</span><span class="denominator">x + y</span></span>',
+                '<span class="fraction"><span class="numerator">x</span><span class="denominator">s</span></span> + <span class="fraction"><span class="numerator">y</span><span class="denominator">s</span></span>',
+                '<span class="fraction"><span class="numerator">s</span><span class="denominator">x</span></span> + <span class="fraction"><span class="numerator">s</span><span class="denominator">y</span></span>'
+            ],
+            correct: 3,
+            rationale: "Thời gian đi: s/x. Thời gian về: s/y. Tổng thời gian là s/x + s/y."
+        },
+        {
+            id: 14,
+            level: "Vận dụng",
+            q: 'Tìm giá trị của x để phân thức <span class="fraction"><span class="numerator">3</span><span class="denominator">x² - 4x + 4</span></span> xác định.',
+            a: [
+                "x ≠ 2",
+                "x ≠ -2",
+                "x ≠ 4",
+                "Mọi x"
+            ],
+            correct: 0,
+            rationale: "Mẫu x² - 4x + 4 = (x - 2)². Phân thức xác định khi (x - 2)² ≠ 0 ⇒ x ≠ 2."
+        },
 
-  // ===== VẬN DỤNG CAO (1 câu) =====
-  {
-    id: 15,
-    level: "Vận dụng cao",
-    question: (
-      <span>
-        Tìm các giá trị nguyên của x để phân thức{" "}
-        <span className="fraction">
-          <span className="numerator">2x + 1</span>
-          <span className="denominator">x − 1</span>
-        </span>{" "}
-        nhận giá trị nguyên.
-      </span>
-    ),
-    options: [
-      "x ∈ {0; 2; 4}",
-      "x ∈ {-2; 0; 2; 4}",
-      "x ∈ {0; 2}",
-      "x ∈ {-1; 1}"
-    ],
-    correct: 1,
-    rationale:
-      "Ta tách: (2x + 1)/(x − 1) = 2 + 3/(x − 1). Để giá trị là số nguyên, (x − 1) phải là ước của 3 ⇒ x ∈ {-2, 0, 2, 4}."
-  }
-];
-
-        // ======= RANDOM THỨ TỰ ĐÁP ÁN NHƯNG GIỮ ĐÚNG/Sai =======
-        function shuffleArray(arr) {
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
+        // ===== VẬN DỤNG CAO (1 câu) =====
+        {
+            id: 15,
+            level: "Vận dụng cao",
+            q: 'Tìm các giá trị nguyên của x để phân thức <span class="fraction"><span class="numerator">2x + 1</span><span class="denominator">x - 1</span></span> nhận giá trị nguyên.',
+            a: [
+                "x ∈ {0; 2; 4}",
+                "x ∈ {-2; 0; 2; 4}",
+                "x ∈ {0; 2}",
+                "x ∈ {-1; 1}"
+            ],
+            correct: 1,
+            rationale:
+                "Ta tách: (2x + 1)/(x - 1) = 2 + 3/(x - 1). Để giá trị là số nguyên, (x - 1) phải là ước của 3 ⇒ x ∈ {-2, 0, 2, 4}."
         }
+    ];
 
-        const questions = rawQuestions.map(q => {
-            const indices = [0,1,2,3];
-            shuffleArray(indices);
-            const options = indices.map(i => ({
-                text: q.a[i],
-                isCorrect: i === q.correct
-            }));
-            return { ...q, options };
-        });
-
-        // ======= GAME LOGIC =======
-        let currentQIndex = 0;
-        let score = 0;
-
-        const skyline = document.getElementById('city-skyline');
-        for (let i = 0; i < questions.length; i++) {
-            const b = document.createElement('div');
-            b.className = 'building';
-            b.id = `building-${i}`;
-            b.style.height = (Math.random() * 100 + 50) + 'px';
-            skyline.appendChild(b);
+    // ============= RANDOM THỨ TỰ ĐÁP ÁN =============
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
         }
+    }
 
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const questions = rawQuestions.map(q => {
+        const indices = [0, 1, 2, 3];
+        shuffleArray(indices);
+        const options = indices.map(i => ({
+            text: q.a[i],
+            isCorrect: i === q.correct
+        }));
+        return { ...q, options };
+    });
 
-        function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
+    // ============= GAME LOGIC =============
+    let currentQIndex = 0;
+    let score = 0;
 
-            if (type === 'construct') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(100, now);
-                osc.frequency.linearRampToValueAtTime(50, now + 0.1);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.2);
-                osc.start(now);
-                osc.stop(now + 0.2);
-            } else if (type === 'correct') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, now);
-                osc.frequency.exponentialRampToValueAtTime(1760, now + 0.1);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.5);
-                osc.start(now);
-                osc.stop(now + 0.5);
-            } else if (type === 'wrong') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(100, now);
-                osc.frequency.linearRampToValueAtTime(50, now + 0.3);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.3);
-                osc.start(now);
-                osc.stop(now + 0.3);
-            } else if (type === 'win') {
-                [440, 554, 659, 880].forEach((f, i) => {
-                    setTimeout(() => {
-                        const o = audioCtx.createOscillator();
-                        const g = audioCtx.createGain();
-                        o.connect(g);
-                        g.connect(audioCtx.destination);
-                        o.type = 'triangle';
-                        o.frequency.value = f;
-                        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-                        o.start();
-                        o.stop(audioCtx.currentTime + 0.5);
-                    }, i * 150);
-                });
-            }
-        }
+    // Khởi tạo skyline
+    const skyline = document.getElementById('city-skyline');
+    for (let i = 0; i < questions.length; i++) {
+        const b = document.createElement('div');
+        b.className = 'building';
+        b.id = `building-${i}`;
+        b.style.height = (Math.random() * 100 + 50) + 'px';
+        skyline.appendChild(b);
+    }
 
-        function startGame() {
-            document.getElementById('start-screen').classList.add('hidden');
-            const gameScreen = document.getElementById('game-screen');
-            gameScreen.classList.remove('hidden');
-            gameScreen.classList.add('flex');
+    // Âm thanh
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-            playSound('construct');
-            currentQIndex = 0;
-            score = 0;
-            updateUI();
-            loadQuestion();
-        }
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
 
-        function loadQuestion() {
-            const q = questions[currentQIndex];
-
-            document.getElementById('q-number').innerText = currentQIndex + 1;
-            document.getElementById('question-text').innerHTML = q.q;
-
-            const badge = document.getElementById('level-badge');
-            badge.innerText = q.level;
-            if (q.level === "NHẬN BIẾT") badge.className = "absolute top-0 left-0 bg-green-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
-            else if (q.level === "THÔNG HIỂU") badge.className = "absolute top-0 left-0 bg-blue-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
-            else if (q.level === "VẬN DỤNG CAO") badge.className = "absolute top-0 left-0 bg-red-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
-            else badge.className = "absolute top-0 left-0 bg-purple-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
-
-            const logBox = document.getElementById('tech-log');
-            logBox.classList.remove('show');
-            document.getElementById('next-btn-container').classList.add('hidden');
-
-            const grid = document.getElementById('options-grid');
-            grid.innerHTML = '';
-
-            q.options.forEach((optObj, idx) => {
-                const btn = document.createElement('button');
-                btn.className = "btn-cyber w-full p-4 rounded min-h-[80px]";
-                btn.innerHTML = optObj.text;
-                btn.onclick = () => handleAnswer(optObj.isCorrect, btn);
-                grid.appendChild(btn);
+        if (type === 'construct') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.linearRampToValueAtTime(50, now + 0.1);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+        } else if (type === 'correct') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, now);
+            osc.frequency.exponentialRampToValueAtTime(1760, now + 0.1);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.5);
+            osc.start(now);
+            osc.stop(now + 0.5);
+        } else if (type === 'wrong') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.linearRampToValueAtTime(50, now + 0.3);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'win') {
+            [440, 554, 659, 880].forEach((f, i) => {
+                setTimeout(() => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.type = 'triangle';
+                    o.frequency.value = f;
+                    g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                    o.start();
+                    o.stop(audioCtx.currentTime + 0.5);
+                }, i * 150);
             });
         }
+    }
 
-        function handleAnswer(isCorrect, btn) {
-            const btns = document.querySelectorAll('#options-grid .btn-cyber');
-            btns.forEach(b => b.disabled = true);
+    function startGame() {
+        document.getElementById('start-screen').classList.add('hidden');
+        const gameScreen = document.getElementById('game-screen');
+        gameScreen.classList.remove('hidden');
+        gameScreen.classList.add('flex');
 
-            const q = questions[currentQIndex];
-            const logBox = document.getElementById('tech-log');
-            const content = document.getElementById('log-content');
+        playSound('construct');
+        currentQIndex = 0;
+        score = 0;
+        updateUI();
+        loadQuestion();
+    }
 
-            content.innerHTML = q.rationale;
-            logBox.classList.add('show');
+    function loadQuestion() {
+        const q = questions[currentQIndex];
 
-            if (isCorrect) {
-                btn.classList.add('correct');
-                score += 100;
-                playSound('correct');
-                showFeedback("🏗️");
-                fireConfetti(30);
-                document.getElementById(`building-${currentQIndex}`).classList.add('built');
-            } else {
-                btn.classList.add('wrong');
-                const correctBtn = Array.from(btns).find((b, i) => q.options[i].isCorrect);
-                if (correctBtn) correctBtn.classList.add('correct');
-                playSound('wrong');
-                showFeedback("💥");
+        document.getElementById('q-number').innerText = currentQIndex + 1;
+        document.getElementById('question-text').innerHTML = q.q;
+
+        const badge = document.getElementById('level-badge');
+        badge.innerText = q.level.toUpperCase();
+        const lv = q.level.toUpperCase();
+        if (lv.includes("NHẬN")) {
+            badge.className = "absolute top-0 left-0 bg-green-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
+        } else if (lv.includes("THÔNG")) {
+            badge.className = "absolute top-0 left-0 bg-blue-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
+        } else if (lv.includes("VẬN DỤNG CAO")) {
+            badge.className = "absolute top-0 left-0 bg-red-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
+        } else {
+            badge.className = "absolute top-0 left-0 bg-purple-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
+        }
+
+        const logBox = document.getElementById('tech-log');
+        logBox.classList.remove('show');
+        document.getElementById('next-btn-container').classList.add('hidden');
+
+        const grid = document.getElementById('options-grid');
+        grid.innerHTML = '';
+
+        q.options.forEach((optObj, idx) => {
+            const btn = document.createElement('button');
+            btn.className = "btn-cyber w-full p-4 rounded min-h-[80px]";
+            btn.innerHTML = optObj.text;
+            btn.onclick = () => handleAnswer(optObj.isCorrect, btn);
+            grid.appendChild(btn);
+        });
+    }
+
+    function handleAnswer(isCorrect, btn) {
+        const btns = document.querySelectorAll('#options-grid .btn-cyber');
+        btns.forEach(b => b.disabled = true);
+
+        const q = questions[currentQIndex];
+        const logBox = document.getElementById('tech-log');
+        const content = document.getElementById('log-content');
+
+        content.innerHTML = q.rationale;
+        logBox.classList.add('show');
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            score += 100;
+            playSound('correct');
+            showFeedback("🏗️");
+            fireConfetti(30);
+            document.getElementById(`building-${currentQIndex}`).classList.add('built');
+        } else {
+            btn.classList.add('wrong');
+            const correctBtn = Array.from(btns).find((b, i) => q.options[i].isCorrect);
+            if (correctBtn) correctBtn.classList.add('correct');
+            playSound('wrong');
+            showFeedback("💥");
+        }
+
+        updateUI();
+        document.getElementById('next-btn-container').classList.remove('hidden');
+    }
+
+    function updateUI() {
+        document.getElementById('score').innerText = score;
+        const progress = ((currentQIndex + 1) / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = `${progress}%`;
+    }
+
+    function showFeedback(emoji) {
+        const el = document.getElementById('feedback-emoji');
+        el.innerText = emoji;
+        el.style.opacity = '1';
+        el.style.transform = 'scale(1.5)';
+
+        setTimeout(() => {
+            el.style.opacity = '0';
+            el.style.transform = 'scale(0)';
+        }, 800);
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        if (currentQIndex < questions.length) {
+            playSound('construct');
+            loadQuestion();
+        } else {
+            endGame();
+        }
+    }
+
+    // Gắn sự kiện cho nút "TIẾP TỤC XỬ LÝ"
+    const nextBtnEl = document.getElementById("next-btn");
+    if (nextBtnEl) {
+        nextBtnEl.addEventListener("click", nextQuestion);
+    }
+
+    function endGame() {
+        const gameScreen = document.getElementById('game-screen');
+        gameScreen.classList.remove('flex');
+        gameScreen.classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+        document.getElementById('final-score').innerText = score;
+        playSound('win');
+        setInterval(() => fireConfetti(50), 1000);
+    }
+
+    // ============= CONFETTI =============
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let particles = [];
+
+    function fireConfetti(amount) {
+        for (let i = 0; i < amount; i++) {
+            particles.push({
+                x: window.innerWidth / 2,
+                y: window.innerHeight / 2,
+                vx: (Math.random() - 0.5) * 20,
+                vy: (Math.random() - 0.5) * 20,
+                life: 100,
+                size: Math.random() * 3 + 1,
+                color: `hsl(${Math.random() * 60 + 160}, 100%, 50%)`
+            });
+        }
+        if (particles.length <= amount) requestAnimationFrame(animateParticles);
+    }
+
+    function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+            let p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.2;
+            p.life--;
+
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, p.size, p.size);
+
+            if (p.life <= 0) {
+                particles.splice(i, 1);
+                i--;
             }
-
-            updateUI();
-            document.getElementById('next-btn-container').classList.remove('hidden');
         }
+        if (particles.length > 0) requestAnimationFrame(animateParticles);
+    }
 
-        function updateUI() {
-            document.getElementById('score').innerText = score;
-            const progress = ((currentQIndex + 1) / questions.length) * 100;
-            document.getElementById('progress-bar').style.width = `${progress}%`;
-        }
-
-        function showFeedback(emoji) {
-            const el = document.getElementById('feedback-emoji');
-            el.innerText = emoji;
-            el.style.opacity = '1';
-            el.style.transform = 'scale(1.5)';
-
-            setTimeout(() => {
-                el.style.opacity = '0';
-                el.style.transform = 'scale(0)';
-            }, 800);
-        }
-
-        function nextQuestion() {
-            currentQIndex++;
-            if (currentQIndex < questions.length) {
-                playSound('construct');
-                loadQuestion();
-            } else {
-                endGame();
-            }
-        }
-// Gắn sự kiện click cho nút "TIẾP TỤC XỬ LÝ"
-const nextBtnEl = document.getElementById("next-btn");
-if (nextBtnEl) {
-    nextBtnEl.addEventListener("click", nextQuestion);
-}
-        function endGame() {
-            const gameScreen = document.getElementById('game-screen');
-            gameScreen.classList.remove('flex');
-            gameScreen.classList.add('hidden');
-            document.getElementById('end-screen').classList.remove('hidden');
-            document.getElementById('final-score').innerText = score;
-            playSound('win');
-            setInterval(() => fireConfetti(50), 1000);
-        }
-
-        // Confetti
-        const canvas = document.getElementById('confetti-canvas');
-        const ctx = canvas.getContext('2d');
+    window.addEventListener('resize', () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        let particles = [];
-
-        function fireConfetti(amount) {
-            for (let i = 0; i < amount; i++) {
-                particles.push({
-                    x: window.innerWidth / 2,
-                    y: window.innerHeight / 2,
-                    vx: (Math.random() - 0.5) * 20,
-                    vy: (Math.random() - 0.5) * 20,
-                    life: 100,
-                    size: Math.random() * 3 + 1,
-                    color: `hsl(${Math.random() * 60 + 160}, 100%, 50%)`
-                });
-            }
-            if (particles.length <= amount) requestAnimationFrame(animateParticles);
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particles.length; i++) {
-                let p = particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += 0.2;
-                p.life--;
-
-                ctx.fillStyle = p.color;
-                ctx.fillRect(p.x, p.y, p.size, p.size);
-
-                if (p.life <= 0) {
-                    particles.splice(i, 1);
-                    i--;
-                }
-            }
-            if (particles.length > 0) requestAnimationFrame(animateParticles);
-        }
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-    </script>
+    });
+</script>
 </body>
 </html>
