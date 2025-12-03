@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thành Phố Tương Lai - Bài 5: Phân thức đại số</title>
+    <title>Thành Phố Tương Lai – Bài 5: Phân thức đại số</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600&display=swap');
@@ -33,7 +33,7 @@
         .grid-lines {
             position: absolute;
             bottom: 0; left: 0; width: 100%; height: 50%;
-            background: 
+            background:
                 linear-gradient(transparent 95%, rgba(0, 243, 255, 0.3) 95%),
                 linear-gradient(90deg, transparent 95%, rgba(0, 243, 255, 0.3) 95%);
             background-size: 40px 40px;
@@ -46,7 +46,6 @@
             to { background-position: 0 400px; }
         }
 
-        /* --- Buildings --- */
         .skyline {
             position: absolute;
             bottom: 100px;
@@ -68,7 +67,7 @@
             position: relative;
             transform: translateY(100%);
             transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0.9;
+            opacity: 0.8;
         }
 
         .building.built {
@@ -79,20 +78,41 @@
             content: '';
             position: absolute;
             top: 5px; left: 5px; right: 5px; bottom: 5px;
-            background: repeating-linear-gradient(transparent 0px, transparent 10px, rgba(0,243,255,0.2) 10px, rgba(0,243,255,0.2) 12px);
+            background: repeating-linear-gradient(
+                transparent 0px,
+                transparent 10px,
+                rgba(0,243,255,0.2) 10px,
+                rgba(0,243,255,0.2) 12px
+            );
         }
 
-        /* --- Game Interface --- */
         .holo-panel {
-            background: rgba(5, 10, 30, 0.9);
+            background: rgba(5, 10, 30, 0.85);
             border: 2px solid #00f3ff;
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2), inset 0 0 30px rgba(0, 243, 255, 0.1);
-            backdrop-filter: blur(8px);
+            box-shadow:
+                0 0 20px rgba(0, 243, 255, 0.2),
+                inset 0 0 30px rgba(0, 243, 255, 0.1);
+            backdrop-filter: blur(5px);
             border-radius: 15px;
             position: relative;
         }
 
-        /* --- Buttons --- */
+        .holo-panel::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, transparent, rgba(0,243,255,0.5), transparent);
+            z-index: -1;
+            border-radius: 15px;
+            animation: borderGlow 3s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
         .btn-cyber {
             background: linear-gradient(90deg, rgba(0,243,255,0.1), rgba(0,243,255,0.2));
             border: 1px solid #00f3ff;
@@ -129,7 +149,6 @@
             animation: glitch 0.3s;
         }
 
-        /* --- Explanation Box --- */
         #tech-log {
             background: rgba(0, 20, 40, 0.95);
             border-left: 4px solid #ff00ff;
@@ -142,19 +161,13 @@
         }
 
         #tech-log.show {
-            max-height: 500px;
+            max-height: 400px;
             opacity: 1;
             margin-top: 1rem;
             padding: 1rem;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
 
-        /* --- Math Display --- */
-        .math-text {
-            font-family: 'Times New Roman', serif;
-            font-style: italic;
-            font-size: 1.1em;
-        }
         .fraction {
             display: inline-block;
             text-align: center;
@@ -166,7 +179,6 @@
         .fraction span.numerator { border-bottom: 1px solid currentColor; }
         .fraction span.denominator { border-top: 1px solid transparent; }
 
-        /* --- Animations --- */
         @keyframes glitch {
             0% { transform: translate(0) }
             20% { transform: translate(-2px, 2px) }
@@ -176,7 +188,6 @@
             100% { transform: translate(0) }
         }
 
-        /* --- Progress Bar --- */
         .energy-bar-container {
             width: 100%;
             height: 10px;
@@ -192,56 +203,47 @@
             transition: width 0.5s;
             box-shadow: 0 0 10px #00f3ff;
         }
-
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
 
     <div id="city-bg">
         <div class="grid-lines"></div>
-        <div class="skyline" id="city-skyline">
-            <!-- Buildings injected here -->
-        </div>
+        <div class="skyline" id="city-skyline"></div>
     </div>
 
     <!-- Start Screen -->
     <div id="start-screen" class="holo-panel p-10 text-center max-w-2xl w-full z-10">
         <h1 class="cyber-font text-5xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 mb-4 drop-shadow-[0_0_10px_rgba(0,243,255,0.8)]">
-            THÀNH PHỐ<br>TƯƠNG LAI
+            THÀNH PHỐ<br> TƯƠNG LAI
         </h1>
-        <h2 class="text-2xl text-pink-400 mb-6 font-bold tracking-widest uppercase">Mạng Lưới Thông Tin</h2>
-        
-        <div class="text-left bg-black/40 p-6 rounded-lg mb-8 border border-cyan-900/50 text-lg">
-            <p class="mb-3 text-cyan-100"><span class="text-xl">🏙️</span> <b>Nhiệm vụ:</b> Tối ưu hóa 15 máy chủ dữ liệu cho CyberCity.</p>
-            <p class="mb-3 text-cyan-100"><span class="text-xl">🧩</span> <b>Chủ đề:</b> Phân thức đại số (Định nghĩa, Tính chất, Rút gọn).</p>
-            <p class="text-cyan-100"><span class="text-xl">⚠️</span> <b>Yêu cầu:</b> Xác định đúng điều kiện để hệ thống vận hành.</p>
-        </div>
+        <h2 class="text-2xl text-pink-400 mb-6 font-bold tracking-widest uppercase">
+            Bài 5: Phân thức đại số
+        </h2>
 
-        <div class="grid grid-cols-2 gap-4 mb-8 text-sm font-bold text-gray-400">
-            <div><span class="text-green-400">■</span> 6 Nhận Biết</div>
-            <div><span class="text-blue-400">■</span> 5 Thông Hiểu</div>
-            <div><span class="text-purple-400">■</span> 3 Vận Dụng</div>
-            <div><span class="text-red-400">■</span> 1 Vận Dụng Cao</div>
+        <div class="text-left bg-black/40 p-6 rounded-lg mb-8 border border-cyan-900/50 text-lg">
+            <p class="mb-3 text-cyan-100"><span class="text-xl">🏙️</span> <b>Nhiệm vụ:</b> Luyện phân thức đại số: điều kiện xác định, tính chất, rút gọn.</p>
+            <p class="mb-3 text-cyan-100"><span class="text-xl">🧩</span> <b>Chủ đề:</b> Phân thức đại số – Toán 8 Bài 5.</p>
+            <p class="text-cyan-100"><span class="text-xl">⚠️</span> <b>Yêu cầu:</b> Chọn đúng để xây thêm tầng cho các tòa tháp năng lượng.</p>
         </div>
 
         <button onclick="startGame()" class="btn-cyber px-12 py-4 w-full md:w-auto text-2xl">
-            TRUY CẬP HỆ THỐNG 🚀
+            KHỞI ĐỘNG HỆ THỐNG 🚀
         </button>
     </div>
 
     <!-- Game Screen -->
     <div id="game-screen" class="hidden w-full max-w-4xl z-10 flex-col h-full justify-center">
-        <!-- Header -->
         <div class="flex justify-between items-end mb-4 px-2">
             <div>
-                <div class="text-xs text-cyan-600 uppercase tracking-widest">Server Status</div>
+                <div class="text-xs text-cyan-600 uppercase tracking-widest">Project Status</div>
                 <div class="text-2xl font-bold text-white cyber-font">LEVEL <span id="q-number">1</span></div>
             </div>
             <div class="flex-grow mx-4">
-                 <div class="text-xs text-right text-pink-500 mb-1 uppercase">Dữ liệu tải lên</div>
-                 <div class="energy-bar-container">
-                     <div id="progress-bar" class="energy-bar"></div>
-                 </div>
+                <div class="text-xs text-right text-pink-500 mb-1 uppercase">Năng lượng tích lũy</div>
+                <div class="energy-bar-container">
+                    <div id="progress-bar" class="energy-bar"></div>
+                </div>
             </div>
             <div class="text-right">
                 <div class="text-xs text-cyan-600 uppercase tracking-widest">Score</div>
@@ -252,27 +254,26 @@
         <!-- Question Panel -->
         <div class="holo-panel p-8 mb-4 relative min-h-[180px] flex flex-col justify-center items-center text-center">
             <div id="level-badge" class="absolute top-0 left-0 bg-cyan-900 text-cyan-100 px-4 py-1 text-xs font-bold rounded-br-lg">NHẬN BIẾT</div>
-            
             <div id="question-text" class="text-2xl md:text-3xl font-bold text-white leading-relaxed drop-shadow-md mt-4">
-                Connecting to server...
+                Loading architectural data...
             </div>
         </div>
 
-        <!-- Explanation (Tech Log) -->
+        <!-- Explanation -->
         <div id="tech-log" class="rounded shadow-lg">
-            <div class="text-pink-500 font-bold mb-2 border-b border-pink-900 pb-1 cyber-font tracking-wide">💾 DỮ LIỆU KỸ THUẬT:</div>
+            <div class="text-pink-500 font-bold mb-2 border-b border-pink-900 pb-1 cyber-font tracking-wide">
+                💾 DỮ LIỆU KỸ THUẬT:
+            </div>
             <div id="log-content" class="text-cyan-100 leading-relaxed text-lg"></div>
         </div>
 
-        <!-- Options Grid -->
-        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <!-- Buttons injected here -->
-        </div>
+        <!-- Options -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"></div>
 
-        <!-- Next Button -->
+        <!-- Next button -->
         <div id="next-btn-container" class="hidden text-center pb-4">
             <button onclick="nextQuestion()" class="btn-cyber px-10 py-3 text-xl bg-blue-900/50">
-                TIẾP TỤC XỬ LÝ &rarr;
+                TIẾP TỤC XÂY DỰNG →
             </button>
         </div>
     </div>
@@ -280,20 +281,18 @@
     <!-- End Screen -->
     <div id="end-screen" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/95">
         <div class="holo-panel p-12 text-center max-w-2xl w-full mx-4 border-pink-500">
-            <div class="text-7xl mb-4 animate-pulse">💾</div>
-            <h2 class="cyber-font text-5xl text-cyan-400 mb-4">DỮ LIỆU ĐỒNG BỘ!</h2>
-            <p class="text-xl text-white mb-8">Mạng lưới thông tin đã hoạt động ổn định.</p>
-            
+            <div class="text-7xl mb-4 animate-pulse">🌆</div>
+            <h2 class="cyber-font text-5xl text-cyan-400 mb-4">THÀNH PHỐ HOÀN THÀNH!</h2>
+            <p class="text-xl text-white mb-8">Bạn đã làm chủ phân thức đại số. CyberCity đã an toàn!</p>
+
             <div class="bg-cyan-900/30 p-6 rounded border border-cyan-500 inline-block mb-8 w-full">
                 <div class="text-sm text-cyan-300 uppercase mb-2 tracking-widest">Tổng Điểm</div>
                 <div class="text-7xl font-bold text-white cyber-font" id="final-score">0</div>
             </div>
 
-            <div>
-                <button onclick="location.reload()" class="btn-cyber px-10 py-4 text-xl w-full">
-                    KHỞI ĐỘNG LẠI
-                </button>
-            </div>
+            <button onclick="location.reload()" class="btn-cyber px-10 py-4 text-xl w-full">
+                XÂY DỰNG LẠI
+            </button>
         </div>
     </div>
 
@@ -306,161 +305,189 @@
     <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
 
     <script>
-        // --- DATA ---
-        // 15 Questions: Math 8 Chapter 1 Lesson 5 (Algebraic Fractions)
-        // 4 Levels: 6 NB, 5 TH, 3 VD, 1 VDC
-       const questions = [
-    // LEVEL 1: NHẬN BIẾT (6 câu)
-    {
-        q: "Trong các biểu thức sau, biểu thức nào là <b>phân thức đại số</b>?",
-        a: [
-            "&radic;x",
-            "<div class='fraction'><span class='numerator'>1</span><span class='denominator'>&radic;x</span></div>",
-            "<div class='fraction'><span class='numerator'>2x + 1</span><span class='denominator'>x - 3</span></div>", // ĐÚNG
-            "x + &radic;y"
-        ],
-        correct: 2,
-        rationale: "Phân thức đại số là A/B với A,B là đa thức và B ≠ 0.<br>2x + 1 và x - 3 là đa thức.",
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Điều kiện xác định của phân thức <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> là:",
-        a: ["A ≠ 0", "A = 0", "B ≠ 0", "B = 0"],
-        correct: 2,
-        rationale: "Điều kiện xác định: mẫu thức B phải khác 0.",
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Tử thức của phân thức <div class='fraction'><span class='numerator'>3x</span><span class='denominator'>y - 1</span></div> là:",
-        a: ["3x", "3", "x", "y - 1"],
-        correct: 0,
-        rationale: "Tử thức là đa thức nằm trên dấu gạch ngang.",
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Hai phân thức <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> và <div class='fraction'><span class='numerator'>C</span><span class='denominator'>D</span></div> bằng nhau khi:",
-        a: ["A·B = C·D", "A + D = B + C", "A·D = B·C", "A·C = B·D"],
-        correct: 2,
-        rationale: "Định nghĩa hai phân thức bằng nhau: tích chéo A·D = B·C.",
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Đa thức A bất kỳ có thể coi là phân thức với mẫu thức bằng:",
-        a: ["A", "-1", "1", "0"],
-        correct: 2,
-        rationale: "A = A/1 nên mẫu là 1.",
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Tính chất cơ bản của phân thức: <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> = <div class='fraction'><span class='numerator'>A·M</span><span class='denominator'>B·M</span></div> với M là:",
-        a: ["Số nguyên", "Đa thức bất kỳ", "Đa thức khác 0", "Số 0"],
-        correct: 2,
-        rationale: "Nhân cả tử và mẫu cho cùng đa thức M ≠ 0.",
-        level: "NHẬN BIẾT"
-    },
+        // ================== CÂU HỎI GỐC (giữ nguyên đáp án đúng) ==================
+        const rawQuestions = [
+            // 6 Nhận biết, 5 TH, 3 VD, 1 VDC – như cô đã dùng trong Bài 5
+            {
+                q: "Biểu thức nào sau đây là <b>đơn thức</b>?",
+                a: [
+                    "2x<sup>2</sup>y",
+                    "x + y",
+                    "2x - 3",
+                    "<div class='fraction'><span class='numerator'>x</span><span class='denominator'>y</span></div>"
+                ],
+                correct: 0,
+                rationale: "Đơn thức là biểu thức đại số chỉ gồm một số, hoặc một biến, hoặc một tích giữa các số và các biến.<br>2x<sup>2</sup>y là tích của số và biến.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Trong các biểu thức sau, biểu thức nào là <b>đa thức</b>?",
+                a: [
+                    "<div class='fraction'><span class='numerator'>1</span><span class='denominator'>x</span></div>",
+                    "x<sup>2</sup> - 2xy + y<sup>2</sup>",
+                    "&radic;x",
+                    "x + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>y</span></div>"
+                ],
+                correct: 1,
+                rationale: "Đa thức là một tổng của những đơn thức.<br>x<sup>2</sup> - 2xy + y<sup>2</sup> là tổng của các đơn thức x<sup>2</sup>, -2xy, y<sup>2</sup>.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Hệ số của đơn thức -5x<sup>2</sup>y<sup>3</sup> là:",
+                a: ["5","3","-5","2"],
+                correct: 2,
+                rationale: "Hệ số là phần số của đơn thức. Ở đây là -5.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Bậc của đơn thức 3x<sup>2</sup>yz<sup>4</sup> là:",
+                a: ["6","4","2","7"],
+                correct: 3,
+                rationale: "Bậc của đơn thức là tổng số mũ của các biến.<br>x<sup>2</sup> (mũ 2) + y<sup>1</sup> (mũ 1) + z<sup>4</sup> (mũ 4) = 2 + 1 + 4 = 7.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Đơn thức nào sau đây đồng dạng với đơn thức 3x<sup>2</sup>y?",
+                a: [
+                    "-7x<sup>2</sup>y",
+                    "3xy<sup>2</sup>",
+                    "3x<sup>2</sup>",
+                    "xy"
+                ],
+                correct: 0,
+                rationale: "Hai đơn thức đồng dạng là hai đơn thức có hệ số khác 0 và có <b>cùng phần biến</b>.<br>Phần biến ở đây là x<sup>2</sup>y.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Giá trị của đơn thức 2x tại x = -1 là:",
+                a: ["1","-2","0","2"],
+                correct: 1,
+                rationale: "Thay x = -1 vào biểu thức: 2 . (-1) = -2.",
+                level: "NHẬN BIẾT"
+            },
+            {
+                q: "Thu gọn đơn thức A = (2x<sup>2</sup>y) . (-3xy<sup>3</sup>) ta được:",
+                a: [
+                    "6x<sup>2</sup>y<sup>3</sup>",
+                    "-x<sup>3</sup>y<sup>4</sup>",
+                    "-6x<sup>3</sup>y<sup>4</sup>",
+                    "-6x<sup>2</sup>y<sup>3</sup>"
+                ],
+                correct: 2,
+                rationale: "Nhân hệ số: 2 . (-3) = -6.<br>Nhân phần biến: x<sup>2</sup>.x = x<sup>3</sup>; y.y<sup>3</sup> = y<sup>4</sup>.<br>Kết quả: -6x<sup>3</sup>y<sup>4</sup>.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Tổng của hai đơn thức 3xy<sup>2</sup> và 4xy<sup>2</sup> là:",
+                a: [
+                    "12xy<sup>2</sup>",
+                    "7x<sup>2</sup>y<sup>4</sup>",
+                    "xy<sup>2</sup>",
+                    "7xy<sup>2</sup>"
+                ],
+                correct: 3,
+                rationale: "Cộng hệ số, giữ nguyên phần biến: (3 + 4)xy<sup>2</sup> = 7xy<sup>2</sup>.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Bậc của đa thức M = x<sup>5</sup> - 2x<sup>3</sup> + x<sup>5</sup> - x<sup>5</sup> + 1 sau khi thu gọn là:",
+                a: ["5","3","1","0"],
+                correct: 0,
+                rationale: "Thu gọn M: (x<sup>5</sup> + x<sup>5</sup> - x<sup>5</sup>) - 2x<sup>3</sup> + 1 = x<sup>5</sup> - 2x<sup>3</sup> + 1.<br>Hạng tử có bậc cao nhất là x<sup>5</sup> (bậc 5).",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Thu gọn đa thức P = 3x + 2y - x - 5y ta được:",
+                a: [
+                    "4x + 7y",
+                    "2x - 3y",
+                    "2x - 7y",
+                    "2x + 3y"
+                ],
+                correct: 1,
+                rationale: "Nhóm hạng tử đồng dạng: (3x - x) + (2y - 5y) = 2x - 3y.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Hệ số của hạng tử có bậc cao nhất trong đa thức Q = -2x<sup>3</sup> + 4x - 5 là:",
+                a: ["4","3","-2","-5"],
+                correct: 2,
+                rationale: "Hạng tử có bậc cao nhất là -2x<sup>3</sup> (bậc 3). Hệ số của nó là -2.",
+                level: "THÔNG HIỂU"
+            },
+            {
+                q: "Tính giá trị của đa thức A = x<sup>2</sup> - 2xy + y<sup>2</sup> tại x = 12, y = 2.",
+                a: ["4","144","120","100"],
+                correct: 3,
+                rationale: "Cách 1: Thay số trực tiếp: 12<sup>2</sup> - 2·12·2 + 2<sup>2</sup> = 144 - 48 + 4 = 100.<br>Cách 2 (HĐT): A = (x - y)<sup>2</sup> = (12 - 2)<sup>2</sup> = 10<sup>2</sup> = 100.",
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "(Thực tế) Một hình hộp chữ nhật có chiều dài 2x, chiều rộng 3y và chiều cao z. Biểu thức tính thể tích hình hộp là:",
+                a: [
+                    "6xyz",
+                    "5x+y+z",
+                    "2x+3y+z",
+                    "6(x+y+z)"
+                ],
+                correct: 0,
+                rationale: "Thể tích = Dài × Rộng × Cao = (2x)(3y)z = 6xyz.",
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "Cho đa thức A = 5xy<sup>2</sup> + xy - xy<sup>2</sup> - <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy. Thu gọn A ta được:",
+                a: [
+                    "4xy<sup>2</sup> - <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy",
+                    "4xy<sup>2</sup> + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy",
+                    "5xy<sup>2</sup>",
+                    "6xy<sup>2</sup> + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy"
+                ],
+                correct: 1,
+                rationale: "Nhóm: (5xy<sup>2</sup> - xy<sup>2</sup>) + (xy - 1/2xy) = 4xy<sup>2</sup> + 1/2xy.",
+                level: "VẬN DỤNG"
+            },
+            {
+                q: "Tìm giá trị của m để đa thức P = mx<sup>2</sup>y - 3x<sup>2</sup>y + 5xy có bậc là 2.",
+                a: ["m = 0","m ≠ 3","m = 3","m = -3"],
+                correct: 2,
+                rationale: "Hạng tử mx<sup>2</sup>y và -3x<sup>2</sup>y có bậc 3. Để đa thức còn bậc 2, tổng hệ số của hai hạng tử này phải bằng 0: m - 3 = 0 ⇒ m = 3.",
+                level: "VẬN DỤNG CAO"
+            }
+        ];
 
-    // LEVEL 2: THÔNG HIỂU (5 câu)
-    {
-        q: "Điều kiện xác định của phân thức <div class='fraction'><span class='numerator'>x + 1</span><span class='denominator'>x - 2</span></div> là:",
-        a: ["x ≠ -1", "x ≠ 2", "x ≠ 0", "x ≠ -2"],
-        correct: 1,
-        rationale: "x - 2 ≠ 0 ⇒ x ≠ 2",
-        level: "THÔNG HIỂU"
-    },
-    {
-        q: "Rút gọn phân thức <div class='fraction'><span class='numerator'>5x²y</span><span class='denominator'>10xy²</span></div>",
-        a: [
-            "<div class='fraction'><span class='numerator'>x</span><span class='denominator'>2y</span></div>", // ĐÚNG
-            "<div class='fraction'><span class='numerator'>1</span><span class='denominator'>2y</span></div>",
-            "<div class='fraction'><span class='numerator'>x</span><span class='denominator'>2</span></div>",
-            "<div class='fraction'><span class='numerator'>5x</span><span class='denominator'>2y</span></div>"
-        ],
-        correct: 0,
-        rationale: "Chia tử và mẫu cho 5xy.",
-        level: "THÔNG HIỂU"
-    },
-    {
-        q: "Giá trị của phân thức <div class='fraction'><span class='numerator'>x - 2</span><span class='denominator'>x</span></div> tại x = 2 là:",
-        a: ["1", "-1", "Không xác định", "0"],
-        correct: 3,
-        rationale: "(2 - 2)/2 = 0",
-        level: "THÔNG HIỂU"
-    },
-    {
-        q: "Phân thức <div class='fraction'><span class='numerator'>x - 1</span><span class='denominator'>1 - x</span></div> bằng:",
-        a: ["1", "-1", "x", "-x"],
-        correct: 1,
-        rationale: "x - 1 = -(1 - x) nên phân thức = -1",
-        level: "THÔNG HIỂU"
-    },
-    {
-        q: "Điền vào chỗ trống: <div class='fraction'><span class='numerator'>2</span><span class='denominator'>x</span></div> = <div class='fraction'><span class='numerator'>?</span><span class='denominator'>x²</span></div>",
-        a: ["2", "x", "4", "2x"],
-        correct: 3,
-        rationale: "Nhân tử và mẫu với x: được 2x/x²",
-        level: "THÔNG HIỂU"
-    },
+        // ======= RANDOM THỨ TỰ ĐÁP ÁN NHƯNG GIỮ ĐÚNG/Sai =======
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
 
-    // LEVEL 3: VẬN DỤNG (3 câu)
-    {
-        q: "Rút gọn phân thức <div class='fraction'><span class='numerator'>x² - 4</span><span class='denominator'>x + 2</span></div>",
-        a: ["x + 2", "x - 2", "1", "x - 4"],
-        correct: 1,
-        rationale: "x² - 4 = (x - 2)(x + 2) ⇒ rút gọn còn x - 2",
-        level: "VẬN DỤNG"
-    },
-    {
-        q: "(Thực tế) Diện tích 3x² + 6x; chiều rộng = 3x. Chiều dài bằng:",
-        a: ["x - 2", "3x + 2", "x", "x + 2"],
-        correct: 3,
-        rationale: "Chiều dài = S / rộng = (3x² + 6x) / 3x = x + 2",
-        level: "VẬN DỤNG"
-    },
-    {
-        q: "Rút gọn phân thức <div class='fraction'><span class='numerator'>3x(x - y)</span><span class='denominator'>y(y - x)</span></div>",
-        a: [
-            "<div class='fraction'><span class='numerator'>3x</span><span class='denominator'>y</span></div>",
-            "<div class='fraction'><span class='numerator'>-3x</span><span class='denominator'>y</span></div>", // ĐÚNG
-            "<div class='fraction'><span class='numerator'>-x</span><span class='denominator'>y</span></div>",
-            "-3"
-        ],
-        correct: 1,
-        rationale: "x - y = -(y - x) ⇒ phân thức = -3x/y",
-        level: "VẬN DỤNG"
-    },
+        const questions = rawQuestions.map(q => {
+            const indices = [0,1,2,3];
+            shuffleArray(indices);
+            const options = indices.map(i => ({
+                text: q.a[i],
+                isCorrect: i === q.correct
+            }));
+            return { ...q, options };
+        });
 
-    // LEVEL 4: VẬN DỤNG CAO (1 câu)
-    {
-        q: "Tìm giá trị nguyên của x để phân thức <div class='fraction'><span class='numerator'>3</span><span class='denominator'>x - 1</span></div> nguyên:",
-        a: [
-            "x ∈ {-1; 1; 3}",
-            "x ∈ {0; 2; 4}",
-            "x ∈ {2; 4}", 
-            "x ∈ {-2; 0; 2; 4}" // ĐÚNG
-        ],
-        correct: 3,
-        rationale: "x - 1 ∈ {±1, ±3} ⇒ x = {-2, 0, 2, 4}",
-        level: "VẬN DỤNG CAO"
-    }
-];
-        // --- GAME LOGIC ---
+        // ======= GAME LOGIC =======
         let currentQIndex = 0;
         let score = 0;
-        
-        // Init Skyline
+
         const skyline = document.getElementById('city-skyline');
-        for(let i=0; i<questions.length; i++) {
+        for (let i = 0; i < questions.length; i++) {
             const b = document.createElement('div');
             b.className = 'building';
             b.id = `building-${i}`;
-            // Random height
-            b.style.height = Math.floor(Math.random() * 120 + 60) + 'px';
+            b.style.height = (Math.random() * 100 + 50) + 'px';
             skyline.appendChild(b);
         }
 
-        // Audio Setup
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
+
         function playSound(type) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
@@ -469,7 +496,7 @@
             gain.connect(audioCtx.destination);
             const now = audioCtx.currentTime;
 
-            if (type === 'construct') { // Mechanical clank
+            if (type === 'construct') {
                 osc.type = 'square';
                 osc.frequency.setValueAtTime(100, now);
                 osc.frequency.linearRampToValueAtTime(50, now + 0.1);
@@ -477,15 +504,15 @@
                 gain.gain.linearRampToValueAtTime(0, now + 0.2);
                 osc.start(now);
                 osc.stop(now + 0.2);
-            } else if (type === 'correct') { // High tech chime
+            } else if (type === 'correct') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, now); 
+                osc.frequency.setValueAtTime(880, now);
                 osc.frequency.exponentialRampToValueAtTime(1760, now + 0.1);
                 gain.gain.setValueAtTime(0.1, now);
                 gain.gain.linearRampToValueAtTime(0, now + 0.5);
                 osc.start(now);
                 osc.stop(now + 0.5);
-            } else if (type === 'wrong') { // Glitch noise
+            } else if (type === 'wrong') {
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(100, now);
                 osc.frequency.linearRampToValueAtTime(50, now + 0.3);
@@ -493,7 +520,7 @@
                 gain.gain.linearRampToValueAtTime(0, now + 0.3);
                 osc.start(now);
                 osc.stop(now + 0.3);
-            } else if (type === 'win') { // Synth fanfare
+            } else if (type === 'win') {
                 [440, 554, 659, 880].forEach((f, i) => {
                     setTimeout(() => {
                         const o = audioCtx.createOscillator();
@@ -513,9 +540,10 @@
 
         function startGame() {
             document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
-            document.getElementById('game-screen').classList.add('flex');
-            
+            const gameScreen = document.getElementById('game-screen');
+            gameScreen.classList.remove('hidden');
+            gameScreen.classList.add('flex');
+
             playSound('construct');
             currentQIndex = 0;
             score = 0;
@@ -525,11 +553,10 @@
 
         function loadQuestion() {
             const q = questions[currentQIndex];
-            
+
             document.getElementById('q-number').innerText = currentQIndex + 1;
             document.getElementById('question-text').innerHTML = q.q;
-            
-            // Level Badge Color
+
             const badge = document.getElementById('level-badge');
             badge.innerText = q.level;
             if (q.level === "NHẬN BIẾT") badge.className = "absolute top-0 left-0 bg-green-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
@@ -537,46 +564,44 @@
             else if (q.level === "VẬN DỤNG CAO") badge.className = "absolute top-0 left-0 bg-red-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
             else badge.className = "absolute top-0 left-0 bg-purple-600 text-white px-4 py-1 text-xs font-bold rounded-br-lg";
 
-            // Reset Log
             const logBox = document.getElementById('tech-log');
             logBox.classList.remove('show');
             document.getElementById('next-btn-container').classList.add('hidden');
 
             const grid = document.getElementById('options-grid');
             grid.innerHTML = '';
-            
-            q.a.forEach((opt, idx) => {
+
+            q.options.forEach((optObj, idx) => {
                 const btn = document.createElement('button');
                 btn.className = "btn-cyber w-full p-4 rounded min-h-[80px]";
-                btn.innerHTML = opt; // Allow HTML for fractions
-                btn.onclick = () => handleAnswer(idx, q.correct, btn);
+                btn.innerHTML = optObj.text;
+                btn.onclick = () => handleAnswer(optObj.isCorrect, btn);
                 grid.appendChild(btn);
             });
         }
 
-        function handleAnswer(selected, correct, btn) {
-            const btns = document.querySelectorAll('.btn-cyber');
+        function handleAnswer(isCorrect, btn) {
+            const btns = document.querySelectorAll('#options-grid .btn-cyber');
             btns.forEach(b => b.disabled = true);
 
             const q = questions[currentQIndex];
             const logBox = document.getElementById('tech-log');
             const content = document.getElementById('log-content');
-            
+
             content.innerHTML = q.rationale;
             logBox.classList.add('show');
 
-            if (selected === correct) {
+            if (isCorrect) {
                 btn.classList.add('correct');
                 score += 100;
                 playSound('correct');
-                showFeedback("😍"); 
+                showFeedback("🏗️");
                 fireConfetti(30);
-                
-                // Build Building
                 document.getElementById(`building-${currentQIndex}`).classList.add('built');
             } else {
                 btn.classList.add('wrong');
-                btns[correct].classList.add('correct');
+                const correctBtn = Array.from(btns).find((b, i) => q.options[i].isCorrect);
+                if (correctBtn) correctBtn.classList.add('correct');
                 playSound('wrong');
                 showFeedback("💥");
             }
@@ -596,7 +621,7 @@
             el.innerText = emoji;
             el.style.opacity = '1';
             el.style.transform = 'scale(1.5)';
-            
+
             setTimeout(() => {
                 el.style.opacity = '0';
                 el.style.transform = 'scale(0)';
@@ -614,15 +639,16 @@
         }
 
         function endGame() {
-            document.getElementById('game-screen').classList.remove('flex');
-            document.getElementById('game-screen').classList.add('hidden');
+            const gameScreen = document.getElementById('game-screen');
+            gameScreen.classList.remove('flex');
+            gameScreen.classList.add('hidden');
             document.getElementById('end-screen').classList.remove('hidden');
             document.getElementById('final-score').innerText = score;
             playSound('win');
             setInterval(() => fireConfetti(50), 1000);
         }
 
-        // --- CONFETTI (Neon Sparks) ---
+        // Confetti
         const canvas = document.getElementById('confetti-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -638,10 +664,10 @@
                     vy: (Math.random() - 0.5) * 20,
                     life: 100,
                     size: Math.random() * 3 + 1,
-                    color: `hsl(${Math.random() * 60 + 160}, 100%, 50%)` // Cyan/Blue
+                    color: `hsl(${Math.random() * 60 + 160}, 100%, 50%)`
                 });
             }
-            if(particles.length <= amount) requestAnimationFrame(animateParticles);
+            if (particles.length <= amount) requestAnimationFrame(animateParticles);
         }
 
         function animateParticles() {
@@ -652,7 +678,7 @@
                 p.y += p.vy;
                 p.vy += 0.2;
                 p.life--;
-                
+
                 ctx.fillStyle = p.color;
                 ctx.fillRect(p.x, p.y, p.size, p.size);
 
@@ -668,7 +694,6 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
-
     </script>
 </body>
 </html>
