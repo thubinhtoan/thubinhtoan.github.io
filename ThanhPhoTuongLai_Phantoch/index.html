@@ -306,154 +306,249 @@
 
     <script>
         // ================== CÂU HỎI GỐC (giữ nguyên đáp án đúng) ==================
-        const rawQuestions = [
-            // 6 Nhận biết, 5 TH, 3 VD, 1 VDC – như cô đã dùng trong Bài 5
-            {
-                q: "Biểu thức nào sau đây là <b>đơn thức</b>?",
-                a: [
-                    "2x<sup>2</sup>y",
-                    "x + y",
-                    "2x - 3",
-                    "<div class='fraction'><span class='numerator'>x</span><span class='denominator'>y</span></div>"
-                ],
-                correct: 0,
-                rationale: "Đơn thức là biểu thức đại số chỉ gồm một số, hoặc một biến, hoặc một tích giữa các số và các biến.<br>2x<sup>2</sup>y là tích của số và biến.",
-                level: "NHẬN BIẾT"
-            },
-            {
-                q: "Trong các biểu thức sau, biểu thức nào là <b>đa thức</b>?",
-                a: [
-                    "<div class='fraction'><span class='numerator'>1</span><span class='denominator'>x</span></div>",
-                    "x<sup>2</sup> - 2xy + y<sup>2</sup>",
-                    "&radic;x",
-                    "x + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>y</span></div>"
-                ],
-                correct: 1,
-                rationale: "Đa thức là một tổng của những đơn thức.<br>x<sup>2</sup> - 2xy + y<sup>2</sup> là tổng của các đơn thức x<sup>2</sup>, -2xy, y<sup>2</sup>.",
-                level: "NHẬN BIẾT"
-            },
-            {
-                q: "Hệ số của đơn thức -5x<sup>2</sup>y<sup>3</sup> là:",
-                a: ["5","3","-5","2"],
-                correct: 2,
-                rationale: "Hệ số là phần số của đơn thức. Ở đây là -5.",
-                level: "NHẬN BIẾT"
-            },
-            {
-                q: "Bậc của đơn thức 3x<sup>2</sup>yz<sup>4</sup> là:",
-                a: ["6","4","2","7"],
-                correct: 3,
-                rationale: "Bậc của đơn thức là tổng số mũ của các biến.<br>x<sup>2</sup> (mũ 2) + y<sup>1</sup> (mũ 1) + z<sup>4</sup> (mũ 4) = 2 + 1 + 4 = 7.",
-                level: "NHẬN BIẾT"
-            },
-            {
-                q: "Đơn thức nào sau đây đồng dạng với đơn thức 3x<sup>2</sup>y?",
-                a: [
-                    "-7x<sup>2</sup>y",
-                    "3xy<sup>2</sup>",
-                    "3x<sup>2</sup>",
-                    "xy"
-                ],
-                correct: 0,
-                rationale: "Hai đơn thức đồng dạng là hai đơn thức có hệ số khác 0 và có <b>cùng phần biến</b>.<br>Phần biến ở đây là x<sup>2</sup>y.",
-                level: "NHẬN BIẾT"
-            },
-            {
-                q: "Giá trị của đơn thức 2x tại x = -1 là:",
-                a: ["1","-2","0","2"],
-                correct: 1,
-                rationale: "Thay x = -1 vào biểu thức: 2 . (-1) = -2.",
-                level: "NHẬN BIẾT"
-            },
-            {
-                q: "Thu gọn đơn thức A = (2x<sup>2</sup>y) . (-3xy<sup>3</sup>) ta được:",
-                a: [
-                    "6x<sup>2</sup>y<sup>3</sup>",
-                    "-x<sup>3</sup>y<sup>4</sup>",
-                    "-6x<sup>3</sup>y<sup>4</sup>",
-                    "-6x<sup>2</sup>y<sup>3</sup>"
-                ],
-                correct: 2,
-                rationale: "Nhân hệ số: 2 . (-3) = -6.<br>Nhân phần biến: x<sup>2</sup>.x = x<sup>3</sup>; y.y<sup>3</sup> = y<sup>4</sup>.<br>Kết quả: -6x<sup>3</sup>y<sup>4</sup>.",
-                level: "THÔNG HIỂU"
-            },
-            {
-                q: "Tổng của hai đơn thức 3xy<sup>2</sup> và 4xy<sup>2</sup> là:",
-                a: [
-                    "12xy<sup>2</sup>",
-                    "7x<sup>2</sup>y<sup>4</sup>",
-                    "xy<sup>2</sup>",
-                    "7xy<sup>2</sup>"
-                ],
-                correct: 3,
-                rationale: "Cộng hệ số, giữ nguyên phần biến: (3 + 4)xy<sup>2</sup> = 7xy<sup>2</sup>.",
-                level: "THÔNG HIỂU"
-            },
-            {
-                q: "Bậc của đa thức M = x<sup>5</sup> - 2x<sup>3</sup> + x<sup>5</sup> - x<sup>5</sup> + 1 sau khi thu gọn là:",
-                a: ["5","3","1","0"],
-                correct: 0,
-                rationale: "Thu gọn M: (x<sup>5</sup> + x<sup>5</sup> - x<sup>5</sup>) - 2x<sup>3</sup> + 1 = x<sup>5</sup> - 2x<sup>3</sup> + 1.<br>Hạng tử có bậc cao nhất là x<sup>5</sup> (bậc 5).",
-                level: "THÔNG HIỂU"
-            },
-            {
-                q: "Thu gọn đa thức P = 3x + 2y - x - 5y ta được:",
-                a: [
-                    "4x + 7y",
-                    "2x - 3y",
-                    "2x - 7y",
-                    "2x + 3y"
-                ],
-                correct: 1,
-                rationale: "Nhóm hạng tử đồng dạng: (3x - x) + (2y - 5y) = 2x - 3y.",
-                level: "THÔNG HIỂU"
-            },
-            {
-                q: "Hệ số của hạng tử có bậc cao nhất trong đa thức Q = -2x<sup>3</sup> + 4x - 5 là:",
-                a: ["4","3","-2","-5"],
-                correct: 2,
-                rationale: "Hạng tử có bậc cao nhất là -2x<sup>3</sup> (bậc 3). Hệ số của nó là -2.",
-                level: "THÔNG HIỂU"
-            },
-            {
-                q: "Tính giá trị của đa thức A = x<sup>2</sup> - 2xy + y<sup>2</sup> tại x = 12, y = 2.",
-                a: ["4","144","120","100"],
-                correct: 3,
-                rationale: "Cách 1: Thay số trực tiếp: 12<sup>2</sup> - 2·12·2 + 2<sup>2</sup> = 144 - 48 + 4 = 100.<br>Cách 2 (HĐT): A = (x - y)<sup>2</sup> = (12 - 2)<sup>2</sup> = 10<sup>2</sup> = 100.",
-                level: "VẬN DỤNG"
-            },
-            {
-                q: "(Thực tế) Một hình hộp chữ nhật có chiều dài 2x, chiều rộng 3y và chiều cao z. Biểu thức tính thể tích hình hộp là:",
-                a: [
-                    "6xyz",
-                    "5x+y+z",
-                    "2x+3y+z",
-                    "6(x+y+z)"
-                ],
-                correct: 0,
-                rationale: "Thể tích = Dài × Rộng × Cao = (2x)(3y)z = 6xyz.",
-                level: "VẬN DỤNG"
-            },
-            {
-                q: "Cho đa thức A = 5xy<sup>2</sup> + xy - xy<sup>2</sup> - <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy. Thu gọn A ta được:",
-                a: [
-                    "4xy<sup>2</sup> - <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy",
-                    "4xy<sup>2</sup> + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy",
-                    "5xy<sup>2</sup>",
-                    "6xy<sup>2</sup> + <div class='fraction'><span class='numerator'>1</span><span class='denominator'>2</span></div>xy"
-                ],
-                correct: 1,
-                rationale: "Nhóm: (5xy<sup>2</sup> - xy<sup>2</sup>) + (xy - 1/2xy) = 4xy<sup>2</sup> + 1/2xy.",
-                level: "VẬN DỤNG"
-            },
-            {
-                q: "Tìm giá trị của m để đa thức P = mx<sup>2</sup>y - 3x<sup>2</sup>y + 5xy có bậc là 2.",
-                a: ["m = 0","m ≠ 3","m = 3","m = -3"],
-                correct: 2,
-                rationale: "Hạng tử mx<sup>2</sup>y và -3x<sup>2</sup>y có bậc 3. Để đa thức còn bậc 2, tổng hệ số của hai hạng tử này phải bằng 0: m - 3 = 0 ⇒ m = 3.",
-                level: "VẬN DỤNG CAO"
-            }
-        ];
+       const questions = [
+    // ===================== NHẬN BIẾT =====================
+    {
+        id: 1,
+        level: "Nhận biết",
+        question: "Biểu thức nào sau đây là một <b>phân thức đại số</b>?",
+        options: [
+            `<div class="fraction"><span class="numerator">x+1</span><span class="denominator">0</span></div>`,
+            `<div class="fraction"><span class="numerator">2x - 1</span><span class="denominator">x + 3</span></div>`,
+            `<div class="fraction"><span class="numerator">√x</span><span class="denominator">2</span></div> (với x là biến)`,
+            `<div class="fraction"><span class="numerator">1</span><span class="denominator">√y</span></div> (với y là biến)`
+        ],
+        correct: 1,
+        rationale:
+            "Phân thức đại số phải có dạng A/B với A, B đều là đa thức và B khác 0. Biểu thức (2x − 1)/(x + 3) thỏa điều kiện."
+    },
+
+    {
+        id: 2,
+        level: "Nhận biết",
+        question:
+            "Điều kiện xác định của phân thức <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> là gì?",
+        options: [
+            "B ≠ 0",
+            "A ≠ 0",
+            "A = 0",
+            "B = 0"
+        ],
+        correct: 0,
+        rationale:
+            "Phân thức chỉ xác định khi mẫu thức khác 0."
+    },
+
+    {
+        id: 3,
+        level: "Nhận biết",
+        question:
+            "Hai phân thức <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> và <div class='fraction'><span class='numerator'>C</span><span class='denominator'>D</span></div> bằng nhau khi:",
+        options: [
+            "A · C = B · D",
+            "A · B = C · D",
+            "A · D = B · C",
+            "A + D = B + C"
+        ],
+        correct: 2,
+        rationale:
+            "Theo định nghĩa: A/B = C/D khi và chỉ khi A·D = B·C."
+    },
+
+    {
+        id: 4,
+        level: "Nhận biết",
+        question: "Đa thức nào dưới đây được coi là phân thức đại số?",
+        options: [
+            "Chỉ có số 0",
+            "Chỉ có số 1",
+            "Mọi đa thức đều là phân thức với mẫu bằng 1",
+            "Không đa thức nào là phân thức"
+        ],
+        correct: 2,
+        rationale:
+            "Mỗi đa thức P luôn được coi là phân thức P/1."
+    },
+
+    {
+        id: 5,
+        level: "Nhận biết",
+        question:
+            "Tính chất cơ bản của phân thức: Nhân cả tử và mẫu của phân thức <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> với đa thức M (M ≠ 0) cho ta:",
+        options: [
+            "Phân thức đối",
+            "Phân thức nghịch đảo",
+            "Một phân thức bằng phân thức ban đầu",
+            "Phân thức bằng 1"
+        ],
+        correct: 2,
+        rationale:
+            "A/B = (A·M)/(B·M) khi M ≠ 0. Đây là tính chất dùng để quy đồng mẫu."
+    },
+
+    {
+        id: 6,
+        level: "Nhận biết",
+        question:
+            "Tìm đa thức P sao cho: <div class='fraction'><span class='numerator'>x</span><span class='denominator'>y</span></div> = <div class='fraction'><span class='numerator'>xP</span><span class='denominator'>yP</span></div>",
+        options: [
+            "P phải là đơn thức",
+            "P tùy ý",
+            "P phải là đa thức khác 0",
+            "P là số nguyên"
+        ],
+        correct: 2,
+        rationale:
+            "P phải là đa thức khác 0 để phân thức mới xác định và bằng phân thức cũ."
+    },
+
+    // ===================== THÔNG HIỂU =====================
+    {
+        id: 7,
+        level: "Thông hiểu",
+        question:
+            "Điều kiện xác định của phân thức <div class='fraction'><span class='numerator'>3x - 1</span><span class='denominator'>x - 2</span></div> là:",
+        options: [
+            "x ≠ -2",
+            "x ≠ 1/3",
+            "x = 2",
+            "x ≠ 2"
+        ],
+        correct: 3,
+        rationale:
+            "Mẫu x − 2 ≠ 0 ⇒ x ≠ 2."
+    },
+
+    {
+        id: 8,
+        level: "Thông hiểu",
+        question:
+            "Rút gọn phân thức <div class='fraction'><span class='numerator'>15x²y</span><span class='denominator'>5xy</span></div> ta được:",
+        options: [
+            "3y",
+            "3x",
+            "5x",
+            "3"
+        ],
+        correct: 1,
+        rationale:
+            "Chia tử và mẫu cho 5xy: (15x²y)/(5xy) = 3x."
+    },
+
+    {
+        id: 9,
+        level: "Thông hiểu",
+        question:
+            "Giá trị phân thức <div class='fraction'><span class='numerator'>x - 3</span><span class='denominator'>x + 3</span></div> tại x = 3 là:",
+        options: [
+            "1",
+            "-1",
+            "Không xác định",
+            "0"
+        ],
+        correct: 3,
+        rationale:
+            "(3 - 3)/(3 + 3) = 0/6 = 0."
+    },
+
+    {
+        id: 10,
+        level: "Thông hiểu",
+        question:
+            "Phân thức <div class='fraction'><span class='numerator'>x² - 1</span><span class='denominator'>x + 1</span></div> bằng phân thức nào?",
+        options: [
+            "x - 1",
+            "x + 1",
+            "1 - x",
+            "(x - 1)²"
+        ],
+        correct: 0,
+        rationale:
+            "x² − 1 = (x - 1)(x + 1). Rút gọn với mẫu x + 1 được x - 1."
+    },
+
+    {
+        id: 11,
+        level: "Thông hiểu",
+        question:
+            "Điền vào chỗ trống: <div class='fraction'><span class='numerator'>2x</span><span class='denominator'>x - 1</span></div> = <div class='fraction'><span class='numerator'>...</span><span class='denominator'>x(x - 1)</span></div>",
+        options: [
+            "2x",
+            "2x²",
+            "2",
+            "x"
+        ],
+        correct: 1,
+        rationale:
+            "Mẫu được nhân thêm x, nên tử cũng phải nhân x: 2x·x = 2x²."
+    },
+
+    // ===================== VẬN DỤNG =====================
+    {
+        id: 12,
+        level: "Vận dụng",
+        question:
+            "Rút gọn phân thức <div class='fraction'><span class='numerator'>x² + 2xy + y²</span><span class='denominator'>x² - y²</span></div> là:",
+        options: [
+            `<div class='fraction'><span class='numerator'>x + y</span><span class='denominator'>x - y</span></div>`,
+            `<div class='fraction'><span class='numerator'>x - y</span><span class='denominator'>x + y</span></div>`,
+            "1",
+            `<div class='fraction'><span class='numerator'>1</span><span class='denominator'>x - y</span></div>`
+        ],
+        correct: 0,
+        rationale:
+            "Tử = (x + y)²; mẫu = (x - y)(x + y). Rút gọn được (x + y)/(x - y)."
+    },
+
+    {
+        id: 13,
+        level: "Vận dụng (Thực tế)",
+        question:
+            "Một ca nô đi xuôi dòng với vận tốc x (km/h) và ngược dòng với vận tốc y (km/h). Quãng đường AB dài s (km). Tổng thời gian đi và về là:",
+        options: [
+            `<div class='fraction'><span class='numerator'>s</span><span class='denominator'>x + y</span></div>`,
+            `<div class='fraction'><span class='numerator'>2s</span><span class='denominator'>x + y</span></div>`,
+            `<div class='fraction'><span class='numerator'>x</span><span class='denominator'>s</span></div> + <div class='fraction'><span class='numerator'>y</span><span class='denominator'>s</span></div>`,
+            `<div class='fraction'><span class='numerator'>s</span><span class='denominator'>x</span></div> + <div class='fraction'><span class='numerator'>s</span><span class='denominator'>y</span></div>`
+        ],
+        correct: 3,
+        rationale:
+            "Thời gian đi = s/x; thời gian về = s/y. Tổng thời gian là s/x + s/y."
+    },
+
+    {
+        id: 14,
+        level: "Vận dụng",
+        question:
+            "Tìm giá trị của x để phân thức <div class='fraction'><span class='numerator'>3</span><span class='denominator'>x² - 4x + 4</span></div> xác định:",
+        options: [
+            "x ≠ 2",
+            "x ≠ -2",
+            "x ≠ 4",
+            "Mọi x"
+        ],
+        correct: 0,
+        rationale:
+            "Mẫu = (x − 2)². Điều kiện xác định là x − 2 ≠ 0 ⇒ x ≠ 2."
+    },
+
+    // ===================== VẬN DỤNG CAO =====================
+    {
+        id: 15,
+        level: "Vận dụng cao",
+        question:
+            "Tìm giá trị nguyên của x để phân thức <div class='fraction'><span class='numerator'>2x + 1</span><span class='denominator'>x - 1</span></div> nhận giá trị nguyên.",
+        options: [
+            "x ∈ {0; 2; 4}",
+            "x ∈ {-2; 0; 2; 4}",
+            "x ∈ {0; 2}",
+            "x ∈ {-1; 1}"
+        ],
+        correct: 1,
+        rationale:
+            "Tách phân thức: (2x+1)/(x−1) = 2 + 3/(x−1). Để nguyên thì (x−1) phải là ước của 3 ⇒ x ∈ {−2, 0, 2, 4}."
+    }
+];
 
         // ======= RANDOM THỨ TỰ ĐÁP ÁN NHƯNG GIỮ ĐÚNG/Sai =======
         function shuffleArray(arr) {
