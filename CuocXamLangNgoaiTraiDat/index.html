@@ -606,19 +606,21 @@
             }
         }
 
-        function startGame() {
-            document.getElementById('start-screen').classList.add('hidden');
-            nextContainer.classList.remove('hidden');
+       function startGame() {
+    // Ẩn màn hình chờ
+    document.getElementById('start-screen').classList.add('hidden');
 
-          // Tự cuộn xuống cho thấy nút TIẾP TỤC
-        
-            document.getElementById('game-screen').classList.add('flex');
-            
-            currentQIndex = 0;
-            score = 0;
-            updateUI();
-            loadQuestion();
-        }
+    // Hiện màn hình game
+    const gameScreen = document.getElementById('game-screen');
+    gameScreen.classList.remove('hidden');
+    gameScreen.classList.add('flex');
+
+    // Reset game
+    currentQIndex = 0;
+    score = 0;
+    updateUI();
+    loadQuestion();
+}
 
         function loadQuestion() {
             if (currentQIndex >= questions.length) {
@@ -708,24 +710,15 @@
             setTimeout(() => explosion.remove(), 500);
         }
 
-      function handleAnswer(selected, correct, btn) {
+     function handleAnswer(selected, correct, btn) {
     if (isAnswering) return;
     isAnswering = true;
 
-    const nextContainer = document.getElementById('next-btn-container');
-    nextContainer.classList.remove('hidden');
-
-    // Tự cuộn xuống cho thấy nút TIẾP TỤC
-    nextContainer.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-    });
-}
-
-    // KHÓA tất cả nút đáp án để HS không bấm lại
+    // Khóa tất cả nút đáp án
     const allBtns = document.querySelectorAll('#options-grid .btn-option');
     allBtns.forEach(b => b.disabled = true);
 
+    // Hiện phân tích dữ liệu
     const q = questions[currentQIndex];
     const logBox = document.getElementById('data-log');
     const content = document.getElementById('log-content');
@@ -735,7 +728,37 @@
     if (selected === correct) {
         btn.classList.add('correct');
         score += 100;
-        
+
+        // Hiệu ứng bắn laser trúng
+        fireLaser();
+        setTimeout(() => {
+            playSound('correct');
+            showFeedback("🎯");
+            fireConfetti(30);
+        }, 400);
+    } else {
+        btn.classList.add('wrong');
+        allBtns[correct].classList.add('correct');
+        playSound('wrong');
+        showFeedback("⚠️");
+
+        // Rung khu vực game
+        const area = document.getElementById('game-area');
+        area.classList.add('shake');
+        setTimeout(() => area.classList.remove('shake'), 500);
+    }
+
+    updateUI();
+
+    // Hiện nút NEXT và cuộn xuống cho cô thấy
+    const nextContainer = document.getElementById('next-btn-container');
+    nextContainer.classList.remove('hidden');
+    nextContainer.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+    });
+}
+
         // Hiệu ứng bắn laser + trúng
         fireLaser();
         setTimeout(() => {
