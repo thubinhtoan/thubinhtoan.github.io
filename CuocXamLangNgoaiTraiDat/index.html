@@ -12,7 +12,8 @@
             font-family: 'Share Tech Mono', monospace;
             background-color: #000;
             color: #0f0;
-            overflow: hidden;
+           overflow-x: hidden;   /* chặn cuộn ngang */
+           overflow-y: auto;     /* cho phép cuộn dọc */
             margin: 0;
             user-select: none;
         }
@@ -607,7 +608,14 @@
 
         function startGame() {
             document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
+           const nextContainer = document.getElementById('next-btn-container');
+           nextContainer.classList.remove('hidden');
+
+          // Tự cuộn xuống cho thấy nút TIẾP TỤC
+          nextContainer.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+          });
             document.getElementById('game-screen').classList.add('flex');
             
             currentQIndex = 0;
