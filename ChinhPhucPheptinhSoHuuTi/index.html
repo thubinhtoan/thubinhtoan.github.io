@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinh Phục Thế Giới Số Hữu Tỉ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            min-height: 100vh;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .option-btn {
+            transition: all 0.2s;
+            border: 2px solid #e2e8f0;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        .option-btn.selected {
+            border-color: #3b82f6;
+            background-color: #dbeafe;
+        }
+
+        .option-btn.correct {
+            border-color: #22c55e;
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        .option-btn.wrong {
+            border-color: #ef4444;
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+
+        /* Math formula style */
+        .math {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+
+    <!-- Audio Elements -->
+    <audio id="correctSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="wrongSound" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3"></audio>
+    <audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+    <div id="app" class="w-full max-w-2xl">
+        <!-- Start Screen -->
+        <div id="startScreen" class="game-card p-8 text-center fade-in">
+            <div class="mb-6">
+                <i class="fa-solid fa-calculator text-6xl text-blue-500"></i>
+            </div>
+            <h1 class="text-4xl font-extrabold text-slate-800 mb-4">Chinh Phục<br><span class="text-blue-600">Số Hữu Tỉ</span></h1>
+            <p class="text-slate-600 mb-8 text-lg">Bài 2: Các phép tính với số hữu tỉ (Toán 7)</p>
+            
+            <div class="grid grid-cols-2 gap-4 mb-8 text-left max-w-md mx-auto bg-slate-50 p-4 rounded-xl">
+                <div class="flex items-center space-x-2 text-slate-700">
+                    <i class="fa-solid fa-list-check text-blue-500"></i>
+                    <span>15 Câu hỏi</span>
+                </div>
+                <div class="flex items-center space-x-2 text-slate-700">
+                    <i class="fa-solid fa-layer-group text-purple-500"></i>
+                    <span>4 Mức độ</span>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transform transition hover:-translate-y-1 text-xl w-full sm:w-auto">
+                <i class="fa-solid fa-play mr-2"></i> Bắt đầu ngay
+            </button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="hidden">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center space-x-2 bg-white px-4 py-2 rounded-full shadow-sm">
+                    <span class="text-sm font-bold text-slate-500">Câu</span>
+                    <span id="currentQuestionNum" class="text-xl font-bold text-blue-600">1</span>
+                    <span class="text-slate-400">/</span>
+                    <span class="text-sm font-bold text-slate-500">15</span>
+                </div>
+                <div class="flex items-center space-x-2 bg-white px-4 py-2 rounded-full shadow-sm">
+                    <i class="fa-solid fa-trophy text-yellow-500"></i>
+                    <span id="scoreDisplay" class="text-xl font-bold text-slate-700">0</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-200 rounded-full h-2.5 mb-6">
+                <div id="progressBar" class="bg-blue-600 h-2.5 rounded-full progress-bar" style="width: 0%"></div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="game-card p-6 mb-6 relative overflow-hidden">
+                <div id="levelBadge" class="absolute top-0 right-0 bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-bl-lg">
+                    Nhận biết
+                </div>
+                <h2 id="questionText" class="text-xl sm:text-2xl font-bold text-slate-800 mb-6 mt-2 leading-relaxed">
+                    <!-- Question goes here -->
+                </h2>
+
+                <div id="optionsContainer" class="grid grid-cols-1 gap-3">
+                    <!-- Options go here -->
+                </div>
+            </div>
+
+            <!-- Feedback / Rationale -->
+            <div id="feedbackContainer" class="hidden game-card p-6 border-l-4 border-blue-500 bg-blue-50 fade-in">
+                <div class="flex items-start">
+                    <div id="feedbackIcon" class="mr-4 mt-1">
+                        <!-- Icon -->
+                    </div>
+                    <div>
+                        <h3 id="feedbackTitle" class="font-bold text-lg mb-1">Giải thích</h3>
+                        <p id="feedbackText" class="text-slate-700 leading-relaxed"></p>
+                    </div>
+                </div>
+                <div class="mt-4 text-right">
+                    <button onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow transition">
+                        Tiếp theo <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="resultScreen" class="hidden game-card p-8 text-center fade-in">
+            <div id="resultIcon" class="mb-6">
+                <!-- Result Icon -->
+            </div>
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Hoàn thành!</h2>
+            <p class="text-slate-600 mb-6">Bạn đã chinh phục bài học số hữu tỉ.</p>
+            
+            <div class="text-6xl font-black text-blue-600 mb-2" id="finalScore">0</div>
+            <p class="text-slate-500 font-medium mb-8">Tổng điểm của bạn</p>
+
+            <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="bg-slate-50 p-4 rounded-xl">
+                    <div class="text-2xl font-bold text-green-500" id="correctCount">0</div>
+                    <div class="text-xs text-slate-500 uppercase font-bold">Đúng</div>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl">
+                    <div class="text-2xl font-bold text-red-500" id="wrongCount">0</div>
+                    <div class="text-xs text-slate-500 uppercase font-bold">Sai</div>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl">
+                    <div class="text-2xl font-bold text-blue-500">15</div>
+                    <div class="text-xs text-slate-500 uppercase font-bold">Tổng</div>
+                </div>
+            </div>
+
+            <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-8 rounded-xl shadow-lg transform transition hover:-translate-y-1">
+                <i class="fa-solid fa-rotate-right mr-2"></i> Chơi lại
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Database câu hỏi (đã cân lại A/B/C/D)
+        const questions = [
+            // Mức độ: Nhận biết (6 câu)
+            {
+                text: "Kết quả của phép cộng hai số hữu tỉ âm sẽ là:",
+                options: [
+                    "Một số hữu tỉ âm",           // A (đúng)
+                    "Một số hữu tỉ dương",
+                    "Số 0",
+                    "Không xác định"
+                ],
+                correct: 0,
+                rationale: "Cộng hai số âm ta cộng hai giá trị tuyệt đối và đặt dấu trừ đằng trước. Kết quả là số âm.",
+                level: "Nhận biết"
+            },
+            {
+                text: "Số đối của số hữu tỉ <span class='math'>-1/2</span> là:",
+                options: [
+                    "<span class='math'>-1/2</span>",
+                    "<span class='math'>1/2</span>", // B (đúng)
+                    "<span class='math'>2</span>",
+                    "<span class='math'>-2</span>"
+                ],
+                correct: 1,
+                rationale: "Hai số đối nhau có tổng bằng 0. Số đối của số âm là số dương tương ứng.",
+                level: "Nhận biết"
+            },
+            {
+                text: "Khẳng định nào sau đây đúng về phép nhân số hữu tỉ?",
+                options: [
+                    "Tích hai số cùng dấu là số âm",
+                    "Tích hai số khác dấu là số dương",
+                    "Tích số dương với số âm là số âm", // C (đúng)
+                    "Tích số âm với 0 là số âm"
+                ],
+                correct: 2,
+                rationale: "Quy tắc nhân dấu: Dương x Âm = Âm.",
+                level: "Nhận biết"
+            },
+            {
+                text: "Để chia hai số hữu tỉ <span class='math'>x : y</span> (với <span class='math'>y ≠ 0</span>), ta làm thế nào?",
+                options: [
+                    "Lấy x nhân với y",
+                    "Lấy x cộng với số đối của y",
+                    "Lấy nghịch đảo của x nhân y",
+                    "Lấy x nhân với nghịch đảo của y" // D (đúng)
+                ],
+                correct: 3,
+                rationale: "Quy tắc chia: Nhân với số nghịch đảo của số chia.",
+                level: "Nhận biết"
+            },
+            {
+                text: "Phép cộng số hữu tỉ có tính chất nào sau đây?",
+                options: [
+                    "Cả giao hoán, kết hợp và cộng với số 0", // A (đúng)
+                    "Chỉ có tính chất giao hoán",
+                    "Chỉ có tính chất kết hợp",
+                    "Không có tính chất nào"
+                ],
+                correct: 0,
+                rationale: "Phép cộng số hữu tỉ thừa hưởng đầy đủ tính chất của phép cộng phân số/số nguyên.",
+                level: "Nhận biết"
+            },
+            {
+                text: "Trong quy tắc chuyển vế, khi chuyển một số hạng từ vế này sang vế kia của một đẳng thức, ta phải:",
+                options: [
+                    "Giữ nguyên dấu",
+                    "Nhân số hạng đó với -1",
+                    "Đổi dấu số hạng đó",        // C (đúng)
+                    "Nghịch đảo số hạng đó"
+                ],
+                correct: 2,
+                rationale: "Quy tắc chuyển vế: Chuyển vế thì phải đổi dấu (+ thành -, - thành +).",
+                level: "Nhận biết"
+            },
+
+            // Mức độ: Thông hiểu (5 câu)
+            {
+                text: "Kết quả của phép tính <span class='math'>-3/4 + 1/4</span> là:",
+                options: [
+                    "<span class='math'>-2/4</span>",
+                    "<span class='math'>-1/2</span>",   // B (đúng)
+                    "<span class='math'>-1</span>",
+                    "<span class='math'>1/2</span>"
+                ],
+                correct: 1,
+                rationale: "Cùng mẫu số: (-3 + 1) / 4 = -2/4. Rút gọn ta được -1/2.",
+                level: "Thông hiểu"
+            },
+            {
+                text: "Tính giá trị của biểu thức: <span class='math'>(-2) . (-3/4)</span>",
+                options: [
+                    "<span class='math'>-3/2</span>",
+                    "<span class='math'>6/4</span>",
+                    "<span class='math'>3/2</span>",    // C (đúng)
+                    "<span class='math'>-6/4</span>"
+                ],
+                correct: 2,
+                rationale: "Âm nhân âm ra dương: 2 . (3/4) = 6/4 = 3/2.",
+                level: "Thông hiểu"
+            },
+            {
+                text: "Tìm x, biết: <span class='math'>x - 1/2 = -2/3</span>",
+                options: [
+                    "<span class='math'>1/6</span>",
+                    "<span class='math'>7/6</span>",
+                    "<span class='math'>-7/6</span>",
+                    "<span class='math'>x = -1/6</span>" // D (đúng, ghi rõ x = ...)
+                ],
+                correct: 3,
+                rationale: "Chuyển vế: x = -2/3 + 1/2 = -4/6 + 3/6 = -1/6.",
+                level: "Thông hiểu"
+            },
+            {
+                text: "Kết quả của phép chia <span class='math'>-15/8 : 3/4</span> là:",
+                options: [
+                    "<span class='math'>-45/32</span>",
+                    "<span class='math'>-5/2</span>",   // B (đúng)
+                    "<span class='math'>5/2</span>",
+                    "<span class='math'>-5/6</span>"
+                ],
+                correct: 1,
+                rationale: "(-15/8) . (4/3) = (-15 . 4) / (8 . 3) = -60 / 24 = -5/2.",
+                level: "Thông hiểu"
+            },
+            {
+                text: "Hỗn số <span class='math'>1 2/3</span> viết dưới dạng phân số là:",
+                options: [
+                    "<span class='math'>5/3</span>",   // A (đúng)
+                    "<span class='math'>3/3</span>",
+                    "<span class='math'>2/3</span>",
+                    "<span class='math'>12/3</span>"
+                ],
+                correct: 0,
+                rationale: "1 2/3 = (1*3 + 2)/3 = 5/3.",
+                level: "Thông hiểu"
+            },
+
+            // Mức độ: Vận dụng (3 câu)
+            {
+                text: "Một kho đông lạnh đang ở <span class='math'>-12°C</span>. Người ta giảm nhiệt độ thêm <span class='math'>3,5°C</span> nữa. Hỏi nhiệt độ mới là bao nhiêu?",
+                options: [
+                    "<span class='math'>-8,5°C</span>",
+                    "<span class='math'>8,5°C</span>",
+                    "<span class='math'>15,5°C</span>",
+                    "<span class='math'>-15,5°C</span>"  // D (đúng)
+                ],
+                correct: 3,
+                rationale: "Giảm thêm nghĩa là trừ đi (hoặc cộng thêm số âm): -12 - 3,5 = -15,5.",
+                level: "Vận dụng thực tế"
+            },
+            {
+                text: "Tính giá trị biểu thức: <span class='math'>A = (2/3 - 1/2) : 1/6</span>",
+                options: [
+                    "<span class='math'>1/6</span>",
+                    "<span class='math'>-1</span>",
+                    "<span class='math'>1</span>",      // C (đúng)
+                    "<span class='math'>1/36</span>"
+                ],
+                correct: 2,
+                rationale: "Trong ngoặc: 4/6 - 3/6 = 1/6. Sau đó: 1/6 : 1/6 = 1.",
+                level: "Vận dụng"
+            },
+            {
+                text: "Tìm x biết: <span class='math'>2/3 . x + 1/4 = 7/12</span>",
+                options: [
+                    "<span class='math'>x = 1/3</span>",
+                    "<span class='math'>x = 1/2</span>", // B (đúng)
+                    "<span class='math'>x = 2</span>",
+                    "<span class='math'>x = 1</span>"
+                ],
+                correct: 1,
+                rationale: "2/3 . x = 7/12 - 1/4 = 7/12 - 3/12 = 4/12 = 1/3. Vậy x = 1/3 : 2/3 = 1/2.",
+                level: "Vận dụng"
+            },
+
+            // Mức độ: Vận dụng cao (1 câu)
+            {
+                text: "Tính tổng dãy số quy luật: <span class='math'>S = 1/(1.2) + 1/(2.3) + 1/(3.4) + ... + 1/(9.10)</span>",
+                options: [
+                    "<span class='math'>9/10</span>",   // A (đúng)
+                    "<span class='math'>1/10</span>",
+                    "<span class='math'>10/11</span>",
+                    "<span class='math'>1/90</span>"
+                ],
+                correct: 0,
+                rationale: "Áp dụng công thức 1/[n(n+1)] = 1/n - 1/(n+1). S = 1 - 1/2 + 1/2 - 1/3 + ... + 1/9 - 1/10 = 1 - 1/10 = 9/10.",
+                level: "Vận dụng cao"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctAnswersCount = 0;
+        let isAnswering = true;
+
+        const startScreen = document.getElementById('startScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const feedbackContainer = document.getElementById('feedbackContainer');
+        const feedbackTitle = document.getElementById('feedbackTitle');
+        const feedbackText = document.getElementById('feedbackText');
+        const feedbackIcon = document.getElementById('feedbackIcon');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const currentQuestionNum = document.getElementById('currentQuestionNum');
+        const progressBar = document.getElementById('progressBar');
+        const levelBadge = document.getElementById('levelBadge');
+
+        // Sounds
+        const correctSound = document.getElementById('correctSound');
+        const wrongSound = document.getElementById('wrongSound');
+        const winSound = document.getElementById('winSound');
+
+        function playSound(type) {
+            if(type === 'correct') { correctSound.currentTime = 0; correctSound.play().catch(e => {}); }
+            if(type === 'wrong') { wrongSound.currentTime = 0; wrongSound.play().catch(e => {}); }
+            if(type === 'win') { winSound.currentTime = 0; winSound.play().catch(e => {}); }
+        }
+
+        function startGame() {
+            startScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            gameScreen.classList.add('fade-in');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isAnswering = true;
+            feedbackContainer.classList.add('hidden');
+            const q = questions[currentQuestionIndex];
+            
+            // Update UI Info
+            currentQuestionNum.textContent = currentQuestionIndex + 1;
+            const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+            
+            // Level Badge color
+            let badgeClass = "bg-gray-100 text-gray-800";
+            if(q.level.includes("Nhận biết")) badgeClass = "bg-green-100 text-green-800";
+            if(q.level.includes("Thông hiểu")) badgeClass = "bg-blue-100 text-blue-800";
+            if(q.level.includes("Vận dụng")) badgeClass = "bg-yellow-100 text-yellow-800";
+            if(q.level.includes("cao")) badgeClass = "bg-purple-100 text-purple-800";
+            levelBadge.className = `absolute top-0 right-0 text-xs font-bold px-3 py-1 rounded-bl-lg ${badgeClass}`;
+            levelBadge.textContent = q.level;
+
+            // Question Text
+            questionText.innerHTML = q.text;
+
+            // Options
+            optionsContainer.innerHTML = '';
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-4 rounded-xl text-slate-700 font-medium text-lg';
+                btn.innerHTML = `<span class="inline-block w-8 h-8 rounded-full bg-slate-100 text-slate-500 text-center leading-8 mr-3 font-bold text-sm">${String.fromCharCode(65 + index)}</span> ${option}`;
+                btn.onclick = () => checkAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex, btnElement) {
+            if (!isAnswering) return;
+            isAnswering = false;
+
+            const q = questions[currentQuestionIndex];
+            const buttons = optionsContainer.getElementsByTagName('button');
+
+            // Hiển thị kết quả trên các nút
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                if (i === q.correct) {
+                    buttons[i].classList.add('correct');
+                    buttons[i].innerHTML += ' <i class="fa-solid fa-check float-right mt-1"></i>';
+                }
+            }
+
+            if (selectedIndex === q.correct) {
+                // Đúng
+                score += 10;
+                correctAnswersCount++;
+                scoreDisplay.textContent = score;
+                playSound('correct');
+                
+                // Hiệu ứng tung hoa (Confetti)
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#22c55e', '#3b82f6', '#f59e0b']
+                });
+
+                showFeedback(true, q.rationale);
+            } else {
+                // Sai
+                btnElement.classList.add('wrong');
+                btnElement.innerHTML += ' <i class="fa-solid fa-xmark float-right mt-1"></i>';
+                playSound('wrong');
+                showFeedback(false, q.rationale);
+            }
+        }
+
+        function showFeedback(isCorrect, rationale) {
+            feedbackContainer.classList.remove('hidden');
+            
+            if (isCorrect) {
+                feedbackContainer.className = "game-card p-6 border-l-4 border-green-500 bg-green-50 fade-in mt-6";
+                feedbackIcon.innerHTML = '<i class="fa-regular fa-face-smile text-3xl text-green-500"></i>';
+                feedbackTitle.textContent = "Chính xác! Xuất sắc quá!";
+                feedbackTitle.className = "font-bold text-lg mb-1 text-green-700";
+            } else {
+                feedbackContainer.className = "game-card p-6 border-l-4 border-red-500 bg-red-50 fade-in mt-6";
+                feedbackIcon.innerHTML = '<i class="fa-regular fa-face-frown-open text-3xl text-red-500"></i>';
+                feedbackTitle.textContent = "Tiếc quá, chưa đúng rồi!";
+                feedbackTitle.className = "font-bold text-lg mb-1 text-red-700";
+            }
+            feedbackText.innerHTML = rationale;
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('correctCount').textContent = correctAnswersCount;
+            document.getElementById('wrongCount').textContent = questions.length - correctAnswersCount;
+
+            const resultIcon = document.getElementById('resultIcon');
+            if (correctAnswersCount >= 12) {
+                resultIcon.innerHTML = '<i class="fa-solid fa-crown text-6xl text-yellow-400 fa-bounce"></i>';
+                playSound('win');
+                confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+            } else if (correctAnswersCount >= 8) {
+                resultIcon.innerHTML = '<i class="fa-solid fa-star text-6xl text-blue-400"></i>';
+            } else {
+                resultIcon.innerHTML = '<i class="fa-solid fa-book-open text-6xl text-slate-400"></i>';
+            }
+        }
+    </script>
+</body>
+</html>
