@@ -315,451 +315,399 @@
     <!-- Confetti Canvas -->
     <canvas id="confetti-canvas" class="fixed top-0 left-0 pointer-events-none z-50 w-full h-full"></canvas>
 
-    <script>
-        // --- GAME DATA ---
-        // 15 Questions: Chapter 1 Lesson 7 Math 8 (Mult/Div Algebraic Fractions)
-        // No $ symbols. Using HTML entities.
+  <script>
+    // --- GAME DATA ---
+    // 15 câu: Hệ thức lượng trong tam giác vuông (Toán 9)
     const questions = [
-    // LEVEL 1: NHẬN BIẾT (6 câu)
-    {
-        q: "Trong tam giác vuông, tỉ số giữa cạnh đối và cạnh huyền của một góc nhọn được gọi là:",
-        a: ["sin", "cos", "tan", "cot"],
-        correct: 0,
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Hệ thức nào sau đây là ĐÚNG với góc nhọn &alpha;?",
-        a: [
-            "tan &alpha; = cos &alpha; / sin &alpha;",
-            "tan &alpha; = sin &alpha; / cos &alpha;",
-            "tan &alpha; = 1 + sin &alpha;",
-            "tan &alpha; = 1 - cos &alpha;"
-        ],
-        correct: 1,
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Nếu hai góc phụ nhau (tổng bằng 90&deg;), thì sin góc này bằng:",
-        a: ["sin góc kia", "tan góc kia", "cot góc kia", "cos góc kia"],
-        correct: 3,
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Cho tam giác ABC vuông tại A. Cạnh góc vuông AC bằng:",
-        a: ["BC . sin B", "BC . cos B", "BC . tan B", "BC . cot B"],
-        correct: 0, // AC = BC.sinB
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Cho tam giác MNP vuông tại M. Cạnh góc vuông MN bằng cạnh góc vuông MP nhân với:",
-        a: ["sin P", "cos P", "cot P", "tan P"],
-        correct: 3, // MN = MP.tanP
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Giá trị của biểu thức sin<sup>2</sup>&alpha; + cos<sup>2</sup>&alpha; luôn bằng:",
-        a: ["0", "1", "2", "tan &alpha;"],
-        correct: 1,
-        level: "NHẬN BIẾT"
-    },
+        // LEVEL 1: NHẬN BIẾT (6 câu)
+        {
+            q: "Trong tam giác vuông, tỉ số giữa cạnh đối và cạnh huyền của một góc nhọn được gọi là:",
+            a: ["sin", "cos", "tan", "cot"],
+            correct: 0,
+            level: "NHẬN BIẾT"
+        },
+        {
+            q: "Hệ thức nào sau đây là ĐÚNG với góc nhọn &alpha;?",
+            a: [
+                "tan &alpha; = cos &alpha; / sin &alpha;",
+                "tan &alpha; = sin &alpha; / cos &alpha;",
+                "tan &alpha; = 1 + sin &alpha;",
+                "tan &alpha; = 1 - cos &alpha;"
+            ],
+            correct: 1,
+            level: "NHẬN BIẾT"
+        },
+        {
+            q: "Nếu hai góc phụ nhau (tổng bằng 90&deg;), thì sin góc này bằng:",
+            a: ["sin góc kia", "tan góc kia", "cot góc kia", "cos góc kia"],
+            correct: 3,
+            level: "NHẬN BIẾT"
+        },
+        {
+            q: "Cho tam giác ABC vuông tại A. Cạnh góc vuông AC bằng:",
+            a: ["BC . sin B", "BC . cos B", "BC . tan B", "BC . cot B"],
+            correct: 0, // AC = BC.sinB
+            level: "NHẬN BIẾT"
+        },
+        {
+            q: "Cho tam giác MNP vuông tại M. Cạnh góc vuông MN bằng cạnh góc vuông MP nhân với:",
+            a: ["sin P", "cos P", "cot P", "tan P"],
+            correct: 3, // MN = MP.tanP
+            level: "NHẬN BIẾT"
+        },
+        {
+            q: "Giá trị của biểu thức sin<sup>2</sup>&alpha; + cos<sup>2</sup>&alpha; luôn bằng:",
+            a: ["0", "1", "2", "tan &alpha;"],
+            correct: 1,
+            level: "NHẬN BIẾT"
+        },
 
-    // LEVEL 2: THÔNG HIỂU (5 câu)
-    {
-        q: "Tam giác ABC vuông tại A có AB = 6, AC = 8. Giá trị sin B là:",
-        a: ["0.6", "0.8", "0.75", "1.33"],
-        correct: 1, // BC = 10, sinB = 8/10
-        level: "THÔNG HIỂU"
-    },
-    {
-        q: "Cho cos &alpha; = 0.5. Số đo góc &alpha; là:",
-        a: ["30&deg;", "45&deg;", "60&deg;", "90&deg;"],
-        correct: 2,
-        level: "THÔNG HIỂU"
-    },
-    {
-        q: "Rút gọn biểu thức P = 1 - sin<sup>2</sup>&alpha; ta được:",
-        a: ["sin<sup>2</sup>&alpha;", "cos<sup>2</sup>&alpha;", "tan<sup>2</sup>&alpha;", "1"],
-        correct: 1,
-        level: "THÔNG HIỂU"
-    },
-    {
-        q: "Một cái thang dài 4m dựa vào tường, chân thang cách tường 2m. Góc tạo bởi thang và mặt đất là:",
-        a: ["30&deg;", "45&deg;", "60&deg;", "75&deg;"],
-        correct: 2, // cos = 2/4 = 0.5 → 60°
-        level: "THÔNG HIỂU"
-    },
-    {
-        q: "Cho tam giác ABC vuông tại A, đường cao AH. Biết BH=1, HC=4. Giá trị tan B là:",
-        a: ["2", "0.5", "4", "0.25"],
-        correct: 0, // AH^2 = 1*4 = 4 → AH=2, tanB = 2/1
-        level: "THÔNG HIỂU"
-    },
+        // LEVEL 2: THÔNG HIỂU (5 câu)
+        {
+            q: "Tam giác ABC vuông tại A có AB = 6, AC = 8. Giá trị sin B là:",
+            a: ["0.6", "0.8", "0.75", "1.33"],
+            correct: 1, // BC = 10, sinB = 8/10
+            level: "THÔNG HIỂU"
+        },
+        {
+            q: "Cho cos &alpha; = 0.5. Số đo góc &alpha; là:",
+            a: ["30&deg;", "45&deg;", "60&deg;", "90&deg;"],
+            correct: 2,
+            level: "THÔNG HIỂU"
+        },
+        {
+            q: "Rút gọn biểu thức P = 1 - sin<sup>2</sup>&alpha; ta được:",
+            a: ["sin<sup>2</sup>&alpha;", "cos<sup>2</sup>&alpha;", "tan<sup>2</sup>&alpha;", "1"],
+            correct: 1,
+            level: "THÔNG HIỂU"
+        },
+        {
+            q: "Một cái thang dài 4m dựa vào tường, chân thang cách tường 2m. Góc tạo bởi thang và mặt đất là:",
+            a: ["30&deg;", "45&deg;", "60&deg;", "75&deg;"],
+            correct: 2, // cos = 2/4 = 0.5 → 60°
+            level: "THÔNG HIỂU"
+        },
+        {
+            q: "Cho tam giác ABC vuông tại A, đường cao AH. Biết BH=1, HC=4. Giá trị tan B là:",
+            a: ["2", "0.5", "4", "0.25"],
+            correct: 0, // AH^2 = 1*4 = 4 → AH=2, tanB = 2/1
+            level: "THÔNG HIỂU"
+        },
 
-    // LEVEL 3: VẬN DỤNG (3 câu)
-    {
-        q: "(Thực tế) Một cột cờ cao 10m có bóng trên mặt đất dài 10m. Góc nắng mặt trời (góc tạo bởi tia nắng và mặt đất) là:",
-        a: ["30&deg;", "45&deg;", "60&deg;", "50&deg;"],
-        // tan a = 10/10 = 1 → a = 45°
-        correct: 1, // Đáp án đúng là B = 45°
-        level: "VẬN DỤNG"
-    },
-    {
-        q: "Tam giác ABC vuông tại A, BC = 20, góc C = 30&deg;. Độ dài cạnh AB là:",
-        a: ["10", "10&radic;3", "20&radic;3", "20"],
-        correct: 0, // AB = BC.sinC = 20*sin30 = 10
-        level: "VẬN DỤNG"
-    },
-    {
-        q: "Tìm x trong tam giác vuông có cạnh huyền bằng 10, một góc nhọn bằng 40&deg;, x là cạnh kề góc đó (Làm tròn 1 chữ số thập phân):",
-        a: ["6.4", "8.2", "7.7", "5.0"],
-        // x = 10.cos40 ≈ 7.7
-        correct: 2,
-        level: "VẬN DỤNG"
-    },
+        // LEVEL 3: VẬN DỤNG (3 câu)
+        {
+            q: "(Thực tế) Một cột cờ cao 10m có bóng trên mặt đất dài 10m. Góc nắng mặt trời (góc tạo bởi tia nắng và mặt đất) là:",
+            a: ["30&deg;", "45&deg;", "60&deg;", "50&deg;"],
+            // tan a = 10/10 = 1 → a = 45°
+            correct: 1, // B = 45°
+            level: "VẬN DỤNG"
+        },
+        {
+            q: "Tam giác ABC vuông tại A, BC = 20, góc C = 30&deg;. Độ dài cạnh AB là:",
+            a: ["10", "10&radic;3", "20&radic;3", "20"],
+            correct: 0, // AB = BC.sinC = 20*sin30 = 10
+            level: "VẬN DỤNG"
+        },
+        {
+            q: "Tìm x trong tam giác vuông có cạnh huyền bằng 10, một góc nhọn bằng 40&deg;, x là cạnh kề góc đó (Làm tròn 1 chữ số thập phân):",
+            a: ["6.4", "8.2", "7.7", "5.0"],
+            // x = 10.cos40 ≈ 7.7
+            correct: 2,
+            level: "VẬN DỤNG"
+        },
 
-    // LEVEL 4: VẬN DỤNG CAO (1 câu)
-    {
-        q: "Tính giá trị biểu thức: S = sin<sup>2</sup>15&deg; + sin<sup>2</sup>25&deg; + sin<sup>2</sup>35&deg; + sin<sup>2</sup>55&deg; + sin<sup>2</sup>65&deg; + sin<sup>2</sup>75&deg;",
-        a: ["1", "2", "3", "4"],
-        correct: 2, // 3 cặp bổ sung nhau → S = 3
-        level: "VẬN DỤNG CAO"
+        // LEVEL 4: VẬN DỤNG CAO (1 câu)
+        {
+            q: "Tính giá trị biểu thức: S = sin<sup>2</sup>15&deg; + sin<sup>2</sup>25&deg; + sin<sup>2</sup>35&deg; + sin<sup>2</sup>55&deg; + sin<sup>2</sup>65&deg; + sin<sup>2</sup>75&deg;",
+            a: ["1", "2", "3", "4"],
+            correct: 2, // 3 cặp bổ sung nhau → S = 3
+            level: "VẬN DỤNG CAO"
+        }
+    ];
+
+    // --- GAME STATE ---
+    let currentQIndex = 0;
+    let score = 0;
+    let isAnswering = false;
+
+    // --- BACKGROUND STARS ---
+    const space = document.getElementById('space');
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.width = Math.random() * 3 + 'px';
+        star.style.height = star.style.width;
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 2 + 's';
+        space.appendChild(star);
     }
-];
-        // --- GAME LOGIC ---
-        let currentQIndex = 0;
-        let score = 0;
-        let isAnswering = false;
-        
-        // Stars generation
-        const space = document.getElementById('space');
-        for(let i=0; i<100; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.width = Math.random() * 3 + 'px';
-            star.style.height = star.style.width;
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.animationDelay = Math.random() * 2 + 's';
-            space.appendChild(star);
-        }
 
-        // Audio System (Synthesized)
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // --- AUDIO SYSTEM ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
 
-            const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
 
-            if (type === 'laser') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(880, now);
-                osc.frequency.exponentialRampToValueAtTime(110, now + 0.2);
-                gainNode.gain.setValueAtTime(0.3, now);
-                gainNode.gain.linearRampToValueAtTime(0, now + 0.2);
-                osc.start(now);
-                osc.stop(now + 0.2);
-            } else if (type === 'explosion') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(100, now);
-                osc.frequency.exponentialRampToValueAtTime(0.01, now + 0.5);
-                gainNode.gain.setValueAtTime(0.5, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-                osc.start(now);
-                osc.stop(now + 0.5);
-            } else if (type === 'correct') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, now); // C5
-                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
-                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
-                gainNode.gain.setValueAtTime(0.2, now);
-                gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
-                osc.start(now);
-                osc.stop(now + 0.4);
-            } else if (type === 'wrong') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.linearRampToValueAtTime(50, now + 0.3);
-                gainNode.gain.setValueAtTime(0.5, now);
-                gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
-                osc.start(now);
-                osc.stop(now + 0.3);
-            } else if (type === 'win') {
-                const notes = [523.25, 659.25, 783.99, 1046.50];
-                notes.forEach((freq, i) => {
-                    setTimeout(() => {
-                        const o = audioCtx.createOscillator();
-                        const g = audioCtx.createGain();
-                        o.connect(g);
-                        g.connect(audioCtx.destination);
-                        o.type = 'square';
-                        o.frequency.value = freq;
-                        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                        o.start();
-                        o.stop(audioCtx.currentTime + 0.3);
-                    }, i * 150);
-                });
-            }
-        }
+        const now = audioCtx.currentTime;
 
-       function startGame() {
-    // Ẩn màn hình chờ
-    document.getElementById('start-screen').classList.add('hidden');
-
-    // Hiện màn hình game
-    const gameScreen = document.getElementById('game-screen');
-    gameScreen.classList.remove('hidden');
-    gameScreen.classList.add('flex');
-
-    // Reset game
-    currentQIndex = 0;
-    score = 0;
-    updateUI();
-    loadQuestion();
-}
-
-        function loadQuestion() {
-            if (currentQIndex >= questions.length) {
-                endGame();
-                return;
-            }
-
-            const q = questions[currentQIndex];
-            
-            // Reset Alien
-            const alien = document.getElementById('alien');
-            alien.style.opacity = '1';
-            alien.style.transform = 'translateX(-50%)';
-            alien.innerText = getAlienSkin(currentQIndex);
-
-            // Update Text
-            document.getElementById('q-number').innerText = currentQIndex + 1;
-            document.getElementById('question-text').innerHTML = q.q;
-            document.getElementById('level-badge').innerText = q.level;
-            
-            // Level Color
-            const badge = document.getElementById('level-badge');
-            if (q.level.includes("NHẬN BIẾT")) badge.className = "font-bold text-green-400 text-lg";
-            else if (q.level.includes("THÔNG HIỂU")) badge.className = "font-bold text-blue-400 text-lg";
-            else if (q.level.includes("VẬN DỤNG CAO")) badge.className = "font-bold text-red-500 text-lg";
-            else badge.className = "font-bold text-yellow-400 text-lg";
-
-            // Reset Log
-            const logBox = document.getElementById('data-log');
-            logBox.classList.remove('show');
-            document.getElementById('next-btn-container').classList.add('hidden');
-
-            // Buttons
-            const grid = document.getElementById('options-grid');
-            grid.innerHTML = '';
-            
-            q.a.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = "btn-option w-full p-4 rounded text-lg font-medium shadow-lg min-h-[70px] font-mono";
-                btn.innerHTML = opt;
-                btn.onclick = () => handleAnswer(idx, q.correct, btn);
-                grid.appendChild(btn);
+        if (type === 'laser') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(880, now);
+            osc.frequency.exponentialRampToValueAtTime(110, now + 0.2);
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.linearRampToValueAtTime(0, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+        } else if (type === 'explosion') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.exponentialRampToValueAtTime(0.01, now + 0.5);
+            gainNode.gain.setValueAtTime(0.5, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+            osc.start(now);
+            osc.stop(now + 0.5);
+        } else if (type === 'correct') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.setValueAtTime(659.25, now + 0.1);
+            osc.frequency.setValueAtTime(783.99, now + 0.2);
+            gainNode.gain.setValueAtTime(0.2, now);
+            gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
+            osc.start(now);
+            osc.stop(now + 0.4);
+        } else if (type === 'wrong') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.linearRampToValueAtTime(50, now + 0.3);
+            gainNode.gain.setValueAtTime(0.5, now);
+            gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'win') {
+            const notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, i) => {
+                setTimeout(() => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.type = 'square';
+                    o.frequency.value = freq;
+                    g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    o.start();
+                    o.stop(audioCtx.currentTime + 0.3);
+                }, i * 150);
             });
-
-            isAnswering = false;
         }
-
-        function getAlienSkin(index) {
-            const aliens = ['🛸', '👽', '👾', '🤖', '🕷️', '🐙', '🛸', '🧟', '🦇', '🐉'];
-            return aliens[index % aliens.length];
-        }
-
-        function fireLaser() {
-            playSound('laser');
-            const gameArea = document.getElementById('game-area');
-            const laser = document.createElement('div');
-            laser.className = 'laser-beam';
-            gameArea.appendChild(laser);
-
-            // Animate laser
-            let pos = 60;
-            const interval = setInterval(() => {
-                pos += 20;
-                laser.style.bottom = pos + 'px';
-                if (pos > gameArea.offsetHeight - 50) {
-                    clearInterval(interval);
-                    laser.remove();
-                    createExplosion();
-                }
-            }, 16);
-        }
-
-        function createExplosion() {
-            playSound('explosion');
-            const gameArea = document.getElementById('game-area');
-            const alien = document.getElementById('alien');
-            
-            // Hide alien
-            alien.style.opacity = '0';
-
-            const explosion = document.createElement('div');
-            explosion.className = 'explosion';
-            explosion.innerText = '💥';
-            explosion.style.top = '20px';
-            gameArea.appendChild(explosion);
-
-            setTimeout(() => explosion.remove(), 500);
-        }
-
-     function handleAnswer(selected, correct, btn) {
-    if (isAnswering) return;
-    isAnswering = true;
-
-    // Khóa tất cả nút đáp án
-    const allBtns = document.querySelectorAll('#options-grid .btn-option');
-    allBtns.forEach(b => b.disabled = true);
-
-    // Hiện phân tích dữ liệu
-    const q = questions[currentQIndex];
-    const logBox = document.getElementById('data-log');
-    const content = document.getElementById('log-content');
-    content.innerHTML = q.rationale;
-    logBox.classList.add('show');
-
-    if (selected === correct) {
-        btn.classList.add('correct');
-        score += 100;
-
-        // Hiệu ứng bắn laser trúng
-        fireLaser();
-        setTimeout(() => {
-            playSound('correct');
-            showFeedback("🎯");
-            fireConfetti(30);
-        }, 400);
-    } else {
-        btn.classList.add('wrong');
-        allBtns[correct].classList.add('correct');
-        playSound('wrong');
-        showFeedback("⚠️");
-
-        // Rung khu vực game
-        const area = document.getElementById('game-area');
-        area.classList.add('shake');
-        setTimeout(() => area.classList.remove('shake'), 500);
     }
 
-    updateUI();
+    // --- GAME FLOW ---
+    function startGame() {
+        // Ẩn màn hình chờ
+        document.getElementById('start-screen').classList.add('hidden');
 
-    // Hiện nút NEXT và cuộn xuống cho cô thấy
-    const nextContainer = document.getElementById('next-btn-container');
-    nextContainer.classList.remove('hidden');
-    nextContainer.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-    });
-}
+        // Hiện màn hình game
+        const gameScreen = document.getElementById('game-screen');
+        gameScreen.classList.remove('hidden');
+        gameScreen.classList.add('flex');
 
-        // Hiệu ứng bắn laser + trúng
-        fireLaser();
-        setTimeout(() => {
-            playSound('correct');
-            showFeedback("🎯");
-            fireConfetti(30);
-        }, 400);
-
-    } else {
-        btn.classList.add('wrong');
-        allBtns[correct].classList.add('correct');
-        playSound('wrong');
-        showFeedback("⚠️");
-        
-        // Rung màn hình
-        const area = document.getElementById('game-area');
-        area.classList.add('shake');
-        setTimeout(() => area.classList.remove('shake'), 500);
+        // Reset game
+        currentQIndex = 0;
+        score = 0;
+        updateUI();
+        loadQuestion();
     }
 
-    updateUI();
-    document.getElementById('next-btn-container').classList.remove('hidden');
-}
-
-        function nextQuestion() {
-            currentQIndex++;
-            if (currentQIndex < questions.length) {
-                loadQuestion();
-            } else {
-                endGame();
-            }
+    function loadQuestion() {
+        if (currentQIndex >= questions.length) {
+            endGame();
+            return;
         }
 
-        function updateUI() {
-            document.getElementById('score').innerText = score.toString().padStart(4, '0');
-        }
+        const q = questions[currentQIndex];
 
-        function showFeedback(emoji) {
-            const el = document.getElementById('feedback-emoji');
-            el.innerText = emoji;
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 1000);
-        }
+        // Reset Alien
+        const alien = document.getElementById('alien');
+        alien.style.opacity = '1';
+        alien.style.transform = 'translateX(-50%)';
+        alien.innerText = getAlienSkin(currentQIndex);
 
-        function endGame() {
-            document.getElementById('game-screen').classList.remove('flex');
-            document.getElementById('game-screen').classList.add('hidden');
-            document.getElementById('end-screen').classList.remove('hidden');
-            document.getElementById('final-score').innerText = score;
-            playSound('win');
-            setInterval(() => fireConfetti(50), 1000);
-        }
+        // Update text
+        document.getElementById('q-number').innerText = currentQIndex + 1;
+        document.getElementById('question-text').innerHTML = q.q;
+        document.getElementById('level-badge').innerText = q.level;
 
-        // --- CONFETTI ---
-        const canvas = document.getElementById('confetti-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        let particles = [];
+        // Level color
+        const badge = document.getElementById('level-badge');
+        if (q.level.includes("NHẬN BIẾT")) badge.className = "font-bold text-green-400 text-lg";
+        else if (q.level.includes("THÔNG HIỂU")) badge.className = "font-bold text-blue-400 text-lg";
+        else if (q.level.includes("VẬN DỤNG CAO")) badge.className = "font-bold text-red-500 text-lg";
+        else badge.className = "font-bold text-yellow-400 text-lg";
 
-        function fireConfetti(amount) {
-            for (let i = 0; i < amount; i++) {
-                particles.push({
-                    x: window.innerWidth / 2,
-                    y: window.innerHeight / 2,
-                    vx: (Math.random() - 0.5) * 20,
-                    vy: (Math.random() - 0.5) * 20,
-                    life: 100,
-                    color: `hsl(${Math.random() * 120}, 100%, 50%)`, // Green spectrum
-                    size: Math.random() * 5 + 2
-                });
-            }
-            if(particles.length <= amount) requestAnimationFrame(updateConfetti);
-        }
+        // Tạo các nút đáp án
+        const grid = document.getElementById('options-grid');
+        grid.innerHTML = '';
 
-        function updateConfetti() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particles.length; i++) {
-                const p = particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.life--;
-                
-                ctx.fillStyle = p.color;
-                ctx.fillRect(p.x, p.y, p.size, p.size);
-
-                if (p.life <= 0) {
-                    particles.splice(i, 1);
-                    i--;
-                }
-            }
-            if (particles.length > 0) requestAnimationFrame(updateConfetti);
-        }
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        q.a.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = "btn-option w-full p-4 rounded text-lg font-medium shadow-lg min-h-[70px] font-mono";
+            btn.innerHTML = opt;
+            btn.onclick = () => handleAnswer(idx, q.correct, btn);
+            grid.appendChild(btn);
         });
 
-    </script>
+        isAnswering = false;
+    }
+
+    function getAlienSkin(index) {
+        const aliens = ['🛸', '👽', '👾', '🤖', '🕷️', '🐙', '🛸', '🧟', '🦇', '🐉'];
+        return aliens[index % aliens.length];
+    }
+
+    function fireLaser() {
+        playSound('laser');
+        const gameArea = document.getElementById('game-area');
+        const laser = document.createElement('div');
+        laser.className = 'laser-beam';
+        gameArea.appendChild(laser);
+
+        let pos = 60;
+        const interval = setInterval(() => {
+            pos += 20;
+            laser.style.bottom = pos + 'px';
+            if (pos > gameArea.offsetHeight - 50) {
+                clearInterval(interval);
+                laser.remove();
+                createExplosion();
+            }
+        }, 16);
+    }
+
+    function createExplosion() {
+        playSound('explosion');
+        const gameArea = document.getElementById('game-area');
+        const alien = document.getElementById('alien');
+
+        alien.style.opacity = '0';
+
+        const explosion = document.createElement('div');
+        explosion.className = 'explosion';
+        explosion.innerText = '💥';
+        explosion.style.top = '20px';
+        gameArea.appendChild(explosion);
+
+        setTimeout(() => explosion.remove(), 500);
+    }
+
+    function handleAnswer(selected, correct, btn) {
+        if (isAnswering) return;
+        isAnswering = true;
+
+        const allBtns = document.querySelectorAll('.btn-option');
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            score += 100;
+
+            fireLaser();
+            setTimeout(() => {
+                playSound('correct');
+                showFeedback("🎯");
+                fireConfetti(30);
+            }, 400);
+        } else {
+            btn.classList.add('wrong');
+            allBtns[correct].classList.add('correct');
+            playSound('wrong');
+            showFeedback("⚠️");
+
+            const area = document.getElementById('game-area');
+            area.classList.add('shake');
+            setTimeout(() => area.classList.remove('shake'), 500);
+        }
+
+        updateUI();
+
+        // Tự động sang câu mới sau 2 giây
+        setTimeout(() => {
+            currentQIndex++;
+            loadQuestion();
+        }, 2000);
+    }
+
+    function updateUI() {
+        document.getElementById('score').innerText = score.toString().padStart(4, '0');
+    }
+
+    function showFeedback(emoji) {
+        const el = document.getElementById('feedback-emoji');
+        el.innerText = emoji;
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 1000);
+    }
+
+    function endGame() {
+        document.getElementById('game-screen').classList.remove('flex');
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+        document.getElementById('final-score').innerText = score;
+        playSound('win');
+        setInterval(() => fireConfetti(50), 1000);
+    }
+
+    // --- CONFETTI ---
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let particles = [];
+
+    function fireConfetti(amount) {
+        for (let i = 0; i < amount; i++) {
+            particles.push({
+                x: window.innerWidth / 2,
+                y: window.innerHeight / 2,
+                vx: (Math.random() - 0.5) * 20,
+                vy: (Math.random() - 0.5) * 20,
+                life: 100,
+                color: `hsl(${Math.random() * 120}, 100%, 50%)`,
+                size: Math.random() * 5 + 2
+            });
+        }
+        if (particles.length <= amount) requestAnimationFrame(updateConfetti);
+    }
+
+    function updateConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life--;
+
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, p.size, p.size);
+
+            if (p.life <= 0) {
+                particles.splice(i, 1);
+                i--;
+            }
+        }
+        if (particles.length > 0) requestAnimationFrame(updateConfetti);
+    }
+
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+</script>
+
 </body>
 </html>
