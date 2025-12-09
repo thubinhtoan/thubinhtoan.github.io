@@ -322,204 +322,106 @@
     const questions = [
     // LEVEL 1: NHẬN BIẾT (6 câu)
     {
-        q: "Muốn nhân hai phân thức, ta thực hiện như thế nào?",
-        a: [
-            "Nhân tử với mẫu, mẫu với tử",
-            "Nhân tử với tử, mẫu với mẫu",
-            "Quy đồng mẫu rồi nhân tử",
-            "Giữ nguyên mẫu, nhân các tử"
-        ],
-        // ĐÚNG: B
-        correct: 1,
-        rationale: "Quy tắc: <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> . <div class='fraction'><span class='numerator'>C</span><span class='denominator'>D</span></div> = <div class='fraction'><span class='numerator'>A.C</span><span class='denominator'>B.D</span></div>.",
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Phân thức nghịch đảo của phân thức <div class='fraction'><span class='numerator'>x - 2</span><span class='denominator'>x + 1</span></div> (với x &ne; 2, x &ne; -1) là:",
-        a: [
-            "<div class='fraction'><span class='numerator'>-(x - 2)</span><span class='denominator'>x + 1</span></div>",
-            "<div class='fraction'><span class='numerator'>x - 2</span><span class='denominator'>-(x + 1)</span></div>",
-            "<div class='fraction'><span class='numerator'>1</span><span class='denominator'>x - 2</span></div>",
-            "<div class='fraction'><span class='numerator'>x + 1</span><span class='denominator'>x - 2</span></div>"
-        ],
-        // ĐÚNG: D
-        correct: 3,
-        rationale: "Phân thức nghịch đảo của A/B là B/A.",
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Kết quả của phép tính <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> : <div class='fraction'><span class='numerator'>C</span><span class='denominator'>D</span></div> là:",
-        a: [
-            "<div class='fraction'><span class='numerator'>A.C</span><span class='denominator'>B.D</span></div>",
-            "<div class='fraction'><span class='numerator'>A.B</span><span class='denominator'>C.D</span></div>",
-            "<div class='fraction'><span class='numerator'>A.D</span><span class='denominator'>B.C</span></div>",
-            "<div class='fraction'><span class='numerator'>B.C</span><span class='denominator'>A.D</span></div>"
-        ],
-        // ĐÚNG: C
-        correct: 2,
-        rationale: "Chia là nhân với nghịch đảo: (A/B) . (D/C) = (A.D)/(B.C).",
-        level: "NHẬN BIẾT"
-    },
-    {
-        q: "Điều kiện để thực hiện phép chia <div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div> : <div class='fraction'><span class='numerator'>C</span><span class='denominator'>D</span></div> là:",
-        a: [
-            "C/D &ne; 0",
-            "A/B &ne; 0",
-            "A &ne; 0",
-            "D = 0"
-        ],
-        // ĐÚNG: A
+        q: "Trong tam giác vuông, tỉ số giữa cạnh đối và cạnh huyền của một góc nhọn được gọi là:",
+        a: ["sin", "cos", "tan", "cot"],
         correct: 0,
-        rationale: "Phân thức chia (số chia) phải khác 0.",
         level: "NHẬN BIẾT"
     },
     {
-        q: "Kết quả của phép tính <div class='fraction'><span class='numerator'>2x</span><span class='denominator'>3y</span></div> . <div class='fraction'><span class='numerator'>3y</span><span class='denominator'>2x</span></div> (với x, y &ne; 0) là:",
+        q: "Hệ thức nào sau đây là ĐÚNG với góc nhọn &alpha;?",
         a: [
-            "0",
-            "1",
-            "x/y",
-            "2/3"
+            "tan &alpha; = cos &alpha; / sin &alpha;",
+            "tan &alpha; = sin &alpha; / cos &alpha;",
+            "tan &alpha; = 1 + sin &alpha;",
+            "tan &alpha; = 1 - cos &alpha;"
         ],
-        // ĐÚNG: B
         correct: 1,
-        rationale: "Tích của một phân thức và nghịch đảo của nó luôn bằng 1.",
         level: "NHẬN BIẾT"
     },
     {
-        q: "Lũy thừa tầng của phân thức: (<div class='fraction'><span class='numerator'>A</span><span class='denominator'>B</span></div>)<sup>n</sup> bằng:",
-        a: [
-            "<div class='fraction'><span class='numerator'>A.n</span><span class='denominator'>B.n</span></div>",
-            "<div class='fraction'><span class='numerator'>A<sup>n</sup></span><span class='denominator'>B</span></div>",
-            "<div class='fraction'><span class='numerator'>A<sup>n</sup></span><span class='denominator'>B<sup>n</sup></span></div>",
-            "<div class='fraction'><span class='numerator'>A</span><span class='denominator'>B<sup>n</sup></span></div>"
-        ],
-        // ĐÚNG: C
-        correct: 2,
-        rationale: "Lũy thừa của một thương bằng thương các lũy thừa.",
+        q: "Nếu hai góc phụ nhau (tổng bằng 90&deg;), thì sin góc này bằng:",
+        a: ["sin góc kia", "tan góc kia", "cot góc kia", "cos góc kia"],
+        correct: 3,
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Cho tam giác ABC vuông tại A. Cạnh góc vuông AC bằng:",
+        a: ["BC . sin B", "BC . cos B", "BC . tan B", "BC . cot B"],
+        correct: 0, // AC = BC.sinB
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Cho tam giác MNP vuông tại M. Cạnh góc vuông MN bằng cạnh góc vuông MP nhân với:",
+        a: ["sin P", "cos P", "cot P", "tan P"],
+        correct: 3, // MN = MP.tanP
+        level: "NHẬN BIẾT"
+    },
+    {
+        q: "Giá trị của biểu thức sin<sup>2</sup>&alpha; + cos<sup>2</sup>&alpha; luôn bằng:",
+        a: ["0", "1", "2", "tan &alpha;"],
+        correct: 1,
         level: "NHẬN BIẾT"
     },
 
     // LEVEL 2: THÔNG HIỂU (5 câu)
     {
-        q: "Thực hiện phép tính: <div class='fraction'><span class='numerator'>15x</span><span class='denominator'>7y<sup>3</sup></span></div> . <div class='fraction'><span class='numerator'>2y<sup>2</sup></span><span class='denominator'>x<sup>2</sup></span></div>",
-        a: [
-            "<div class='fraction'><span class='numerator'>30</span><span class='denominator'>7xy</span></div>",
-            "<div class='fraction'><span class='numerator'>30x</span><span class='denominator'>7y</span></div>",
-            "<div class='fraction'><span class='numerator'>15</span><span class='denominator'>14xy</span></div>",
-            "<div class='fraction'><span class='numerator'>30xy</span><span class='denominator'>7</span></div>"
-        ],
-        // ĐÚNG: A
-        correct: 0,
-        rationale: "Tử: 15x . 2y<sup>2</sup> = 30xy<sup>2</sup>. Mẫu: 7y<sup>3</sup> . x<sup>2</sup> = 7x<sup>2</sup>y<sup>3</sup>.<br>Rút gọn: 30xy<sup>2</sup> / 7x<sup>2</sup>y<sup>3</sup> = 30 / 7xy.",
+        q: "Tam giác ABC vuông tại A có AB = 6, AC = 8. Giá trị sin B là:",
+        a: ["0.6", "0.8", "0.75", "1.33"],
+        correct: 1, // BC = 10, sinB = 8/10
         level: "THÔNG HIỂU"
     },
     {
-        q: "Kết quả của phép nhân <div class='fraction'><span class='numerator'>x<sup>2</sup> - 4</span><span class='denominator'>3x</span></div> . <div class='fraction'><span class='numerator'>6</span><span class='denominator'>x + 2</span></div> là:",
-        a: [
-            "<div class='fraction'><span class='numerator'>2(x + 2)</span><span class='denominator'>x</span></div>",
-            "<div class='fraction'><span class='numerator'>x - 2</span><span class='denominator'>2x</span></div>",
-            "2",
-            "<div class='fraction'><span class='numerator'>2(x - 2)</span><span class='denominator'>x</span></div>"
-        ],
-        // ĐÚNG: D
-        correct: 3,
-        rationale: "Phân tích: x<sup>2</sup>-4 = (x-2)(x+2).<br>Biểu thức = <div class='fraction'><span class='numerator'>(x-2)(x+2).6</span><span class='denominator'>3x(x+2)</span></div> = <div class='fraction'><span class='numerator'>2(x-2)</span><span class='denominator'>x</span></div>.",
-        level: "THÔNG HIỂU"
-    },
-    {
-        q: "Thực hiện phép chia: <div class='fraction'><span class='numerator'>5x</span><span class='denominator'>2y</span></div> : <div class='fraction'><span class='numerator'>10x<sup>2</sup></span><span class='denominator'>6y</span></div>",
-        a: [
-            "<div class='fraction'><span class='numerator'>3x</span><span class='denominator'>2</span></div>",
-            "<div class='fraction'><span class='numerator'>3</span><span class='denominator'>2x</span></div>",
-            "<div class='fraction'><span class='numerator'>2</span><span class='denominator'>3x</span></div>",
-            "<div class='fraction'><span class='numerator'>3</span><span class='denominator'>x</span></div>"
-        ],
-        // ĐÚNG: B
-        correct: 1,
-        rationale: "= <div class='fraction'><span class='numerator'>5x</span><span class='denominator'>2y</span></div> . <div class='fraction'><span class='numerator'>6y</span><span class='denominator'>10x<sup>2</sup></span></div> = <div class='fraction'><span class='numerator'>30xy</span><span class='denominator'>20x<sup>2</sup>y</span></div> = <div class='fraction'><span class='numerator'>3</span><span class='denominator'>2x</span></div>.",
-        level: "THÔNG HIỂU"
-    },
-    {
-        q: "Rút gọn biểu thức <div class='fraction'><span class='numerator'>x - 1</span><span class='denominator'>x</span></div> . <div class='fraction'><span class='numerator'>x<sup>2</sup></span><span class='denominator'>1 - x</span></div>",
-        a: [
-            "x",
-            "1",
-            "-x",
-            "-1"
-        ],
-        // ĐÚNG: C
+        q: "Cho cos &alpha; = 0.5. Số đo góc &alpha; là:",
+        a: ["30&deg;", "45&deg;", "60&deg;", "90&deg;"],
         correct: 2,
-        rationale: "1 - x = -(x - 1).<br>Biểu thức = <div class='fraction'><span class='numerator'>(x-1)x<sup>2</sup></span><span class='denominator'>x . [-(x-1)]</span></div> = -x.",
         level: "THÔNG HIỂU"
     },
     {
-        q: "Kết quả của phép tính <div class='fraction'><span class='numerator'>4x<sup>2</sup></span><span class='denominator'>5y<sup>2</sup></span></div> : <div class='fraction'><span class='numerator'>2x</span><span class='denominator'>5y</span></div> là:",
-        a: [
-            "<div class='fraction'><span class='numerator'>2x</span><span class='denominator'>y</span></div>",
-            "<div class='fraction'><span class='numerator'>2y</span><span class='denominator'>x</span></div>",
-            "<div class='fraction'><span class='numerator'>x</span><span class='denominator'>2y</span></div>",
-            "<div class='fraction'><span class='numerator'>y</span><span class='denominator'>2x</span></div>"
-        ],
-        // ĐÚNG: A
-        correct: 0,
-        rationale: "= <div class='fraction'><span class='numerator'>4x<sup>2</sup></span><span class='denominator'>5y<sup>2</sup></span></div> . <div class='fraction'><span class='numerator'>5y</span><span class='denominator'>2x</span></div> = <div class='fraction'><span class='numerator'>20x<sup>2</sup>y</span><span class='denominator'>10xy<sup>2</sup></span></div> = <div class='fraction'><span class='numerator'>2x</span><span class='denominator'>y</span></div>.",
+        q: "Rút gọn biểu thức P = 1 - sin<sup>2</sup>&alpha; ta được:",
+        a: ["sin<sup>2</sup>&alpha;", "cos<sup>2</sup>&alpha;", "tan<sup>2</sup>&alpha;", "1"],
+        correct: 1,
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Một cái thang dài 4m dựa vào tường, chân thang cách tường 2m. Góc tạo bởi thang và mặt đất là:",
+        a: ["30&deg;", "45&deg;", "60&deg;", "75&deg;"],
+        correct: 2, // cos = 2/4 = 0.5 → 60°
+        level: "THÔNG HIỂU"
+    },
+    {
+        q: "Cho tam giác ABC vuông tại A, đường cao AH. Biết BH=1, HC=4. Giá trị tan B là:",
+        a: ["2", "0.5", "4", "0.25"],
+        correct: 0, // AH^2 = 1*4 = 4 → AH=2, tanB = 2/1
         level: "THÔNG HIỂU"
     },
 
     // LEVEL 3: VẬN DỤNG (3 câu)
     {
-        q: "Rút gọn biểu thức P = <div class='fraction'><span class='numerator'>x<sup>2</sup> - 1</span><span class='denominator'>x + 2</span></div> . <div class='fraction'><span class='numerator'>x<sup>2</sup> + 4x + 4</span><span class='denominator'>x + 1</span></div>",
-        a: [
-            "(x + 1)(x - 2)",
-            "x<sup>2</sup> + 2",
-            "(x - 1)(x + 2)",
-            "x - 1"
-        ],
-        // ĐÚNG: C
+        q: "(Thực tế) Một cột cờ cao 10m có bóng trên mặt đất dài 10m. Góc nắng mặt trời (góc tạo bởi tia nắng và mặt đất) là:",
+        a: ["30&deg;", "45&deg;", "60&deg;", "50&deg;"],
+        // tan a = 10/10 = 1 → a = 45°
+        correct: 1, // Đáp án đúng là B = 45°
+        level: "VẬN DỤNG"
+    },
+    {
+        q: "Tam giác ABC vuông tại A, BC = 20, góc C = 30&deg;. Độ dài cạnh AB là:",
+        a: ["10", "10&radic;3", "20&radic;3", "20"],
+        correct: 0, // AB = BC.sinC = 20*sin30 = 10
+        level: "VẬN DỤNG"
+    },
+    {
+        q: "Tìm x trong tam giác vuông có cạnh huyền bằng 10, một góc nhọn bằng 40&deg;, x là cạnh kề góc đó (Làm tròn 1 chữ số thập phân):",
+        a: ["6.4", "8.2", "7.7", "5.0"],
+        // x = 10.cos40 ≈ 7.7
         correct: 2,
-        rationale: "P = <div class='fraction'><span class='numerator'>(x-1)(x+1) . (x+2)<sup>2</sup></span><span class='denominator'>(x+2)(x+1)</span></div> = (x-1)(x+2).",
-        level: "VẬN DỤNG"
-    },
-    {
-        q: "(Thực tế) Một hình chữ nhật có diện tích <div class='fraction'><span class='numerator'>3x<sup>2</sup> - 3x</span><span class='denominator'>x + 2</span></div> (cm<sup>2</sup>) và chiều rộng <div class='fraction'><span class='numerator'>3x</span><span class='denominator'>x + 2</span></div> (cm). Chiều dài hình chữ nhật là:",
-        a: [
-            "x + 1 (cm)",
-            "x - 1 (cm)",
-            "3(x - 1) (cm)",
-            "3x (cm)"
-        ],
-        // ĐÚNG: B
-        correct: 1,
-        rationale: "Chiều dài = Diện tích : Chiều rộng = <div class='fraction'><span class='numerator'>3x(x-1)</span><span class='denominator'>x+2</span></div> . <div class='fraction'><span class='numerator'>x+2</span><span class='denominator'>3x</span></div> = x - 1.",
-        level: "VẬN DỤNG"
-    },
-    {
-        q: "Một ca nô đi xuôi dòng với vận tốc v km/h. Thời gian đi hết quãng đường s km là <div class='fraction'><span class='numerator'>s</span><span class='denominator'>v</span></div>. Nếu vận tốc tăng gấp đôi và quãng đường giảm một nửa thì thời gian mới bằng bao nhiêu lần thời gian cũ?",
-        a: [
-            "1/4",
-            "1/2",
-            "4",
-            "2"
-        ],
-        // ĐÚNG: A
-        correct: 0,
-        rationale: "t_mới = (s/2) / (2v) = s / 4v = 1/4 . (s/v) = 1/4 t_cũ.",
         level: "VẬN DỤNG"
     },
 
     // LEVEL 4: VẬN DỤNG CAO (1 câu)
     {
-        q: "Tìm các giá trị nguyên dương của x để biểu thức P = <div class='fraction'><span class='numerator'>3(x-2)</span><span class='denominator'>x+2</span></div> nhận giá trị nguyên.",
-        a: [
-            "x &isin; {1; 5}",
-            "x &isin; {0; 1}",
-            "x &isin; {1; 2; 4; 10}",
-            "x &isin; {2; 4}"
-        ],
-        // ĐÚNG: C
-        correct: 2,
-        rationale: "P = 3 - 12/(x+2). Để P nguyên, x+2 là ước của 12.<br>x nguyên dương => x+2 &ge; 3.<br>x+2 &isin; {3; 4; 6; 12} => x &isin; {1; 2; 4; 10}.",
+        q: "Tính giá trị biểu thức: S = sin<sup>2</sup>15&deg; + sin<sup>2</sup>25&deg; + sin<sup>2</sup>35&deg; + sin<sup>2</sup>55&deg; + sin<sup>2</sup>65&deg; + sin<sup>2</sup>75&deg;",
+        a: ["1", "2", "3", "4"],
+        correct: 2, // 3 cặp bổ sung nhau → S = 3
         level: "VẬN DỤNG CAO"
     }
 ];
