@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thám Tử Dữ Liệu - Toán 8</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%); /* Teal theme */
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 40px -10px rgba(20, 184, 166, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .option-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.15);
+            background-color: #f0fdfa;
+            border-color: #14b8a6;
+        }
+
+        .option-btn.correct {
+            background-color: #d1fae5 !important;
+            border-color: #059669 !important;
+            color: #064e3b !important;
+        }
+
+        .option-btn.wrong {
+            background-color: #fee2e2 !important;
+            border-color: #dc2626 !important;
+            color: #7f1d1d !important;
+        }
+
+        /* Animation cho Feedback */
+        .feedback-enter {
+            animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-bar {
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-3xl">
+        <!-- Start Screen -->
+        <div id="start-screen" class="card p-10 text-center">
+            <div class="mb-6 inline-flex p-5 bg-teal-100 rounded-full animate-bounce">
+                <span class="text-6xl">🔍</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-teal-800 mb-4">Thám Tử Dữ Liệu</h1>
+            <p class="text-teal-600 mb-10 text-lg font-medium">Chinh phục kỹ năng Phân tích số liệu<br>Toán 8 - Chương 4</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 text-left">
+                <div class="bg-teal-50 p-4 rounded-xl border border-teal-100">
+                    <div class="font-bold text-teal-800 mb-1">🎯 Mục tiêu</div>
+                    <div class="text-sm text-teal-600">Phát hiện quy luật & tính hợp lý</div>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <div class="font-bold text-blue-800 mb-1">📊 Kỹ năng</div>
+                    <div class="text-sm text-blue-600">Đọc & xử lý biểu đồ</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                    <div class="font-bold text-purple-800 mb-1">🏆 Thử thách</div>
+                    <div class="text-sm text-purple-600">15 câu hỏi hóc búa</div>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="w-full md:w-auto px-12 py-4 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-2xl shadow-lg shadow-teal-200 transform transition hover:-translate-y-1 text-xl flex items-center justify-center gap-3 mx-auto">
+                <span>Bắt Đầu Điều Tra</span> 👉
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden">
+            <!-- Header -->
+            <div class="flex justify-between items-end mb-6 px-2">
+                <div>
+                    <span class="text-teal-600 text-xs font-bold uppercase tracking-wider block mb-1">Tiến độ điều tra</span>
+                    <div class="text-2xl font-black text-gray-800"><span id="current-question">1</span><span class="text-gray-400 text-lg">/15</span></div>
+                </div>
+                <div class="text-right">
+                    <div class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm">
+                        <span class="text-yellow-500 text-xl">⭐</span>
+                        <span class="text-2xl font-black text-teal-600" id="score">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-white rounded-full h-3 mb-8 p-1 shadow-sm">
+                <div id="progress" class="bg-teal-500 h-full rounded-full progress-bar" style="width: 0%"></div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="card p-6 md:p-10 mb-6 relative overflow-hidden border-b-4 border-teal-100">
+                <div id="level-badge" class="badge bg-green-100 text-green-700 absolute top-6 right-6">Nhận biết</div>
+                
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800 mt-6 mb-8 leading-relaxed">
+                    Đang tải dữ liệu vụ án...
+                </h2>
+
+                <div id="options-container" class="grid gap-3 md:gap-4">
+                    <!-- Options will be injected here -->
+                </div>
+            </div>
+
+            <!-- Feedback Area -->
+            <div id="feedback-area" class="hidden feedback-enter">
+                <div id="feedback-card" class="card p-6 border-l-8 shadow-xl">
+                    <div class="flex flex-col md:flex-row items-start gap-5">
+                        <div id="feedback-icon" class="text-5xl filter drop-shadow-md">😎</div>
+                        <div class="flex-1">
+                            <h3 id="feedback-title" class="text-2xl font-bold mb-2 text-teal-700">Chính xác!</h3>
+                            <div class="text-xs font-bold text-gray-400 uppercase mb-2 tracking-wide">Phân tích:</div>
+                            <p id="feedback-text" class="text-gray-700 leading-relaxed text-lg font-medium"></p>
+                        </div>
+                    </div>
+                    <button onclick="nextQuestion()" class="mt-6 w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-4 px-6 rounded-xl transition flex items-center justify-center gap-2 shadow-lg">
+                        Vụ án tiếp theo <span class="text-xl">→</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden card p-10 text-center">
+            <div class="mb-8">
+                <div class="inline-block p-8 rounded-full bg-yellow-50 border-4 border-yellow-200 mb-6 animate-pulse">
+                    <span class="text-7xl">🕵️</span>
+                </div>
+                <h2 class="text-4xl font-extrabold text-gray-800 mb-3">Hồ Sơ Khép Lại!</h2>
+                <p class="text-gray-500 text-lg">Bạn đã hoàn thành nhiệm vụ phân tích.</p>
+            </div>
+
+            <div class="bg-teal-50 rounded-2xl p-8 mb-8 border-2 border-teal-100 border-dashed">
+                <div class="text-teal-500 font-bold uppercase text-xs tracking-widest mb-2">Tổng điểm đạt được</div>
+                <div class="text-6xl font-black text-teal-600 mb-4" id="final-score">0</div>
+                <p id="result-message" class="text-gray-700 font-bold text-xl">Xuất sắc!</p>
+            </div>
+
+            <button onclick="location.reload()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-10 rounded-xl shadow-lg transform transition hover:scale-105 flex items-center justify-center gap-2 mx-auto w-full md:w-auto">
+                <span class="text-xl">🔄</span> Phân Tích Lại
+            </button>
+        </div>
+    </div>
+
+    <!-- Audio Effects -->
+    <audio id="sound-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="sound-wrong" src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3"></audio>
+    <audio id="sound-finish" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+   <script>
+  const questions = [
+    {
+      level: "Nhận biết",
+      question: "Dữ liệu nào sau đây là dữ liệu định lượng?",
+      options: ["Nơi sinh", "Màu mắt", "Điểm thi Toán", "Sở thích"],
+      correct: 2,
+      rationale: "Dữ liệu định lượng được biểu diễn bằng con số. Điểm thi Toán là số cụ thể."
+    },
+    {
+      level: "Nhận biết",
+      question: "Loại biểu đồ nào thích hợp nhất để biểu diễn tỉ lệ phần trăm của các thành phần trong một tổng thể?",
+      options: ["Biểu đồ cột", "Biểu đồ đoạn thẳng", "Biểu đồ hình quạt tròn", "Biểu đồ tranh"],
+      correct: 2,
+      rationale: "Biểu đồ hình quạt tròn thể hiện cơ cấu và tỉ lệ phần trăm."
+    },
+    {
+      level: "Nhận biết",
+      question: "Muốn thu thập dữ liệu về nhiệt độ trung bình các ngày trong tháng 12 tại Hà Nội, phương pháp nào hợp lý nhất?",
+      options: [
+        "Phỏng vấn người qua đường",
+        "Quan sát bầu trời",
+        "Tra cứu từ nguồn Internet hoặc trạm khí tượng",
+        "Làm thí nghiệm"
+      ],
+      correct: 2,
+      rationale: "Nhiệt độ là số liệu cần độ chính xác cao, nên lấy từ nguồn đo đạc chính thống."
+    },
+    {
+      level: "Nhận biết",
+      question: "Trục hoành của biểu đồ cột thường dùng để biểu diễn điều gì?",
+      options: ["Số liệu thống kê", "Tên các đối tượng thống kê", "Tỉ lệ phần trăm", "Đơn vị đo"],
+      correct: 1,
+      rationale: "Trục hoành thường ghi tên các đối tượng được thống kê."
+    },
+    {
+      level: "Nhận biết",
+      question: "Dữ liệu 'Xếp loại hạnh kiểm: Tốt, Khá, Trung bình, Yếu' thuộc loại nào?",
+      options: [
+        "Dữ liệu định lượng rời rạc",
+        "Dữ liệu định lượng liên tục",
+        "Dữ liệu định tính (có thứ bậc)",
+        "Dữ liệu định tính (không có thứ bậc)"
+      ],
+      correct: 2,
+      rationale: "Đây là dữ liệu chữ nhưng có thứ bậc rõ ràng."
+    },
+    {
+      level: "Nhận biết",
+      question: "Trong biểu đồ đoạn thẳng, độ dốc của đoạn thẳng đi lên từ trái sang phải biểu thị điều gì?",
+      options: ["Dữ liệu giảm đi", "Dữ liệu không đổi", "Dữ liệu tăng lên", "Dữ liệu biến động mạnh"],
+      correct: 2,
+      rationale: "Đường đi lên cho thấy giá trị tăng theo thời gian."
+    },
+
+    {
+      level: "Thông hiểu",
+      question: "Bảng thống kê số áo bán được: Size S (10), Size M (50), Size L (30), Size XL (5). Mốt của dữ liệu là gì?",
+      options: ["Size S", "Size M", "Size L", "50"],
+      correct: 1,
+      rationale: "Size M xuất hiện nhiều nhất nên là mốt."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Biểu đồ quạt tròn cho biết: Bóng đá 40%, Cầu lông 30%, Bơi lội x%, Bóng rổ 10%. Giá trị x là?",
+      options: ["10%", "20%", "30%", "15%"],
+      correct: 1,
+      rationale: "x = 100% − (40% + 30% + 10%) = 20%."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Để so sánh doanh thu của hai chi nhánh A và B trong 4 quý, nên dùng biểu đồ nào?",
+      options: ["Hai biểu đồ quạt tròn", "Biểu đồ cột đơn", "Biểu đồ cột kép", "Biểu đồ đoạn thẳng đơn"],
+      correct: 2,
+      rationale: "Biểu đồ cột kép giúp so sánh hai đối tượng song song."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Nếu bảng ghi: Số HS lớp 8A là 40, số HS Giỏi là 45. Nhận xét đúng là?",
+      options: ["Lớp học rất giỏi", "Dữ liệu chính xác", "Dữ liệu không hợp lý", "Cần vẽ biểu đồ"],
+      correct: 2,
+      rationale: "Số học sinh giỏi không thể lớn hơn tổng số học sinh."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Giá vàng ngày 2 là 60 triệu, ngày 3 là 62 triệu. Giá tăng bao nhiêu?",
+      options: ["2 triệu", "3.33%", "20%", "Không xác định"],
+      correct: 0,
+      rationale: "Giá tăng tuyệt đối là 62 − 60 = 2 triệu."
+    },
+
+    {
+      level: "Vận dụng",
+      question: "Lớp 8B có 40 học sinh, trung bình mỗi bạn quyên góp 3 quyển sách. Tổng số sách là?",
+      options: ["120 quyển", "43 quyển", "13 quyển", "40 quyển"],
+      correct: 0,
+      rationale: "Tổng = 40 × 3 = 120 quyển."
+    },
+    {
+      level: "Vận dụng (Thực tế)",
+      question: "Theo dõi cân nặng hàng tháng trong 1 năm nên dùng biểu đồ nào?",
+      options: ["Biểu đồ cột", "Biểu đồ tranh", "Biểu đồ đoạn thẳng", "Biểu đồ quạt tròn"],
+      correct: 2,
+      rationale: "Biểu đồ đoạn thẳng thể hiện rõ xu hướng theo thời gian."
+    },
+    {
+      level: "Vận dụng",
+      question: "100 khách hàng thích màu áo: Xanh 30, Đỏ 20, Vàng 50. Góc ở tâm của màu Vàng là?",
+      options: ["50°", "90°", "180°", "120°"],
+      correct: 2,
+      rationale: "50% × 360° = 180°."
+    },
+
+    {
+      level: "Vận dụng cao",
+      question: "Biểu đồ giá xăng có trục tung bắt đầu từ 20.000đ gây hiểu lầm vì sao?",
+      options: [
+        "Giá tăng gấp đôi",
+        "Bài báo trung thực",
+        "Biểu đồ phóng đại do cắt trục tung",
+        "Giá tăng rất mạnh"
+      ],
+      correct: 2,
+      rationale: "Cắt trục tung làm chênh lệch nhỏ trông lớn hơn thực tế."
+    }
+  ];
+
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let isAnswering = false;
+
+  const soundCorrect = document.getElementById('sound-correct');
+  const soundWrong = document.getElementById('sound-wrong');
+  const soundFinish = document.getElementById('sound-finish');
+
+  function playSound(type) {
+    if (type === 'correct') soundCorrect.play().catch(() => {});
+    if (type === 'wrong') soundWrong.play().catch(() => {});
+    if (type === 'finish') soundFinish.play().catch(() => {});
+  }
+
+  function shuffleOptions(options, correctIndex) {
+    const arr = options.map((text, i) => ({ text, isCorrect: i === correctIndex }));
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return {
+      options: arr.map(o => o.text),
+      correct: arr.findIndex(o => o.isCorrect)
+    };
+  }
+
+  function startGame() {
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    isAnswering = true;
+    const q = questions[currentQuestionIndex];
+    const shuffled = shuffleOptions(q.options, q.correct);
+    q.options = shuffled.options;
+    q.correct = shuffled.correct;
+
+    document.getElementById('current-question').innerText = currentQuestionIndex + 1;
+    document.getElementById('score').innerText = score;
+    document.getElementById('progress').style.width =
+      ((currentQuestionIndex + 1) / questions.length) * 100 + "%";
+
+    document.getElementById('question-text').innerText = q.question;
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = "";
+
+    q.options.forEach((opt, index) => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn w-full text-left p-5 rounded-xl border-2 bg-white font-bold";
+      btn.onclick = () => checkAnswer(index, btn);
+      btn.innerHTML = `<b>${String.fromCharCode(65 + index)}.</b> ${opt}`;
+      container.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(index, btn) {
+    if (!isAnswering) return;
+    isAnswering = false;
+
+    const q = questions[currentQuestionIndex];
+    const buttons = document.querySelectorAll(".option-btn");
+
+    buttons.forEach(b => b.disabled = true);
+
+    if (index === q.correct) {
+      btn.classList.add("correct");
+      score += 10;
+      playSound("correct");
+      fireConfetti();
+    } else {
+      btn.classList.add("wrong");
+      buttons[q.correct].classList.add("correct");
+      playSound("wrong");
+    }
+
+    document.getElementById("score").innerText = score;
+    showFeedback(index === q.correct, q.rationale);
+  }
+
+  function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) loadQuestion();
+    else showResult();
+  }
+
+  function showResult() {
+    document.getElementById("quiz-screen").classList.add("hidden");
+    document.getElementById("result-screen").classList.remove("hidden");
+    document.getElementById("final-score").innerText = score;
+    playSound("finish");
+    fireConfetti();
+  }
+
+  function fireConfetti() {
+    confetti({ particleCount: 120, spread: 70, origin: { y: 0.7 } });
+  }
+</script>
+</body>
+</html>
