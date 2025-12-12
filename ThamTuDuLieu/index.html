@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thám Tử Dữ Liệu - Toán 8</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%); /* Teal theme */
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 40px -10px rgba(20, 184, 166, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .option-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.15);
+            background-color: #f0fdfa;
+            border-color: #14b8a6;
+        }
+
+        .option-btn.correct {
+            background-color: #d1fae5 !important;
+            border-color: #059669 !important;
+            color: #064e3b !important;
+        }
+
+        .option-btn.wrong {
+            background-color: #fee2e2 !important;
+            border-color: #dc2626 !important;
+            color: #7f1d1d !important;
+        }
+
+        /* Animation cho Feedback */
+        .feedback-enter {
+            animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-bar {
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-3xl">
+        <!-- Start Screen -->
+        <div id="start-screen" class="card p-10 text-center">
+            <div class="mb-6 inline-flex p-5 bg-teal-100 rounded-full animate-bounce">
+                <span class="text-6xl">🔍</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-teal-800 mb-4">Thám Tử Dữ Liệu</h1>
+            <p class="text-teal-600 mb-10 text-lg font-medium">Chinh phục kỹ năng Phân tích số liệu<br>Toán 8 - Chương 4</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 text-left">
+                <div class="bg-teal-50 p-4 rounded-xl border border-teal-100">
+                    <div class="font-bold text-teal-800 mb-1">🎯 Mục tiêu</div>
+                    <div class="text-sm text-teal-600">Phát hiện quy luật & tính hợp lý</div>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <div class="font-bold text-blue-800 mb-1">📊 Kỹ năng</div>
+                    <div class="text-sm text-blue-600">Đọc & xử lý biểu đồ</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                    <div class="font-bold text-purple-800 mb-1">🏆 Thử thách</div>
+                    <div class="text-sm text-purple-600">15 câu hỏi hóc búa</div>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="w-full md:w-auto px-12 py-4 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-2xl shadow-lg shadow-teal-200 transform transition hover:-translate-y-1 text-xl flex items-center justify-center gap-3 mx-auto">
+                <span>Bắt Đầu Điều Tra</span> 👉
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden">
+            <!-- Header -->
+            <div class="flex justify-between items-end mb-6 px-2">
+                <div>
+                    <span class="text-teal-600 text-xs font-bold uppercase tracking-wider block mb-1">Tiến độ điều tra</span>
+                    <div class="text-2xl font-black text-gray-800"><span id="current-question">1</span><span class="text-gray-400 text-lg">/15</span></div>
+                </div>
+                <div class="text-right">
+                    <div class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm">
+                        <span class="text-yellow-500 text-xl">⭐</span>
+                        <span class="text-2xl font-black text-teal-600" id="score">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-white rounded-full h-3 mb-8 p-1 shadow-sm">
+                <div id="progress" class="bg-teal-500 h-full rounded-full progress-bar" style="width: 0%"></div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="card p-6 md:p-10 mb-6 relative overflow-hidden border-b-4 border-teal-100">
+                <div id="level-badge" class="badge bg-green-100 text-green-700 absolute top-6 right-6">Nhận biết</div>
+                
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800 mt-6 mb-8 leading-relaxed">
+                    Đang tải dữ liệu vụ án...
+                </h2>
+
+                <div id="options-container" class="grid gap-3 md:gap-4">
+                    <!-- Options will be injected here -->
+                </div>
+            </div>
+
+            <!-- Feedback Area -->
+            <div id="feedback-area" class="hidden feedback-enter">
+                <div id="feedback-card" class="card p-6 border-l-8 shadow-xl">
+                    <div class="flex flex-col md:flex-row items-start gap-5">
+                        <div id="feedback-icon" class="text-5xl filter drop-shadow-md">😎</div>
+                        <div class="flex-1">
+                            <h3 id="feedback-title" class="text-2xl font-bold mb-2 text-teal-700">Chính xác!</h3>
+                            <div class="text-xs font-bold text-gray-400 uppercase mb-2 tracking-wide">Phân tích:</div>
+                            <p id="feedback-text" class="text-gray-700 leading-relaxed text-lg font-medium"></p>
+                        </div>
+                    </div>
+                    <button onclick="nextQuestion()" class="mt-6 w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-4 px-6 rounded-xl transition flex items-center justify-center gap-2 shadow-lg">
+                        Vụ án tiếp theo <span class="text-xl">→</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden card p-10 text-center">
+            <div class="mb-8">
+                <div class="inline-block p-8 rounded-full bg-yellow-50 border-4 border-yellow-200 mb-6 animate-pulse">
+                    <span class="text-7xl">🕵️</span>
+                </div>
+                <h2 class="text-4xl font-extrabold text-gray-800 mb-3">Hồ Sơ Khép Lại!</h2>
+                <p class="text-gray-500 text-lg">Bạn đã hoàn thành nhiệm vụ phân tích.</p>
+            </div>
+
+            <div class="bg-teal-50 rounded-2xl p-8 mb-8 border-2 border-teal-100 border-dashed">
+                <div class="text-teal-500 font-bold uppercase text-xs tracking-widest mb-2">Tổng điểm đạt được</div>
+                <div class="text-6xl font-black text-teal-600 mb-4" id="final-score">0</div>
+                <p id="result-message" class="text-gray-700 font-bold text-xl">Xuất sắc!</p>
+            </div>
+
+            <button onclick="location.reload()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-10 rounded-xl shadow-lg transform transition hover:scale-105 flex items-center justify-center gap-2 mx-auto w-full md:w-auto">
+                <span class="text-xl">🔄</span> Phân Tích Lại
+            </button>
+        </div>
+    </div>
+
+    <!-- Audio Effects -->
+    <audio id="sound-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="sound-wrong" src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3"></audio>
+    <audio id="sound-finish" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+   <script>
+  const questions = [
+    // 6 Câu Nhận biết (1-6)
+    {
+      level: "Nhận biết",
+      question: "Trong bảng thống kê số cây trồng được của 4 tổ: Tổ 1 (20), Tổ 2 (25), Tổ 3 (18), Tổ 4 (30). Tổ nào trồng được nhiều cây nhất?",
+      options: ["Tổ 1", "Tổ 2", "Tổ 3", "Tổ 4"],
+      correct: 3,
+      rationale: "Dựa vào bảng số liệu, ta so sánh các giá trị: 20, 25, 18, 30. Giá trị lớn nhất là 30, tương ứng với Tổ 4."
+    },
+    {
+      level: "Nhận biết",
+      question: "Biểu đồ cột biểu diễn nhiệt độ trung bình các tháng. Trục tung (trục thẳng đứng) thường biểu diễn đại lượng nào?",
+      options: ["Các tháng trong năm", "Nhiệt độ (độ C)", "Tên thành phố", "Năm thống kê"],
+      correct: 1,
+      rationale: "Trong biểu đồ cột, trục hoành thường biểu diễn các đối tượng (tháng), còn trục tung biểu diễn số liệu của đối tượng đó (nhiệt độ)."
+    },
+    {
+      level: "Nhận biết",
+      question: "Để phát hiện một giá trị bất hợp lý trong dãy số liệu chiều cao học sinh lớp 8 (đơn vị cm), giá trị nào sau đây là đáng ngờ nhất?",
+      options: ["155", "162", "350", "148"],
+      correct: 2,
+      rationale: "Chiều cao 350cm (3.5 mét) là phi thực tế đối với con người. Đây là dữ liệu bất hợp lý cần loại bỏ hoặc kiểm tra lại."
+    },
+    {
+      level: "Nhận biết",
+      question: "Trong biểu đồ hình quạt tròn biểu diễn tỉ lệ xếp loại học lực, phần hình quạt lớn nhất sẽ tương ứng với?",
+      options: ["Loại có số lượng ít nhất", "Loại có tỉ lệ phần trăm cao nhất", "Loại trung bình", "Không xác định được"],
+      correct: 1,
+      rationale: "Diện tích (hoặc góc ở tâm) của hình quạt tỉ lệ thuận với phần trăm của thành phần đó. Phần lớn nhất ứng với tỉ lệ cao nhất."
+    },
+    {
+      level: "Nhận biết",
+      question: "Biểu đồ đoạn thẳng đi xuống từ trái sang phải trong một khoảng thời gian thể hiện xu hướng gì?",
+      options: ["Tăng lên", "Giữ nguyên", "Giảm đi", "Biến động mạnh"],
+      correct: 2,
+      rationale: "Độ dốc đi xuống của đường gấp khúc trong biểu đồ đoạn thẳng thể hiện giá trị của dữ liệu đang giảm đi theo thời gian."
+    },
+    {
+      level: "Nhận biết",
+      question: "Tổng các tần số (số lượng) của các thành phần trong bảng thống kê phải bằng:",
+      options: ["100", "Tổng số đối tượng được điều tra", "Giá trị lớn nhất", "Giá trị trung bình"],
+      correct: 1,
+      rationale: "Khi cộng tất cả số lượng của từng nhóm con lại, ta phải được tổng số đối tượng ban đầu của mẫu số liệu."
+    },
+
+    // 5 Câu Thông hiểu (7-11)
+    {
+      level: "Thông hiểu",
+      question: "Biểu đồ quạt tròn cho biết: Loại A (25%), Loại B (35%), Loại C (x%). Giá trị của x là bao nhiêu để biểu đồ hợp lý?",
+      options: ["30%", "40%", "50%", "100%"],
+      correct: 1,
+      rationale: "Tổng tỉ lệ phần trăm phải là 100%. Ta có x = 100% - (25% + 35%) = 40%."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Doanh thu công ty: Tháng 1 (10 tỷ), Tháng 2 (12 tỷ), Tháng 3 (15 tỷ). Nhận xét nào sau đây là đúng về xu hướng doanh thu?",
+      options: ["Doanh thu giảm dần", "Doanh thu không đổi", "Doanh thu tăng trưởng đều", "Doanh thu tăng liên tục"],
+      correct: 3,
+      rationale: "Các giá trị 10 < 12 < 15 cho thấy doanh thu tăng liên tục qua các tháng."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Một cửa hàng bán size giày: 38, 39, 40, 41. Số lượng bán được lần lượt là 5, 15, 20, 2. Cửa hàng nên nhập thêm size nào nhiều nhất?",
+      options: ["Size 38", "Size 39", "Size 40", "Size 41"],
+      correct: 2,
+      rationale: "Size 40 bán được nhiều nhất (20 đôi), cho thấy nhu cầu cao nhất. Cửa hàng nên ưu tiên nhập size này."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Nếu biểu đồ cột có gốc trục tung bắt đầu từ 100 thay vì 0, điều này có thể dẫn đến sự hiểu lầm nào?",
+      options: ["Làm cho số liệu nhỏ đi", "Phóng đại sự chênh lệch giữa các cột", "Làm cho các cột bằng nhau", "Không ảnh hưởng gì"],
+      correct: 1,
+      rationale: "Việc cắt bớt trục tung (không bắt đầu từ 0) làm cho tỉ lệ chiều cao các cột thay đổi, khiến sự chênh lệch trông có vẻ lớn hơn thực tế."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Điểm trung bình môn Toán của tổ 1 là 8.0. Nếu có thêm một bạn điểm 10 chuyển vào tổ, điểm trung bình mới sẽ như thế nào?",
+      options: ["Giảm đi", "Tăng lên", "Không đổi", "Bằng 9.0"],
+      correct: 1,
+      rationale: "Vì điểm số mới (10) cao hơn điểm trung bình hiện tại (8.0), nên nó sẽ kéo điểm trung bình chung của cả tổ tăng lên."
+    },
+
+    // 3 Câu Vận dụng (12-14)
+    {
+      level: "Vận dụng",
+      question: "Lớp 8A có 40 học sinh. Biểu đồ quạt tròn cho thấy số học sinh giỏi chiếm 30%. Hỏi lớp 8A có bao nhiêu học sinh giỏi?",
+      options: ["10 học sinh", "12 học sinh", "30 học sinh", "15 học sinh"],
+      correct: 1,
+      rationale: "Số học sinh giỏi = Tổng số học sinh × Tỉ lệ % = 40 × 30% = 12 học sinh."
+    },
+    {
+      level: "Vận dụng (Thực tế)",
+      question: "Giá một loại cổ phiếu trong 3 ngày: Ngày 1 (100k), Ngày 2 (110k), Ngày 3 (121k). Tỉ lệ tăng trưởng của Ngày 2 so với Ngày 1 là bao nhiêu?",
+      options: ["10%", "11%", "21%", "100%"],
+      correct: 0,
+      rationale: "Mức tăng là 110 - 100 = 10k. Tỉ lệ tăng = (10 / 100) × 100% = 10%."
+    },
+    {
+      level: "Vận dụng",
+      question: "Trung bình cộng số cân nặng của 3 bạn là 45kg. Nếu bạn thứ tư nặng 53kg gia nhập nhóm, trung bình cộng mới của 4 bạn là bao nhiêu?",
+      options: ["49 kg", "47 kg", "48 kg", "50 kg"],
+      correct: 1,
+      rationale: "Tổng cân nặng 3 bạn đầu: 45 × 3 = 135kg. Tổng cân nặng 4 bạn: 135 + 53 = 188kg. Trung bình mới: 188 : 4 = 47kg."
+    },
+
+    // 1 Câu Vận dụng cao (15) - ĐÃ SỬA ĐÁP ÁN
+    {
+      level: "Vận dụng cao",
+      question: "Một công ty báo cáo: 'Doanh thu năm nay tăng gấp đôi năm ngoái!'. Tuy nhiên, khi nhìn vào biểu đồ, cột năm nay cao gấp đôi cột năm ngoái nhưng trục tung lại bắt đầu từ 50 tỷ (doanh thu năm ngoái là 100 tỷ). Thực tế doanh thu tăng bao nhiêu phần trăm?",
+      options: ["100% (Gấp đôi)", "50%", "200%", "Không xác định được"],
+      correct: 1,
+      rationale: "Vì trục tung bắt đầu từ 50 nên chiều cao cột tỉ lệ với (giá trị − 50). Năm ngoái: 100−50=50. Năm nay cao gấp đôi ⇒ (x−50)=100 ⇒ x=150. Tăng (150−100)/100=50%."
+    }
+  ];
+
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let isAnswering = false;
+
+  // Sound Elements
+  const soundCorrect = document.getElementById('sound-correct');
+  const soundWrong = document.getElementById('sound-wrong');
+  const soundFinish = document.getElementById('sound-finish');
+
+  function playSound(type) {
+    if (type === 'correct') { soundCorrect.currentTime = 0; soundCorrect.play().catch(() => {}); }
+    if (type === 'wrong') { soundWrong.currentTime = 0; soundWrong.play().catch(() => {}); }
+    if (type === 'finish') { soundFinish.currentTime = 0; soundFinish.play().catch(() => {}); }
+  }
+
+  // Shuffle options but keep correct answer consistent
+  function shuffleWithCorrect(options, correctIndex) {
+    const arr = options.map((text, i) => ({ text, isCorrect: i === correctIndex }));
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return {
+      options: arr.map(o => o.text),
+      correct: arr.findIndex(o => o.isCorrect)
+    };
+  }
+
+  function startGame() {
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    isAnswering = true;
+    const q = questions[currentQuestionIndex];
+
+    // Random options each time load question
+    const shuffled = shuffleWithCorrect(q.options, q.correct);
+    q.options = shuffled.options;
+    q.correct = shuffled.correct;
+
+    // Update UI
+    document.getElementById('current-question').innerText = currentQuestionIndex + 1;
+    document.getElementById('score').innerText = score;
+
+    // Progress (correct to 100% at last question)
+    const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
+    document.getElementById('progress').style.width = `${progressPercent}%`;
+
+    // Setup Question Card
+    document.getElementById('question-text').innerText = q.question;
+
+    // Badge color based on level
+    const badge = document.getElementById('level-badge');
+    badge.innerText = q.level;
+    if (q.level.includes("Nhận biết")) badge.className = "badge bg-green-100 text-green-700 absolute top-6 right-6";
+    else if (q.level.includes("Thông hiểu")) badge.className = "badge bg-blue-100 text-blue-700 absolute top-6 right-6";
+    else if (q.level.includes("Vận dụng cao")) badge.className = "badge bg-purple-100 text-purple-700 absolute top-6 right-6";
+    else badge.className = "badge bg-yellow-100 text-yellow-700 absolute top-6 right-6";
+
+    // Hide feedback area & reset animation class
+    const feedbackArea = document.getElementById('feedback-area');
+    feedbackArea.classList.add('hidden');
+    feedbackArea.classList.remove('feedback-enter');
+
+    // Generate Options
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
+
+    q.options.forEach((opt, index) => {
+      const btn = document.createElement('button');
+      btn.className = `option-btn w-full text-left p-5 rounded-xl border-2 border-teal-50 bg-white text-gray-700 font-bold text-lg flex items-center shadow-sm`;
+      btn.onclick = () => checkAnswer(index, btn);
+      btn.innerHTML = `
+        <span class="inline-flex items-center justify-center w-10 h-10 bg-teal-50 rounded-lg text-teal-600 font-extrabold mr-4 text-lg border border-teal-100 shrink-0">
+          ${String.fromCharCode(65 + index)}
+        </span>
+        <span>${opt}</span>
+      `;
+      container.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(selectedIndex, btnElement) {
+    if (!isAnswering) return;
+    isAnswering = false;
+
+    const q = questions[currentQuestionIndex];
+    const isCorrect = selectedIndex === q.correct;
+    const buttons = document.querySelectorAll('.option-btn');
+
+    // Disable all buttons
+    buttons.forEach(btn => btn.disabled = true);
+
+    // Highlight answers
+    if (isCorrect) {
+      btnElement.classList.add('correct');
+      score += 10;
+      document.getElementById('score').innerText = score;
+      playSound('correct');
+      fireConfetti();
+      showFeedback(true, q.rationale);
+    } else {
+      btnElement.classList.add('wrong');
+      if (buttons[q.correct]) buttons[q.correct].classList.add('correct');
+      playSound('wrong');
+      showFeedback(false, q.rationale);
+    }
+  }
+
+  function showFeedback(isCorrect, rationale) {
+    const area = document.getElementById('feedback-area');
+    const card = document.getElementById('feedback-card');
+    const title = document.getElementById('feedback-title');
+    const text = document.getElementById('feedback-text');
+    const icon = document.getElementById('feedback-icon');
+
+    area.classList.remove('hidden');
+    void area.offsetWidth; // Trigger reflow
+    area.classList.add('feedback-enter');
+
+    if (isCorrect) {
+      card.className = "card p-6 border-l-8 border-green-500 bg-green-50 shadow-xl";
+      title.className = "text-2xl font-bold mb-2 text-green-700";
+      title.innerText = "Chính xác! 🎉";
+      icon.innerText = "🤩";
+    } else {
+      card.className = "card p-6 border-l-8 border-red-500 bg-red-50 shadow-xl";
+      title.className = "text-2xl font-bold mb-2 text-red-700";
+      title.innerText = "Chưa chính xác... 🧐";
+      icon.innerText = "🤔";
+    }
+
+    text.innerText = rationale;
+  }
+
+  function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+      loadQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('result-screen').classList.remove('hidden');
+    document.getElementById('final-score').innerText = score;
+    playSound('finish');
+    fireConfetti();
+
+    const msg = document.getElementById('result-message');
+    if (score >= 130) msg.innerText = "Đỉnh của chóp! Bạn là chuyên gia phân tích! 🌟";
+    else if (score >= 100) msg.innerText = "Rất tốt! Tư duy phân tích sắc bén! 👍";
+    else if (score >= 70) msg.innerText = "Khá lắm! Cố gắng thêm chút nữa nhé! 💪";
+    else msg.innerText = "Hãy ôn lại bài và thử lại nhé! 📚";
+  }
+
+  function fireConfetti() {
+    var count = 200;
+    var defaults = { origin: { y: 0.7 } };
+
+    function fire(particleRatio, opts) {
+      confetti(Object.assign({}, defaults, opts, {
+        particleCount: Math.floor(count * particleRatio)
+      }));
+    }
+
+    fire(0.25, { spread: 26, startVelocity: 55 });
+    fire(0.2, { spread: 60 });
+    fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+    fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+    fire(0.1, { spread: 120, startVelocity: 45 });
+  }
+</script>
+</body>
+</html>
