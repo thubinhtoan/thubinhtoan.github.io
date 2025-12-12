@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đấu Trường Xác Suất - Toán 8</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- MathJax -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #fbcfe8 0%, #f43f5e 100%); /* Rose theme */
+            min-height: 100vh;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(225, 29, 72, 0.15), 0 10px 10px -5px rgba(225, 29, 72, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .option-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border-width: 2px;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25);
+            background-color: #fff1f2;
+            border-color: #f43f5e;
+        }
+
+        .option-btn.correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #14532d !important;
+        }
+
+        .option-btn.wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #7f1d1d !important;
+        }
+
+        .feedback-enter {
+            animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+
+    <div class="w-full max-w-3xl">
+        <!-- Start Screen -->
+        <div id="start-screen" class="card p-10 text-center">
+            <div class="mb-6 inline-flex p-6 bg-pink-100 rounded-full animate-bounce shadow-inner">
+                <span class="text-6xl">🎯</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-rose-600 mb-4">Đấu Trường Xác Suất</h1>
+            <p class="text-gray-600 mb-8 text-lg font-medium">Tổng ôn Chương 9 - Toán 8<br>Bạn đã sẵn sàng cho thử thách cuối cùng?</p>
+            
+            <div class="grid grid-cols-2 gap-4 mb-10 text-left">
+                <div class="bg-rose-50 p-4 rounded-xl border border-rose-200">
+                    <div class="font-bold text-rose-800 mb-1">🔥 Thử thách</div>
+                    <div class="text-sm text-rose-600">15 Câu hỏi tổng hợp</div>
+                </div>
+                <div class="bg-pink-50 p-4 rounded-xl border border-pink-200">
+                    <div class="font-bold text-pink-800 mb-1">🏅 Mục tiêu</div>
+                    <div class="text-sm text-pink-600">Thành thạo xác suất</div>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="w-full md:w-auto px-10 py-4 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-2xl shadow-xl shadow-rose-200 transform transition hover:-translate-y-1 text-xl flex items-center justify-center gap-3 mx-auto">
+                <span>Vào Trận Ngay</span> 🎲
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden">
+            <!-- Header -->
+            <div class="flex justify-between items-end mb-6 px-2">
+                <div>
+                    <span class="text-rose-700 text-xs font-bold uppercase tracking-wider block mb-1">Câu hỏi</span>
+                    <div class="text-3xl font-black text-gray-800"><span id="current-question">1</span><span class="text-gray-400 text-xl">/15</span></div>
+                </div>
+                <div class="text-right">
+                    <div class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-rose-100">
+                        <span class="text-yellow-400 text-xl">⭐</span>
+                        <span class="text-2xl font-black text-rose-600" id="score">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-white rounded-full h-4 mb-8 p-1 shadow-sm border border-rose-100">
+                <div id="progress" class="bg-gradient-to-r from-rose-400 to-pink-500 h-full rounded-full progress-bar shadow-md" style="width: 0%"></div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="card p-6 md:p-10 mb-6 relative overflow-hidden border-b-8 border-rose-200">
+                <div id="level-badge" class="badge bg-green-100 text-green-700 absolute top-6 right-6">Nhận biết</div>
+                
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800 mt-6 mb-8 leading-relaxed">
+                    <!-- Question goes here -->
+                </h2>
+
+                <div id="options-container" class="grid gap-3 md:gap-4">
+                    <!-- Options injected here -->
+                </div>
+            </div>
+
+            <!-- Feedback Area -->
+            <div id="feedback-area" class="hidden feedback-enter">
+                <div id="feedback-card" class="card p-6 border-l-8 shadow-2xl transform scale-100">
+                    <div class="flex flex-col md:flex-row items-start gap-5">
+                        <div id="feedback-icon" class="text-5xl filter drop-shadow-md shrink-0">😎</div>
+                        <div class="flex-1">
+                            <h3 id="feedback-title" class="text-2xl font-bold mb-2 text-rose-700">Chính xác!</h3>
+                            <div class="text-xs font-bold text-gray-400 uppercase mb-2 tracking-wide">Giải thích:</div>
+                            <p id="feedback-text" class="text-gray-700 leading-relaxed text-lg font-medium"></p>
+                        </div>
+                    </div>
+                    <button onclick="nextQuestion()" class="mt-6 w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-4 px-6 rounded-xl transition flex items-center justify-center gap-2 shadow-lg group">
+                        Câu tiếp theo <span class="group-hover:translate-x-1 transition-transform">➜</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden card p-10 text-center">
+            <div class="mb-8 relative">
+                <div class="absolute inset-0 bg-rose-200 rounded-full opacity-20 blur-xl animate-pulse"></div>
+                <div class="inline-block p-8 rounded-full bg-yellow-50 border-4 border-yellow-200 mb-6 relative z-10">
+                    <span class="text-7xl">🏆</span>
+                </div>
+                <h2 class="text-4xl font-extrabold text-gray-800 mb-3">Chiến Thắng!</h2>
+                <p class="text-gray-500 text-lg">Bạn đã hoàn thành xuất sắc bài ôn tập chương 9.</p>
+            </div>
+
+            <div class="bg-rose-50 rounded-2xl p-8 mb-8 border-2 border-rose-100 border-dashed">
+                <div class="text-rose-500 font-bold uppercase text-xs tracking-widest mb-2">Tổng điểm đạt được</div>
+                <div class="text-6xl font-black text-rose-600 mb-4" id="final-score">0</div>
+                <div class="h-1 w-24 bg-rose-200 mx-auto rounded-full mb-4"></div>
+                <p id="result-message" class="text-gray-700 font-bold text-xl">Quá đỉnh!</p>
+            </div>
+
+            <button onclick="location.reload()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-4 px-10 rounded-xl shadow-lg transform transition hover:scale-105 flex items-center justify-center gap-2 mx-auto w-full md:w-auto">
+                <span class="text-xl">🔄</span> Chơi Lại
+            </button>
+        </div>
+    </div>
+
+    <!-- Sounds -->
+    <audio id="sound-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="sound-wrong" src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3"></audio>
+    <audio id="sound-finish" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+   <script>
+  /* =========================
+     GAME DATA (15 QUESTIONS)
+     =========================
+     - Đã chỉnh để phân bố đáp án đúng gần đều: A=4, B=4, C=4, D=3
+     - CÓ random thứ tự đáp án (A/B/C/D sẽ đổi mỗi lần tải câu)
+     - Chấm đúng theo đáp án sau khi random
+  */
+
+  const questions = [
+    // 6 Câu Nhận biết
+    {
+      level: "Nhận biết",
+      question: "Biến cố có xác suất bằng 1 được gọi là gì?",
+      options: ["Biến cố chắc chắn", "Biến cố ngẫu nhiên", "Biến cố không thể", "Biến cố sơ cấp"],
+      correct: 0,
+      rationale: "Biến cố chắc chắn là biến cố luôn luôn xảy ra, nên xác suất của nó bằng 1 (hoặc 100%)."
+    },
+    {
+      level: "Nhận biết",
+      question: "Biến cố không thể có xác suất là bao nhiêu?",
+      options: ["0.5", "1", "Lớn hơn 1", "0"],
+      correct: 3,
+      rationale: "Biến cố không thể là biến cố không bao giờ xảy ra, nên xác suất của nó bằng 0."
+    },
+    {
+      level: "Nhận biết",
+      question: "Công thức tính xác suất của biến cố A khi các kết quả đồng khả năng là:",
+      options: ["$P(A) = \\frac{n(A)}{n(\\Omega)}$", "$P(A) = n(A) \\cdot n(\\Omega)$", "$P(A) = n(\\Omega) - n(A)$", "$P(A) = \\frac{n(\\Omega)}{n(A)}$"],
+      correct: 0,
+      rationale: "Xác suất bằng tỉ số giữa số kết quả thuận lợi cho A và tổng số kết quả có thể xảy ra."
+    },
+    {
+      level: "Nhận biết",
+      question: "Một hộp có 5 quả bóng xanh và 3 quả bóng đỏ. Tổng số kết quả có thể xảy ra khi lấy ngẫu nhiên 1 quả bóng là:",
+      options: ["3", "5", "8", "15"],
+      correct: 2,
+      rationale: "Tổng số bóng trong hộp là $5 + 3 = 8$ quả. Mỗi quả bóng được lấy ra là một kết quả."
+    },
+    {
+      level: "Nhận biết",
+      question: "Trong một trò chơi tung đồng xu, xác suất thực nghiệm phụ thuộc vào:",
+      options: ["Lý thuyết toán học", "Kết quả thực tế của các lần tung", "Mệnh giá của đồng xu", "Người tung đồng xu"],
+      correct: 1,
+      rationale: "Xác suất thực nghiệm được tính dựa trên tần suất xuất hiện của biến cố trong một chuỗi các phép thử thực tế."
+    },
+    {
+      level: "Nhận biết",
+      question: "Tập hợp các kết quả có thể xảy ra của một phép thử được gọi là:",
+      options: ["Biến cố", "Xác suất", "Tập hợp con", "Không gian mẫu"],
+      correct: 3,
+      rationale: "Không gian mẫu (thường ký hiệu là $\\Omega$) là tập hợp chứa tất cả các kết quả có thể xảy ra của phép thử."
+    },
+
+    // 5 Câu Thông hiểu
+    {
+      level: "Thông hiểu",
+      question: "Gieo một con xúc xắc 6 mặt cân đối. Xác suất để gieo được mặt có số chấm chia hết cho 3 là:",
+      options: ["1/2", "1/3", "1/6", "2/3"],
+      correct: 1,
+      rationale: "Các mặt chia hết cho 3 là {3; 6} (2 kết quả). Tổng số kết quả là 6. Vậy $P = \\frac{2}{6} = \\frac{1}{3}$."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Một lớp học có 18 nam và 12 nữ. Chọn ngẫu nhiên một bạn làm lớp trưởng. Xác suất để bạn nam được chọn là:",
+      options: ["3/5", "2/3", "2/5", "1/2"],
+      correct: 0,
+      rationale: "Tổng số học sinh là $18 + 12 = 30$. Xác suất chọn nam là $\\frac{18}{30} = \\frac{3}{5}$."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Một hộp có các thẻ số từ 1 đến 20. Xác suất rút được thẻ ghi số chính phương là:",
+      options: ["1/5", "1/4", "3/20", "1/10"],
+      correct: 0,
+      rationale: "Các số chính phương từ 1 đến 20 là {1; 4; 9; 16} (4 số). Xác suất là $\\frac{4}{20} = \\frac{1}{5}$."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Quay vòng quay may mắn có 10 ô, trong đó có 3 ô 'Thưởng lớn'. Nếu quay 50 lần, số lần 'Thưởng lớn' *kỳ vọng* theo lý thuyết là khoảng bao nhiêu?",
+      options: ["3 lần", "10 lần", "15 lần", "30 lần"],
+      correct: 2,
+      rationale: "Xác suất trúng thưởng là $\\frac{3}{10}$. Số lần kỳ vọng = $50 \\times \\frac{3}{10} = 15$ lần."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Thực hiện gieo đồng xu 20 lần, thấy có 12 lần ngửa. Xác suất thực nghiệm của biến cố 'mặt sấp' là:",
+      options: ["0.6", "0.4", "0.5", "0.8"],
+      correct: 1,
+      rationale: "Số lần sấp là $20 - 12 = 8$ lần. Xác suất thực nghiệm = $\\frac{8}{20} = 0.4$."
+    },
+
+    // 3 Câu Vận dụng
+    {
+      level: "Vận dụng",
+      question: "Một hộp chứa 5 viên bi xanh, 4 viên bi đỏ và $x$ viên bi vàng. Biết xác suất lấy được bi đỏ là $\\frac{1}{3}$. Tìm số bi vàng.",
+      options: ["2", "3", "4", "5"],
+      correct: 1,
+      rationale: "Tổng số bi là $9+x$. Xác suất bi đỏ là $\\frac{4}{9+x} = \\frac{1}{3} \\Rightarrow 12 = 9+x \\Rightarrow x = 3$."
+    },
+    {
+      level: "Vận dụng (Thực tế)",
+      question: "Thống kê cho thấy trong 1000 bóng đèn sản xuất ra thì có 20 bóng bị hỏng. Hãy ước lượng xác suất mua phải một bóng đèn hỏng.",
+      options: ["0.2", "0.002", "0.05", "0.02"],
+      correct: 3,
+      rationale: "Xác suất thực nghiệm = $\\frac{20}{1000} = 0.02$ (hay 2%)."
+    },
+    {
+      level: "Vận dụng",
+      question: "Gieo hai con xúc xắc cân đối. Xác suất để tổng số chấm trên hai mặt bằng 10 là:",
+      options: ["1/6", "1/9", "1/12", "1/18"],
+      correct: 2,
+      rationale: "Tổng số kết quả là 36. Các cặp có tổng 10 là (4,6), (5,5), (6,4) -> 3 kết quả. $P = \\frac{3}{36} = \\frac{1}{12}$."
+    },
+
+    // 1 Câu Vận dụng cao
+    {
+      level: "Vận dụng cao",
+      question: "Trong một trò chơi rút thăm, tỉ lệ trúng thưởng là 20%. Bạn An đã rút 4 lần và đều trượt. Hỏi xác suất trúng thưởng ở lần rút thứ 5 là bao nhiêu (biết mỗi lần rút là độc lập)?",
+      options: ["100%", "80%", "20%", "0%"],
+      correct: 2,
+      rationale: "Vì các lần rút là độc lập, kết quả quá khứ không ảnh hưởng đến tương lai. Xác suất trúng thưởng ở bất kỳ lần nào vẫn là 20%."
+    }
+  ];
+
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let isAnswering = false;
+
+  // Audio Elements
+  const soundCorrect = document.getElementById('sound-correct');
+  const soundWrong = document.getElementById('sound-wrong');
+  const soundFinish = document.getElementById('sound-finish');
+
+  function playSound(type) {
+    if (type === 'correct') { soundCorrect.currentTime = 0; soundCorrect.play().catch(() => {}); }
+    if (type === 'wrong') { soundWrong.currentTime = 0; soundWrong.play().catch(() => {}); }
+    if (type === 'finish') { soundFinish.currentTime = 0; soundFinish.play().catch(() => {}); }
+  }
+
+  // Fisher–Yates shuffle
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function startGame() {
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    isAnswering = true;
+    const q = questions[currentQuestionIndex];
+
+    // Update Header
+    document.getElementById('current-question').innerText = currentQuestionIndex + 1;
+    document.getElementById('score').innerText = score;
+
+    // Progress: cho đủ 100% ở câu cuối
+    const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
+    document.getElementById('progress').style.width = `${progressPercent}%`;
+
+    // Question Content
+    document.getElementById('question-text').innerHTML = q.question;
+
+    // Level Badge
+    const badge = document.getElementById('level-badge');
+    badge.innerText = q.level;
+
+    let badgeClass = "badge absolute top-6 right-6 ";
+    if (q.level.includes("Nhận biết")) badgeClass += "bg-blue-100 text-blue-700";
+    else if (q.level.includes("Thông hiểu")) badgeClass += "bg-green-100 text-green-700";
+    else if (q.level.includes("Vận dụng cao")) badgeClass += "bg-purple-100 text-purple-700";
+    else badgeClass += "bg-yellow-100 text-yellow-700";
+    badge.className = badgeClass;
+
+    // Reset Feedback
+    const feedbackArea = document.getElementById('feedback-area');
+    feedbackArea.classList.add('hidden');
+    feedbackArea.classList.remove('feedback-enter');
+
+    // ===== RANDOM OPTIONS =====
+    // tạo mảng option objects để random mà vẫn giữ đúng đáp án
+    const optionObjs = q.options.map((text, idx) => ({
+      text,
+      isCorrect: idx === q.correct
+    }));
+    shuffleArray(optionObjs);
+    q._correctShuffledIndex = optionObjs.findIndex(o => o.isCorrect);
+
+    // Render Options
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
+
+    optionObjs.forEach((optObj, index) => {
+      const btn = document.createElement('button');
+      btn.className = `option-btn w-full text-left p-5 rounded-xl border-2 border-rose-100 bg-white text-gray-700 font-bold text-lg flex items-center shadow-sm`;
+      btn.onclick = () => checkAnswer(index, btn);
+
+      btn.innerHTML = `
+        <span class="inline-flex items-center justify-center w-10 h-10 bg-rose-50 rounded-lg text-rose-600 font-extrabold mr-4 text-lg border border-rose-100 shrink-0">
+          ${String.fromCharCode(65 + index)}
+        </span>
+        <span>${optObj.text}</span>
+      `;
+      container.appendChild(btn);
+    });
+
+    // Typeset MathJax
+    if (window.MathJax) MathJax.typesetPromise();
+  }
+
+  function checkAnswer(selectedIndex, btnElement) {
+    if (!isAnswering) return;
+    isAnswering = false;
+
+    const q = questions[currentQuestionIndex];
+    const correctIndex = q._correctShuffledIndex;
+    const isCorrect = selectedIndex === correctIndex;
+    const buttons = document.querySelectorAll('.option-btn');
+
+    buttons.forEach(btn => btn.disabled = true);
+
+    if (isCorrect) {
+      btnElement.classList.add('correct');
+      score += 10;
+      document.getElementById('score').innerText = score;
+      playSound('correct');
+      fireConfetti();
+      showFeedback(true, q.rationale);
+    } else {
+      btnElement.classList.add('wrong');
+      buttons[correctIndex].classList.add('correct');
+      playSound('wrong');
+      showFeedback(false, q.rationale);
+    }
+  }
+
+  function showFeedback(isCorrect, rationale) {
+    const area = document.getElementById('feedback-area');
+    const title = document.getElementById('feedback-title');
+    const text = document.getElementById('feedback-text');
+    const icon = document.getElementById('feedback-icon');
+
+    area.classList.remove('hidden');
+    void area.offsetWidth;
+    area.classList.add('feedback-enter');
+
+    if (isCorrect) {
+      title.innerText = "Chính xác! 🎉";
+      title.className = "text-2xl font-bold mb-2 text-green-600";
+      icon.innerText = "🤩";
+    } else {
+      title.innerText = "Tiếc quá... 😅";
+      title.className = "text-2xl font-bold mb-2 text-rose-600";
+      icon.innerText = "🤔";
+    }
+
+    text.innerHTML = rationale;
+    if (window.MathJax) MathJax.typesetPromise([text]);
+  }
+
+  function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+      loadQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('result-screen').classList.remove('hidden');
+    document.getElementById('final-score').innerText = score;
+    playSound('finish');
+    fireConfetti();
+
+    const msg = document.getElementById('result-message');
+    if (score >= 130) msg.innerText = "Đỉnh của chóp! Bạn là chuyên gia xác suất! 🔮";
+    else if (score >= 100) msg.innerText = "Rất tốt! Kiến thức vững vàng! 👍";
+    else if (score >= 70) msg.innerText = "Khá ổn! Cố gắng thêm chút nữa nhé! 💪";
+    else msg.innerText = "Hãy ôn lại bài và thử lại nhé! 📚";
+  }
+
+  function fireConfetti() {
+    var count = 200;
+    var defaults = { origin: { y: 0.7 } };
+
+    function fire(particleRatio, opts) {
+      confetti(Object.assign({}, defaults, opts, {
+        particleCount: Math.floor(count * particleRatio)
+      }));
+    }
+
+    fire(0.25, { spread: 26, startVelocity: 55 });
+    fire(0.2, { spread: 60 });
+    fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+    fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+    fire(0.1, { spread: 120, startVelocity: 45 });
+  }
+</script>
+</body>
+</html>
