@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thử Tài Toán Học: Thu Thập & Phân Loại Dữ Liệu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .option-btn {
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background-color: #f0f9ff;
+            border-color: #3b82f6;
+        }
+
+        .option-btn.correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #14532d !important;
+        }
+
+        .option-btn.wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #7f1d1d !important;
+        }
+
+        .emoji-feedback {
+            font-size: 3rem;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-3xl">
+        <!-- Start Screen -->
+        <div id="start-screen" class="card p-8 text-center">
+            <h1 class="text-4xl font-extrabold text-blue-600 mb-2">Dữ Liệu Thông Minh</h1>
+            <p class="text-gray-500 mb-8 text-lg">Chinh phục kiến thức Toán 8 - Chương 4</p>
+            
+            <div class="grid grid-cols-2 gap-4 mb-8 text-left">
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <span class="text-2xl mb-2 block">📊</span>
+                    <h3 class="font-bold text-gray-800">15 Câu hỏi</h3>
+                    <p class="text-sm text-gray-600">Từ nhận biết đến vận dụng cao</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                    <span class="text-2xl mb-2 block">🏆</span>
+                    <h3 class="font-bold text-gray-800">Thử thách</h3>
+                    <p class="text-sm text-gray-600">Thu thập sao và điểm số</p>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transform transition hover:scale-105 text-xl">
+                Bắt Đầu Ngay! 🚀
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-4 bg-white p-4 rounded-xl shadow-sm">
+                <div>
+                    <span class="text-gray-400 text-sm font-bold uppercase">Câu hỏi</span>
+                    <div class="text-2xl font-black text-gray-800"><span id="current-question">1</span><span class="text-gray-300 text-lg">/15</span></div>
+                </div>
+                <div class="flex flex-col items-end">
+                    <span class="text-gray-400 text-sm font-bold uppercase">Điểm số</span>
+                    <div class="text-2xl font-black text-blue-600" id="score">0</div>
+                </div>
+            </div>
+
+            <!-- Progress -->
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                <div id="progress" class="bg-blue-600 h-2.5 rounded-full progress-bar" style="width: 0%"></div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="card p-6 md:p-8 mb-6 relative overflow-hidden">
+                <div id="level-badge" class="badge bg-green-100 text-green-700 absolute top-6 right-6">Nhận biết</div>
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800 mt-4 mb-6 leading-relaxed">
+                    Đang tải câu hỏi...
+                </h2>
+
+                <div id="options-container" class="grid gap-3">
+                    <!-- Options will be injected here -->
+                </div>
+            </div>
+
+            <!-- Feedback Modal (Inline) -->
+            <div id="feedback-area" class="hidden transform transition-all duration-300">
+                <div id="feedback-card" class="card p-6 border-l-4">
+                    <div class="flex items-start gap-4">
+                        <div id="feedback-icon" class="emoji-feedback">😎</div>
+                        <div class="flex-1">
+                            <h3 id="feedback-title" class="text-xl font-bold mb-1">Tuyệt vời!</h3>
+                            <div class="text-sm font-bold text-gray-400 uppercase mb-2">Giải thích:</div>
+                            <p id="feedback-text" class="text-gray-700 leading-relaxed"></p>
+                        </div>
+                    </div>
+                    <button onclick="nextQuestion()" class="mt-4 w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2">
+                        Câu tiếp theo <span class="text-xl">→</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden card p-8 text-center">
+            <div class="mb-6">
+                <div class="inline-block p-6 rounded-full bg-yellow-100 mb-4">
+                    <span class="text-6xl">🎉</span>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Hoàn Thành Xuất Sắc!</h2>
+                <p class="text-gray-500">Bạn đã chinh phục bài kiểm tra</p>
+            </div>
+
+            <div class="bg-gray-50 rounded-xl p-6 mb-8">
+                <div class="text-gray-500 font-medium mb-1">Tổng điểm của bạn</div>
+                <div class="text-5xl font-black text-blue-600 mb-4" id="final-score">0</div>
+                <p id="result-message" class="text-gray-600 font-medium">Bạn là một chuyên gia dữ liệu thực thụ!</p>
+            </div>
+
+            <button onclick="location.reload()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition">
+                Chơi Lại 🔄
+            </button>
+        </div>
+    </div>
+
+    <!-- Audio Effects -->
+    <audio id="sound-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="sound-wrong" src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3"></audio>
+    <audio id="sound-finish" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+  <script>
+  const questions = [
+    // 6 Câu Nhận biết
+    {
+      level: "Nhận biết",
+      question: "Dữ liệu nào sau đây là số liệu (dữ liệu định lượng)?",
+      options: ["Màu sắc yêu thích của các bạn trong lớp", "Nơi sinh của các thành viên trong gia đình", "Chiều cao (tính bằng cm) của các học sinh lớp 8A", "Mức độ hài lòng về dịch vụ (Rất hài lòng, Hài lòng...)"],
+      correct: 2,
+      rationale: "Số liệu (dữ liệu định lượng) là dữ liệu có thể cân, đo, đong, đếm được và biểu thị bằng các con số. Chiều cao là một con số cụ thể."
+    },
+    {
+      level: "Nhận biết",
+      question: "Dữ liệu nào sau đây là dữ liệu định tính?",
+      options: ["Số điểm đạt được trong bài kiểm tra Toán", "Danh sách các loại nhạc cụ mà học sinh biết chơi", "Số lượng học sinh vắng mặt trong tuần", "Nhiệt độ trung bình các ngày trong tháng"],
+      correct: 1,
+      rationale: "Dữ liệu định tính là dữ liệu mô tả tính chất, đặc điểm (không phải là số). Tên các loại nhạc cụ là dữ liệu định tính."
+    },
+    {
+      level: "Nhận biết",
+      question: "Phương pháp nào sau đây KHÔNG PHẢI là phương pháp thu thập dữ liệu?",
+      options: ["Quan sát", "Làm thí nghiệm", "Lập bảng tần số", "Phỏng vấn"],
+      correct: 2,
+      rationale: "Quan sát, làm thí nghiệm, phỏng vấn là các cách để LẤY dữ liệu. Lập bảng tần số là cách để TỔ CHỨC và PHÂN TÍCH dữ liệu sau khi đã thu thập."
+    },
+    {
+      level: "Nhận biết",
+      question: "Dữ liệu rời rạc là gì?",
+      options: ["Dữ liệu chỉ nhận các giá trị hữu hạn hoặc đếm được", "Dữ liệu có thể nhận mọi giá trị trong một khoảng", "Dữ liệu không thể đo lường bằng số", "Dữ liệu về sở thích cá nhân"],
+      correct: 0,
+      rationale: "Dữ liệu rời rạc là dạng dữ liệu số mà các giá trị của nó là các số đếm được (ví dụ: số học sinh, số xe máy...), không thể nhận các giá trị trung gian như 1.5 người."
+    },
+    {
+      level: "Nhận biết",
+      question: "Trong các dữ liệu sau, đâu là dữ liệu liên tục?",
+      options: ["Số con trong một gia đình", "Số bàn thắng trong một trận đấu", "Cân nặng của trẻ sơ sinh", "Số quyển sách trên kệ"],
+      correct: 2,
+      rationale: "Cân nặng là dữ liệu liên tục vì nó có thể nhận bất kỳ giá trị nào trong một khoảng (ví dụ: 3.2 kg, 3.25 kg...). Các dữ liệu còn lại là số đếm (rời rạc)."
+    },
+    {
+      level: "Nhận biết",
+      question: "Để biết ý kiến của các bạn trong lớp về địa điểm tham quan hè, lớp trưởng nên dùng cách nào?",
+      options: ["Quan sát bầu trời", "Tra cứu Internet", "Phỏng vấn hoặc phát phiếu hỏi", "Làm thí nghiệm hóa học"],
+      correct: 2,
+      rationale: "Để thu thập ý kiến, quan điểm của một nhóm người, phương pháp phù hợp nhất là phỏng vấn trực tiếp hoặc phát phiếu khảo sát."
+    },
+
+    // 5 Câu Thông hiểu
+    {
+      level: "Thông hiểu",
+      question: "Dữ liệu 'Xếp loại học lực: Tốt, Khá, Đạt, Chưa đạt' thuộc loại dữ liệu nào?",
+      options: ["Dữ liệu định lượng (số liệu)", "Dữ liệu định tính (không thể so sánh thứ bậc)", "Dữ liệu định tính (có thể so sánh thứ bậc)", "Dữ liệu liên tục"],
+      correct: 2,
+      rationale: "Đây là dữ liệu định tính (chữ) nhưng có tính thứ bậc rõ ràng (Tốt > Khá > Đạt > Chưa đạt)."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Bạn Lan ghi lại số xe máy đi qua cổng trường trong 5 phút. Dữ liệu Lan thu được thuộc loại nào?",
+      options: ["Dữ liệu định tính", "Dữ liệu định lượng (rời rạc)", "Dữ liệu định lượng (liên tục)", "Dữ liệu thứ cấp"],
+      correct: 1,
+      rationale: "Số xe máy là kết quả của việc đếm (1 xe, 2 xe...), nên nó là dữ liệu định lượng rời rạc."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Một bảng thống kê về loại nhạc yêu thích có tổng phần trăm là 110%. Điều này cho thấy gì?",
+      options: ["Dữ liệu rất chính xác", "Dữ liệu không hợp lý", "Nhiều người thích nghe nhạc", "Cần thu thập thêm dữ liệu"],
+      correct: 1,
+      rationale: "Tổng phần trăm của các thành phần trong một tổng thể không thể vượt quá 100%. Nếu tổng là 110%, dữ liệu đó bị sai hoặc không hợp lý."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Muốn biết nhiệt độ thay đổi như thế nào trong một ngày tại Hà Nội, ta nên dùng phương pháp thu thập nào?",
+      options: ["Phỏng vấn người đi đường", "Sử dụng nhiệt kế để đo tại các thời điểm hoặc tra cứu từ trạm khí tượng", "Đếm số người mặc áo ấm", "Tổ chức cuộc thi dự báo thời tiết"],
+      correct: 1,
+      rationale: "Nhiệt độ là số liệu cần độ chính xác cao, cần dùng dụng cụ đo lường (nhiệt kế) hoặc lấy từ nguồn uy tín (trạm khí tượng)."
+    },
+    {
+      level: "Thông hiểu",
+      question: "Dữ liệu nào sau đây KHÔNG hợp lý khi nói về tuổi của học sinh lớp 8?",
+      options: ["13 tuổi", "14 tuổi", "15 tuổi", "-5 tuổi"],
+      correct: 3,
+      rationale: "Tuổi của con người không thể là số âm. Do đó, '-5 tuổi' là dữ liệu sai/không hợp lý."
+    },
+
+    // 3 Câu Vận dụng
+    {
+      level: "Vận dụng",
+      question: "Một cửa hàng giày ghi lại cỡ giày của khách hàng đã mua: 38, 39, 40, 41, 42. Cửa hàng đang quan tâm đến dữ liệu nào?",
+      options: ["Dữ liệu định tính về màu sắc", "Dữ liệu định lượng rời rạc về kích cỡ", "Dữ liệu định lượng liên tục về độ bền", "Dữ liệu định tính về chất liệu"],
+      correct: 1,
+      rationale: "Cỡ giày (size) là các con số cụ thể, rời rạc (không có cỡ 38.567), dùng để đo kích thước chân."
+    },
+    {
+      level: "Vận dụng (Thực tế)",
+      question: "Nhà trường muốn khảo sát mức độ yêu thích môn Toán của TOÀN BỘ 1000 học sinh. Do không đủ thời gian, trường chỉ chọn ngẫu nhiên 100 bạn để hỏi. Tập hợp 100 bạn này được gọi là gì?",
+      options: ["Mẫu số liệu", "Toàn thể", "Dữ liệu gốc", "Dữ liệu thứ cấp"],
+      correct: 0,
+      rationale: "Trong thống kê, khi không thể điều tra toàn bộ, người ta chọn ra một nhóm đại diện gọi là 'Mẫu'. 100 bạn học sinh này chính là mẫu số liệu."
+    },
+    {
+      level: "Vận dụng",
+      question: "Trong bảng thống kê 'Số giờ tự học' của bạn Nam: Thứ 2 (2h), Thứ 3 (1.5h), Thứ 4 (300 phút), Thứ 5 (1h). Dữ liệu nào cần được quy đổi để đồng nhất?",
+      options: ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5"],
+      correct: 2,
+      rationale: "Các ngày khác dùng đơn vị 'giờ', riêng Thứ 4 dùng 'phút'. Để so sánh hoặc vẽ biểu đồ, cần quy đổi 300 phút về giờ (5h) hoặc đổi tất cả ra phút."
+    },
+
+    // 1 Câu Vận dụng cao
+    {
+      level: "Vận dụng cao",
+      question: "Một cuộc khảo sát online về 'Mức độ phổ biến của Internet' kết luận rằng: '100% người dân đều sử dụng Internet'. Kết luận này có đáng tin cậy không? Tại sao?",
+      options: ["Đáng tin, vì 100% là con số tuyệt đối.", "Đáng tin, vì khảo sát online rất nhanh.", "Không đáng tin, vì mẫu khảo sát bị thiên lệch (chỉ những người có Internet mới làm khảo sát online).", "Không đáng tin, vì số lượng người tham gia quá ít."],
+      correct: 2,
+      rationale: "Đây là lỗi chọn mẫu (bias). Nếu khảo sát online, bạn đã loại bỏ hoàn toàn những người không có Internet. Do đó, kết luận '100% người dân dùng Internet' là sai lệch do phương pháp thu thập."
+    }
+  ];
+
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let isAnswering = false;
+
+  // Sound Elements
+  const soundCorrect = document.getElementById('sound-correct');
+  const soundWrong = document.getElementById('sound-wrong');
+  const soundFinish = document.getElementById('sound-finish');
+
+  function playSound(type) {
+    if (type === 'correct') { soundCorrect.currentTime = 0; soundCorrect.play().catch(() => {}); }
+    if (type === 'wrong') { soundWrong.currentTime = 0; soundWrong.play().catch(() => {}); }
+    if (type === 'finish') { soundFinish.currentTime = 0; soundFinish.play().catch(() => {}); }
+  }
+
+  // Shuffle options BUT keep correct answer updated
+  function shuffleWithCorrect(options, correctIndex) {
+    const arr = options.map((text, i) => ({ text, isCorrect: i === correctIndex }));
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    const newCorrect = arr.findIndex(o => o.isCorrect);
+    return { options: arr.map(o => o.text), correct: newCorrect };
+  }
+
+  function startGame() {
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    isAnswering = true;
+    const q = questions[currentQuestionIndex];
+
+    // Random options for THIS question (in-place update)
+    const shuffled = shuffleWithCorrect(q.options, q.correct);
+    q.options = shuffled.options;
+    q.correct = shuffled.correct;
+
+    // Update UI
+    document.getElementById('current-question').innerText = currentQuestionIndex + 1;
+    document.getElementById('score').innerText = score;
+
+    // Progress: go to 100% at last question
+    const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
+    document.getElementById('progress').style.width = `${progressPercent}%`;
+
+    // Setup Question Card
+    document.getElementById('question-text').innerText = q.question;
+
+    // Badge color based on level
+    const badge = document.getElementById('level-badge');
+    badge.innerText = q.level;
+    if (q.level.includes("Nhận biết")) badge.className = "badge bg-green-100 text-green-700 absolute top-6 right-6";
+    else if (q.level.includes("Thông hiểu")) badge.className = "badge bg-blue-100 text-blue-700 absolute top-6 right-6";
+    else if (q.level.includes("Vận dụng cao")) badge.className = "badge bg-red-100 text-red-700 absolute top-6 right-6";
+    else badge.className = "badge bg-yellow-100 text-yellow-700 absolute top-6 right-6";
+
+    // Hide feedback area
+    document.getElementById('feedback-area').classList.add('hidden');
+
+    // Generate Options
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
+
+    q.options.forEach((opt, index) => {
+      const btn = document.createElement('button');
+      btn.className = `option-btn w-full text-left p-4 rounded-xl border-2 border-gray-100 bg-white text-gray-700 font-semibold text-lg`;
+      btn.onclick = () => checkAnswer(index, btn);
+      btn.innerHTML = `<span class="inline-block w-8 h-8 bg-gray-100 rounded-full text-center leading-8 mr-3 text-sm text-gray-500 font-bold">${String.fromCharCode(65 + index)}</span>${opt}`;
+      container.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(selectedIndex, btnElement) {
+    if (!isAnswering) return;
+    isAnswering = false;
+
+    const q = questions[currentQuestionIndex];
+    const isCorrect = selectedIndex === q.correct;
+    const buttons = document.querySelectorAll('.option-btn');
+
+    // Disable all buttons
+    buttons.forEach(btn => btn.disabled = true);
+
+    // Highlight answers
+    if (isCorrect) {
+      btnElement.classList.add('correct');
+      score += 10;
+      document.getElementById('score').innerText = score;
+      playSound('correct');
+      fireConfetti();
+      showFeedback(true, q.rationale);
+    } else {
+      btnElement.classList.add('wrong');
+      if (buttons[q.correct]) buttons[q.correct].classList.add('correct');
+      playSound('wrong');
+      showFeedback(false, q.rationale);
+    }
+  }
+
+  function showFeedback(isCorrect, rationale) {
+    const area = document.getElementById('feedback-area');
+    const card = document.getElementById('feedback-card');
+    const title = document.getElementById('feedback-title');
+    const text = document.getElementById('feedback-text');
+    const icon = document.getElementById('feedback-icon');
+
+    area.classList.remove('hidden');
+
+    if (isCorrect) {
+      card.className = "card p-6 border-l-8 border-green-500 bg-green-50";
+      title.className = "text-xl font-bold mb-1 text-green-700";
+      title.innerText = "Chính xác! 🎉";
+      icon.innerText = "🤩";
+    } else {
+      card.className = "card p-6 border-l-8 border-red-500 bg-red-50";
+      title.className = "text-xl font-bold mb-1 text-red-700";
+      title.innerText = "Chưa đúng rồi! 😅";
+      icon.innerText = "🤔";
+    }
+
+    text.innerText = rationale;
+  }
+
+  function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+      loadQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('result-screen').classList.remove('hidden');
+    document.getElementById('final-score').innerText = score + "/150";
+    playSound('finish');
+    fireConfetti();
+
+    const msg = document.getElementById('result-message');
+    if (score >= 130) msg.innerText = "Xuất sắc! Bạn là bậc thầy thống kê! 🌟";
+    else if (score >= 100) msg.innerText = "Giỏi lắm! Kiến thức rất vững vàng! 👍";
+    else if (score >= 70) msg.innerText = "Khá tốt! Cố gắng thêm chút nữa nhé! 💪";
+    else msg.innerText = "Hãy ôn lại bài và thử lại nhé! 📚";
+  }
+
+  function fireConfetti() {
+    var count = 200;
+    var defaults = { origin: { y: 0.7 } };
+
+    function fire(particleRatio, opts) {
+      confetti(Object.assign({}, defaults, opts, {
+        particleCount: Math.floor(count * particleRatio)
+      }));
+    }
+
+    fire(0.25, { spread: 26, startVelocity: 55 });
+    fire(0.2, { spread: 60 });
+    fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+    fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+    fire(0.1, { spread: 120, startVelocity: 45 });
+  }
+</script>
+</body>
+</html>
