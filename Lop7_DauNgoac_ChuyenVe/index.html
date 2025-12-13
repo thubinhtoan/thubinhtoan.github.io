@@ -187,7 +187,33 @@
         </div>
     </div>
 
-    <script>
+   <script>
+    // ✅ 1) HÀM LÀM SẠCH: đổi $...$ -> \( ... \) và xóa mọi dấu $ còn sót
+    function convertDollarMathToParen(str) {
+        if (typeof str !== "string") return str;
+
+        // Đổi $$...$$ -> \[...\]
+        str = str.replace(/\$\$([\s\S]+?)\$\$/g, (_, m) => `\\[${m}\\]`);
+
+        // Đổi $...$ -> \(...\)
+        str = str.replace(/\$([^\$]+?)\$/g, (_, m) => `\\(${m}\\)`);
+
+        // Xóa mọi dấu $ còn sót (tránh trường hợp bị lộ $)
+        str = str.replace(/\$/g, "");
+
+        return str;
+    }
+
+    function sanitizeQuestions(arr) {
+        return arr.map(q => ({
+            ...q,
+            text: convertDollarMathToParen(q.text),
+            rationale: convertDollarMathToParen(q.rationale),
+            level: convertDollarMathToParen(q.level),
+            options: Array.isArray(q.options) ? q.options.map(convertDollarMathToParen) : q.options
+        }));
+    }
+
     // Database câu hỏi (bản đã cân lại A/B/C/D)
     const questions = [
         // Mức độ: Nhận biết (6 câu)
@@ -267,13 +293,8 @@
         // Mức độ: Thông hiểu (5 câu)
         {
             text: "Tính giá trị biểu thức: $5 - (3 - 4)$",
-            options: [
-                "2",
-                "4",
-                "6",
-                "-2"
-            ],
-            correct: 2, // C (6)
+            options: ["2", "4", "6", "-2"],
+            correct: 2, // C
             rationale: "$5 - (3 - 4) = 5 - 3 + 4 = 2 + 4 = 6$. Hoặc $5 - (-1) = 6$.",
             level: "Thông hiểu"
         },
@@ -303,25 +324,15 @@
         },
         {
             text: "Tính nhanh: $214 - (14 + 50)$",
-            options: [
-                "250",
-                "150",
-                "178",
-                "200"
-            ],
+            options: ["250", "150", "178", "200"],
             correct: 1, // B
             rationale: "$214 - 14 - 50 = (214 - 14) - 50 = 200 - 50 = 150$.",
             level: "Thông hiểu"
         },
         {
             text: "Kết quả của phép tính $-(\\frac{3}{5} + \\frac{3}{4}) - (-\\frac{3}{4} + \\frac{2}{5})$ là:",
-            options: [
-                "$-2$",
-                "$-\\frac{1}{5}$",
-                "$-1$",
-                "$0$"
-            ],
-            correct: 2, // C (-1)
+            options: ["$-2$", "$-\\frac{1}{5}$", "$-1$", "$0$"],
+            correct: 2, // C
             rationale: "Bỏ ngoặc: $-\\frac{3}{5} - \\frac{3}{4} + \\frac{3}{4} - \\frac{2}{5} = (-\\frac{3}{5} - \\frac{2}{5}) + (-\\frac{3}{4} + \\frac{3}{4}) = -\\frac{5}{5} + 0 = -1$.",
             level: "Thông hiểu"
         },
@@ -379,6 +390,9 @@
         }
     ];
 
+    // ✅ 2) TẠO BẢN SẠCH (không còn dấu $ bị lộ)
+    const CLEAN_QUESTIONS = sanitizeQuestions(questions);
+
     let currentQuestionIndex = 0;
     let score = 0;
     let correctAnswersCount = 0;
@@ -435,8 +449,8 @@
         correctAnswersCount = 0;
         scoreDisplay.textContent = 0;
 
-        // xáo trộn thứ tự câu hỏi mỗi lần chơi
-        shuffleArray(questions);
+        // ✅ xáo trộn thứ tự câu hỏi mỗi lần chơi (dùng bản sạch)
+        shuffleArray(CLEAN_QUESTIONS);
 
         startScreen.classList.add('hidden');
         gameScreen.classList.remove('hidden');
@@ -447,11 +461,13 @@
     function loadQuestion() {
         isAnswering = true;
         feedbackContainer.classList.add('hidden');
-        const q = questions[currentQuestionIndex];
+
+        // ✅ dùng bản sạch
+        const q = CLEAN_QUESTIONS[currentQuestionIndex];
 
         // Update UI Info
         currentQuestionNum.textContent = currentQuestionIndex + 1;
-        const progressPercent = (currentQuestionIndex / questions.length) * 100;
+        const progressPercent = (currentQuestionIndex / CLEAN_QUESTIONS.length) * 100;
         progressBar.style.width = `${progressPercent}%`;
 
         // Level Badge color
@@ -508,7 +524,7 @@
             }
         }
 
-        const q = questions[currentQuestionIndex];
+        const q = CLEAN_QUESTIONS[currentQuestionIndex];
 
         if (selectedIndex === currentCorrectIndex) {
             // Đúng
@@ -557,7 +573,7 @@
 
     function nextQuestion() {
         currentQuestionIndex++;
-        if (currentQuestionIndex < questions.length) {
+        if (currentQuestionIndex < CLEAN_QUESTIONS.length) {
             loadQuestion();
         } else {
             endGame();
@@ -570,7 +586,7 @@
 
         document.getElementById('finalScore').textContent = score;
         document.getElementById('correctCount').textContent = correctAnswersCount;
-        document.getElementById('wrongCount').textContent = questions.length - correctAnswersCount;
+        document.getElementById('wrongCount').textContent = CLEAN_QUESTIONS.length - correctAnswersCount;
 
         const resultIcon = document.getElementById('resultIcon');
         if (correctAnswersCount >= 12) {
