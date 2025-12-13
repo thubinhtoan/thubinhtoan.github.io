@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thử Tài Thống Kê - Toán 9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .option-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .option-card:hover:not(.disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .option-card.selected-correct {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .option-card.selected-wrong {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .option-card.disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Audio Elements -->
+    <audio id="correctSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="wrongSound" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3"></audio>
+    <audio id="bgMusic" loop>
+        <source src="https://assets.mixkit.co/active_storage/sfx/123/123-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="container max-w-4xl w-full">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="glass-panel p-8 md:p-12 text-center fade-in">
+            <div class="mb-6">
+                <i class="fa-solid fa-chart-pie text-6xl text-indigo-600 mb-4 animate-bounce"></i>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-2">Thử Tài Thống Kê</h1>
+                <p class="text-xl text-gray-600 font-semibold">Chương 7 - Toán 9: Bảng tần số & Biểu đồ</p>
+            </div>
+            
+            <div class="bg-indigo-50 rounded-xl p-6 mb-8 text-left mx-auto max-w-2xl">
+                <h3 class="text-lg font-bold text-indigo-800 mb-2"><i class="fa-solid fa-circle-info mr-2"></i>Luật chơi:</h3>
+                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                    <li>Gồm <strong>15 câu hỏi</strong> trắc nghiệm.</li>
+                    <li>Có 4 mức độ: Nhận biết, Thông hiểu, Vận dụng, Vận dụng cao.</li>
+                    <li>Trả lời đúng để nhận điểm và hiệu ứng chúc mừng!</li>
+                    <li>Mỗi câu hỏi sẽ có giải thích chi tiết sau khi trả lời.</li>
+                </ul>
+            </div>
+
+            <button onclick="startGame()" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 px-10 rounded-full text-xl hover:shadow-lg transform hover:scale-105 transition duration-300">
+                Bắt đầu ngay <i class="fa-solid fa-rocket ml-2"></i>
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="glass-panel p-6 md:p-8 hidden">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <div>
+                    <span class="text-sm font-bold text-indigo-500 uppercase tracking-wider">Câu hỏi</span>
+                    <div class="text-2xl font-black text-gray-800"><span id="current-question-num">1</span>/15</div>
+                </div>
+                <div class="bg-indigo-100 px-4 py-2 rounded-lg">
+                    <span class="text-sm font-bold text-indigo-600">Điểm số: <span id="score" class="text-xl">0</span></span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-8">
+                <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+
+            <!-- Question Content -->
+            <div class="mb-8">
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800 leading-relaxed">
+                    <!-- Question goes here -->
+                </h2>
+                <p id="hint-text" class="text-sm text-gray-500 mt-2 italic hidden"><i class="fa-regular fa-lightbulb mr-1 text-yellow-500"></i><span id="hint-content"></span></p>
+            </div>
+
+            <!-- Options Grid -->
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <!-- Options will be injected here -->
+            </div>
+
+            <!-- Feedback Area (Rationale) -->
+            <div id="feedback-area" class="hidden rounded-xl p-6 mb-6 transition-all duration-300 border-l-4">
+                <div class="flex items-start">
+                    <div id="feedback-icon" class="text-3xl mr-4 flex-shrink-0"></div>
+                    <div>
+                        <h4 id="feedback-title" class="font-bold text-lg mb-1"></h4>
+                        <p id="feedback-content" class="text-gray-700"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex justify-end">
+                <button id="next-btn" onclick="nextQuestion()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all">
+                    Câu tiếp theo <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="glass-panel p-8 md:p-12 text-center hidden fade-in">
+            <div class="mb-6 relative">
+                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <i class="fa-solid fa-trophy text-6xl text-yellow-400 drop-shadow-lg"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mt-12 mb-2">Hoàn thành!</h2>
+                <p class="text-gray-600">Bạn đã hoàn thành bài kiểm tra.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-8 shadow-inner mb-8 max-w-sm mx-auto">
+                <div class="text-sm text-gray-500 uppercase font-bold tracking-wide mb-2">Tổng điểm của bạn</div>
+                <div class="text-6xl font-black text-indigo-600 mb-2"><span id="final-score">0</span><span class="text-2xl text-gray-400">/150</span></div>
+                <div id="result-message" class="text-lg font-semibold text-indigo-500"></div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <button onclick="location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full transition-all">
+                    <i class="fa-solid fa-rotate-right mr-2"></i> Chơi lại
+                </button>
+                <button onclick="alert('Cảm ơn bạn đã tham gia!')" class="bg-white hover:bg-gray-50 text-indigo-600 border-2 border-indigo-600 font-bold py-3 px-8 rounded-full transition-all">
+                    <i class="fa-solid fa-share-nodes mr-2"></i> Chia sẻ kết quả
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+   <script>
+  // --- QUIZ DATA ---
+  const quizData = [
+    {
+      question: "Trong thống kê, 'tần số' của một giá trị x trong mẫu dữ liệu được định nghĩa là gì?",
+      options: [
+        "Giá trị của x chia cho tổng số dữ liệu.",
+        "Tổng các giá trị có trong mẫu dữ liệu.",
+        "Số lần xuất hiện của giá trị x trong mẫu dữ liệu đó.",
+        "Số lượng các giá trị khác nhau trong mẫu."
+      ],
+      correct: 2,
+      rationale: "Chính xác! 🎉 Tần số chính là số lần một giá trị cụ thể được lặp lại trong tập dữ liệu (số lần xuất hiện).",
+      hint: "Hãy nhớ lại hoạt động 'kiểm đếm' số lần một giá trị xuất hiện."
+    },
+    {
+      question: "Cho mẫu số liệu: 6; 7; 8; 6; 9; 6; 7. Giá trị 6 có tần số là bao nhiêu?",
+      options: ["2", "3", "4", "6"],
+      correct: 1,
+      rationale: "Tuyệt vời! 🌟 Nếu bạn đếm, số 6 xuất hiện ở vị trí thứ 1, thứ 4 và thứ 6. Tổng cộng là 3 lần.",
+      hint: "Đếm xem số 6 xuất hiện bao nhiêu lần trong danh sách."
+    },
+    {
+      question: "Trong bảng tần số, tổng các tần số của tất cả các giá trị luôn bằng:",
+      options: [
+        "Số các đơn vị điều tra (Cỡ mẫu N)",
+        "100",
+        "Số giá trị khác nhau của mẫu",
+        "Giá trị lớn nhất trong mẫu"
+      ],
+      correct: 0,
+      rationale: "Chuẩn xác! 👏 Tổng các tần số chính là tổng số dữ liệu đã thu thập được, gọi là cỡ mẫu N.",
+      hint: "Nếu bạn cộng số lần xuất hiện của tất cả các giá trị lại, bạn sẽ được tổng số gì?"
+    },
+    {
+      question: "Biểu đồ tần số dạng cột có đặc điểm nào sau đây?",
+      options: [
+        "Trục hoành biểu diễn tần số, trục tung biểu diễn giá trị.",
+        "Các cột nối với nhau bằng các đoạn thẳng gấp khúc.",
+        "Luôn có dạng hình tròn.",
+        "Các cột có chiều rộng bằng nhau và chiều cao tương ứng với tần số."
+      ],
+      correct: 3,
+      rationale: "Đúng rồi! 🎊 Trong biểu đồ cột, chiều cao của cột thể hiện số lần xuất hiện (tần số) của giá trị đó, và các cột thường có độ rộng bằng nhau.",
+      hint: "Hãy hình dung về các hình chữ nhật đứng trong biểu đồ."
+    },
+    {
+      question: "Trong biểu đồ tần số dạng đoạn thẳng, các điểm được xác định bởi cặp tọa độ nào?",
+      options: [
+        "(Tần số; Giá trị)",
+        "(Giá trị; Tần số)",
+        "(Giá trị; Giá trị)",
+        "(Tần số; Tần số)"
+      ],
+      correct: 1,
+      rationale: "Chính xác! 🌹 Trục hoành (ngang) thường là giá trị, trục tung (đứng) là tần số, nên cặp tọa độ là (Giá trị; Tần số).",
+      hint: "Trục nằm ngang (x) thường là Giá trị, trục thẳng đứng (y) thường là Tần số."
+    },
+    {
+      question: "Để biết giá trị nào xuất hiện nhiều nhất trong mẫu số liệu dựa vào biểu đồ cột, ta nhìn vào đâu?",
+      options: [
+        "Cột cao nhất.",
+        "Cột thấp nhất.",
+        "Cột nằm ngoài cùng bên trái.",
+        "Cột nằm ngoài cùng bên phải."
+      ],
+      correct: 0,
+      rationale: "Hoan hô! 🌻 Cột cao nhất có chiều cao lớn nhất, tương ứng với tần số lớn nhất (xuất hiện nhiều nhất).",
+      hint: "Tần số càng lớn thì cột càng..."
+    },
+    {
+      question: "Cho bảng tần số điểm kiểm tra: Điểm 8 (tần số 5), Điểm 9 (tần số 3), Điểm 10 (tần số 2). Cỡ mẫu N là bao nhiêu?",
+      options: ["3", "10", "27", "30"],
+      correct: 1,
+      rationale: "Đúng rồi! 🌟 Cỡ mẫu N = Tổng tần số = 5 + 3 + 2 = 10.",
+      hint: "Cộng tất cả các tần số lại với nhau."
+    },
+    {
+      question: "Một cửa hàng bán kem ghi lại số lượng kem bán được trong 5 ngày: 20, 15, 20, 25, 20. Bảng tần số nào sau đây đúng?",
+      options: [
+        "Giá trị: 15, 20, 25 | Tần số: 1, 2, 2",
+        "Giá trị: 20, 15, 25 | Tần số: 20, 15, 25",
+        "Giá trị: 15, 20, 25 | Tần số: 1, 3, 1",
+        "Giá trị: 1, 2, 3 | Tần số: 15, 20, 25"
+      ],
+      correct: 2,
+      rationale: "Tuyệt vời! 🍦 Sắp xếp lại: 15 (1 lần), 20 (3 lần), 25 (1 lần).",
+      hint: "Đếm xem số 20 xuất hiện mấy lần, số 15 mấy lần..."
+    },
+    {
+      question: "Khi chuyển từ bảng tần số sang biểu đồ tần số dạng đoạn thẳng, nếu hai giá trị có tần số bằng nhau thì trên biểu đồ chúng sẽ như thế nào?",
+      options: [
+        "Hai điểm biểu diễn sẽ trùng nhau.",
+        "Hai điểm biểu diễn sẽ nằm trên cùng một đường nằm ngang.",
+        "Hai điểm biểu diễn sẽ nằm trên cùng một đường thẳng đứng.",
+        "Không có mối liên hệ nào."
+      ],
+      correct: 1,
+      rationale: "Chính xác! 📏 Vì có cùng tung độ (tần số) nên chúng có cùng độ cao so với trục hoành, tức là nằm trên cùng một đường ngang.",
+      hint: "Tần số được biểu diễn bằng độ cao (tung độ) của điểm."
+    },
+    {
+      question: "Cho bảng tần số lỗi chính tả: 0 lỗi (4 bạn), 1 lỗi (5 bạn), 2 lỗi (8 bạn), 3 lỗi (3 bạn). Số học sinh mắc ít nhất 2 lỗi là bao nhiêu?",
+      options: ["8", "3", "11", "20"],
+      correct: 2,
+      rationale: "Đúng rồi! 🎉 'Ít nhất 2 lỗi' nghĩa là mắc 2 lỗi hoặc nhiều hơn (3 lỗi). Số bạn = 8 (mắc 2 lỗi) + 3 (mắc 3 lỗi) = 11.",
+      hint: "Ít nhất 2 lỗi nghĩa là số lỗi >= 2. Hãy cộng tần số của các giá trị 2 và 3."
+    },
+    {
+      question: "Quan sát biểu đồ cột về số cây trồng được: Tổ 1 (10 cây), Tổ 2 (15 cây), Tổ 3 (12 cây), Tổ 4 (15 cây). Nhận xét nào ĐÚNG?",
+      options: [
+        "Tổ 1 trồng được nhiều cây nhất.",
+        "Tổ 3 trồng được ít cây nhất.",
+        "Tổng số cây trồng được là 40.",
+        "Tổ 2 và Tổ 4 trồng được số cây bằng nhau và nhiều nhất."
+      ],
+      correct: 3,
+      rationale: "Chính xác! 🌳 Cả Tổ 2 và Tổ 4 đều trồng được 15 cây và đây là mức cao nhất trong 4 tổ.",
+      hint: "So sánh chiều cao của các cột tương ứng với từng tổ."
+    },
+    {
+      question: "Cửa hàng thời trang thống kê cỡ áo bán ra: S (10 cái), M (35 cái), L (15 cái), XL (5 cái). Chủ cửa hàng nên ưu tiên nhập thêm cỡ áo nào nhất?",
+      options: ["Cỡ S", "Cỡ XL", "Cỡ M", "Nhập đều các cỡ"],
+      correct: 2,
+      rationale: "Quyết định sáng suốt! 👔 Cỡ M có tần số cao nhất (35), chứng tỏ nhu cầu khách hàng cao nhất, nên cần nhập nhiều nhất.",
+      hint: "Trong kinh doanh, người ta thường nhập nhiều hàng hóa loại 'bán chạy nhất' (có tần số cao nhất)."
+    },
+    {
+      question: "Thống kê thời gian giải toán (phút): 5, 7, 5, 8, 7, 5, 10, 6. Có bao nhiêu học sinh giải bài toán trong thời gian dưới 7 phút?",
+      options: ["3", "4", "5", "6"],
+      correct: 1,
+      rationale: "Chính xác! ⏱️ Các giá trị dưới 7 là: 5, 5, 5, 6. Tổng cộng có 4 học sinh.",
+      hint: "Liệt kê các giá trị nhỏ hơn 7 trong dãy số liệu và đếm số lượng của chúng."
+    },
+    {
+      question: "Một bảng tần số ghi lại số con trong 20 hộ gia đình. Tần số của các hộ có 1 con là 8, 2 con là 10. Tần số của hộ có 3 con bị mờ. Hãy tìm tần số đó?",
+      options: ["1", "2", "18", "0"],
+      correct: 1,
+      rationale: "Thông minh lắm! 🧩 Tổng số hộ (N) là 20. Số hộ đã biết là 8 + 10 = 18. Vậy số hộ còn lại là 20 - 18 = 2.",
+      hint: "Tổng các tần số phải bằng kích thước mẫu N (ở đây N=20)."
+    },
+    {
+      question: "Cho biểu đồ cột số huy chương vàng: Cột A cao gấp đôi B. Cột C cao bằng B. Cột D thấp nhất (khác 0). Tổng là 25, B có 5 huy chương. Hỏi đoàn D có bao nhiêu huy chương?",
+      options: [
+        "5",
+        "Có lỗi trong dữ kiện đề bài (D không thể vừa bằng 5 mà vẫn 'thấp nhất').",
+        "2",
+        "10"
+      ],
+      correct: 1,
+      rationale: "Đây là câu bẫy logic 🕵️‍♂️: B=5 ⇒ A=10, C=5 ⇒ A+B+C=20 ⇒ D=25-20=5. Nhưng nếu D=5 thì D bằng B và C, không thỏa điều kiện 'D thấp nhất'. Vậy dữ kiện mâu thuẫn.",
+      hint: "Tính D trước, rồi kiểm tra lại điều kiện 'D thấp nhất'."
+    }
+  ];
+
+  // --- GAME VARIABLES ---
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let answered = false;
+
+  // Lưu phương án sau khi random để chấm đúng
+  let currentOptionsShuffled = [];
+  let currentCorrectIndex = 0;
+
+  // --- DOM ELEMENTS ---
+  const startScreen = document.getElementById('start-screen');
+  const quizScreen = document.getElementById('quiz-screen');
+  const resultScreen = document.getElementById('result-screen');
+  const questionText = document.getElementById('question-text');
+  const optionsContainer = document.getElementById('options-container');
+  const scoreEl = document.getElementById('score');
+  const progressBar = document.getElementById('progress-bar');
+  const currentQNum = document.getElementById('current-question-num');
+  const feedbackArea = document.getElementById('feedback-area');
+  const feedbackTitle = document.getElementById('feedback-title');
+  const feedbackContent = document.getElementById('feedback-content');
+  const feedbackIcon = document.getElementById('feedback-icon');
+  const nextBtn = document.getElementById('next-btn');
+  const hintText = document.getElementById('hint-text');
+  const hintContent = document.getElementById('hint-content');
+
+  // Sounds
+  const correctSound = document.getElementById('correctSound');
+  const wrongSound = document.getElementById('wrongSound');
+
+  // --- HELPERS ---
+  function shuffleInPlace(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  // --- FUNCTIONS ---
+  function startGame() {
+    startScreen.classList.add('hidden');
+    quizScreen.classList.remove('hidden');
+    quizScreen.classList.add('fade-in');
+
+    // Reset state
+    currentQuestionIndex = 0;
+    score = 0;
+    scoreEl.innerText = score;
+
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    const data = quizData[currentQuestionIndex];
+
+    // Update UI
+    currentQNum.innerText = currentQuestionIndex + 1;
+    questionText.innerText = data.question;
+    progressBar.style.width = `${(currentQuestionIndex / quizData.length) * 100}%`;
+
+    // Reset feedback & buttons
+    feedbackArea.classList.add('hidden');
+    nextBtn.classList.add('hidden');
+    answered = false;
+
+    // Hint
+    if (data.hint && data.hint.trim() !== "") {
+      hintText.classList.remove('hidden');
+      hintContent.innerText = data.hint;
+    } else {
+      hintText.classList.add('hidden');
+      hintContent.innerText = "";
+    }
+
+    // --- RANDOM thứ tự đáp án (và cập nhật correct) ---
+    const objects = data.options.map((text, idx) => ({
+      text,
+      isCorrect: idx === data.correct
+    }));
+    shuffleInPlace(objects);
+
+    currentOptionsShuffled = objects.map(o => o.text);
+    currentCorrectIndex = objects.findIndex(o => o.isCorrect);
+
+    // Render Options
+    optionsContainer.innerHTML = '';
+    currentOptionsShuffled.forEach((opt, index) => {
+      const btn = document.createElement('div');
+      btn.className =
+        'option-card bg-white p-4 rounded-xl shadow-sm hover:shadow-md font-semibold text-gray-700 flex items-center';
+      btn.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3 font-bold text-gray-500 border border-gray-300">
+          ${String.fromCharCode(65 + index)}
+        </div>
+        <span>${opt}</span>
+      `;
+      btn.onclick = () => checkAnswer(index, btn);
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(selectedIndex, btnElement) {
+    if (answered) return;
+    answered = true;
+
+    const data = quizData[currentQuestionIndex];
+    const isCorrect = selectedIndex === currentCorrectIndex;
+    const options = optionsContainer.children;
+
+    // Highlight answers
+    if (isCorrect) {
+      btnElement.classList.add('selected-correct');
+      btnElement.querySelector('div').className =
+        "w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mr-3 font-bold text-white border border-green-500";
+      btnElement.querySelector('div').innerHTML = '<i class="fa-solid fa-check"></i>';
+
+      score += 10;
+      scoreEl.innerText = score;
+      playCorrectEffect();
+    } else {
+      btnElement.classList.add('selected-wrong');
+      btnElement.querySelector('div').className =
+        "w-8 h-8 rounded-full bg-red-500 flex items-center justify-center mr-3 font-bold text-white border border-red-500";
+      btnElement.querySelector('div').innerHTML = '<i class="fa-solid fa-xmark"></i>';
+
+      // Highlight correct answer
+      const correctBtn = options[currentCorrectIndex];
+      correctBtn.classList.add('selected-correct');
+      correctBtn.querySelector('div').className =
+        "w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mr-3 font-bold text-white border border-green-500";
+      correctBtn.querySelector('div').innerHTML = '<i class="fa-solid fa-check"></i>';
+
+      playWrongEffect();
+    }
+
+    // Disable all options
+    for (let btn of options) {
+      btn.classList.add('disabled');
+    }
+
+    // Show Feedback (Rationale)
+    showFeedback(isCorrect, data.rationale);
+    nextBtn.classList.remove('hidden');
+
+    // Update progress bar
+    progressBar.style.width = `${((currentQuestionIndex + 1) / quizData.length) * 100}%`;
+  }
+
+  function showFeedback(isCorrect, rationaleText) {
+    feedbackArea.classList.remove('hidden');
+    if (isCorrect) {
+      feedbackArea.className =
+        "rounded-xl p-6 mb-6 transition-all duration-300 border-l-4 bg-green-50 border-green-500 fade-in";
+      feedbackIcon.innerHTML = '<i class="fa-solid fa-face-laugh-beam text-green-500"></i>';
+      feedbackTitle.innerText = "Chính xác!";
+      feedbackTitle.className = "font-bold text-lg mb-1 text-green-700";
+    } else {
+      feedbackArea.className =
+        "rounded-xl p-6 mb-6 transition-all duration-300 border-l-4 bg-red-50 border-red-500 fade-in";
+      feedbackIcon.innerHTML = '<i class="fa-solid fa-face-frown-open text-red-500"></i>';
+      feedbackTitle.innerText = "Chưa đúng rồi!";
+      feedbackTitle.className = "font-bold text-lg mb-1 text-red-700";
+    }
+    feedbackContent.innerText = rationaleText;
+  }
+
+  function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < quizData.length) {
+      loadQuestion();
+    } else {
+      showResults();
+    }
+  }
+
+  function showResults() {
+    quizScreen.classList.add('hidden');
+    resultScreen.classList.remove('hidden');
+
+    const finalScoreEl = document.getElementById('final-score');
+    const resultMessage = document.getElementById('result-message');
+
+    // FIX lỗi score=0 bị nhảy lên 1
+    let currentScoreDisplay = 0;
+    finalScoreEl.innerText = 0;
+
+    const interval = setInterval(() => {
+      if (currentScoreDisplay >= score) {
+        clearInterval(interval);
+        triggerBigConfetti();
+        return;
+      }
+      currentScoreDisplay += 1;
+      finalScoreEl.innerText = currentScoreDisplay;
+    }, 20);
+
+    // Message based on score
+    if (score === 150) {
+      resultMessage.innerText = "Tuyệt đối! Bạn là chuyên gia thống kê! 🏆";
+    } else if (score >= 120) {
+      resultMessage.innerText = "Rất tốt! Kiến thức vững vàng! 🌟";
+    } else if (score >= 80) {
+      resultMessage.innerText = "Khá lắm! Cố gắng thêm chút nữa nhé! 👍";
+    } else {
+      resultMessage.innerText = "Hãy ôn lại bài và thử lại nhé! 💪";
+    }
+  }
+
+  // --- EFFECTS ---
+  function playCorrectEffect() {
+    correctSound.currentTime = 0;
+    correctSound.play().catch(e => console.log("Audio play prevented"));
+
+    confetti({
+      particleCount: 50,
+      spread: 60,
+      origin: { y: 0.7 },
+      colors: ['#10b981', '#34d399', '#6ee7b7']
+    });
+  }
+
+  function playWrongEffect() {
+    wrongSound.currentTime = 0;
+    wrongSound.play().catch(e => console.log("Audio play prevented"));
+
+    const container = document.getElementById('options-container');
+    container.classList.add('animate-pulse');
+    setTimeout(() => container.classList.remove('animate-pulse'), 500);
+  }
+
+  function triggerBigConfetti() {
+    var duration = 3000;
+    var end = Date.now() + duration;
+
+    (function frame() {
+      confetti({
+        particleCount: 5,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: ['#6366f1', '#ec4899', '#10b981', '#f59e0b']
+      });
+      confetti({
+        particleCount: 5,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: ['#6366f1', '#ec4899', '#10b981', '#f59e0b']
+      });
+
+      if (Date.now() < end) requestAnimationFrame(frame);
+    })();
+  }
+</script>
+</body>
+</html>
