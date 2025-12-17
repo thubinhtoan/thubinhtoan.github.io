@@ -58,654 +58,657 @@
 <body>
   <div id="root"></div>
 
-  <script type="text/babel">
-    const { useState, useEffect } = React;
+ <script type="text/babel">
+  const { useState, useEffect } = React;
 
-    // --- DỮ LIỆU CÂU HỎI ---
-   const questions = [
-  // Nhận biết
-  {
-    id: 1,
-    level: "Nhận biết",
-    text:
-      "Công thức khử mẫu của biểu thức:<br/>" +
-      "\\[\\sqrt{\\frac{A}{B}}\\]<br/>" +
-      "với $AB \\ge 0$ và $B \\ne 0$ là gì?",
-    options: [
-      "$\\frac{\\sqrt{AB}}{B}$",
-      "$\\frac{\\sqrt{AB}}{|B|}$",
-      "$\\frac{A\\sqrt{B}}{B}$",
-      "$A\\sqrt{B}$"
-    ],
-    correct: 1,
-    rationale:
-      "Theo quy tắc khử mẫu, ta nhân cả tử và mẫu với $B$ để mẫu trở thành bình phương: " +
-      "$\\sqrt{\\frac{A}{B}} = \\sqrt{\\frac{AB}{B^2}} = \\frac{\\sqrt{AB}}{|B|}$."
-  },
-  {
-    id: 2,
-    level: "Nhận biết",
-    text:
-      "Biểu thức liên hợp của biểu thức:<br/>" +
-      "\\[\\sqrt{3} - 1\\]<br/>" +
-      "dùng để trục căn thức ở mẫu là gì?",
-    options: [
-      "$\\sqrt{3} - 1$",
-      "$-\\sqrt{3} + 1$",
-      "$\\sqrt{3} + 1$",
-      "$\\sqrt{3}$"
-    ],
-    correct: 2,
-    rationale:
-      "Để tạo ra hằng đẳng thức hiệu hai bình phương $A^2 - B^2$, biểu thức liên hợp của " +
-      "$\\sqrt{A} - B$ là $\\sqrt{A} + B$. Vậy liên hợp của $\\sqrt{3}-1$ là $\\sqrt{3}+1$."
-  },
-  {
-    id: 3,
-    level: "Nhận biết",
-    text:
-      "Kết quả của phép đưa thừa số ra ngoài dấu căn của biểu thức:<br/>" +
-      "\\[\\sqrt{12}\\]<br/>" +
-      "là:",
-    options: [
-      "$2\\sqrt{3}$",
-      "$3\\sqrt{2}$",
-      "$4\\sqrt{3}$",
-      "$6\\sqrt{2}$"
-    ],
-    correct: 0,
-    rationale:
-      "Ta phân tích $12 = 4\\cdot3 = 2^2\\cdot3$. Đưa thừa số $2$ ra ngoài dấu căn ta được $2\\sqrt{3}$."
-  },
-  {
-    id: 4,
-    level: "Nhận biết",
-    text:
-      "Đưa thừa số vào trong dấu căn của biểu thức:<br/>" +
-      "\\[3\\sqrt{2}\\]<br/>" +
-      "ta được:",
-    options: [
-      "$\\sqrt{6}$",
-      "$\\sqrt{12}$",
-      "$\\sqrt{18}$",
-      "$\\sqrt{36}$"
-    ],
-    correct: 2,
-    rationale:
-      "Đưa thừa số dương vào trong căn: $3\\sqrt{2} = \\sqrt{3^2\\cdot2} = \\sqrt{9\\cdot2} = \\sqrt{18}$."
-  },
-  {
-    id: 5,
-    level: "Nhận biết",
-    text:
-      "Khẳng định nào sau đây là SAI về phép trục căn thức ở mẫu?",
-    options: [
-      "$\\frac{2}{\\sqrt{3}} = \\frac{2\\sqrt{3}}{3}$",
-      "$\\frac{1}{2+\\sqrt{3}} = 2-\\sqrt{3}$",
-      "$\\frac{a}{\\sqrt{b}} = \\frac{a\\sqrt{b}}{b} (b>0)$",
-      "$\\frac{1}{\\sqrt{5}} = \\frac{1}{5}$"
-    ],
-    correct: 3,
-    rationale:
-      "Khẳng định D sai. Đúng phải là: $\\frac{1}{\\sqrt{5}} = \\frac{\\sqrt{5}}{5}$."
-  },
-  {
-    id: 6,
-    level: "Nhận biết",
-    text:
-      "Với $x \\ge 0$, giá trị của biểu thức:<br/>" +
-      "\\[\\sqrt{x}(\\sqrt{x} + 2)\\]<br/>" +
-      "bằng:",
-    options: [
-      "$x + 2$",
-      "$\\sqrt{x} + 2\\sqrt{x}$",
-      "$2x$",
-      "$x + 2\\sqrt{x}$"
-    ],
-    correct: 3,
-    rationale:
-      "$\\sqrt{x}(\\sqrt{x}+2) = (\\sqrt{x})^2 + 2\\sqrt{x} = x + 2\\sqrt{x}$."
-  },
-
-  // Thông hiểu
-  {
-    id: 7,
-    level: "Thông hiểu",
-    text:
-      "Rút gọn biểu thức:<br/>" +
-      "\\[M = 2\\sqrt{3} + \\sqrt{27} - \\sqrt{12}\\]<br/>" +
-      "ta được:",
-    options: [
-      "$3\\sqrt{3}$",
-      "$4\\sqrt{3}$",
-      "$\\sqrt{3}$",
-      "$5\\sqrt{3}$"
-    ],
-    correct: 0,
-    rationale:
-      "$M = 2\\sqrt{3} + \\sqrt{9\\cdot3} - \\sqrt{4\\cdot3} = 2\\sqrt{3} + 3\\sqrt{3} - 2\\sqrt{3} = 3\\sqrt{3}$."
-  },
-  {
-    id: 8,
-    level: "Thông hiểu",
-    text:
-      "Trục căn thức ở mẫu của biểu thức:<br/>" +
-      "\\[\\frac{4}{\\sqrt{5}-1}\\]<br/>" +
-      "ta được kết quả là:",
-    options: [
-      "$4(\\sqrt{5}+1)$",
-      "$\\sqrt{5}+1$",
-      "$\\sqrt{5}-1$",
-      "$2(\\sqrt{5}+1)$"
-    ],
-    correct: 1,
-    rationale:
-      "$\\frac{4}{\\sqrt{5}-1} = \\frac{4(\\sqrt{5}+1)}{5-1} = \\sqrt{5}+1$."
-  },
-  {
-    id: 9,
-    level: "Thông hiểu",
-    text:
-      "Rút gọn biểu thức:<br/>" +
-      "\\[\\sqrt{18a^2}\\]<br/>" +
-      "với $a < 0$.",
-    options: [
-      "$3a\\sqrt{2}$",
-      "$-3a\\sqrt{2}$",
-      "$3\\sqrt{2a}$",
-      "$-3\\sqrt{2a}$"
-    ],
-    correct: 1,
-    rationale:
-      "$\\sqrt{18a^2} = \\sqrt{9\\cdot2\\cdot a^2} = 3\\sqrt{2}|a|$. Vì $a<0$ nên $|a|=-a$, được $-3a\\sqrt{2}$."
-  },
-  {
-    id: 10,
-    level: "Thông hiểu",
-    text:
-      "Giá trị của biểu thức:<br/>" +
-      "\\[(\\sqrt{3}-2)(\\sqrt{3}+2)\\]<br/>" +
-      "là:",
-    options: [
-      "7",
-      "1",
-      "-1",
-      "-7"
-    ],
-    correct: 2,
-    rationale:
-      "$(\\sqrt{3}-2)(\\sqrt{3}+2) = (\\sqrt{3})^2 - 2^2 = 3-4 = -1$."
-  },
-  {
-    id: 11,
-    level: "Thông hiểu",
-    text:
-      "Khử mẫu của biểu thức:<br/>" +
-      "\\[\\sqrt{\\frac{5a}{2}}\\]<br/>" +
-      "với $a > 0$ ta được:",
-    options: [
-      "$\\frac{5\\sqrt{a}}{2}$",
-      "$\\frac{\\sqrt{5a}}{2}$",
-      "$\\frac{\\sqrt{10a}}{4}$",
-      "$\\frac{\\sqrt{10a}}{2}$"
-    ],
-    correct: 3,
-    rationale:
-      "$\\sqrt{\\frac{5a}{2}} = \\sqrt{\\frac{5a\\cdot2}{2\\cdot2}} = \\frac{\\sqrt{10a}}{\\sqrt{4}} = \\frac{\\sqrt{10a}}{2}$."
-  },
-
-  // Vận dụng
-  {
-    id: 12,
-    level: "Vận dụng",
-    text:
-      "Rút gọn biểu thức:<br/>" +
-      "\\[P = \\frac{a - \\sqrt{a}}{\\sqrt{a} - 1}\\]<br/>" +
-      "với $a \\ge 0, a \\ne 1$.",
-    options: [
-      "$\\sqrt{a}$",
-      "$\\sqrt{a} + 1$",
-      "$\\sqrt{a} - 1$",
-      "$a$"
-    ],
-    correct: 0,
-    rationale:
-      "$a-\\sqrt{a} = \\sqrt{a}(\\sqrt{a}-1)$ nên $P = \\sqrt{a}$."
-  },
-  {
-    id: 13,
-    level: "Vận dụng",
-    text:
-      "Tìm $x$ biết:<br/>" +
-      "\\[\\sqrt{4x} + \\sqrt{x} = 6\\]<br/>" +
-      "(với $x \\ge 0$).",
-    options: [
-      "$x = 2$",
-      "$x = 4$",
-      "$x = 9$",
-      "$x = 16$"
-    ],
-    correct: 1,
-    rationale:
-      "$\\sqrt{4x}=2\\sqrt{x}$ nên $3\\sqrt{x}=6 \\Rightarrow \\sqrt{x}=2 \\Rightarrow x=4$."
-  },
-  {
-    id: 14,
-    level: "Vận dụng (Thực tế)",
-    text:
-      "Một mảnh vườn hình chữ nhật có:<br/>" +
-      "Chiều dài $\\sqrt{32}$ m, chiều rộng $\\sqrt{8}$ m.<br/>" +
-      "Diện tích của mảnh vườn là:",
-    options: [
-      "$8 m^2$",
-      "$12 m^2$",
-      "$16 m^2$",
-      "$32 m^2$"
-    ],
-    correct: 2,
-    rationale:
-      "Diện tích $=\\sqrt{32}\\cdot\\sqrt{8}=\\sqrt{256}=16\\,m^2$."
-  },
-
-  // Vận dụng cao
-  {
-    id: 15,
-    level: "Vận dụng cao",
-    text:
-      "Tính giá trị của biểu thức:<br/>" +
-      "\\[A = \\frac{1}{\\sqrt{2}+1} + \\frac{1}{\\sqrt{3}+\\sqrt{2}} + \\frac{1}{\\sqrt{4}+\\sqrt{3}}\\]",
-    options: [
-      "1",
-      "2",
-      "3",
-      "$\\sqrt{2}$"
-    ],
-    correct: 0,
-    rationale:
-      "Trục căn: $A=(\\sqrt{2}-1)+ (\\sqrt{3}-\\sqrt{2}) + (\\sqrt{4}-\\sqrt{3}) = -1+2 = 1$."
+  // ===== FIX HIỂN THỊ: ÉP 1 DÒNG + INLINE MATH =====
+  function normalizeOneLine(str) {
+    return (str || "")
+      .replace(/<br\s*\/?>/gi, " ")   // <br/> -> space
+      .replace(/\r?\n/g, " ")         // newline thật -> space
+      .replace(/\\n/g, " ")           // "\n" trong string -> space
+      .replace(/\s+/g, " ")           // gom khoảng trắng
+      .trim();
   }
-];
 
-    // --- ÂM THANH ---
-    const playSound = (type) => {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
+  function toInlineMath(str) {
+    // \[ ... \] là dạng display => xuống dòng. Đổi sang \( ... \) để nằm cùng dòng.
+    return (str || "")
+      .replace(/\\\[/g, "\\(")
+      .replace(/\\\]/g, "\\)");
+  }
 
-      const ctx = new AudioContext();
-      const osc = ctx.createOscillator();
-      const gainNode = ctx.createGain();
+  function formatOneLineHTML(htmlString) {
+    // giữ nguyên latex $...$ và chuyển display math sang inline + bỏ <br>
+    return toInlineMath(normalizeOneLine(htmlString));
+  }
 
-      osc.connect(gainNode);
-      gainNode.connect(ctx.destination);
+  // --- DỮ LIỆU CÂU HỎI ---
+  const questions = [
+    // Nhận biết
+    {
+      id: 1,
+      level: "Nhận biết",
+      text:
+        "Công thức khử mẫu của biểu thức:<br/>" +
+        "\\[\\sqrt{\\frac{A}{B}}\\]<br/>" +
+        "với $AB \\ge 0$ và $B \\ne 0$ là gì?",
+      options: [
+        "$\\frac{\\sqrt{AB}}{B}$",
+        "$\\frac{\\sqrt{AB}}{|B|}$",
+        "$\\frac{A\\sqrt{B}}{B}$",
+        "$A\\sqrt{B}$"
+      ],
+      correct: 1,
+      rationale:
+        "Theo quy tắc khử mẫu, ta nhân cả tử và mẫu với $B$ để mẫu trở thành bình phương: " +
+        "$\\sqrt{\\frac{A}{B}} = \\sqrt{\\frac{AB}{B^2}} = \\frac{\\sqrt{AB}}{|B|}$."
+    },
+    {
+      id: 2,
+      level: "Nhận biết",
+      text:
+        "Biểu thức liên hợp của biểu thức:<br/>" +
+        "\\[\\sqrt{3} - 1\\]<br/>" +
+        "dùng để trục căn thức ở mẫu là gì?",
+      options: [
+        "$\\sqrt{3} - 1$",
+        "$-\\sqrt{3} + 1$",
+        "$\\sqrt{3} + 1$",
+        "$\\sqrt{3}$"
+      ],
+      correct: 2,
+      rationale:
+        "Để tạo ra hằng đẳng thức hiệu hai bình phương $A^2 - B^2$, biểu thức liên hợp của " +
+        "$\\sqrt{A} - B$ là $\\sqrt{A} + B$. Vậy liên hợp của $\\sqrt{3}-1$ là $\\sqrt{3}+1$."
+    },
+    {
+      id: 3,
+      level: "Nhận biết",
+      text:
+        "Kết quả của phép đưa thừa số ra ngoài dấu căn của biểu thức:<br/>" +
+        "\\[\\sqrt{12}\\]<br/>" +
+        "là:",
+      options: [
+        "$2\\sqrt{3}$",
+        "$3\\sqrt{2}$",
+        "$4\\sqrt{3}$",
+        "$6\\sqrt{2}$"
+      ],
+      correct: 0,
+      rationale:
+        "Ta phân tích $12 = 4\\cdot3 = 2^2\\cdot3$. Đưa thừa số $2$ ra ngoài dấu căn ta được $2\\sqrt{3}$."
+    },
+    {
+      id: 4,
+      level: "Nhận biết",
+      text:
+        "Đưa thừa số vào trong dấu căn của biểu thức:<br/>" +
+        "\\[3\\sqrt{2}\\]<br/>" +
+        "ta được:",
+      options: [
+        "$\\sqrt{6}$",
+        "$\\sqrt{12}$",
+        "$\\sqrt{18}$",
+        "$\\sqrt{36}$"
+      ],
+      correct: 2,
+      rationale:
+        "Đưa thừa số dương vào trong căn: $3\\sqrt{2} = \\sqrt{3^2\\cdot2} = \\sqrt{9\\cdot2} = \\sqrt{18}$."
+    },
+    {
+      id: 5,
+      level: "Nhận biết",
+      text:
+        "Khẳng định nào sau đây là SAI về phép trục căn thức ở mẫu?",
+      options: [
+        "$\\frac{2}{\\sqrt{3}} = \\frac{2\\sqrt{3}}{3}$",
+        "$\\frac{1}{2+\\sqrt{3}} = 2-\\sqrt{3}$",
+        "$\\frac{a}{\\sqrt{b}} = \\frac{a\\sqrt{b}}{b} (b>0)$",
+        "$\\frac{1}{\\sqrt{5}} = \\frac{1}{5}$"
+      ],
+      correct: 3,
+      rationale:
+        "Khẳng định D sai. Đúng phải là: $\\frac{1}{\\sqrt{5}} = \\frac{\\sqrt{5}}{5}$."
+    },
+    {
+      id: 6,
+      level: "Nhận biết",
+      text:
+        "Với $x \\ge 0$, giá trị của biểu thức:<br/>" +
+        "\\[\\sqrt{x}(\\sqrt{x} + 2)\\]<br/>" +
+        "bằng:",
+      options: [
+        "$x + 2$",
+        "$\\sqrt{x} + 2\\sqrt{x}$",
+        "$2x$",
+        "$x + 2\\sqrt{x}$"
+      ],
+      correct: 3,
+      rationale:
+        "$\\sqrt{x}(\\sqrt{x}+2) = (\\sqrt{x})^2 + 2\\sqrt{x} = x + 2\\sqrt{x}$."
+    },
 
-      if (type === 'correct') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(600, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
-        gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.5);
-      } else if (type === 'wrong') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, ctx.currentTime);
-        osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.3);
-        gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.3);
-      } else if (type === 'win') {
-        const now = ctx.currentTime;
-        const notes = [523.25, 659.25, 783.99, 1046.50];
-        notes.forEach((freq, i) => {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.connect(g);
-          g.connect(ctx.destination);
-          o.type = 'square';
-          o.frequency.value = freq;
-          g.gain.setValueAtTime(0.2, now + i * 0.1);
-          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.3);
-          o.start(now + i * 0.1);
-          o.stop(now + i * 0.1 + 0.3);
-        });
-      }
-    };
+    // Thông hiểu
+    {
+      id: 7,
+      level: "Thông hiểu",
+      text:
+        "Rút gọn biểu thức:<br/>" +
+        "\\[M = 2\\sqrt{3} + \\sqrt{27} - \\sqrt{12}\\]<br/>" +
+        "ta được:",
+      options: [
+        "$3\\sqrt{3}$",
+        "$4\\sqrt{3}$",
+        "$\\sqrt{3}$",
+        "$5\\sqrt{3}$"
+      ],
+      correct: 0,
+      rationale:
+        "$M = 2\\sqrt{3} + \\sqrt{9\\cdot3} - \\sqrt{4\\cdot3} = 2\\sqrt{3} + 3\\sqrt{3} - 2\\sqrt{3} = 3\\sqrt{3}$."
+    },
+    {
+      id: 8,
+      level: "Thông hiểu",
+      text:
+        "Trục căn thức ở mẫu của biểu thức:<br/>" +
+        "\\[\\frac{4}{\\sqrt{5}-1}\\]<br/>" +
+        "ta được kết quả là:",
+      options: [
+        "$4(\\sqrt{5}+1)$",
+        "$\\sqrt{5}+1$",
+        "$\\sqrt{5}-1$",
+        "$2(\\sqrt{5}+1)$"
+      ],
+      correct: 1,
+      rationale:
+        "$\\frac{4}{\\sqrt{5}-1} = \\frac{4(\\sqrt{5}+1)}{5-1} = \\sqrt{5}+1$."
+    },
+    {
+      id: 9,
+      level: "Thông hiểu",
+      text:
+        "Rút gọn biểu thức:<br/>" +
+        "\\[\\sqrt{18a^2}\\]<br/>" +
+        "với $a < 0$.",
+      options: [
+        "$3a\\sqrt{2}$",
+        "$-3a\\sqrt{2}$",
+        "$3\\sqrt{2a}$",
+        "$-3\\sqrt{2a}$"
+      ],
+      correct: 1,
+      rationale:
+        "$\\sqrt{18a^2} = \\sqrt{9\\cdot2\\cdot a^2} = 3\\sqrt{2}|a|$. Vì $a<0$ nên $|a|=-a$, được $-3a\\sqrt{2}$."
+    },
+    {
+      id: 10,
+      level: "Thông hiểu",
+      text:
+        "Giá trị của biểu thức:<br/>" +
+        "\\[(\\sqrt{3}-2)(\\sqrt{3}+2)\\]<br/>" +
+        "là:",
+      options: [
+        "7",
+        "1",
+        "-1",
+        "-7"
+      ],
+      correct: 2,
+      rationale:
+        "$(\\sqrt{3}-2)(\\sqrt{3}+2) = (\\sqrt{3})^2 - 2^2 = 3-4 = -1$."
+    },
+    {
+      id: 11,
+      level: "Thông hiểu",
+      text:
+        "Khử mẫu của biểu thức:<br/>" +
+        "\\[\\sqrt{\\frac{5a}{2}}\\]<br/>" +
+        "với $a > 0$ ta được:",
+      options: [
+        "$\\frac{5\\sqrt{a}}{2}$",
+        "$\\frac{\\sqrt{5a}}{2}$",
+        "$\\frac{\\sqrt{10a}}{4}$",
+        "$\\frac{\\sqrt{10a}}{2}$"
+      ],
+      correct: 3,
+      rationale:
+        "$\\sqrt{\\frac{5a}{2}} = \\sqrt{\\frac{5a\\cdot2}{2\\cdot2}} = \\frac{\\sqrt{10a}}{\\sqrt{4}} = \\frac{\\sqrt{10a}}{2}$."
+    },
 
-    // --- CONFETTI ---
-    const Confetti = () => {
-      const [particles, setParticles] = useState([]);
+    // Vận dụng
+    {
+      id: 12,
+      level: "Vận dụng",
+      text:
+        "Rút gọn biểu thức:<br/>" +
+        "\\[P = \\frac{a - \\sqrt{a}}{\\sqrt{a} - 1}\\]<br/>" +
+        "với $a \\ge 0, a \\ne 1$.",
+      options: [
+        "$\\sqrt{a}$",
+        "$\\sqrt{a} + 1$",
+        "$\\sqrt{a} - 1$",
+        "$a$"
+      ],
+      correct: 0,
+      rationale:
+        "$a-\\sqrt{a} = \\sqrt{a}(\\sqrt{a}-1)$ nên $P = \\sqrt{a}$."
+    },
+    {
+      id: 13,
+      level: "Vận dụng",
+      text:
+        "Tìm $x$ biết:<br/>" +
+        "\\[\\sqrt{4x} + \\sqrt{x} = 6\\]<br/>" +
+        "(với $x \\ge 0$).",
+      options: [
+        "$x = 2$",
+        "$x = 4$",
+        "$x = 9$",
+        "$x = 16$"
+      ],
+      correct: 1,
+      rationale:
+        "$\\sqrt{4x}=2\\sqrt{x}$ nên $3\\sqrt{x}=6 \\Rightarrow \\sqrt{x}=2 \\Rightarrow x=4$."
+    },
+    {
+      id: 14,
+      level: "Vận dụng (Thực tế)",
+      text:
+        "Một mảnh vườn hình chữ nhật có:<br/>" +
+        "Chiều dài $\\sqrt{32}$ m, chiều rộng $\\sqrt{8}$ m.<br/>" +
+        "Diện tích của mảnh vườn là:",
+      options: [
+        "$8 m^2$",
+        "$12 m^2$",
+        "$16 m^2$",
+        "$32 m^2$"
+      ],
+      correct: 2,
+      rationale:
+        "Diện tích $=\\sqrt{32}\\cdot\\sqrt{8}=\\sqrt{256}=16\\,m^2$."
+    },
 
-      useEffect(() => {
-        const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f'];
-        const newParticles = Array.from({ length: 50 }).map((_, i) => ({
-          id: i,
-          left: Math.random() * 100 + 'vw',
-          animationDuration: Math.random() * 3 + 2 + 's',
-          backgroundColor: colors[Math.floor(Math.random() * colors.length)],
-          transform: `rotate(${Math.random() * 360}deg)`
-        }));
-        setParticles(newParticles);
-      }, []);
+    // Vận dụng cao
+    {
+      id: 15,
+      level: "Vận dụng cao",
+      text:
+        "Tính giá trị của biểu thức:<br/>" +
+        "\\[A = \\frac{1}{\\sqrt{2}+1} + \\frac{1}{\\sqrt{3}+\\sqrt{2}} + \\frac{1}{\\sqrt{4}+\\sqrt{3}}\\]",
+      options: [
+        "1",
+        "2",
+        "3",
+        "$\\sqrt{2}$"
+      ],
+      correct: 0,
+      rationale:
+        "Trục căn: $A=(\\sqrt{2}-1)+ (\\sqrt{3}-\\sqrt{2}) + (\\sqrt{4}-\\sqrt{3}) = -1+2 = 1$."
+    }
+  ];
 
-      return (
-        <div className="fixed inset-0 pointer-events-none z-50">
-          {particles.map(p => (
-            <div
-              key={p.id}
-              className="confetti"
-              style={{
-                left: p.left,
-                animationDuration: p.animationDuration,
-                backgroundColor: p.backgroundColor,
-                transform: p.transform,
-                top: '-20px'
-              }}
-            />
-          ))}
-        </div>
-      );
-    };
+  // --- ÂM THANH ---
+  const playSound = (type) => {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
 
-    // --- START SCREEN ---
-    const StartScreen = ({ onStart }) => (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-4 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold mb-6 text-yellow-400 game-font tracking-wider animate-bounce">
-          THỢ SĂN KHO BÁU
-        </h1>
-        <h2 className="text-2xl md:text-3xl mb-8 text-blue-300">
-          Bí Ẩn Căn Thức Bậc Hai
-        </h2>
-        <div className="bg-slate-800 p-6 rounded-lg shadow-xl max-w-lg mb-8 border-2 border-yellow-500">
-          <p className="mb-4 text-lg">Chào mừng nhà thám hiểm!</p>
-          <p className="mb-2">
-            Nhiệm vụ của bạn là giải mã <strong>15 câu đố</strong> để mở cánh cửa kho báu cổ xưa.
-          </p>
-          <p className="text-sm text-gray-400 italic">
-            (Toán 9 - Bài 4: Biến đổi đơn giản biểu thức chứa căn thức bậc hai)
-          </p>
-        </div>
-        <button
-          onClick={onStart}
-          className="px-8 py-4 bg-green-600 hover:bg-green-500 text-white rounded-full font-bold text-xl transition transform hover:scale-105 shadow-lg border-b-4 border-green-800 active:border-b-0 active:translate-y-1"
-        >
-          BẮT ĐẦU HÀNH TRÌNH
-        </button>
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+
+    osc.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    if (type === 'correct') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
+      gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+    } else if (type === 'wrong') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.3);
+      gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } else if (type === 'win') {
+      const now = ctx.currentTime;
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, i) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.type = 'square';
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(0.2, now + i * 0.1);
+        g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.3);
+        o.start(now + i * 0.1);
+        o.stop(now + i * 0.1 + 0.3);
+      });
+    }
+  };
+
+  // --- CONFETTI ---
+  const Confetti = () => {
+    const [particles, setParticles] = useState([]);
+
+    useEffect(() => {
+      const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f'];
+      const newParticles = Array.from({ length: 50 }).map((_, i) => ({
+        id: i,
+        left: Math.random() * 100 + 'vw',
+        animationDuration: Math.random() * 3 + 2 + 's',
+        backgroundColor: colors[Math.floor(Math.random() * colors.length)],
+        transform: `rotate(${Math.random() * 360}deg)`
+      }));
+      setParticles(newParticles);
+    }, []);
+
+    return (
+      <div className="fixed inset-0 pointer-events-none z-50">
+        {particles.map(p => (
+          <div
+            key={p.id}
+            className="confetti"
+            style={{
+              left: p.left,
+              animationDuration: p.animationDuration,
+              backgroundColor: p.backgroundColor,
+              transform: p.transform,
+              top: '-20px'
+            }}
+          />
+        ))}
       </div>
     );
+  };
 
-    // --- GAME SCREEN ---
-    const GameScreen = ({ questionData, questionIndex, totalQuestions, onAnswer, score }) => {
-      const [selectedOption, setSelectedOption] = useState(null);
-      const [isAnswered, setIsAnswered] = useState(false);
-      const [showRationale, setShowRationale] = useState(false);
+  // --- START SCREEN ---
+  const StartScreen = ({ onStart }) => (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-4 text-center">
+      <h1 className="text-5xl md:text-6xl font-bold mb-6 text-yellow-400 game-font tracking-wider animate-bounce">
+        THỢ SĂN KHO BÁU
+      </h1>
+      <h2 className="text-2xl md:text-3xl mb-8 text-blue-300">
+        Bí Ẩn Căn Thức Bậc Hai
+      </h2>
+      <div className="bg-slate-800 p-6 rounded-lg shadow-xl max-w-lg mb-8 border-2 border-yellow-500">
+        <p className="mb-4 text-lg">Chào mừng nhà thám hiểm!</p>
+        <p className="mb-2">
+          Nhiệm vụ của bạn là giải mã <strong>15 câu đố</strong> để mở cánh cửa kho báu cổ xưa.
+        </p>
+        <p className="text-sm text-gray-400 italic">
+          (Toán 9 - Bài 4: Biến đổi đơn giản biểu thức chứa căn thức bậc hai)
+        </p>
+      </div>
+      <button
+        onClick={onStart}
+        className="px-8 py-4 bg-green-600 hover:bg-green-500 text-white rounded-full font-bold text-xl transition transform hover:scale-105 shadow-lg border-b-4 border-green-800 active:border-b-0 active:translate-y-1"
+      >
+        BẮT ĐẦU HÀNH TRÌNH
+      </button>
+    </div>
+  );
 
-      // reset khi sang câu mới
-      useEffect(() => {
-        setSelectedOption(null);
-        setIsAnswered(false);
-        setShowRationale(false);
-      }, [questionData]);
+  // --- GAME SCREEN ---
+  const GameScreen = ({ questionData, questionIndex, totalQuestions, onAnswer, score }) => {
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [isAnswered, setIsAnswered] = useState(false);
+    const [showRationale, setShowRationale] = useState(false);
 
-      // Gọi MathJax render lại mỗi khi câu / giải thích thay đổi
-      useEffect(() => {
-        if (window.MathJax && window.MathJax.typesetPromise) {
-          window.MathJax.typesetPromise();
-        }
-      }, [questionData, showRationale]);
+    // reset khi sang câu mới
+    useEffect(() => {
+      setSelectedOption(null);
+      setIsAnswered(false);
+      setShowRationale(false);
+    }, [questionData]);
 
-      const handleSelect = (index) => {
-        if (isAnswered) return;
-        setSelectedOption(index);
-        setIsAnswered(true);
-
-        const isCorrect = index === questionData.correct;
-        playSound(isCorrect ? 'correct' : 'wrong');
-
-        setTimeout(() => setShowRationale(true), 500);
-      };
-
-      const handleNext = () => {
-        const isCorrect = selectedOption === questionData.correct;
-        onAnswer(isCorrect);
-      };
-
-      return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-4">
-          {/* Header */}
-          <div className="w-full max-w-3xl flex justify-between items-center mb-6 bg-slate-800 p-4 rounded-lg border border-slate-700">
-            <div className="flex items-center">
-              <span className="text-yellow-400 font-bold text-xl mr-2">💰</span>
-              <span className="font-mono text-xl">{score} Điểm</span>
-            </div>
-            <div className="text-sm md:text-base font-semibold bg-blue-900 px-3 py-1 rounded text-blue-200">
-              Câu {questionIndex + 1}/{totalQuestions} • {questionData.level}
-            </div>
-          </div>
-
-          {/* Thân câu hỏi */}
-          <div className="w-full max-w-3xl bg-white text-slate-800 rounded-2xl shadow-2xl overflow-hidden mb-6 animate-pop">
-            <div className="p-6 md:p-8 bg-gradient-to-br from-blue-50 to-indigo-50">
-              <h3
-                className="text-xl md:text-2xl font-bold mb-6 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: questionData.text }}
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {questionData.options.map((opt, index) => {
-                  let btnClass =
-                    "p-4 rounded-xl border-2 text-left transition-all duration-200 font-medium text-lg relative ";
-
-                  if (!isAnswered) {
-                    btnClass +=
-                      "border-slate-200 hover:border-blue-400 hover:bg-blue-50 cursor-pointer";
-                  } else {
-                    if (index === questionData.correct) {
-                      btnClass +=
-                        "bg-green-100 border-green-500 text-green-800";
-                    } else if (index === selectedOption) {
-                      btnClass += "bg-red-100 border-red-500 text-red-800";
-                    } else {
-                      btnClass +=
-                        "border-slate-100 text-slate-400 opacity-60";
-                    }
-                  }
-
-                  return (
-                    <button
-                      key={index}
-                      onClick={() => handleSelect(index)}
-                      disabled={isAnswered}
-                      className={btnClass}
-                    >
-                      <span className="inline-block w-8 font-bold opacity-50">
-                        {String.fromCharCode(65 + index)}.
-                      </span>
-                      <span
-                        dangerouslySetInnerHTML={{ __html: opt }}
-                      />
-                      {isAnswered &&
-                        index === questionData.correct && (
-                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl">
-                            😃
-                          </span>
-                        )}
-                      {isAnswered &&
-                        index === selectedOption &&
-                        index !== questionData.correct && (
-                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl">
-                            🥺
-                          </span>
-                        )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Giải thích */}
-            {showRationale && (
-              <div className="bg-slate-100 p-6 border-t border-slate-200 animate-pop">
-                <div className="flex items-start mb-4">
-                  <div className="bg-blue-100 p-2 rounded-full mr-3 text-2xl">
-                    💡
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-blue-800 mb-1">
-                      Giải thích:
-                    </h4>
-                    <p
-                      className="text-slate-700 leading-relaxed"
-                      dangerouslySetInnerHTML={{
-                        __html: questionData.rationale
-                      }}
-                    />
-                  </div>
-                </div>
-                <button
-                  onClick={handleNext}
-                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-lg shadow transition flex items-center justify-center gap-2"
-                >
-                  {questionIndex < totalQuestions - 1
-                    ? "Tiếp Tục Hành Trình ➜"
-                    : "Xem Kết Quả 🏆"}
-                </button>
-              </div>
-            )}
-          </div>
-
-          {isAnswered && selectedOption === questionData.correct && (
-            <Confetti />
-          )}
-        </div>
-      );
-    };
-
-    // --- RESULT SCREEN ---
-    const ResultScreen = ({ score, total, onRestart }) => {
-      useEffect(() => {
-        if (score > total / 2) playSound("win");
-      }, []);
-
-      const percentage = (score / total) * 100;
-      let message = "";
-      let emoji = "";
-
-      if (percentage === 100) {
-        message = "Huyền Thoại Toán Học! Bạn đã mở được kho báu!";
-        emoji = "👑";
-      } else if (percentage >= 80) {
-        message = "Xuất sắc! Bạn là một thợ săn tài ba!";
-        emoji = "💎";
-      } else if (percentage >= 50) {
-        message = "Làm tốt lắm! Kiến thức của bạn rất vững.";
-        emoji = "✨";
-      } else {
-        message = "Đừng nản lòng! Hãy ôn tập và thử lại nhé.";
-        emoji = "📚";
+    // Gọi MathJax render lại mỗi khi câu / giải thích thay đổi
+    useEffect(() => {
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise();
       }
+    }, [questionData, showRationale]);
 
-      return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-4 text-center">
-          <div className="text-8xl mb-6 animate-bounce">{emoji}</div>
-          <h2 className="text-4xl font-bold mb-4 text-yellow-400">
-            Kết Quả Cuộc Thám Hiểm
-          </h2>
-          <div className="text-6xl font-black mb-6 text-white">
-            {score} <span className="text-3xl text-gray-400">/ {total}</span>
-          </div>
-          <p className="text-xl text-blue-200 mb-8 max-w-md">{message}</p>
+    const handleSelect = (index) => {
+      if (isAnswered) return;
+      setSelectedOption(index);
+      setIsAnswered(true);
 
-          <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
-            <div className="bg-slate-800 p-4 rounded-lg">
-              <div className="text-gray-400 text-sm">Tỷ lệ đúng</div>
-              <div className="text-2xl font-bold text-green-400">
-                {Math.round(percentage)}%
-              </div>
-            </div>
-            <div className="bg-slate-800 p-4 rounded-lg">
-              <div className="text-gray-400 text-sm">Xếp hạng</div>
-              <div className="text-2xl font-bold text-purple-400">
-                {percentage >= 80
-                  ? "Cao Thủ"
-                  : percentage >= 50
-                  ? "Tập Sự"
-                  : "Nhập Môn"}
-              </div>
-            </div>
-          </div>
+      const isCorrect = index === questionData.correct;
+      playSound(isCorrect ? 'correct' : 'wrong');
 
-          <button
-            onClick={onRestart}
-            className="mt-10 px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full font-bold shadow-lg transition"
-          >
-            Chơi Lại Từ Đầu ↺
-          </button>
-          {percentage >= 50 && <Confetti />}
-        </div>
-      );
+      setTimeout(() => setShowRationale(true), 500);
     };
 
-    // --- APP (có random thứ tự đáp án) ---
-    const App = () => {
-      const [gameState, setGameState] = useState("start"); // start, playing, result
-      const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-      const [score, setScore] = useState(0);
-      const [preparedQuestions, setPreparedQuestions] = useState([]);
+    const handleNext = () => {
+      const isCorrect = selectedOption === questionData.correct;
+      onAnswer(isCorrect);
+    };
 
-      // shuffle options nhưng giữ đúng đáp án
-      const prepareQuestions = () => {
-        return questions.map((q) => {
-          const indices = q.options.map((_, idx) => idx);
-          for (let i = indices.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [indices[i], indices[j]] = [indices[j], indices[i]];
-          }
-          const newOptions = indices.map((i) => q.options[i]);
-          const newCorrect = indices.indexOf(q.correct);
-          return { ...q, options: newOptions, correct: newCorrect };
-        });
-      };
+    // ===== FIX: ép 1 dòng cho question/option/rationale =====
+    const questionHTML = formatOneLineHTML(questionData.text);
+    const rationaleHTML = formatOneLineHTML(questionData.rationale);
 
-      const startGame = () => {
-        setPreparedQuestions(prepareQuestions());
-        setGameState("playing");
-        setCurrentQuestionIndex(0);
-        setScore(0);
-      };
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-4">
+        {/* Header */}
+        <div className="w-full max-w-3xl flex justify-between items-center mb-6 bg-slate-800 p-4 rounded-lg border border-slate-700">
+          <div className="flex items-center">
+            <span className="text-yellow-400 font-bold text-xl mr-2">💰</span>
+            <span className="font-mono text-xl">{score} Điểm</span>
+          </div>
+          <div className="text-sm md:text-base font-semibold bg-blue-900 px-3 py-1 rounded text-blue-200">
+            Câu {questionIndex + 1}/{totalQuestions} • {questionData.level}
+          </div>
+        </div>
 
-      const handleAnswer = (isCorrect) => {
-        if (isCorrect) setScore((s) => s + 1);
-
-        if (currentQuestionIndex < preparedQuestions.length - 1) {
-          setCurrentQuestionIndex((curr) => curr + 1);
-        } else {
-          setGameState("result");
-        }
-      };
-
-      const total = preparedQuestions.length || questions.length;
-
-      return (
-        <div className="antialiased">
-          {gameState === "start" && <StartScreen onStart={startGame} />}
-          {gameState === "playing" && preparedQuestions.length > 0 && (
-            <GameScreen
-              questionData={preparedQuestions[currentQuestionIndex]}
-              questionIndex={currentQuestionIndex}
-              totalQuestions={preparedQuestions.length}
-              onAnswer={handleAnswer}
-              score={score}
+        {/* Thân câu hỏi */}
+        <div className="w-full max-w-3xl bg-white text-slate-800 rounded-2xl shadow-2xl overflow-hidden mb-6 animate-pop">
+          <div className="p-6 md:p-8 bg-gradient-to-br from-blue-50 to-indigo-50">
+            <h3
+              className="text-xl md:text-2xl font-bold mb-6 leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: questionHTML }}
             />
-          )}
-          {gameState === "result" && (
-            <ResultScreen score={score} total={total} onRestart={startGame} />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {questionData.options.map((opt, index) => {
+                let btnClass =
+                  "p-4 rounded-xl border-2 text-left transition-all duration-200 font-medium text-lg relative ";
+
+                if (!isAnswered) {
+                  btnClass +=
+                    "border-slate-200 hover:border-blue-400 hover:bg-blue-50 cursor-pointer";
+                } else {
+                  if (index === questionData.correct) {
+                    btnClass += "bg-green-100 border-green-500 text-green-800";
+                  } else if (index === selectedOption) {
+                    btnClass += "bg-red-100 border-red-500 text-red-800";
+                  } else {
+                    btnClass += "border-slate-100 text-slate-400 opacity-60";
+                  }
+                }
+
+                const optHTML = formatOneLineHTML(opt);
+
+                return (
+                  <button
+                    key={index}
+                    onClick={() => handleSelect(index)}
+                    disabled={isAnswered}
+                    className={btnClass}
+                  >
+                    <span className="inline-block w-8 font-bold opacity-50">
+                      {String.fromCharCode(65 + index)}.
+                    </span>
+                    <span dangerouslySetInnerHTML={{ __html: optHTML }} />
+                    {isAnswered && index === questionData.correct && (
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl">😃</span>
+                    )}
+                    {isAnswered && index === selectedOption && index !== questionData.correct && (
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl">🥺</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Giải thích */}
+          {showRationale && (
+            <div className="bg-slate-100 p-6 border-t border-slate-200 animate-pop">
+              <div className="flex items-start mb-4">
+                <div className="bg-blue-100 p-2 rounded-full mr-3 text-2xl">💡</div>
+                <div>
+                  <h4 className="font-bold text-blue-800 mb-1">Giải thích:</h4>
+                  <p
+                    className="text-slate-700 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: rationaleHTML }}
+                  />
+                </div>
+              </div>
+              <button
+                onClick={handleNext}
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-lg shadow transition flex items-center justify-center gap-2"
+              >
+                {questionIndex < totalQuestions - 1 ? "Tiếp Tục Hành Trình ➜" : "Xem Kết Quả 🏆"}
+              </button>
+            </div>
           )}
         </div>
-      );
+
+        {isAnswered && selectedOption === questionData.correct && <Confetti />}
+      </div>
+    );
+  };
+
+  // --- RESULT SCREEN ---
+  const ResultScreen = ({ score, total, onRestart }) => {
+    useEffect(() => {
+      if (score > total / 2) playSound("win");
+    }, []);
+
+    const percentage = (score / total) * 100;
+    let message = "";
+    let emoji = "";
+
+    if (percentage === 100) {
+      message = "Huyền Thoại Toán Học! Bạn đã mở được kho báu!";
+      emoji = "👑";
+    } else if (percentage >= 80) {
+      message = "Xuất sắc! Bạn là một thợ săn tài ba!";
+      emoji = "💎";
+    } else if (percentage >= 50) {
+      message = "Làm tốt lắm! Kiến thức của bạn rất vững.";
+      emoji = "✨";
+    } else {
+      message = "Đừng nản lòng! Hãy ôn tập và thử lại nhé.";
+      emoji = "📚";
+    }
+
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-4 text-center">
+        <div className="text-8xl mb-6 animate-bounce">{emoji}</div>
+        <h2 className="text-4xl font-bold mb-4 text-yellow-400">
+          Kết Quả Cuộc Thám Hiểm
+        </h2>
+        <div className="text-6xl font-black mb-6 text-white">
+          {score} <span className="text-3xl text-gray-400">/ {total}</span>
+        </div>
+        <p className="text-xl text-blue-200 mb-8 max-w-md">{message}</p>
+
+        <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
+          <div className="bg-slate-800 p-4 rounded-lg">
+            <div className="text-gray-400 text-sm">Tỷ lệ đúng</div>
+            <div className="text-2xl font-bold text-green-400">
+              {Math.round(percentage)}%
+            </div>
+          </div>
+          <div className="bg-slate-800 p-4 rounded-lg">
+            <div className="text-gray-400 text-sm">Xếp hạng</div>
+            <div className="text-2xl font-bold text-purple-400">
+              {percentage >= 80 ? "Cao Thủ" : percentage >= 50 ? "Tập Sự" : "Nhập Môn"}
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={onRestart}
+          className="mt-10 px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full font-bold shadow-lg transition"
+        >
+          Chơi Lại Từ Đầu ↺
+        </button>
+        {percentage >= 50 && <Confetti />}
+      </div>
+    );
+  };
+
+  // --- APP (có random thứ tự đáp án) ---
+  const App = () => {
+    const [gameState, setGameState] = useState("start"); // start, playing, result
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [score, setScore] = useState(0);
+    const [preparedQuestions, setPreparedQuestions] = useState([]);
+
+    // shuffle options nhưng giữ đúng đáp án
+    const prepareQuestions = () => {
+      return questions.map((q) => {
+        const indices = q.options.map((_, idx) => idx);
+        for (let i = indices.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
+        const newOptions = indices.map((i) => q.options[i]);
+        const newCorrect = indices.indexOf(q.correct);
+        return { ...q, options: newOptions, correct: newCorrect };
+      });
     };
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-  </script>
+    const startGame = () => {
+      setPreparedQuestions(prepareQuestions());
+      setGameState("playing");
+      setCurrentQuestionIndex(0);
+      setScore(0);
+    };
+
+    const handleAnswer = (isCorrect) => {
+      if (isCorrect) setScore((s) => s + 1);
+
+      if (currentQuestionIndex < preparedQuestions.length - 1) {
+        setCurrentQuestionIndex((curr) => curr + 1);
+      } else {
+        setGameState("result");
+      }
+    };
+
+    const total = preparedQuestions.length || questions.length;
+
+    return (
+      <div className="antialiased">
+        {gameState === "start" && <StartScreen onStart={startGame} />}
+        {gameState === "playing" && preparedQuestions.length > 0 && (
+          <GameScreen
+            questionData={preparedQuestions[currentQuestionIndex]}
+            questionIndex={currentQuestionIndex}
+            totalQuestions={preparedQuestions.length}
+            onAnswer={handleAnswer}
+            score={score}
+          />
+        )}
+        {gameState === "result" && (
+          <ResultScreen score={score} total={total} onRestart={startGame} />
+        )}
+      </div>
+    );
+  };
+
+  ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
 </body>
 </html>
