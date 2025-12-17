@@ -9,8 +9,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- React -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <!-- Font -->
@@ -32,20 +32,20 @@
       overflow: hidden;
       font-family: system-ui, sans-serif;
     }
-    .game-font {
-      font-family: 'Patrick Hand', cursive;
-    }
+    .game-font { font-family: 'Patrick Hand', cursive; }
 
-    /* ===== FIX 1 DÒNG TUYỆT ĐỐI ===== */
-    .nowrap-line {
+    /* ===== FIX 1 DÒNG + KÉO NGANG ===== */
+    .nowrap-line{
       white-space: nowrap !important;
       overflow-x: auto;
       overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
     }
 
+    /* Ép MathJax không tạo block xuống dòng */
     .mjx-container,
     .MathJax,
-    .MathJax_Display {
+    .MathJax_Display{
       display: inline !important;
       white-space: nowrap !important;
       margin: 0 !important;
@@ -57,10 +57,7 @@
       height: 8px;
       animation: fall linear forwards;
     }
-
-    @keyframes fall {
-      to { transform: translateY(100vh) rotate(720deg); }
-    }
+    @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
   </style>
 </head>
 
@@ -68,22 +65,30 @@
   <div id="root"></div>
 
 <script type="text/babel">
-const { useState, useEffect } = React;
+const { useEffect, useMemo, useState } = React;
 
-/* ===== UTIL FIX ===== */
-const oneLine = (s) =>
-  (s || "")
-    .replace(/<br\\s*\\/?>/gi, " ")
-    .replace(/\\r?\\n/g, " ")
-    .replace(/\\\\\\[/g, "\\(")
-    .replace(/\\\\\\]/g, "\\)")
-    .replace(/\\s+/g, " ")
+/* ===== UTIL FIX HIỂN THỊ 1 DÒNG ===== */
+function oneLine(input){
+  return (input ?? "")
+    .replace(/<br\s*\/?>/gi, " ")    // <br/> -> space
+    .replace(/\r?\n/g, " ")         // newline thật -> space
+    .replace(/\\n/g, " ")           // "\n" trong string -> space
+    .replace(/\\\[/g, "\\(")        // \[  -> \(
+    .replace(/\\\]/g, "\\)")        // \]  -> \)
+    .replace(/\s+/g, " ")
     .trim();
+}
 
-/* ===== QUESTIONS (MẪU – CÔ CÓ THỂ DÁN FULL 15 CÂU CỦA CÔ VÀO ĐÂY) ===== */
-const questions = [
+/* ===== DATA 15 CÂU (giữ nguyên nội dung cô gửi) ===== */
+const rawQuestions = [
+  // Nhận biết
   {
-    text: "Công thức khử mẫu của biểu thức \\(\\sqrt{\\frac{A}{B}}\\) với \\(AB \\ge 0, B \\ne 0\\) là gì?",
+    id: 1,
+    level: "Nhận biết",
+    text:
+      "Công thức khử mẫu của biểu thức:<br/>" +
+      "\\[\\sqrt{\\frac{A}{B}}\\]<br/>" +
+      "với $AB \\ge 0$ và $B \\ne 0$ là gì?",
     options: [
       "$\\frac{\\sqrt{AB}}{B}$",
       "$\\frac{\\sqrt{AB}}{|B|}$",
@@ -92,9 +97,238 @@ const questions = [
     ],
     correct: 1,
     rationale:
-      "Theo quy tắc khử mẫu: \\(\\sqrt{\\frac{A}{B}} = \\sqrt{\\frac{AB}{B^2}} = \\frac{\\sqrt{AB}}{|B|}\\)."
+      "Theo quy tắc khử mẫu, ta nhân cả tử và mẫu với $B$ để mẫu trở thành bình phương: " +
+      "$\\sqrt{\\frac{A}{B}} = \\sqrt{\\frac{AB}{B^2}} = \\frac{\\sqrt{AB}}{|B|}$."
+  },
+  {
+    id: 2,
+    level: "Nhận biết",
+    text:
+      "Biểu thức liên hợp của biểu thức:<br/>" +
+      "\\[\\sqrt{3} - 1\\]<br/>" +
+      "dùng để trục căn thức ở mẫu là gì?",
+    options: [
+      "$\\sqrt{3} - 1$",
+      "$-\\sqrt{3} + 1$",
+      "$\\sqrt{3} + 1$",
+      "$\\sqrt{3}$"
+    ],
+    correct: 2,
+    rationale:
+      "Để tạo ra hằng đẳng thức hiệu hai bình phương $A^2 - B^2$, biểu thức liên hợp của " +
+      "$\\sqrt{A} - B$ là $\\sqrt{A} + B$. Vậy liên hợp của $\\sqrt{3}-1$ là $\\sqrt{3}+1$."
+  },
+  {
+    id: 3,
+    level: "Nhận biết",
+    text:
+      "Kết quả của phép đưa thừa số ra ngoài dấu căn của biểu thức:<br/>" +
+      "\\[\\sqrt{12}\\]<br/>" +
+      "là:",
+    options: [
+      "$2\\sqrt{3}$",
+      "$3\\sqrt{2}$",
+      "$4\\sqrt{3}$",
+      "$6\\sqrt{2}$"
+    ],
+    correct: 0,
+    rationale:
+      "Ta phân tích $12 = 4\\cdot3 = 2^2\\cdot3$. Đưa thừa số $2$ ra ngoài dấu căn ta được $2\\sqrt{3}$."
+  },
+  {
+    id: 4,
+    level: "Nhận biết",
+    text:
+      "Đưa thừa số vào trong dấu căn của biểu thức:<br/>" +
+      "\\[3\\sqrt{2}\\]<br/>" +
+      "ta được:",
+    options: [
+      "$\\sqrt{6}$",
+      "$\\sqrt{12}$",
+      "$\\sqrt{18}$",
+      "$\\sqrt{36}$"
+    ],
+    correct: 2,
+    rationale:
+      "Đưa thừa số dương vào trong căn: $3\\sqrt{2} = \\sqrt{3^2\\cdot2} = \\sqrt{9\\cdot2} = \\sqrt{18}$."
+  },
+  {
+    id: 5,
+    level: "Nhận biết",
+    text: "Khẳng định nào sau đây là SAI về phép trục căn thức ở mẫu?",
+    options: [
+      "$\\frac{2}{\\sqrt{3}} = \\frac{2\\sqrt{3}}{3}$",
+      "$\\frac{1}{2+\\sqrt{3}} = 2-\\sqrt{3}$",
+      "$\\frac{a}{\\sqrt{b}} = \\frac{a\\sqrt{b}}{b} (b>0)$",
+      "$\\frac{1}{\\sqrt{5}} = \\frac{1}{5}$"
+    ],
+    correct: 3,
+    rationale:
+      "Khẳng định D sai. Đúng phải là: $\\frac{1}{\\sqrt{5}} = \\frac{\\sqrt{5}}{5}$."
+  },
+  {
+    id: 6,
+    level: "Nhận biết",
+    text:
+      "Với $x \\ge 0$, giá trị của biểu thức:<br/>" +
+      "\\[\\sqrt{x}(\\sqrt{x} + 2)\\]<br/>" +
+      "bằng:",
+    options: [
+      "$x + 2$",
+      "$\\sqrt{x} + 2\\sqrt{x}$",
+      "$2x$",
+      "$x + 2\\sqrt{x}$"
+    ],
+    correct: 3,
+    rationale:
+      "$\\sqrt{x}(\\sqrt{x}+2) = (\\sqrt{x})^2 + 2\\sqrt{x} = x + 2\\sqrt{x}$."
+  },
+
+  // Thông hiểu
+  {
+    id: 7,
+    level: "Thông hiểu",
+    text:
+      "Rút gọn biểu thức:<br/>" +
+      "\\[M = 2\\sqrt{3} + \\sqrt{27} - \\sqrt{12}\\]<br/>" +
+      "ta được:",
+    options: [
+      "$3\\sqrt{3}$",
+      "$4\\sqrt{3}$",
+      "$\\sqrt{3}$",
+      "$5\\sqrt{3}$"
+    ],
+    correct: 0,
+    rationale:
+      "$M = 2\\sqrt{3} + \\sqrt{9\\cdot3} - \\sqrt{4\\cdot3} = 2\\sqrt{3} + 3\\sqrt{3} - 2\\sqrt{3} = 3\\sqrt{3}$."
+  },
+  {
+    id: 8,
+    level: "Thông hiểu",
+    text:
+      "Trục căn thức ở mẫu của biểu thức:<br/>" +
+      "\\[\\frac{4}{\\sqrt{5}-1}\\]<br/>" +
+      "ta được kết quả là:",
+    options: [
+      "$4(\\sqrt{5}+1)$",
+      "$\\sqrt{5}+1$",
+      "$\\sqrt{5}-1$",
+      "$2(\\sqrt{5}+1)$"
+    ],
+    correct: 1,
+    rationale:
+      "$\\frac{4}{\\sqrt{5}-1} = \\frac{4(\\sqrt{5}+1)}{5-1} = \\sqrt{5}+1$."
+  },
+  {
+    id: 9,
+    level: "Thông hiểu",
+    text:
+      "Rút gọn biểu thức:<br/>" +
+      "\\[\\sqrt{18a^2}\\]<br/>" +
+      "với $a < 0$.",
+    options: [
+      "$3a\\sqrt{2}$",
+      "$-3a\\sqrt{2}$",
+      "$3\\sqrt{2a}$",
+      "$-3\\sqrt{2a}$"
+    ],
+    correct: 1,
+    rationale:
+      "$\\sqrt{18a^2} = \\sqrt{9\\cdot2\\cdot a^2} = 3\\sqrt{2}|a|$. Vì $a<0$ nên $|a|=-a$, được $-3a\\sqrt{2}$."
+  },
+  {
+    id: 10,
+    level: "Thông hiểu",
+    text:
+      "Giá trị của biểu thức:<br/>" +
+      "\\[(\\sqrt{3}-2)(\\sqrt{3}+2)\\]<br/>" +
+      "là:",
+    options: ["7","1","-1","-7"],
+    correct: 2,
+    rationale:
+      "$(\\sqrt{3}-2)(\\sqrt{3}+2) = (\\sqrt{3})^2 - 2^2 = 3-4 = -1$."
+  },
+  {
+    id: 11,
+    level: "Thông hiểu",
+    text:
+      "Khử mẫu của biểu thức:<br/>" +
+      "\\[\\sqrt{\\frac{5a}{2}}\\]<br/>" +
+      "với $a > 0$ ta được:",
+    options: [
+      "$\\frac{5\\sqrt{a}}{2}$",
+      "$\\frac{\\sqrt{5a}}{2}$",
+      "$\\frac{\\sqrt{10a}}{4}$",
+      "$\\frac{\\sqrt{10a}}{2}$"
+    ],
+    correct: 3,
+    rationale:
+      "$\\sqrt{\\frac{5a}{2}} = \\sqrt{\\frac{5a\\cdot2}{2\\cdot2}} = \\frac{\\sqrt{10a}}{\\sqrt{4}} = \\frac{\\sqrt{10a}}{2}$."
+  },
+
+  // Vận dụng
+  {
+    id: 12,
+    level: "Vận dụng",
+    text:
+      "Rút gọn biểu thức:<br/>" +
+      "\\[P = \\frac{a - \\sqrt{a}}{\\sqrt{a} - 1}\\]<br/>" +
+      "với $a \\ge 0, a \\ne 1$.",
+    options: ["$\\sqrt{a}$","$\\sqrt{a} + 1$","$\\sqrt{a} - 1$","$a$"],
+    correct: 0,
+    rationale:
+      "$a-\\sqrt{a} = \\sqrt{a}(\\sqrt{a}-1)$ nên $P = \\sqrt{a}$."
+  },
+  {
+    id: 13,
+    level: "Vận dụng",
+    text:
+      "Tìm $x$ biết:<br/>" +
+      "\\[\\sqrt{4x} + \\sqrt{x} = 6\\]<br/>" +
+      "(với $x \\ge 0$).",
+    options: ["$x = 2$","$x = 4$","$x = 9$","$x = 16$"],
+    correct: 1,
+    rationale:
+      "$\\sqrt{4x}=2\\sqrt{x}$ nên $3\\sqrt{x}=6 \\Rightarrow \\sqrt{x}=2 \\Rightarrow x=4$."
+  },
+  {
+    id: 14,
+    level: "Vận dụng (Thực tế)",
+    text:
+      "Một mảnh vườn hình chữ nhật có:<br/>" +
+      "Chiều dài $\\sqrt{32}$ m, chiều rộng $\\sqrt{8}$ m.<br/>" +
+      "Diện tích của mảnh vườn là:",
+    options: ["$8 m^2$","$12 m^2$","$16 m^2$","$32 m^2$"],
+    correct: 2,
+    rationale:
+      "Diện tích $=\\sqrt{32}\\cdot\\sqrt{8}=\\sqrt{256}=16\\,m^2$."
+  },
+
+  // Vận dụng cao
+  {
+    id: 15,
+    level: "Vận dụng cao",
+    text:
+      "Tính giá trị của biểu thức:<br/>" +
+      "\\[A = \\frac{1}{\\sqrt{2}+1} + \\frac{1}{\\sqrt{3}+\\sqrt{2}} + \\frac{1}{\\sqrt{4}+\\sqrt{3}}\\]",
+    options: ["1","2","3","$\\sqrt{2}$"],
+    correct: 0,
+    rationale:
+      "Trục căn: $A=(\\sqrt{2}-1)+ (\\sqrt{3}-\\sqrt{2}) + (\\sqrt{4}-\\sqrt{3}) = -1+2 = 1$."
   }
 ];
+
+/* ===== RANDOM OPTIONS (giữ đúng đáp án) ===== */
+function shuffleKeepCorrect(q){
+  const idx = q.options.map((_, i) => i);
+  for (let i = idx.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [idx[i], idx[j]] = [idx[j], idx[i]];
+  }
+  const newOptions = idx.map(i => q.options[i]);
+  const newCorrect = idx.indexOf(q.correct);
+  return { ...q, options: newOptions, correct: newCorrect };
+}
 
 /* ===== CONFETTI ===== */
 const Confetti = () => {
@@ -110,343 +344,166 @@ const Confetti = () => {
   return (
     <div className="fixed inset-0 pointer-events-none z-50">
       {ps.map(p => (
-        <div key={p.id} className="confetti"
-          style={{ left: p.left, background: p.color, animationDuration: p.duration }} />
+        <div
+          key={p.id}
+          className="confetti"
+          style={{ left: p.left, background: p.color, animationDuration: p.duration, top: "-20px" }}
+        />
       ))}
     </div>
   );
 };
 
-  // --- DỮ LIỆU CÂU HỎI ---
-  const questions = [
-    // Nhận biết
-    {
-      id: 1,
-      level: "Nhận biết",
-      text:
-        "Công thức khử mẫu của biểu thức:<br/>" +
-        "\\[\\sqrt{\\frac{A}{B}}\\]<br/>" +
-        "với $AB \\ge 0$ và $B \\ne 0$ là gì?",
-      options: [
-        "$\\frac{\\sqrt{AB}}{B}$",
-        "$\\frac{\\sqrt{AB}}{|B|}$",
-        "$\\frac{A\\sqrt{B}}{B}$",
-        "$A\\sqrt{B}$"
-      ],
-      correct: 1,
-      rationale:
-        "Theo quy tắc khử mẫu, ta nhân cả tử và mẫu với $B$ để mẫu trở thành bình phương: " +
-        "$\\sqrt{\\frac{A}{B}} = \\sqrt{\\frac{AB}{B^2}} = \\frac{\\sqrt{AB}}{|B|}$."
-    },
-    {
-      id: 2,
-      level: "Nhận biết",
-      text:
-        "Biểu thức liên hợp của biểu thức:<br/>" +
-        "\\[\\sqrt{3} - 1\\]<br/>" +
-        "dùng để trục căn thức ở mẫu là gì?",
-      options: [
-        "$\\sqrt{3} - 1$",
-        "$-\\sqrt{3} + 1$",
-        "$\\sqrt{3} + 1$",
-        "$\\sqrt{3}$"
-      ],
-      correct: 2,
-      rationale:
-        "Để tạo ra hằng đẳng thức hiệu hai bình phương $A^2 - B^2$, biểu thức liên hợp của " +
-        "$\\sqrt{A} - B$ là $\\sqrt{A} + B$. Vậy liên hợp của $\\sqrt{3}-1$ là $\\sqrt{3}+1$."
-    },
-    {
-      id: 3,
-      level: "Nhận biết",
-      text:
-        "Kết quả của phép đưa thừa số ra ngoài dấu căn của biểu thức:<br/>" +
-        "\\[\\sqrt{12}\\]<br/>" +
-        "là:",
-      options: [
-        "$2\\sqrt{3}$",
-        "$3\\sqrt{2}$",
-        "$4\\sqrt{3}$",
-        "$6\\sqrt{2}$"
-      ],
-      correct: 0,
-      rationale:
-        "Ta phân tích $12 = 4\\cdot3 = 2^2\\cdot3$. Đưa thừa số $2$ ra ngoài dấu căn ta được $2\\sqrt{3}$."
-    },
-    {
-      id: 4,
-      level: "Nhận biết",
-      text:
-        "Đưa thừa số vào trong dấu căn của biểu thức:<br/>" +
-        "\\[3\\sqrt{2}\\]<br/>" +
-        "ta được:",
-      options: [
-        "$\\sqrt{6}$",
-        "$\\sqrt{12}$",
-        "$\\sqrt{18}$",
-        "$\\sqrt{36}$"
-      ],
-      correct: 2,
-      rationale:
-        "Đưa thừa số dương vào trong căn: $3\\sqrt{2} = \\sqrt{3^2\\cdot2} = \\sqrt{9\\cdot2} = \\sqrt{18}$."
-    },
-    {
-      id: 5,
-      level: "Nhận biết",
-      text:
-        "Khẳng định nào sau đây là SAI về phép trục căn thức ở mẫu?",
-      options: [
-        "$\\frac{2}{\\sqrt{3}} = \\frac{2\\sqrt{3}}{3}$",
-        "$\\frac{1}{2+\\sqrt{3}} = 2-\\sqrt{3}$",
-        "$\\frac{a}{\\sqrt{b}} = \\frac{a\\sqrt{b}}{b} (b>0)$",
-        "$\\frac{1}{\\sqrt{5}} = \\frac{1}{5}$"
-      ],
-      correct: 3,
-      rationale:
-        "Khẳng định D sai. Đúng phải là: $\\frac{1}{\\sqrt{5}} = \\frac{\\sqrt{5}}{5}$."
-    },
-    {
-      id: 6,
-      level: "Nhận biết",
-      text:
-        "Với $x \\ge 0$, giá trị của biểu thức:<br/>" +
-        "\\[\\sqrt{x}(\\sqrt{x} + 2)\\]<br/>" +
-        "bằng:",
-      options: [
-        "$x + 2$",
-        "$\\sqrt{x} + 2\\sqrt{x}$",
-        "$2x$",
-        "$x + 2\\sqrt{x}$"
-      ],
-      correct: 3,
-      rationale:
-        "$\\sqrt{x}(\\sqrt{x}+2) = (\\sqrt{x})^2 + 2\\sqrt{x} = x + 2\\sqrt{x}$."
-    },
+const Start = ({ onStart }) => (
+  <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="max-w-xl w-full bg-slate-800/60 border border-slate-700 rounded-2xl p-8 text-center">
+      <div className="text-5xl game-font text-yellow-300 mb-2">THỢ SĂN KHO BÁU</div>
+      <div className="text-xl text-blue-200 mb-6">Bí Ẩn Căn Thức Bậc Hai</div>
+      <p className="text-slate-200 mb-6">15 câu hỏi – chọn đáp án và xem giải thích ngay sau khi trả lời.</p>
+      <button
+        onClick={onStart}
+        className="px-8 py-3 rounded-full bg-green-600 hover:bg-green-500 font-bold shadow-lg"
+      >
+        BẮT ĐẦU
+      </button>
+    </div>
+  </div>
+);
 
-    // Thông hiểu
-    {
-      id: 7,
-      level: "Thông hiểu",
-      text:
-        "Rút gọn biểu thức:<br/>" +
-        "\\[M = 2\\sqrt{3} + \\sqrt{27} - \\sqrt{12}\\]<br/>" +
-        "ta được:",
-      options: [
-        "$3\\sqrt{3}$",
-        "$4\\sqrt{3}$",
-        "$\\sqrt{3}$",
-        "$5\\sqrt{3}$"
-      ],
-      correct: 0,
-      rationale:
-        "$M = 2\\sqrt{3} + \\sqrt{9\\cdot3} - \\sqrt{4\\cdot3} = 2\\sqrt{3} + 3\\sqrt{3} - 2\\sqrt{3} = 3\\sqrt{3}$."
-    },
-    {
-      id: 8,
-      level: "Thông hiểu",
-      text:
-        "Trục căn thức ở mẫu của biểu thức:<br/>" +
-        "\\[\\frac{4}{\\sqrt{5}-1}\\]<br/>" +
-        "ta được kết quả là:",
-      options: [
-        "$4(\\sqrt{5}+1)$",
-        "$\\sqrt{5}+1$",
-        "$\\sqrt{5}-1$",
-        "$2(\\sqrt{5}+1)$"
-      ],
-      correct: 1,
-      rationale:
-        "$\\frac{4}{\\sqrt{5}-1} = \\frac{4(\\sqrt{5}+1)}{5-1} = \\sqrt{5}+1$."
-    },
-    {
-      id: 9,
-      level: "Thông hiểu",
-      text:
-        "Rút gọn biểu thức:<br/>" +
-        "\\[\\sqrt{18a^2}\\]<br/>" +
-        "với $a < 0$.",
-      options: [
-        "$3a\\sqrt{2}$",
-        "$-3a\\sqrt{2}$",
-        "$3\\sqrt{2a}$",
-        "$-3\\sqrt{2a}$"
-      ],
-      correct: 1,
-      rationale:
-        "$\\sqrt{18a^2} = \\sqrt{9\\cdot2\\cdot a^2} = 3\\sqrt{2}|a|$. Vì $a<0$ nên $|a|=-a$, được $-3a\\sqrt{2}$."
-    },
-    {
-      id: 10,
-      level: "Thông hiểu",
-      text:
-        "Giá trị của biểu thức:<br/>" +
-        "\\[(\\sqrt{3}-2)(\\sqrt{3}+2)\\]<br/>" +
-        "là:",
-      options: [
-        "7",
-        "1",
-        "-1",
-        "-7"
-      ],
-      correct: 2,
-      rationale:
-        "$(\\sqrt{3}-2)(\\sqrt{3}+2) = (\\sqrt{3})^2 - 2^2 = 3-4 = -1$."
-    },
-    {
-      id: 11,
-      level: "Thông hiểu",
-      text:
-        "Khử mẫu của biểu thức:<br/>" +
-        "\\[\\sqrt{\\frac{5a}{2}}\\]<br/>" +
-        "với $a > 0$ ta được:",
-      options: [
-        "$\\frac{5\\sqrt{a}}{2}$",
-        "$\\frac{\\sqrt{5a}}{2}$",
-        "$\\frac{\\sqrt{10a}}{4}$",
-        "$\\frac{\\sqrt{10a}}{2}$"
-      ],
-      correct: 3,
-      rationale:
-        "$\\sqrt{\\frac{5a}{2}} = \\sqrt{\\frac{5a\\cdot2}{2\\cdot2}} = \\frac{\\sqrt{10a}}{\\sqrt{4}} = \\frac{\\sqrt{10a}}{2}$."
-    },
+const Result = ({ score, total, onRestart }) => (
+  <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="max-w-xl w-full bg-slate-800/60 border border-slate-700 rounded-2xl p-8 text-center">
+      <div className="text-6xl mb-2">🏆</div>
+      <div className="text-3xl font-bold text-yellow-300 mb-2">HOÀN THÀNH</div>
+      <div className="text-xl text-slate-200 mb-6">Điểm: <b className="text-white">{score}</b> / {total}</div>
+      <button
+        onClick={onRestart}
+        className="px-8 py-3 rounded-full bg-indigo-600 hover:bg-indigo-500 font-bold shadow-lg"
+      >
+        CHƠI LẠI
+      </button>
+      {score >= Math.ceil(total * 0.6) && <Confetti />}
+    </div>
+  </div>
+);
 
-    // Vận dụng
-    {
-      id: 12,
-      level: "Vận dụng",
-      text:
-        "Rút gọn biểu thức:<br/>" +
-        "\\[P = \\frac{a - \\sqrt{a}}{\\sqrt{a} - 1}\\]<br/>" +
-        "với $a \\ge 0, a \\ne 1$.",
-      options: [
-        "$\\sqrt{a}$",
-        "$\\sqrt{a} + 1$",
-        "$\\sqrt{a} - 1$",
-        "$a$"
-      ],
-      correct: 0,
-      rationale:
-        "$a-\\sqrt{a} = \\sqrt{a}(\\sqrt{a}-1)$ nên $P = \\sqrt{a}$."
-    },
-    {
-      id: 13,
-      level: "Vận dụng",
-      text:
-        "Tìm $x$ biết:<br/>" +
-        "\\[\\sqrt{4x} + \\sqrt{x} = 6\\]<br/>" +
-        "(với $x \\ge 0$).",
-      options: [
-        "$x = 2$",
-        "$x = 4$",
-        "$x = 9$",
-        "$x = 16$"
-      ],
-      correct: 1,
-      rationale:
-        "$\\sqrt{4x}=2\\sqrt{x}$ nên $3\\sqrt{x}=6 \\Rightarrow \\sqrt{x}=2 \\Rightarrow x=4$."
-    },
-    {
-      id: 14,
-      level: "Vận dụng (Thực tế)",
-      text:
-        "Một mảnh vườn hình chữ nhật có:<br/>" +
-        "Chiều dài $\\sqrt{32}$ m, chiều rộng $\\sqrt{8}$ m.<br/>" +
-        "Diện tích của mảnh vườn là:",
-      options: [
-        "$8 m^2$",
-        "$12 m^2$",
-        "$16 m^2$",
-        "$32 m^2$"
-      ],
-      correct: 2,
-      rationale:
-        "Diện tích $=\\sqrt{32}\\cdot\\sqrt{8}=\\sqrt{256}=16\\,m^2$."
-    },
-
-    // Vận dụng cao
-    {
-      id: 15,
-      level: "Vận dụng cao",
-      text:
-        "Tính giá trị của biểu thức:<br/>" +
-        "\\[A = \\frac{1}{\\sqrt{2}+1} + \\frac{1}{\\sqrt{3}+\\sqrt{2}} + \\frac{1}{\\sqrt{4}+\\sqrt{3}}\\]",
-      options: [
-        "1",
-        "2",
-        "3",
-        "$\\sqrt{2}$"
-      ],
-      correct: 0,
-      rationale:
-        "Trục căn: $A=(\\sqrt{2}-1)+ (\\sqrt{3}-\\sqrt{2}) + (\\sqrt{4}-\\sqrt{3}) = -1+2 = 1$."
-    }
-  ];
-
-const Game = () => {
+const Game = ({ data, onFinish }) => {
   const [i, setI] = useState(0);
   const [chosen, setChosen] = useState(null);
   const [showExplain, setShowExplain] = useState(false);
+  const [score, setScore] = useState(0);
 
-  const q = questions[i];
+  const q = data[i];
 
   useEffect(() => {
-    if (window.MathJax) MathJax.typesetPromise();
+    if (window.MathJax?.typesetPromise) {
+      window.MathJax.typesetClear?.();
+      window.MathJax.typesetPromise();
+    }
   }, [q, showExplain]);
 
   const choose = (idx) => {
     if (chosen !== null) return;
     setChosen(idx);
-    setTimeout(() => setShowExplain(true), 400);
+    setShowExplain(true);
+    if (idx === q.correct) setScore(s => s + 1);
   };
+
+  const next = () => {
+    const nextIdx = i + 1;
+    if (nextIdx >= data.length) onFinish(score + (chosen === q.correct ? 0 : 0)); // score đã cập nhật rồi
+    else {
+      setI(nextIdx);
+      setChosen(null);
+      setShowExplain(false);
+    }
+  };
+
+  const questionHTML = oneLine(q.text);
+  const rationaleHTML = oneLine(q.rationale);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="bg-white text-slate-800 max-w-3xl w-full rounded-xl p-6 shadow-xl">
+      <div className="bg-white text-slate-800 max-w-3xl w-full rounded-2xl p-6 shadow-xl">
+        <div className="flex items-center justify-between mb-4">
+          <div className="text-sm font-bold text-slate-500">
+            Câu {i + 1}/{data.length} • {q.level}
+          </div>
+          <div className="text-sm font-bold text-indigo-600">
+            Điểm: {score}/{data.length}
+          </div>
+        </div>
 
         <h3
-          className="text-xl font-bold mb-4 nowrap-line"
-          dangerouslySetInnerHTML={{ __html: oneLine(q.text) }}
+          className="text-xl md:text-2xl font-bold mb-4 nowrap-line"
+          dangerouslySetInnerHTML={{ __html: questionHTML }}
         />
 
         <div className="grid md:grid-cols-2 gap-3 mb-4">
-          {q.options.map((o, idx) => (
-            <button
-              key={idx}
-              onClick={() => choose(idx)}
-              className={`border rounded-lg p-3 text-left nowrap-line ${
-                chosen === null
-                  ? "hover:bg-blue-50"
-                  : idx === q.correct
-                  ? "bg-green-100 border-green-500"
-                  : idx === chosen
-                  ? "bg-red-100 border-red-500"
-                  : "opacity-50"
-              }`}
-            >
-              <span className="font-bold mr-2">{String.fromCharCode(65 + idx)}.</span>
-              <span dangerouslySetInnerHTML={{ __html: oneLine(o) }} />
-            </button>
-          ))}
+          {q.options.map((o, idx) => {
+            const isCorrect = idx === q.correct;
+            const isChosen = idx === chosen;
+            const locked = chosen !== null;
+
+            let cls = "border rounded-lg p-3 text-left nowrap-line transition ";
+            if (!locked) cls += "hover:bg-blue-50";
+            else if (isCorrect) cls += "bg-green-100 border-green-500";
+            else if (isChosen) cls += "bg-red-100 border-red-500";
+            else cls += "opacity-50";
+
+            return (
+              <button key={idx} onClick={() => choose(idx)} disabled={locked} className={cls}>
+                <span className="font-bold mr-2">{String.fromCharCode(65 + idx)}.</span>
+                <span dangerouslySetInnerHTML={{ __html: oneLine(o) }} />
+              </button>
+            );
+          })}
         </div>
 
         {showExplain && (
           <div className="border-t pt-4 mt-4">
-            <div className="font-bold text-blue-600 mb-1">💡 Giải thích</div>
-            <p
-              className="nowrap-line"
-              dangerouslySetInnerHTML={{ __html: oneLine(q.rationale) }}
-            />
+            <div className="font-bold text-blue-600 mb-1">
+              💡 Giải thích {chosen === q.correct ? "✅" : "❌"}
+            </div>
+            <p className="nowrap-line" dangerouslySetInnerHTML={{ __html: rationaleHTML }} />
+            <button
+              onClick={next}
+              className="mt-4 w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold"
+            >
+              {i < data.length - 1 ? "CÂU TIẾP THEO ➜" : "XEM KẾT QUẢ 🏆"}
+            </button>
           </div>
         )}
 
-        {chosen === q.correct && <Confetti />}
+        {chosen !== null && chosen === q.correct && <Confetti />}
       </div>
     </div>
   );
 };
 
-ReactDOM.createRoot(document.getElementById("root")).render(<Game />);
+const App = () => {
+  const [state, setState] = useState("start"); // start | playing | result
+  const [final, setFinal] = useState(0);
+
+  const prepared = useMemo(() => {
+    // chuẩn hóa hiển thị 1 dòng ngay từ data + random đáp án
+    return rawQuestions.map(q => shuffleKeepCorrect({
+      ...q,
+      text: oneLine(q.text),
+      rationale: oneLine(q.rationale),
+      options: q.options.map(oneLine)
+    }));
+  }, []);
+
+  const start = () => { setFinal(0); setState("playing"); };
+  const finish = (score) => { setFinal(score); setState("result"); };
+
+  if (state === "start") return <Start onStart={start} />;
+  if (state === "result") return <Result score={final} total={prepared.length} onRestart={start} />;
+  return <Game data={prepared} onFinish={finish} />;
+};
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
 </body>
 </html>
-
