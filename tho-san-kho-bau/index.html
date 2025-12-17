@@ -177,22 +177,27 @@
             opacity: 0.7;
         }
 
-        #rationale-box {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 10px;
-            background-color: #FFF3E0;
-            border-left: 5px solid var(--secondary);
-            text-align: left;
-            animation: slideIn 0.3s ease;
-        }
+/* Rationale Box */
+#rationale-box{
+    margin-top: 20px;
+    padding: 24px;                 /* tăng đệm cho thoáng */
+    border-radius: 12px;
+    background-color: #FFF3E0;
+    border-left: 6px solid var(--secondary);
+    text-align: left;
+    animation: slideIn 0.3s ease;
+    font-size: 1.35rem;            /* ✅ tăng cỡ chữ giải thích */
+    line-height: 1.6;              /* ✅ dễ đọc hơn */
+}
 
-        #rationale-title {
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 5px;
-            display: block;
-        }
+#rationale-title{
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 10px;
+    display: block;
+    font-size: 1.6rem;             /* ✅ tiêu đề “Giải thích” to hơn */
+}
+
 
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(10px); }
