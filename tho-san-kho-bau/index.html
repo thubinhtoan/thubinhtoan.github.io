@@ -34,21 +34,35 @@
     }
     .game-font { font-family: 'Patrick Hand', cursive; }
 
-    /* ===== FIX 1 DÒNG + KÉO NGANG ===== */
+    /* ===== FIX 1 DÒNG + KÉO NGANG (CHỐT) ===== */
     .nowrap-line{
+      display: block;
+      max-width: 100%;
       white-space: nowrap !important;
-      overflow-x: auto;
-      overflow-y: hidden;
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
       -webkit-overflow-scrolling: touch;
+      word-break: keep-all !important;
+    }
+    /* CỰC QUAN TRỌNG: ép tất cả con bên trong cũng nowrap (MathJax tạo rất nhiều thẻ con) */
+    .nowrap-line *{
+      white-space: nowrap !important;
     }
 
-    /* Ép MathJax không tạo block xuống dòng */
-    .mjx-container,
-    .MathJax,
-    .MathJax_Display{
-      display: inline !important;
+    /* ===== ÉP MATHJAX V3 KHÔNG TẠO BLOCK / DISPLAY-MATH ===== */
+    mjx-container{
+      display: inline-block !important;
       white-space: nowrap !important;
       margin: 0 !important;
+      padding: 0 !important;
+      vertical-align: baseline !important;
+    }
+    mjx-container[display="true"]{
+      display: inline-block !important; /* display-math cũng ép inline-block */
+    }
+    mjx-container svg{
+      display: inline-block !important;
+      vertical-align: -0.1em !important;
     }
 
     .confetti {
@@ -70,11 +84,11 @@ const { useEffect, useMemo, useState } = React;
 /* ===== UTIL FIX HIỂN THỊ 1 DÒNG ===== */
 function oneLine(input){
   return (input ?? "")
-    .replace(/<br\s*\/?>/gi, " ")    // <br/> -> space
-    .replace(/\r?\n/g, " ")         // newline thật -> space
-    .replace(/\\n/g, " ")           // "\n" trong string -> space
-    .replace(/\\\[/g, "\\(")        // \[  -> \(
-    .replace(/\\\]/g, "\\)")        // \]  -> \)
+    .replace(/<br\s*\/?>/gi, " ")
+    .replace(/\r?\n/g, " ")
+    .replace(/\\n/g, " ")
+    .replace(/\\\[/g, "\\(")   // \[ -> \(
+    .replace(/\\\]/g, "\\)")   // \] -> \)
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -411,16 +425,13 @@ const Game = ({ data, onFinish }) => {
 
   const next = () => {
     const nextIdx = i + 1;
-    if (nextIdx >= data.length) onFinish(score + (chosen === q.correct ? 0 : 0)); // score đã cập nhật rồi
+    if (nextIdx >= data.length) onFinish(score);
     else {
       setI(nextIdx);
       setChosen(null);
       setShowExplain(false);
     }
   };
-
-  const questionHTML = oneLine(q.text);
-  const rationaleHTML = oneLine(q.rationale);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -435,8 +446,8 @@ const Game = ({ data, onFinish }) => {
         </div>
 
         <h3
-          className="text-xl md:text-2xl font-bold mb-4 nowrap-line"
-          dangerouslySetInnerHTML={{ __html: questionHTML }}
+          className="text-xl md:text-2xl font-bold mb-4 nowrap-line w-full"
+          dangerouslySetInnerHTML={{ __html: q.text }}
         />
 
         <div className="grid md:grid-cols-2 gap-3 mb-4">
@@ -445,7 +456,7 @@ const Game = ({ data, onFinish }) => {
             const isChosen = idx === chosen;
             const locked = chosen !== null;
 
-            let cls = "border rounded-lg p-3 text-left nowrap-line transition ";
+            let cls = "border rounded-lg p-3 text-left nowrap-line w-full transition ";
             if (!locked) cls += "hover:bg-blue-50";
             else if (isCorrect) cls += "bg-green-100 border-green-500";
             else if (isChosen) cls += "bg-red-100 border-red-500";
@@ -454,7 +465,7 @@ const Game = ({ data, onFinish }) => {
             return (
               <button key={idx} onClick={() => choose(idx)} disabled={locked} className={cls}>
                 <span className="font-bold mr-2">{String.fromCharCode(65 + idx)}.</span>
-                <span dangerouslySetInnerHTML={{ __html: oneLine(o) }} />
+                <span dangerouslySetInnerHTML={{ __html: o }} />
               </button>
             );
           })}
@@ -465,7 +476,7 @@ const Game = ({ data, onFinish }) => {
             <div className="font-bold text-blue-600 mb-1">
               💡 Giải thích {chosen === q.correct ? "✅" : "❌"}
             </div>
-            <p className="nowrap-line" dangerouslySetInnerHTML={{ __html: rationaleHTML }} />
+            <p className="nowrap-line w-full" dangerouslySetInnerHTML={{ __html: q.rationale }} />
             <button
               onClick={next}
               className="mt-4 w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold"
@@ -486,13 +497,15 @@ const App = () => {
   const [final, setFinal] = useState(0);
 
   const prepared = useMemo(() => {
-    // chuẩn hóa hiển thị 1 dòng ngay từ data + random đáp án
-    return rawQuestions.map(q => shuffleKeepCorrect({
-      ...q,
-      text: oneLine(q.text),
-      rationale: oneLine(q.rationale),
-      options: q.options.map(oneLine)
-    }));
+    return rawQuestions.map(q => {
+      const qq = {
+        ...q,
+        text: oneLine(q.text),
+        rationale: oneLine(q.rationale),
+        options: q.options.map(oneLine),
+      };
+      return shuffleKeepCorrect(qq);
+    });
   }, []);
 
   const start = () => { setFinal(0); setState("playing"); };
