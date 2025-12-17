@@ -1,606 +1,265 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thợ Săn Kho Báu: Bí Mật Căn Thức - Toán 9</title>
-    <style>
-        :root {
-            --primary: #8B4513;
-            --secondary: #DAA520;
-            --bg-color: #FEF9E7;
-            --text-color: #3e2723;
-            --success: #2E7D32;
-            --error: #C62828;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thợ Săn Kho Báu: Bí Mật Căn Thức - Toán 9</title>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #2c3e50;
-            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2334495e" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: var(--text-color);
-        }
+  <!-- MathJax (để dấu căn đầy đủ, đẹp như SGK) -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
-        #game-container {
-            width: 100%;
-            max-width: 900px;
-            background-color: var(--bg-color);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            overflow: hidden;
-            border: 8px solid var(--primary);
-            position: relative;
-        }
+  <style>
+    :root {
+      --primary: #8B4513;
+      --secondary: #DAA520;
+      --bg-color: #FEF9E7;
+      --text-color: #3e2723;
+      --success: #2E7D32;
+      --error: #C62828;
+    }
 
-        header {
-            background-color: var(--primary);
-            color: var(--secondary);
-            padding: 15px;
-            text-align: center;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 4px solid #5D4037;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #2c3e50;
+      background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2334495e" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: var(--text-color);
+    }
 
-        .game-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+    #game-container {
+      width: 100%;
+      max-width: 900px;
+      background-color: var(--bg-color);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      overflow: hidden;
+      border: 8px solid var(--primary);
+      position: relative;
+    }
 
-        .stats {
-            font-size: 1.1rem;
-            font-weight: bold;
-            display: flex;
-            gap: 20px;
-        }
+    header {
+      background-color: var(--primary);
+      color: var(--secondary);
+      padding: 15px;
+      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 4px solid #5D4037;
+    }
 
-        .screen {
-            padding: 30px;
-            text-align: center;
-            min-height: 400px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
+    .game-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
-        .hidden { display: none !important; }
+    .stats {
+      font-size: 1.1rem;
+      font-weight: bold;
+      display: flex;
+      gap: 20px;
+    }
 
-        #start-screen h1 {
-            font-size: 2.5rem;
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
+    .screen {
+      padding: 30px;
+      text-align: center;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
 
-        .btn {
-            background: linear-gradient(to bottom, #DAA520, #B8860B);
-            color: #fff;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-            box-shadow: 0 4px 0 #8B4513;
-            margin-top: 20px;
-        }
+    .hidden { display: none !important; }
 
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #8B4513; }
-        .btn:active { transform: translateY(2px); box-shadow: 0 0 0 #8B4513; }
+    #start-screen h1 {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
 
-        #question-area { width: 100%; }
+    .btn {
+      background: linear-gradient(to bottom, #DAA520, #B8860B);
+      color: #fff;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 0 #8B4513;
+      margin-top: 20px;
+    }
 
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background-color: #ddd;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #8B4513; }
+    .btn:active { transform: translateY(2px); box-shadow: 0 0 0 #8B4513; }
 
-        .progress-fill {
-            height: 100%;
-            background-color: var(--secondary);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
+    #question-area { width: 100%; }
 
-        .level-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            background-color: #607D8B;
-            color: white;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background-color: #ddd;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
 
-        .question-text {
-            font-size: 1.8rem;
-            margin-bottom: 30px;
-            color: var(--text-color);
-            font-weight: 600;
-        }
+    .progress-fill {
+      height: 100%;
+      background-color: var(--secondary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
 
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            width: 100%;
-            max-width: 800px;
-        }
+    .level-badge {
+      display: inline-block;
+      padding: 5px 15px;
+      background-color: #607D8B;
+      color: white;
+      border-radius: 15px;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
 
-        .option-btn {
-            background-color: white;
-            border: 2px solid #D7CCC8;
-            padding: 20px;
-            font-size: 1.3rem;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #4e342e;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 80px;
-        }
+    .question-text {
+      font-size: 1.8rem;
+      margin-bottom: 30px;
+      color: var(--text-color);
+      font-weight: 600;
+      line-height: 1.35;
+    }
 
-        .option-btn:hover:not(:disabled) {
-            background-color: #FFF8E1;
-            border-color: var(--secondary);
-            transform: scale(1.02);
-        }
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      width: 100%;
+      max-width: 800px;
+    }
 
-        .option-btn.correct {
-            background-color: #C8E6C9;
-            border-color: var(--success);
-            color: var(--success);
-        }
+    .option-btn {
+      background-color: white;
+      border: 2px solid #D7CCC8;
+      padding: 18px;
+      font-size: 1.25rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #4e342e;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80px;
+      text-align: center;
+    }
 
-        .option-btn.wrong {
-            background-color: #FFCDD2;
-            border-color: var(--error);
-            color: var(--error);
-            opacity: 0.7;
-        }
+    .option-btn:hover:not(:disabled) {
+      background-color: #FFF8E1;
+      border-color: var(--secondary);
+      transform: scale(1.02);
+    }
 
-/* Rationale Box */
-#rationale-box{
-    margin-top: 20px;
-    padding: 24px;                 /* tăng đệm cho thoáng */
-    border-radius: 12px;
-    background-color: #FFF3E0;
-    border-left: 6px solid var(--secondary);
-    text-align: left;
-    animation: slideIn 0.3s ease;
-    font-size: 1.35rem;            /* ✅ tăng cỡ chữ giải thích */
-    line-height: 1.6;              /* ✅ dễ đọc hơn */
-}
+    .option-btn.correct {
+      background-color: #C8E6C9;
+      border-color: var(--success);
+      color: var(--success);
+    }
 
-#rationale-title{
-    font-weight: 800;
-    color: var(--primary);
-    margin-bottom: 10px;
-    display: block;
-    font-size: 1.6rem;             /* ✅ tiêu đề “Giải thích” to hơn */
-}
+    .option-btn.wrong {
+      background-color: #FFCDD2;
+      border-color: var(--error);
+      color: var(--error);
+      opacity: 0.85;
+    }
 
+    /* Giải thích: tăng cỡ chữ cho dễ nhìn */
+    #rationale-box {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #FFF3E0;
+      border-left: 6px solid var(--secondary);
+      text-align: left;
+      animation: slideIn 0.3s ease;
+      font-size: 1.25rem;        /* TO HƠN */
+      line-height: 1.5;
+    }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    #rationale-title {
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: block;
+      font-size: 1.3rem;         /* TO HƠN */
+    }
 
-        .score-big {
-            font-size: 4rem;
-            color: var(--primary);
-            font-weight: bold;
-            margin: 20px 0;
-        }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-        .message {
-            font-size: 1.5rem;
-            color: #555;
-            margin-bottom: 30px;
-        }
+    .score-big {
+      font-size: 4rem;
+      color: var(--primary);
+      font-weight: bold;
+      margin: 20px 0;
+    }
 
-        #confetti-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 100;
-        }
+    .message {
+      font-size: 1.5rem;
+      color: #555;
+      margin-bottom: 30px;
+    }
 
-        @media (max-width: 600px) {
-            .options-grid { grid-template-columns: 1fr; }
-            .question-text { font-size: 1.4rem; }
-            .stats { font-size: 0.9rem; gap: 10px; }
-        }
-    </style>
+    #confetti-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    @media (max-width: 600px) {
+      .options-grid { grid-template-columns: 1fr; }
+      .question-text { font-size: 1.4rem; }
+      .stats { font-size: 0.9rem; gap: 10px; }
+      #rationale-box { font-size: 1.15rem; }
+    }
+  </style>
 </head>
 <body>
 
 <div id="game-container">
-    <canvas id="confetti-canvas"></canvas>
+  <canvas id="confetti-canvas"></canvas>
 
-    <header>
-        <div class="game-title">🗝️ Thợ Săn Kho Báu</div>
-        <div class="stats">
-            <span>Câu: <span id="q-current">1</span>/15</span>
-            <span>Điểm: <span id="score">0</span></span>
-        </div>
-    </header>
-
-    <!-- START SCREEN -->
-    <div id="start-screen" class="screen">
-        <div style="font-size: 4rem; margin-bottom: 10px;">💎</div>
-        <h1>Bí Mật Căn Thức</h1>
-        <p style="font-size: 1.2rem; max-width: 600px; margin-bottom: 20px;">
-            Chào mừng các em đến với cuộc phiêu lưu! Hãy sử dụng kiến thức về "Biến đổi đơn giản biểu thức chứa căn thức bậc hai" để mở khóa kho báu.
-        </p>
-        <p style="color: #666;">Giáo viên: Cô Thu Bình</p>
-        <button class="btn" onclick="startGame()">Bắt Đầu Hành Trình</button>
+  <header>
+    <div class="game-title">🗝️ Thợ Săn Kho Báu</div>
+    <div class="stats">
+      <span>Câu: <span id="q-current">1</span>/15</span>
+      <span>Điểm: <span id="score">0</span></span>
     </div>
+  </header>
 
-    <!-- GAME SCREEN -->
-    <div id="game-screen" class="screen hidden">
-        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-
-        <div id="question-area">
-            <span id="level-badge" class="level-badge">Nhận Biết</span>
-            <div id="question-text" class="question-text">Câu hỏi sẽ hiện ở đây...</div>
-
-            <div id="options-container" class="options-grid"></div>
-
-            <div id="rationale-box" class="hidden">
-                <span id="rationale-title">💡 Giải thích:</span>
-                <span id="rationale-content">Nội dung giải thích...</span>
-                <div style="text-align: right; margin-top: 10px;">
-                    <button class="btn" onclick="nextQuestion()" style="padding: 10px 30px; font-size: 1rem;">Tiếp tục ➡️</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- END SCREEN -->
-    <div id="end-screen" class="screen hidden">
-        <div style="font-size: 4rem;">🏆</div>
-        <h1 style="color: var(--primary);">Hoàn Thành Nhiệm Vụ!</h1>
-        <div class="score-big" id="final-score">0</div>
-        <p class="message" id="end-message">Bạn làm rất tốt!</p>
-        <button class="btn" onclick="location.reload()">Chơi Lại</button>
-    </div>
-</div>
-
-<script>
-    // --- DATA GỐC ---
-    const questions = [
-        {
-            level: "Nhận Biết",
-            question: "Với A là biểu thức bất kỳ, √A² bằng bao nhiêu?",
-            options: ["A", "-A", "|A|", "A²"],
-            correct: 2,
-            rationale: "Theo hằng đẳng thức căn bậc hai: √A² = |A|."
-        },
-        {
-            level: "Nhận Biết",
-            question: "Điều kiện để √AB = √A.√B là gì?",
-            options: ["A ≥ 0 và B ≥ 0", "A < 0 và B < 0", "A ≥ 0 và B < 0", "A, B tùy ý"],
-            correct: 0,
-            rationale: "Quy tắc khai phương một tích yêu cầu các thừa số phải không âm (A ≥ 0, B ≥ 0)."
-        },
-        {
-            level: "Nhận Biết",
-            question: "Kết quả của phép tính √(3² . 2) là:",
-            options: ["3√2", "2√3", "6", "√6"],
-            correct: 0,
-            rationale: "√(3² . 2) = √3² . √2 = 3√2."
-        },
-        {
-            level: "Nhận Biết",
-            question: "Đưa thừa số ra ngoài dấu căn: √(4x) với x ≥ 0",
-            options: ["4√x", "2√x", "x√4", "-2√x"],
-            correct: 1,
-            rationale: "Vì 4 = 2², nên √(4x) = √2² . √x = 2√x."
-        },
-        {
-            level: "Nhận Biết",
-            question: "Đưa thừa số vào trong dấu căn: 3√2",
-            options: ["√6", "√12", "√18", "√9"],
-            correct: 2,
-            rationale: "3√2 = √(3² . 2) = √(9 . 2) = √18."
-        },
-        {
-            level: "Nhận Biết",
-            question: "Phép biến đổi làm mất căn thức ở mẫu gọi là gì?",
-            options: ["Khai phương", "Trục căn thức ở mẫu", "Đưa thừa số ra ngoài", "Rút gọn phân thức"],
-            correct: 1,
-            rationale: "Đây là định nghĩa của phép trục căn thức ở mẫu."
-        },
-        {
-            level: "Thông Hiểu",
-            question: "Tính giá trị của biểu thức: √8 + √18",
-            options: ["√26", "5√2", "2√13", "7"],
-            correct: 1,
-            rationale: "√8 + √18 = √(4.2) + √(9.2) = 2√2 + 3√2 = 5√2."
-        },
-        {
-            level: "Thông Hiểu",
-            question: "Với x < 0, kết quả rút gọn của √(x²) là:",
-            options: ["x", "-x", "|-x|", "x²"],
-            correct: 1,
-            rationale: "√(x²) = |x|. Vì x < 0 nên |x| = -x."
-        },
-        {
-            level: "Thông Hiểu",
-            question: "Tính giá trị biểu thức: √2 . √8",
-            options: ["√10", "4", "16", "2√2"],
-            correct: 1,
-            rationale: "√2 . √8 = √(2.8) = √16 = 4."
-        },
-        {
-            level: "Thông Hiểu",
-            question: "Trục căn thức ở mẫu của biểu thức 1 / √3",
-            options: ["3", "√3 / 3", "3 / √3", "1/3"],
-            correct: 1,
-            rationale: "Nhân cả tử và mẫu với √3: 1/√3 = (1.√3) / (√3.√3) = √3 / 3."
-        },
-        {
-            level: "Thông Hiểu",
-            question: "Rút gọn biểu thức: √27a - √3a (với a ≥ 0)",
-            options: ["2√3a", "3√a", "√24a", "4√3a"],
-            correct: 0,
-            rationale: "√27a - √3a = √(9.3a) - √3a = 3√3a - 1√3a = 2√3a."
-        },
-        {
-            level: "Vận Dụng",
-            question: "Tìm x biết: √(9x) = 6 (với x ≥ 0)",
-            options: ["x = 2", "x = 4", "x = 36", "x = 9"],
-            correct: 1,
-            rationale: "√(9x) = 3√x. Vậy 3√x = 6 => √x = 2 => x = 4."
-        },
-        {
-            level: "Vận Dụng Thực Tế",
-            question: "Một mảnh đất hình vuông có diện tích 50 m². Độ dài cạnh mảnh đất là:",
-            options: ["25 m", "5√2 m", "10 m", "50 m"],
-            correct: 1,
-            rationale: "Cạnh hình vuông = √Diện tích = √50 = √(25.2) = 5√2 (m)."
-        },
-        {
-            level: "Vận Dụng",
-            question: "Rút gọn biểu thức: √[(2 - √5)²]",
-            options: ["2 - √5", "√5 - 2", "±(2 - √5)", "3"],
-            correct: 1,
-            rationale: "√A² = |A|. Vậy ta có |2 - √5|. Vì √5 ≈ 2.23 > 2 nên (2 - √5) < 0. Do đó kết quả là -(2 - √5) = √5 - 2."
-        },
-        {
-            level: "Vận Dụng Cao",
-            question: "Rút gọn biểu thức A = √(9 - 4√5)",
-            options: ["3 - 2√5", "√5 - 2", "2 - √5", "5 - √2"],
-            correct: 1,
-            rationale: "Ta biến đổi: 9 - 4√5 = (√5 - 2)². Vì √5 > 2 nên √(9 - 4√5) = √5 - 2."
-        }
-    ];
-
-    // --- GAME STATE ---
-    let preparedQuestions = [];
-    let currentQuestionIndex = 0;
-    let score = 0;
-    let isAnswering = true;
-
-    // --- AUDIO ---
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playSound(type) {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        osc.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        if (type === 'correct') {
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.5);
-        } else if (type === 'wrong') {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
-        } else if (type === 'end') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(554, audioCtx.currentTime + 0.2);
-            osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.4);
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 1.5);
-        }
-    }
-
-    // --- SHUFFLE + CHIA ĐỀU ABCD ---
-    function shuffle(arr) {
-        const a = arr.slice();
-        for (let i = a.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [a[i], a[j]] = [a[j], a[i]];
-        }
-        return a;
-    }
-
-    // Pattern 15 câu: A,B,C,D,A,B,C,D,A,B,C,D,A,B,C  -> A4,B4,C4,D3
-    const correctPattern = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2];
-
-    function prepareAllQuestions() {
-        return questions.map((q, idx) => {
-            const desiredCorrect = correctPattern[idx]; // vị trí đáp án đúng muốn đặt (0..3)
-            const correctText = q.options[q.correct];
-            const wrongs = q.options.filter((_, i) => i !== q.correct);
-            const wrongsShuffled = shuffle(wrongs);
-
-            const newOptions = [];
-            let wi = 0;
-            for (let k = 0; k < 4; k++) {
-                if (k === desiredCorrect) newOptions.push(correctText);
-                else newOptions.push(wrongsShuffled[wi++]);
-            }
-
-            return { ...q, options: newOptions, correct: desiredCorrect };
-        });
-    }
-
-    // --- LOGIC ---
-    function startGame() {
-        preparedQuestions = prepareAllQuestions(); // ✅ random + chia đều ABCD
-        currentQuestionIndex = 0;
-        score = 0;
-        document.getElementById('score').innerText = score;
-
-        document.getElementById('start-screen').classList.add('hidden');
-        document.getElementById('game-screen').classList.remove('hidden');
-        loadQuestion();
-    }
-
-    function loadQuestion() {
-        const q = preparedQuestions[currentQuestionIndex];
-
-        document.getElementById('q-current').innerText = currentQuestionIndex + 1;
-        document.getElementById('level-badge').innerText = q.level;
-        document.getElementById('question-text').innerText = q.question;
-
-        // ✅ Progress chuẩn (lên 100% ở câu cuối)
-        const pct = ((currentQuestionIndex + 1) / preparedQuestions.length) * 100;
-        document.getElementById('progress-fill').style.width = pct + "%";
-
-        const container = document.getElementById('options-container');
-        container.innerHTML = '';
-
-        q.options.forEach((opt, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.innerText = opt;
-            btn.onclick = () => checkAnswer(index, btn);
-            container.appendChild(btn);
-        });
-
-        document.getElementById('rationale-box').classList.add('hidden');
-        isAnswering = true;
-    }
-
-    function checkAnswer(selectedIndex, btnElement) {
-        if (!isAnswering) return;
-        isAnswering = false;
-
-        const q = preparedQuestions[currentQuestionIndex];
-        const buttons = document.querySelectorAll('.option-btn');
-
-        if (selectedIndex === q.correct) {
-            btnElement.classList.add('correct');
-            btnElement.innerHTML += " 😃 <span style='color:green; font-weight:bold;'>Đúng!</span>";
-            score += 10;
-            document.getElementById('score').innerText = score;
-            playSound('correct');
-            fireConfetti();
-        } else {
-            btnElement.classList.add('wrong');
-            btnElement.innerHTML += " 😢";
-            buttons[q.correct].classList.add('correct');
-            playSound('wrong');
-        }
-
-        buttons.forEach(b => b.disabled = true);
-
-        document.getElementById('rationale-content').innerText = q.rationale;
-        document.getElementById('rationale-box').classList.remove('hidden');
-    }
-
-    function nextQuestion() {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < preparedQuestions.length) loadQuestion();
-        else endGame();
-    }
-
-    function endGame() {
-        document.getElementById('game-screen').classList.add('hidden');
-        document.getElementById('end-screen').classList.remove('hidden');
-
-        document.getElementById('final-score').innerText = score + "/150";
-        const msg = document.getElementById('end-message');
-
-        playSound('end');
-        fireConfetti();
-
-        if (score >= 130) msg.innerText = "Xuất sắc! Cô Thu Bình rất tự hào về em!";
-        else if (score >= 100) msg.innerText = "Làm tốt lắm! Em đã nắm vững kiến thức.";
-        else msg.innerText = "Cố gắng thêm nhé! Hãy xem lại phần giải thích.";
-    }
-
-    // --- CONFETTI ---
-    function fireConfetti() {
-        const canvas = document.getElementById('confetti-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        const particles = [];
-        const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'];
-
-        for (let i = 0; i < 100; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height - canvas.height,
-                w: Math.random() * 10 + 5,
-                h: Math.random() * 10 + 5,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                speed: Math.random() * 5 + 2,
-                angle: Math.random() * 6.2
-            });
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let active = false;
-
-            particles.forEach(p => {
-                p.y += p.speed;
-                p.angle += 0.1;
-                ctx.fillStyle = p.color;
-                ctx.save();
-                ctx.translate(p.x, p.y);
-                ctx.rotate(p.angle);
-                ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-                ctx.restore();
-
-                if (p.y < canvas.height) active = true;
-            });
-
-            if (active) requestAnimationFrame(draw);
-        }
-        draw();
-    }
-</script>
-
-</body>
-</html>
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen">
+    <div style="font-size: 4rem; margin-bottom: 10px;">💎</div>
+    <h1>Bí Mật Căn Thức</h1>
+    <p style="font-size: 1.2rem; max-width: 600px; margin-bottom: 20px;">
