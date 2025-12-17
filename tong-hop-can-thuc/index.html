@@ -17,17 +17,13 @@
       user-select: none;
     }
 
-    .sci-fi-font {
-      font-family: "Orbitron", sans-serif;
-    }
+    .sci-fi-font { font-family: "Orbitron", sans-serif; }
 
     /* --- Starfield Background --- */
     #starfield {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       z-index: -1;
       background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
     }
@@ -40,17 +36,9 @@
     }
 
     @keyframes star-anim {
-      from {
-        transform: translateY(-100vh);
-        opacity: 0;
-      }
-      50% {
-        opacity: 1;
-      }
-      to {
-        transform: translateY(100vh);
-        opacity: 0;
-      }
+      from { transform: translateY(-100vh); opacity: 0; }
+      50% { opacity: 1; }
+      to { transform: translateY(100vh); opacity: 0; }
     }
 
     /* --- Spaceship & Planets --- */
@@ -90,9 +78,7 @@
       opacity: 0.8;
     }
 
-    .planet.arrived {
-      top: 50px;
-    }
+    .planet.arrived { top: 50px; }
 
     /* --- UI Elements --- */
     .glass-panel {
@@ -128,17 +114,12 @@
       animation: shake 0.4s;
     }
 
+    .btn-option:disabled { cursor: default; opacity: 0.92; }
+
     @keyframes shake {
-      0%,
-      100% {
-        transform: translateX(0);
-      }
-      25% {
-        transform: translateX(-5px);
-      }
-      75% {
-        transform: translateX(5px);
-      }
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
     }
 
     /* Math styling */
@@ -155,19 +136,9 @@
       margin: 0 2px;
       font-size: 0.9em;
     }
-
-    .fraction > span {
-      display: block;
-      padding: 0.1em;
-    }
-
-    .fraction span.numerator {
-      border-bottom: 1px solid currentColor;
-    }
-
-    .fraction span.denominator {
-      border-top: 1px solid transparent;
-    }
+    .fraction > span { display: block; padding: 0.1em; }
+    .fraction span.numerator { border-bottom: 1px solid currentColor; }
+    .fraction span.denominator { border-top: 1px solid transparent; }
   </style>
 </head>
 
@@ -175,102 +146,65 @@
   <div id="starfield"></div>
 
   <!-- START SCREEN -->
-  <div
-    id="start-screen"
-    class="glass-panel p-8 rounded-2xl text-center max-w-3xl w-full z-10"
-  >
-    <h1
-      class="sci-fi-font text-5xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 mb-4 animate-pulse"
-    >
+  <div id="start-screen" class="glass-panel p-8 rounded-2xl text-center max-w-3xl w-full z-10">
+    <h1 class="sci-fi-font text-5xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 mb-4 animate-pulse">
       DU HÀNH<br />GIỮA CÁC VÌ SAO
     </h1>
 
     <p class="text-xl text-gray-300 mb-6 leading-relaxed">
-      Động cơ <span class="text-cyan-400 font-bold">Warp</span> của tàu đã suy
-      yếu. Bạn phải vượt qua
-      <span class="text-yellow-300 font-bold">4 CỔNG THỬ THÁCH</span> tương
-      ứng với 4 mức độ tư duy toán học để khởi động lại hệ thống và mở đường
-      đến các hành tinh mới.
+      Động cơ <span class="text-cyan-400 font-bold">Warp</span> của tàu đã suy yếu. Bạn phải vượt qua
+      <span class="text-yellow-300 font-bold">4 CỔNG THỬ THÁCH</span>
+      tương ứng với 4 mức độ tư duy toán học để khởi động lại hệ thống và mở đường đến các hành tinh mới.
     </p>
 
-    <div
-      class="grid grid-cols-1 gap-3 text-left bg-slate-900/50 p-4 rounded-lg mb-8 text-sm"
-    >
+    <div class="grid grid-cols-1 gap-3 text-left bg-slate-900/50 p-4 rounded-lg mb-8 text-sm">
       <div class="flex items-start gap-3">
         <div class="text-green-400 text-xl">🟢</div>
         <div>
-          <div class="font-bold text-green-300 text-lg">
-            CỔNG 1 – NHẬN BIẾT
-          </div>
-          <div class="text-gray-300">
-            10 câu khởi động: căn bậc hai số học, điều kiện xác định, phép tính
-            cơ bản.
-          </div>
+          <div class="font-bold text-green-300 text-lg">CỔNG 1 – NHẬN BIẾT</div>
+          <div class="text-gray-300">10 câu khởi động: căn bậc hai số học, điều kiện xác định, phép tính cơ bản.</div>
         </div>
       </div>
 
       <div class="flex items-start gap-3">
         <div class="text-blue-400 text-xl">🔵</div>
         <div>
-          <div class="font-bold text-blue-300 text-lg">
-            CỔNG 2 – THÔNG HIỂU
-          </div>
-          <div class="text-gray-300">
-            9 câu củng cố: rút gọn căn, trục căn thức, phân tích – so sánh –
-            chuyển đổi.
-          </div>
+          <div class="font-bold text-blue-300 text-lg">CỔNG 2 – THÔNG HIỂU</div>
+          <div class="text-gray-300">9 câu củng cố: rút gọn căn, trục căn thức, phân tích – so sánh – chuyển đổi.</div>
         </div>
       </div>
 
       <div class="flex items-start gap-3">
         <div class="text-purple-400 text-xl">🟣</div>
         <div>
-          <div class="font-bold text-purple-300 text-lg">
-            CỔNG 3 – VẬN DỤNG
-          </div>
-          <div class="text-gray-300">
-            7 câu tăng tốc: bài toán chứa căn, mô hình thực tế, biến đổi nâng
-            cao.
-          </div>
+          <div class="font-bold text-purple-300 text-lg">CỔNG 3 – VẬN DỤNG</div>
+          <div class="text-gray-300">7 câu tăng tốc: bài toán chứa căn, mô hình thực tế, biến đổi nâng cao.</div>
         </div>
       </div>
 
       <div class="flex items-start gap-3">
         <div class="text-red-400 text-xl">🔴</div>
         <div>
-          <div class="font-bold text-red-300 text-lg">
-            CỔNG 4 – VẬN DỤNG CAO
-          </div>
-          <div class="text-gray-300">
-            4 câu tối thượng: phương trình chứa căn – bài toán tư duy sâu.
-          </div>
+          <div class="font-bold text-red-300 text-lg">CỔNG 4 – VẬN DỤNG CAO</div>
+          <div class="text-gray-300">4 câu tối thượng: phương trình chứa căn – bài toán tư duy sâu.</div>
         </div>
       </div>
     </div>
 
     <p class="text-lg text-cyan-300 mb-8">
-      ✦ Tổng cộng
-      <span class="font-bold text-yellow-300">30 câu hỏi</span> – chinh phục đủ
-      4 cổng để mở lối đi xuyên vũ trụ!
+      ✦ Tổng cộng <span class="font-bold text-yellow-300">30 câu hỏi</span> – chinh phục đủ 4 cổng để mở lối đi xuyên vũ trụ!
     </p>
 
-    <button
-      onclick="startGame()"
-      class="px-10 py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-full text-xl shadow-[0_0_20px_rgba(8,145,178,0.6)] transition transform hover:scale-110"
-    >
+    <button onclick="startGame()"
+      class="px-10 py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-full text-xl shadow-[0_0_20px_rgba(8,145,178,0.6)] transition transform hover:scale-110">
       KHỞI HÀNH 🚀
     </button>
   </div>
 
   <!-- GAME SCREEN -->
-  <div
-    id="game-screen"
-    class="hidden w-full max-w-4xl flex-col z-10 space-y-3"
-  >
+  <div id="game-screen" class="hidden w-full max-w-4xl flex-col z-10 space-y-3">
     <!-- Status Bar -->
-    <div
-      class="flex justify-between items-center px-4 py-2 glass-panel rounded-full"
-    >
+    <div class="flex justify-between items-center px-4 py-2 glass-panel rounded-full">
       <div class="flex items-center gap-2">
         <span class="text-2xl">💎</span>
         <span id="score" class="text-2xl font-bold text-yellow-400">0</span>
@@ -278,10 +212,7 @@
       <div class="text-cyan-300 sci-fi-font text-lg">
         Hành tinh <span id="q-current">1</span>/30
       </div>
-      <div
-        id="difficulty-badge"
-        class="px-3 py-1 rounded bg-slate-700 text-xs font-bold"
-      >
+      <div id="difficulty-badge" class="px-3 py-1 rounded bg-slate-700 text-xs font-bold">
         CỔNG 1 – NHẬN BIẾT
       </div>
     </div>
@@ -294,110 +225,79 @@
     </div>
 
     <!-- Question Area -->
-    <div
-      class="glass-panel p-6 rounded-xl min-h-[160px] flex items-center justify-center relative"
-    >
-      <div
-        id="question-text"
-        class="text-2xl text-center font-medium leading-relaxed"
-      >
+    <div class="glass-panel p-6 rounded-xl min-h-[160px] flex items-center justify-center relative">
+      <div id="question-text" class="text-2xl text-center font-medium leading-relaxed">
         Loading...
       </div>
     </div>
 
     <!-- Answer Grid -->
-    <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <!-- buttons injected -->
+    <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+    <!-- ✅ RATIONALE PANEL (mới) -->
+    <div id="rationale-panel" class="hidden glass-panel p-5 rounded-xl border-l-4">
+      <div class="flex items-start gap-3">
+        <div id="rationale-icon" class="text-3xl">💡</div>
+        <div class="flex-1">
+          <div id="rationale-title" class="font-bold text-lg mb-1"></div>
+          <div id="rationale-text" class="text-gray-200 leading-relaxed"></div>
+        </div>
+      </div>
+
+      <button id="next-btn"
+        class="mt-4 w-full py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg shadow-lg transition">
+        CÂU TIẾP THEO ➜
+      </button>
     </div>
   </div>
 
   <!-- END SCREEN -->
-  <div
-    id="end-screen"
-    class="hidden glass-panel p-10 rounded-2xl text-center max-w-2xl w-full z-20"
-  >
+  <div id="end-screen" class="hidden glass-panel p-10 rounded-2xl text-center max-w-2xl w-full z-20">
     <div class="text-7xl mb-4">🏆</div>
-    <h2 class="sci-fi-font text-4xl text-yellow-400 mb-4">
-      CHINH PHỤC VŨ TRỤ!
-    </h2>
-    <p class="text-xl text-gray-300 mb-4">
-      Bạn đã hoàn thành chuyến du hành xuất sắc.
-    </p>
+    <h2 class="sci-fi-font text-4xl text-yellow-400 mb-4">CHINH PHỤC VŨ TRỤ!</h2>
+    <p class="text-xl text-gray-300 mb-4">Bạn đã hoàn thành chuyến du hành xuất sắc.</p>
 
     <div id="final-score" class="text-5xl font-bold text-white mb-6">0</div>
 
     <div class="mb-6">
-      <input
-        id="player-name"
-        type="text"
-        placeholder="Nhập tên của bạn..."
-        class="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 text-center text-white text-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
-      />
+      <input id="player-name" type="text" placeholder="Nhập tên của bạn..."
+        class="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 text-center text-white text-lg focus:outline-none focus:ring-2 focus:ring-cyan-400" />
     </div>
 
-    <button
-      onclick="saveScore()"
-      class="px-8 py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold shadow-lg mb-6"
-    >
+    <button onclick="saveScore()" class="px-8 py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold shadow-lg mb-6">
       Lưu Điểm 🎉
     </button>
 
-    <div
-      id="leaderboard"
-      class="text-left bg-slate-900/60 p-6 rounded-xl max-h-[300px] overflow-auto hidden"
-    >
+    <div id="leaderboard" class="text-left bg-slate-900/60 p-6 rounded-xl max-h-[300px] overflow-auto hidden">
       <h3 class="text-2xl text-cyan-300 sci-fi-font mb-3">BẢNG XẾP HẠNG</h3>
       <ul id="leaderboard-list" class="space-y-2"></ul>
     </div>
 
-    <button
-      onclick="location.reload()"
-      class="mt-6 px-8 py-3 bg-cyan-600 hover:bg-cyan-500 rounded-lg font-bold shadow-lg"
-    >
+    <button onclick="location.reload()"
+      class="mt-6 px-8 py-3 bg-cyan-600 hover:bg-cyan-500 rounded-lg font-bold shadow-lg">
       Chơi Lại
     </button>
   </div>
 
   <!-- FEEDBACK + CONFETTI -->
-  <div
-    id="feedback-overlay"
-    class="fixed inset-0 pointer-events-none flex items-center justify-center z-50 opacity-0 transition-opacity duration-300"
-  >
-    <div
-      id="feedback-content"
-      class="text-9xl transform scale-0 transition-transform duration-300"
-    ></div>
+  <div id="feedback-overlay"
+    class="fixed inset-0 pointer-events-none flex items-center justify-center z-50 opacity-0 transition-opacity duration-300">
+    <div id="feedback-content"
+      class="text-9xl transform scale-0 transition-transform duration-300"></div>
   </div>
 
-  <canvas
-    id="confetti-canvas"
-    class="fixed inset-0 pointer-events-none z-40"
-  ></canvas>
+  <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-40"></canvas>
 
   <script>
     // ===============================
     //  DỮ LIỆU CÂU HỎI – 30 CÂU / 4 CỔNG
+    //  ✅ Có thể thêm r: "Giải thích..." cho từng câu (tùy cô)
     // ===============================
     const questions = [
       // NHẬN BIẾT – 10 câu
-      {
-        q: "Căn bậc hai số học của 81 là:",
-        a: ["9", "-9", "±9", "81"],
-        c: 0,
-        l: "NHẬN BIẾT",
-      },
-      {
-        q: "Điều kiện xác định của biểu thức &radic;(x - 5) là:",
-        a: ["x > 5", "x < 5", "x &ge; 5", "x &le; 5"],
-        c: 2,
-        l: "NHẬN BIẾT",
-      },
-      {
-        q: "Kết quả của phép tính &radic;((-7)<sup>2</sup>) là:",
-        a: ["-7", "7", "±7", "49"],
-        c: 1,
-        l: "NHẬN BIẾT",
-      },
+      { q: "Căn bậc hai số học của 81 là:", a: ["9", "-9", "±9", "81"], c: 0, l: "NHẬN BIẾT" },
+      { q: "Điều kiện xác định của biểu thức &radic;(x - 5) là:", a: ["x > 5", "x < 5", "x &ge; 5", "x &le; 5"], c: 2, l: "NHẬN BIẾT" },
+      { q: "Kết quả của phép tính &radic;((-7)<sup>2</sup>) là:", a: ["-7", "7", "±7", "49"], c: 1, l: "NHẬN BIẾT" },
       {
         q: "Trong các khẳng định sau, khẳng định nào ĐÚNG?",
         a: [
@@ -406,76 +306,20 @@
           "&radic;(A<sup>2</sup>) = A với mọi A",
           "&radic;A xác định với mọi A",
         ],
-        c: 1,
-        l: "NHẬN BIẾT",
+        c: 1, l: "NHẬN BIẾT"
       },
-      {
-        q: "Căn bậc ba của -64 là:",
-        a: ["4", "-4", "8", "-8"],
-        c: 1,
-        l: "NHẬN BIẾT",
-      },
-      {
-        q: "So sánh 3 và &radic;8:",
-        a: [
-          "3 > &radic;8",
-          "3 < &radic;8",
-          "3 = &radic;8",
-          "Không so sánh được",
-        ],
-        c: 0,
-        l: "NHẬN BIẾT",
-      },
-      {
-        q: "Tính: &radic;25 + 3&radic;4",
-        a: ["7", "9", "11", "13"],
-        c: 2,
-        l: "NHẬN BIẾT",
-      },
-      {
-        q: "Giá trị của &radic;49 − &radic;9 là:",
-        a: ["2", "3", "4", "5"],
-        c: 2,
-        l: "NHẬN BIẾT",
-      },
-      {
-        q: "Biểu thức nào dưới đây là căn bậc hai số học (luôn không âm) của 16?",
-        a: ["&radic;16", "−&radic;16", "&radic;(-16)", "−4"],
-        c: 0,
-        l: "NHẬN BIẾT",
-      },
-      {
-        q: "Điều kiện xác định của biểu thức A = &radic;(5x − 15) là:",
-        a: ["x > 3", "x &ge; 3", "x &le; 3", "x < 3"],
-        c: 1,
-        l: "NHẬN BIẾT",
-      },
+      { q: "Căn bậc ba của -64 là:", a: ["4", "-4", "8", "-8"], c: 1, l: "NHẬN BIẾT" },
+      { q: "So sánh 3 và &radic;8:", a: ["3 > &radic;8", "3 < &radic;8", "3 = &radic;8", "Không so sánh được"], c: 0, l: "NHẬN BIẾT" },
+      { q: "Tính: &radic;25 + 3&radic;4", a: ["7", "9", "11", "13"], c: 2, l: "NHẬN BIẾT" },
+      { q: "Giá trị của &radic;49 − &radic;9 là:", a: ["2", "3", "4", "5"], c: 2, l: "NHẬN BIẾT" },
+      { q: "Biểu thức nào dưới đây là căn bậc hai số học (luôn không âm) của 16?", a: ["&radic;16", "−&radic;16", "&radic;(-16)", "−4"], c: 0, l: "NHẬN BIẾT" },
+      { q: "Điều kiện xác định của biểu thức A = &radic;(5x − 15) là:", a: ["x > 3", "x &ge; 3", "x &le; 3", "x < 3"], c: 1, l: "NHẬN BIẾT" },
 
       // THÔNG HIỂU – 9 câu
-      {
-        q: "Tính giá trị biểu thức: M = &radic;16 + &radic;25",
-        a: ["9", "41", "&radic;41", "1"],
-        c: 0,
-        l: "THÔNG HIỂU",
-      },
-      {
-        q: "Rút gọn biểu thức P = &radic;18 - &radic;8",
-        a: ["&radic;10", "2&radic;2", "&radic;2", "5&radic;2"],
-        c: 2,
-        l: "THÔNG HIỂU",
-      },
-      {
-        q: "Tìm x, biết &radic;x = 6",
-        a: ["x = 6", "x = 12", "x = 36", "x = -36"],
-        c: 2,
-        l: "THÔNG HIỂU",
-      },
-      {
-        q: "Kết quả rút gọn của &radic;((2 - &radic;5)<sup>2</sup>) là:",
-        a: ["2 - &radic;5", "&radic;5 - 2", "2 + &radic;5", "-2 - &radic;5"],
-        c: 1,
-        l: "THÔNG HIỂU",
-      },
+      { q: "Tính giá trị biểu thức: M = &radic;16 + &radic;25", a: ["9", "41", "&radic;41", "1"], c: 0, l: "THÔNG HIỂU" },
+      { q: "Rút gọn biểu thức P = &radic;18 - &radic;8", a: ["&radic;10", "2&radic;2", "&radic;2", "5&radic;2"], c: 2, l: "THÔNG HIỂU" },
+      { q: "Tìm x, biết &radic;x = 6", a: ["x = 6", "x = 12", "x = 36", "x = -36"], c: 2, l: "THÔNG HIỂU" },
+      { q: "Kết quả rút gọn của &radic;((2 - &radic;5)<sup>2</sup>) là:", a: ["2 - &radic;5", "&radic;5 - 2", "2 + &radic;5", "-2 - &radic;5"], c: 1, l: "THÔNG HIỂU" },
       {
         q: "Trục căn thức ở mẫu của biểu thức <div class='fraction'><span class='numerator'>2</span><span class='denominator'>&radic;3</span></div> ta được:",
         a: [
@@ -484,27 +328,11 @@
           "2&radic;3",
           "<div class='fraction'><span class='numerator'>2</span><span class='denominator'>3</span></div>",
         ],
-        c: 0,
-        l: "THÔNG HIỂU",
+        c: 0, l: "THÔNG HIỂU"
       },
-      {
-        q: "Rút gọn: &radic;20",
-        a: ["2&radic;5", "4&radic;5", "&radic;5", "5&radic;2"],
-        c: 0,
-        l: "THÔNG HIỂU",
-      },
-      {
-        q: "Rút gọn: &radic;45 − &radic;5",
-        a: ["4&radic;5", "2&radic;5", "&radic;5", "3&radic;5"],
-        c: 1,
-        l: "THÔNG HIỂU",
-      },
-      {
-        q: "Rút gọn tích: &radic;3 · &radic;12",
-        a: ["&radic;36", "6", "6&radic;3", "3&radic;12"],
-        c: 1,
-        l: "THÔNG HIỂU",
-      },
+      { q: "Rút gọn: &radic;20", a: ["2&radic;5", "4&radic;5", "&radic;5", "5&radic;2"], c: 0, l: "THÔNG HIỂU" },
+      { q: "Rút gọn: &radic;45 − &radic;5", a: ["4&radic;5", "2&radic;5", "&radic;5", "3&radic;5"], c: 1, l: "THÔNG HIỂU" },
+      { q: "Rút gọn tích: &radic;3 · &radic;12", a: ["&radic;36", "6", "6&radic;3", "3&radic;12"], c: 1, l: "THÔNG HIỂU" },
       {
         q: "Trục căn thức ở mẫu của biểu thức 3 / &radic;5 ta được:",
         a: [
@@ -513,47 +341,16 @@
           "3&radic;5",
           "3 / 5",
         ],
-        c: 1,
-        l: "THÔNG HIỂU",
+        c: 1, l: "THÔNG HIỂU"
       },
 
       // VẬN DỤNG – 7 câu
-      {
-        q: "Rút gọn biểu thức A = 3&radic;x - &radic;(16x) + 5 với x &ge; 0",
-        a: ["7&radic;x + 5", "&radic;x + 5", "5 - &radic;x", "19&radic;x"],
-        c: 2,
-        l: "VẬN DỤNG",
-      },
-      {
-        q: "Giải phương trình &radic;(4x - 4) + &radic;(x - 1) = 6",
-        a: ["x = 5", "x = 3", "x = 4", "x = 2"],
-        c: 0,
-        l: "VẬN DỤNG",
-      },
-      {
-        q: "(Vận dụng thực tế) Một mảnh đất hình vuông có diện tích là 50 m<sup>2</sup>. Độ dài cạnh của mảnh đất đó là bao nhiêu?",
-        a: ["25 m", "10 m", "5&radic;2 m", "2&radic;5 m"],
-        c: 2,
-        l: "VẬN DỤNG",
-      },
-      {
-        q: "Rút gọn: &radic;27 + &radic;12",
-        a: ["5&radic;3", "7&radic;3", "3&radic;3 + &radic;12", "3&radic;3 + 2&radic;12"],
-        c: 0,
-        l: "VẬN DỤNG",
-      },
-      {
-        q: "Cho A = &radic;(a<sup>2</sup>) với a là số thực. Kết luận đúng là:",
-        a: ["A = a", "A = −a", "A = |a|", "A = a<sup>2</sup>"],
-        c: 2,
-        l: "VẬN DỤNG",
-      },
-      {
-        q: "Rút gọn: &radic;(18x<sup>2</sup>) với x &ge; 0.",
-        a: ["3x&radic;2", "6x", "3&radic;(2x<sup>2</sup>)", "x&radic;18"],
-        c: 0,
-        l: "VẬN DỤNG",
-      },
+      { q: "Rút gọn biểu thức A = 3&radic;x - &radic;(16x) + 5 với x &ge; 0", a: ["7&radic;x + 5", "&radic;x + 5", "5 - &radic;x", "19&radic;x"], c: 2, l: "VẬN DỤNG" },
+      { q: "Giải phương trình &radic;(4x - 4) + &radic;(x - 1) = 6", a: ["x = 5", "x = 3", "x = 4", "x = 2"], c: 0, l: "VẬN DỤNG" },
+      { q: "(Vận dụng thực tế) Một mảnh đất hình vuông có diện tích là 50 m<sup>2</sup>. Độ dài cạnh của mảnh đất đó là bao nhiêu?", a: ["25 m", "10 m", "5&radic;2 m", "2&radic;5 m"], c: 2, l: "VẬN DỤNG" },
+      { q: "Rút gọn: &radic;27 + &radic;12", a: ["5&radic;3", "7&radic;3", "3&radic;3 + &radic;12", "3&radic;3 + 2&radic;12"], c: 0, l: "VẬN DỤNG" },
+      { q: "Cho A = &radic;(a<sup>2</sup>) với a là số thực. Kết luận đúng là:", a: ["A = a", "A = −a", "A = |a|", "A = a<sup>2</sup>"], c: 2, l: "VẬN DỤNG" },
+      { q: "Rút gọn: &radic;(18x<sup>2</sup>) với x &ge; 0.", a: ["3x&radic;2", "6x", "3&radic;(2x<sup>2</sup>)", "x&radic;18"], c: 0, l: "VẬN DỤNG" },
       {
         q: "Cho A = <div class='fraction'><span class='numerator'>&radic;5 - 1</span><span class='denominator'>&radic;5 + 1</span></div>. Rút gọn A:",
         a: [
@@ -562,39 +359,17 @@
           "<div class='fraction'><span class='numerator'>&radic;5 - 1</span><span class='denominator'>4</span></div>",
           "<div class='fraction'><span class='numerator'>3 - &radic;5</span><span class='denominator'>2</span></div>",
         ],
-        c: 3,
-        l: "VẬN DỤNG",
+        c: 3, l: "VẬN DỤNG"
       },
 
       // VẬN DỤNG CAO – 4 câu
-      {
-        q: "Giải phương trình: &radic;x = 3",
-        a: ["x = &plusmn;3", "x = 3", "x = 9", "x = -9"],
-        c: 2,
-        l: "VẬN DỤNG CAO",
-      },
-      {
-        q: "Giải phương trình: &radic;(x + 5) = x − 1",
-        a: ["x = 0", "x = 2", "x = 3", "x = 4"],
-        c: 3,
-        l: "VẬN DỤNG CAO",
-      },
-      {
-        q: "Một hình vuông có cạnh a = &radic;8 cm. Diện tích hình vuông là:",
-        a: [
-          "4 cm<sup>2</sup>",
-          "8 cm<sup>2</sup>",
-          "16 cm<sup>2</sup>",
-          "8&radic;2 cm<sup>2</sup>",
-        ],
-        c: 1,
-        l: "VẬN DỤNG CAO",
-      },
+      { q: "Giải phương trình: &radic;x = 3", a: ["x = &plusmn;3", "x = 3", "x = 9", "x = -9"], c: 2, l: "VẬN DỤNG CAO" },
+      { q: "Giải phương trình: &radic;(x + 5) = x − 1", a: ["x = 0", "x = 2", "x = 3", "x = 4"], c: 3, l: "VẬN DỤNG CAO" },
+      { q: "Một hình vuông có cạnh a = &radic;8 cm. Diện tích hình vuông là:", a: ["4 cm<sup>2</sup>", "8 cm<sup>2</sup>", "16 cm<sup>2</sup>", "8&radic;2 cm<sup>2</sup>"], c: 1, l: "VẬN DỤNG CAO" },
       {
         q: "Cho biểu thức P = <div class='fraction'><span class='numerator'>x - 1</span><span class='denominator'>&radic;x - 1</span></div> - &radic;x với x &ge; 0, x &ne; 1. Giá trị của P là:",
         a: ["&radic;x", "1", "-1", "2&radic;x"],
-        c: 1,
-        l: "VẬN DỤNG CAO",
+        c: 1, l: "VẬN DỤNG CAO"
       },
     ];
 
@@ -610,6 +385,9 @@
     // ===============================
     let currentIdx = 0;
     let score = 0;
+    let answered = false;
+    let lastWasCorrect = false;
+
     const starContainer = document.getElementById("starfield");
 
     // Nền sao
@@ -633,10 +411,7 @@
       osc.type = type;
       osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
       gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(
-        0.01,
-        audioCtx.currentTime + duration
-      );
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start();
@@ -665,9 +440,13 @@
       const gs = document.getElementById("game-screen");
       gs.classList.remove("hidden");
       gs.classList.add("flex");
+
       currentIdx = 0;
       score = 0;
+      answered = false;
       updateScore();
+      hideRationale();
+
       loadQuestion();
       animatePlanetArrival();
     }
@@ -677,6 +456,9 @@
         endGame();
         return;
       }
+
+      answered = false;
+      hideRationale();
 
       const q = questions[currentIdx];
 
@@ -688,43 +470,104 @@
       badge.innerText = gateInfo.label;
 
       if (q.l === "NHẬN BIẾT")
-        badge.className =
-          "px-3 py-1 rounded bg-green-900 text-green-300 text-xs font-bold";
+        badge.className = "px-3 py-1 rounded bg-green-900 text-green-300 text-xs font-bold";
       else if (q.l === "THÔNG HIỂU")
-        badge.className =
-          "px-3 py-1 rounded bg-blue-900 text-blue-300 text-xs font-bold";
+        badge.className = "px-3 py-1 rounded bg-blue-900 text-blue-300 text-xs font-bold";
       else if (q.l === "VẬN DỤNG")
-        badge.className =
-          "px-3 py-1 rounded bg-purple-900 text-purple-300 text-xs font-bold";
+        badge.className = "px-3 py-1 rounded bg-purple-900 text-purple-300 text-xs font-bold";
       else
-        badge.className =
-          "px-3 py-1 rounded bg-red-900 text-red-300 text-xs font-bold";
+        badge.className = "px-3 py-1 rounded bg-red-900 text-red-300 text-xs font-bold";
 
       const grid = document.getElementById("options-grid");
       grid.innerHTML = "";
 
       q.a.forEach((opt, idx) => {
         const btn = document.createElement("button");
-        btn.className =
-          "btn-option w-full p-4 rounded-xl text-lg font-medium text-slate-200 math-expr";
-        btn.innerHTML = opt;
-        btn.onclick = () => checkAnswer(idx, q.c, btn);
+        btn.className = "btn-option w-full p-4 rounded-xl text-lg font-medium text-slate-200 math-expr";
+        btn.innerHTML = `<span class="inline-block w-8 font-bold opacity-60">${String.fromCharCode(65 + idx)}.</span> ${opt}`;
+        btn.onclick = () => checkAnswer(idx);
         grid.appendChild(btn);
       });
     }
 
-    function checkAnswer(selected, correct, btn) {
+    // ✅ Tạo giải thích mặc định nếu cô chưa nhập r:
+    function defaultRationale(qObj) {
+      const correctIdx = qObj.c;
+      const letter = String.fromCharCode(65 + correctIdx);
+      const ans = qObj.a[correctIdx];
+      return `Đáp án đúng là <b>${letter}</b>: ${ans}`;
+    }
+
+    function showRationale(isCorrect, htmlText) {
+      const panel = document.getElementById("rationale-panel");
+      const icon = document.getElementById("rationale-icon");
+      const title = document.getElementById("rationale-title");
+      const text = document.getElementById("rationale-text");
+
+      panel.classList.remove("hidden");
+
+      if (isCorrect) {
+        panel.classList.remove("border-red-500");
+        panel.classList.add("border-green-500");
+        icon.innerText = "💡";
+        title.innerText = "Chính xác!";
+        title.className = "font-bold text-lg mb-1 text-green-300";
+      } else {
+        panel.classList.remove("border-green-500");
+        panel.classList.add("border-red-500");
+        icon.innerText = "🧠";
+        title.innerText = "Chưa đúng rồi!";
+        title.className = "font-bold text-lg mb-1 text-red-300";
+      }
+
+      text.innerHTML = htmlText;
+
+      const nextBtn = document.getElementById("next-btn");
+      nextBtn.innerText = (currentIdx < questions.length - 1) ? "CÂU TIẾP THEO ➜" : "XEM KẾT QUẢ 🏆";
+      nextBtn.onclick = goNextAfterRationale;
+    }
+
+    function hideRationale() {
+      document.getElementById("rationale-panel").classList.add("hidden");
+      document.getElementById("rationale-text").innerHTML = "";
+    }
+
+    function checkAnswer(selected) {
+      if (answered) return;
+      answered = true;
+
+      const q = questions[currentIdx];
+      const correct = q.c;
       const btns = document.querySelectorAll(".btn-option");
       btns.forEach((b) => (b.disabled = true));
 
-      if (selected === correct) {
-        btn.classList.add("correct");
+      lastWasCorrect = (selected === correct);
+
+      if (lastWasCorrect) {
+        btns[selected].classList.add("correct");
         score += 10;
         updateScore();
         playCorrectSound();
         showFeedback("😍");
         fireConfetti();
+      } else {
+        btns[selected].classList.add("wrong");
+        btns[correct].classList.add("correct");
+        playWrongSound();
+        showFeedback("👽");
+      }
 
+      // ✅ Hiện giải thích giống game trước
+      const rationaleHTML = (q.r && String(q.r).trim() !== "") ? q.r : defaultRationale(q);
+      showRationale(lastWasCorrect, rationaleHTML);
+    }
+
+    // ✅ Chỉ qua câu khi HS bấm nút "Câu tiếp theo"
+    function goNextAfterRationale() {
+      if (!answered) return;
+
+      // nếu đúng: giữ hiệu ứng bay/warp như cũ
+      if (lastWasCorrect) {
         document.body.classList.add("warp-speed");
         document.getElementById("spaceship").style.transform =
           "translateX(-50%) translateY(-100px) scale(0.5)";
@@ -737,18 +580,14 @@
           animatePlanetArrival();
           document.getElementById("spaceship").style.transform =
             "translateX(-50%) translateY(0) scale(1)";
-        }, 1500);
+        }, 1200);
       } else {
-        btn.classList.add("wrong");
-        btns[correct].classList.add("correct");
-        playWrongSound();
-        showFeedback("👽");
-
+        // nếu sai: chuyển câu nhanh hơn
         setTimeout(() => {
           currentIdx++;
           loadQuestion();
           animatePlanetArrival();
-        }, 2000);
+        }, 300);
       }
     }
 
@@ -757,31 +596,12 @@
     }
 
     function animatePlanetArrival() {
-      const planets = [
-        "🪐",
-        "🌍",
-        "🌕",
-        "🌑",
-        "🌞",
-        "⭐",
-        "☄️",
-        "🌌",
-        "🌑",
-        "🪐",
-        "🌍",
-        "🌕",
-        "🌑",
-        "🌞",
-        "🏰",
-      ];
+      const planets = ["🪐","🌍","🌕","🌑","🌞","⭐","☄️","🌌","🌑","🪐","🌍","🌕","🌑","🌞","🏰"];
       const planetEl = document.getElementById("target-planet");
       planetEl.classList.remove("arrived");
       planetEl.innerText = planets[currentIdx % planets.length];
       planetEl.style.top = "-150px";
-
-      setTimeout(() => {
-        planetEl.classList.add("arrived");
-      }, 100);
+      setTimeout(() => planetEl.classList.add("arrived"), 100);
     }
 
     function showFeedback(emoji) {
@@ -790,11 +610,10 @@
       content.innerText = emoji;
       overlay.style.opacity = "1";
       content.style.transform = "scale(1)";
-
       setTimeout(() => {
         overlay.style.opacity = "0";
         content.style.transform = "scale(0)";
-      }, 1000);
+      }, 900);
     }
 
     function endGame() {
@@ -843,9 +662,7 @@
         const li = document.createElement("li");
         li.className =
           "flex justify-between bg-slate-800 p-3 rounded-lg text-gray-200 border border-slate-700";
-        li.innerHTML = `<span class="font-bold">${index + 1}. ${
-          item.name
-        }</span><span class="text-yellow-300">${item.score} điểm</span>`;
+        li.innerHTML = `<span class="font-bold">${index + 1}. ${item.name}</span><span class="text-yellow-300">${item.score} điểm</span>`;
         listEl.appendChild(li);
       });
       if (leaderboard.length > 0) section.classList.remove("hidden");
