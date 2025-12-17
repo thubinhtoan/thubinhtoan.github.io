@@ -505,7 +505,7 @@ const rawQuestions = [
   {
     id: 12,
     level: "Vận dụng",
-    text:
+   question:
       "Rút gọn biểu thức:<br/>" +
       "\\(P = \\frac{a - \\sqrt{a}}{\\sqrt{a} - 1}\\)<br/>" +
       "với $a \\ge 0, a \\ne 1$.",
@@ -686,7 +686,7 @@ const rawQuestions = [
     document.getElementById('level-badge').innerText = q.level;
 
     // ✅ dùng innerHTML để MathJax chạy
-    document.getElementById('question-text').innerHTML = q.question;
+    document.getElementById('question-text').innerHTML = q.question ?? q.text ?? "";
 
     // Progress
     const pct = (currentQuestionIndex / questions.length) * 100;
