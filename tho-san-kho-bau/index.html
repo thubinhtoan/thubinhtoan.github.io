@@ -1,522 +1,601 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thợ Săn Kho Báu – Bí Ẩn Căn Thức</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thợ Săn Kho Báu: Bí Mật Căn Thức - Toán 9</title>
+    <style>
+        :root {
+            --primary: #8B4513;
+            --secondary: #DAA520;
+            --bg-color: #FEF9E7;
+            --text-color: #3e2723;
+            --success: #2E7D32;
+            --error: #C62828;
+        }
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2c3e50;
+            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2334495e" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
 
-  <!-- React -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+        #game-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--bg-color);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+            border: 8px solid var(--primary);
+            position: relative;
+        }
 
-  <!-- Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+        header {
+            background-color: var(--primary);
+            color: var(--secondary);
+            padding: 15px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid #5D4037;
+        }
 
-  <!-- MathJax -->
-  <script>
-    window.MathJax = {
-      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-      svg: { fontCache: 'global' }
-    };
-  </script>
-  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-  <style>
-    body {
-      background: #0f172a;
-      color: white;
-      overflow: hidden;
-      font-family: system-ui, sans-serif;
-    }
-    .game-font { font-family: 'Patrick Hand', cursive; }
+        .stats {
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: flex;
+            gap: 20px;
+        }
 
-    /* ===== FIX 1 DÒNG + KÉO NGANG (CHỐT) ===== */
-    .nowrap-line{
-      display: block;
-      max-width: 100%;
-      white-space: nowrap !important;
-      overflow-x: auto !important;
-      overflow-y: hidden !important;
-      -webkit-overflow-scrolling: touch;
-      word-break: keep-all !important;
-    }
-    /* CỰC QUAN TRỌNG: ép tất cả con bên trong cũng nowrap (MathJax tạo rất nhiều thẻ con) */
-    .nowrap-line *{
-      white-space: nowrap !important;
-    }
+        .screen {
+            padding: 30px;
+            text-align: center;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
 
-    /* ===== ÉP MATHJAX V3 KHÔNG TẠO BLOCK / DISPLAY-MATH ===== */
-    mjx-container{
-      display: inline-block !important;
-      white-space: nowrap !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      vertical-align: baseline !important;
-    }
-    mjx-container[display="true"]{
-      display: inline-block !important; /* display-math cũng ép inline-block */
-    }
-    mjx-container svg{
-      display: inline-block !important;
-      vertical-align: -0.1em !important;
-    }
+        .hidden { display: none !important; }
 
-    .confetti {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      animation: fall linear forwards;
-    }
-    @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
-  </style>
+        #start-screen h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #DAA520, #B8860B);
+            color: #fff;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 0 #8B4513;
+            margin-top: 20px;
+        }
+
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #8B4513; }
+        .btn:active { transform: translateY(2px); box-shadow: 0 0 0 #8B4513; }
+
+        #question-area { width: 100%; }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--secondary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .level-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background-color: #607D8B;
+            color: white;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .question-text {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .option-btn {
+            background-color: white;
+            border: 2px solid #D7CCC8;
+            padding: 20px;
+            font-size: 1.3rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #4e342e;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background-color: #FFF8E1;
+            border-color: var(--secondary);
+            transform: scale(1.02);
+        }
+
+        .option-btn.correct {
+            background-color: #C8E6C9;
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .option-btn.wrong {
+            background-color: #FFCDD2;
+            border-color: var(--error);
+            color: var(--error);
+            opacity: 0.7;
+        }
+
+        #rationale-box {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #FFF3E0;
+            border-left: 5px solid var(--secondary);
+            text-align: left;
+            animation: slideIn 0.3s ease;
+        }
+
+        #rationale-title {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .score-big {
+            font-size: 4rem;
+            color: var(--primary);
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .message {
+            font-size: 1.5rem;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+            .question-text { font-size: 1.4rem; }
+            .stats { font-size: 0.9rem; gap: 10px; }
+        }
+    </style>
 </head>
-
 <body>
-  <div id="root"></div>
 
-<script type="text/babel">
-const { useEffect, useMemo, useState } = React;
+<div id="game-container">
+    <canvas id="confetti-canvas"></canvas>
 
-/* ===== UTIL FIX HIỂN THỊ 1 DÒNG ===== */
-function oneLine(input){
-  return (input ?? "")
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/\r?\n/g, " ")
-    .replace(/\\n/g, " ")
-    .replace(/\\\[/g, "\\(")   // \[ -> \(
-    .replace(/\\\]/g, "\\)")   // \] -> \)
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-/* ===== DATA 15 CÂU (giữ nguyên nội dung cô gửi) ===== */
-const rawQuestions = [
-  // Nhận biết
-  {
-    id: 1,
-    level: "Nhận biết",
-    text:
-      "Công thức khử mẫu của biểu thức:<br/>" +
-      "\\[\\sqrt{\\frac{A}{B}}\\]<br/>" +
-      "với $AB \\ge 0$ và $B \\ne 0$ là gì?",
-    options: [
-      "$\\frac{\\sqrt{AB}}{B}$",
-      "$\\frac{\\sqrt{AB}}{|B|}$",
-      "$\\frac{A\\sqrt{B}}{B}$",
-      "$A\\sqrt{B}$"
-    ],
-    correct: 1,
-    rationale:
-      "Theo quy tắc khử mẫu, ta nhân cả tử và mẫu với $B$ để mẫu trở thành bình phương: " +
-      "$\\sqrt{\\frac{A}{B}} = \\sqrt{\\frac{AB}{B^2}} = \\frac{\\sqrt{AB}}{|B|}$."
-  },
-  {
-    id: 2,
-    level: "Nhận biết",
-    text:
-      "Biểu thức liên hợp của biểu thức:<br/>" +
-      "\\[\\sqrt{3} - 1\\]<br/>" +
-      "dùng để trục căn thức ở mẫu là gì?",
-    options: [
-      "$\\sqrt{3} - 1$",
-      "$-\\sqrt{3} + 1$",
-      "$\\sqrt{3} + 1$",
-      "$\\sqrt{3}$"
-    ],
-    correct: 2,
-    rationale:
-      "Để tạo ra hằng đẳng thức hiệu hai bình phương $A^2 - B^2$, biểu thức liên hợp của " +
-      "$\\sqrt{A} - B$ là $\\sqrt{A} + B$. Vậy liên hợp của $\\sqrt{3}-1$ là $\\sqrt{3}+1$."
-  },
-  {
-    id: 3,
-    level: "Nhận biết",
-    text:
-      "Kết quả của phép đưa thừa số ra ngoài dấu căn của biểu thức:<br/>" +
-      "\\[\\sqrt{12}\\]<br/>" +
-      "là:",
-    options: [
-      "$2\\sqrt{3}$",
-      "$3\\sqrt{2}$",
-      "$4\\sqrt{3}$",
-      "$6\\sqrt{2}$"
-    ],
-    correct: 0,
-    rationale:
-      "Ta phân tích $12 = 4\\cdot3 = 2^2\\cdot3$. Đưa thừa số $2$ ra ngoài dấu căn ta được $2\\sqrt{3}$."
-  },
-  {
-    id: 4,
-    level: "Nhận biết",
-    text:
-      "Đưa thừa số vào trong dấu căn của biểu thức:<br/>" +
-      "\\[3\\sqrt{2}\\]<br/>" +
-      "ta được:",
-    options: [
-      "$\\sqrt{6}$",
-      "$\\sqrt{12}$",
-      "$\\sqrt{18}$",
-      "$\\sqrt{36}$"
-    ],
-    correct: 2,
-    rationale:
-      "Đưa thừa số dương vào trong căn: $3\\sqrt{2} = \\sqrt{3^2\\cdot2} = \\sqrt{9\\cdot2} = \\sqrt{18}$."
-  },
-  {
-    id: 5,
-    level: "Nhận biết",
-    text: "Khẳng định nào sau đây là SAI về phép trục căn thức ở mẫu?",
-    options: [
-      "$\\frac{2}{\\sqrt{3}} = \\frac{2\\sqrt{3}}{3}$",
-      "$\\frac{1}{2+\\sqrt{3}} = 2-\\sqrt{3}$",
-      "$\\frac{a}{\\sqrt{b}} = \\frac{a\\sqrt{b}}{b} (b>0)$",
-      "$\\frac{1}{\\sqrt{5}} = \\frac{1}{5}$"
-    ],
-    correct: 3,
-    rationale:
-      "Khẳng định D sai. Đúng phải là: $\\frac{1}{\\sqrt{5}} = \\frac{\\sqrt{5}}{5}$."
-  },
-  {
-    id: 6,
-    level: "Nhận biết",
-    text:
-      "Với $x \\ge 0$, giá trị của biểu thức:<br/>" +
-      "\\[\\sqrt{x}(\\sqrt{x} + 2)\\]<br/>" +
-      "bằng:",
-    options: [
-      "$x + 2$",
-      "$\\sqrt{x} + 2\\sqrt{x}$",
-      "$2x$",
-      "$x + 2\\sqrt{x}$"
-    ],
-    correct: 3,
-    rationale:
-      "$\\sqrt{x}(\\sqrt{x}+2) = (\\sqrt{x})^2 + 2\\sqrt{x} = x + 2\\sqrt{x}$."
-  },
-
-  // Thông hiểu
-  {
-    id: 7,
-    level: "Thông hiểu",
-    text:
-      "Rút gọn biểu thức:<br/>" +
-      "\\[M = 2\\sqrt{3} + \\sqrt{27} - \\sqrt{12}\\]<br/>" +
-      "ta được:",
-    options: [
-      "$3\\sqrt{3}$",
-      "$4\\sqrt{3}$",
-      "$\\sqrt{3}$",
-      "$5\\sqrt{3}$"
-    ],
-    correct: 0,
-    rationale:
-      "$M = 2\\sqrt{3} + \\sqrt{9\\cdot3} - \\sqrt{4\\cdot3} = 2\\sqrt{3} + 3\\sqrt{3} - 2\\sqrt{3} = 3\\sqrt{3}$."
-  },
-  {
-    id: 8,
-    level: "Thông hiểu",
-    text:
-      "Trục căn thức ở mẫu của biểu thức:<br/>" +
-      "\\[\\frac{4}{\\sqrt{5}-1}\\]<br/>" +
-      "ta được kết quả là:",
-    options: [
-      "$4(\\sqrt{5}+1)$",
-      "$\\sqrt{5}+1$",
-      "$\\sqrt{5}-1$",
-      "$2(\\sqrt{5}+1)$"
-    ],
-    correct: 1,
-    rationale:
-      "$\\frac{4}{\\sqrt{5}-1} = \\frac{4(\\sqrt{5}+1)}{5-1} = \\sqrt{5}+1$."
-  },
-  {
-    id: 9,
-    level: "Thông hiểu",
-    text:
-      "Rút gọn biểu thức:<br/>" +
-      "\\[\\sqrt{18a^2}\\]<br/>" +
-      "với $a < 0$.",
-    options: [
-      "$3a\\sqrt{2}$",
-      "$-3a\\sqrt{2}$",
-      "$3\\sqrt{2a}$",
-      "$-3\\sqrt{2a}$"
-    ],
-    correct: 1,
-    rationale:
-      "$\\sqrt{18a^2} = \\sqrt{9\\cdot2\\cdot a^2} = 3\\sqrt{2}|a|$. Vì $a<0$ nên $|a|=-a$, được $-3a\\sqrt{2}$."
-  },
-  {
-    id: 10,
-    level: "Thông hiểu",
-    text:
-      "Giá trị của biểu thức:<br/>" +
-      "\\[(\\sqrt{3}-2)(\\sqrt{3}+2)\\]<br/>" +
-      "là:",
-    options: ["7","1","-1","-7"],
-    correct: 2,
-    rationale:
-      "$(\\sqrt{3}-2)(\\sqrt{3}+2) = (\\sqrt{3})^2 - 2^2 = 3-4 = -1$."
-  },
-  {
-    id: 11,
-    level: "Thông hiểu",
-    text:
-      "Khử mẫu của biểu thức:<br/>" +
-      "\\[\\sqrt{\\frac{5a}{2}}\\]<br/>" +
-      "với $a > 0$ ta được:",
-    options: [
-      "$\\frac{5\\sqrt{a}}{2}$",
-      "$\\frac{\\sqrt{5a}}{2}$",
-      "$\\frac{\\sqrt{10a}}{4}$",
-      "$\\frac{\\sqrt{10a}}{2}$"
-    ],
-    correct: 3,
-    rationale:
-      "$\\sqrt{\\frac{5a}{2}} = \\sqrt{\\frac{5a\\cdot2}{2\\cdot2}} = \\frac{\\sqrt{10a}}{\\sqrt{4}} = \\frac{\\sqrt{10a}}{2}$."
-  },
-
-  // Vận dụng
-  {
-    id: 12,
-    level: "Vận dụng",
-    text:
-      "Rút gọn biểu thức:<br/>" +
-      "\\[P = \\frac{a - \\sqrt{a}}{\\sqrt{a} - 1}\\]<br/>" +
-      "với $a \\ge 0, a \\ne 1$.",
-    options: ["$\\sqrt{a}$","$\\sqrt{a} + 1$","$\\sqrt{a} - 1$","$a$"],
-    correct: 0,
-    rationale:
-      "$a-\\sqrt{a} = \\sqrt{a}(\\sqrt{a}-1)$ nên $P = \\sqrt{a}$."
-  },
-  {
-    id: 13,
-    level: "Vận dụng",
-    text:
-      "Tìm $x$ biết:<br/>" +
-      "\\[\\sqrt{4x} + \\sqrt{x} = 6\\]<br/>" +
-      "(với $x \\ge 0$).",
-    options: ["$x = 2$","$x = 4$","$x = 9$","$x = 16$"],
-    correct: 1,
-    rationale:
-      "$\\sqrt{4x}=2\\sqrt{x}$ nên $3\\sqrt{x}=6 \\Rightarrow \\sqrt{x}=2 \\Rightarrow x=4$."
-  },
-  {
-    id: 14,
-    level: "Vận dụng (Thực tế)",
-    text:
-      "Một mảnh vườn hình chữ nhật có:<br/>" +
-      "Chiều dài $\\sqrt{32}$ m, chiều rộng $\\sqrt{8}$ m.<br/>" +
-      "Diện tích của mảnh vườn là:",
-    options: ["$8 m^2$","$12 m^2$","$16 m^2$","$32 m^2$"],
-    correct: 2,
-    rationale:
-      "Diện tích $=\\sqrt{32}\\cdot\\sqrt{8}=\\sqrt{256}=16\\,m^2$."
-  },
-
-  // Vận dụng cao
-  {
-    id: 15,
-    level: "Vận dụng cao",
-    text:
-      "Tính giá trị của biểu thức:<br/>" +
-      "\\[A = \\frac{1}{\\sqrt{2}+1} + \\frac{1}{\\sqrt{3}+\\sqrt{2}} + \\frac{1}{\\sqrt{4}+\\sqrt{3}}\\]",
-    options: ["1","2","3","$\\sqrt{2}$"],
-    correct: 0,
-    rationale:
-      "Trục căn: $A=(\\sqrt{2}-1)+ (\\sqrt{3}-\\sqrt{2}) + (\\sqrt{4}-\\sqrt{3}) = -1+2 = 1$."
-  }
-];
-
-/* ===== RANDOM OPTIONS (giữ đúng đáp án) ===== */
-function shuffleKeepCorrect(q){
-  const idx = q.options.map((_, i) => i);
-  for (let i = idx.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [idx[i], idx[j]] = [idx[j], idx[i]];
-  }
-  const newOptions = idx.map(i => q.options[i]);
-  const newCorrect = idx.indexOf(q.correct);
-  return { ...q, options: newOptions, correct: newCorrect };
-}
-
-/* ===== CONFETTI ===== */
-const Confetti = () => {
-  const [ps, setPs] = useState([]);
-  useEffect(() => {
-    setPs(Array.from({ length: 40 }).map((_, i) => ({
-      id: i,
-      left: Math.random() * 100 + "vw",
-      color: `hsl(${Math.random() * 360},100%,50%)`,
-      duration: Math.random() * 2 + 2 + "s"
-    })));
-  }, []);
-  return (
-    <div className="fixed inset-0 pointer-events-none z-50">
-      {ps.map(p => (
-        <div
-          key={p.id}
-          className="confetti"
-          style={{ left: p.left, background: p.color, animationDuration: p.duration, top: "-20px" }}
-        />
-      ))}
-    </div>
-  );
-};
-
-const Start = ({ onStart }) => (
-  <div className="min-h-screen flex items-center justify-center p-4">
-    <div className="max-w-xl w-full bg-slate-800/60 border border-slate-700 rounded-2xl p-8 text-center">
-      <div className="text-5xl game-font text-yellow-300 mb-2">THỢ SĂN KHO BÁU</div>
-      <div className="text-xl text-blue-200 mb-6">Bí Ẩn Căn Thức Bậc Hai</div>
-      <p className="text-slate-200 mb-6">15 câu hỏi – chọn đáp án và xem giải thích ngay sau khi trả lời.</p>
-      <button
-        onClick={onStart}
-        className="px-8 py-3 rounded-full bg-green-600 hover:bg-green-500 font-bold shadow-lg"
-      >
-        BẮT ĐẦU
-      </button>
-    </div>
-  </div>
-);
-
-const Result = ({ score, total, onRestart }) => (
-  <div className="min-h-screen flex items-center justify-center p-4">
-    <div className="max-w-xl w-full bg-slate-800/60 border border-slate-700 rounded-2xl p-8 text-center">
-      <div className="text-6xl mb-2">🏆</div>
-      <div className="text-3xl font-bold text-yellow-300 mb-2">HOÀN THÀNH</div>
-      <div className="text-xl text-slate-200 mb-6">Điểm: <b className="text-white">{score}</b> / {total}</div>
-      <button
-        onClick={onRestart}
-        className="px-8 py-3 rounded-full bg-indigo-600 hover:bg-indigo-500 font-bold shadow-lg"
-      >
-        CHƠI LẠI
-      </button>
-      {score >= Math.ceil(total * 0.6) && <Confetti />}
-    </div>
-  </div>
-);
-
-const Game = ({ data, onFinish }) => {
-  const [i, setI] = useState(0);
-  const [chosen, setChosen] = useState(null);
-  const [showExplain, setShowExplain] = useState(false);
-  const [score, setScore] = useState(0);
-
-  const q = data[i];
-
-  useEffect(() => {
-    if (window.MathJax?.typesetPromise) {
-      window.MathJax.typesetClear?.();
-      window.MathJax.typesetPromise();
-    }
-  }, [q, showExplain]);
-
-  const choose = (idx) => {
-    if (chosen !== null) return;
-    setChosen(idx);
-    setShowExplain(true);
-    if (idx === q.correct) setScore(s => s + 1);
-  };
-
-  const next = () => {
-    const nextIdx = i + 1;
-    if (nextIdx >= data.length) onFinish(score);
-    else {
-      setI(nextIdx);
-      setChosen(null);
-      setShowExplain(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="bg-white text-slate-800 max-w-3xl w-full rounded-2xl p-6 shadow-xl">
-        <div className="flex items-center justify-between mb-4">
-          <div className="text-sm font-bold text-slate-500">
-            Câu {i + 1}/{data.length} • {q.level}
-          </div>
-          <div className="text-sm font-bold text-indigo-600">
-            Điểm: {score}/{data.length}
-          </div>
+    <header>
+        <div class="game-title">🗝️ Thợ Săn Kho Báu</div>
+        <div class="stats">
+            <span>Câu: <span id="q-current">1</span>/15</span>
+            <span>Điểm: <span id="score">0</span></span>
         </div>
+    </header>
 
-        <h3
-          className="text-xl md:text-2xl font-bold mb-4 nowrap-line w-full"
-          dangerouslySetInnerHTML={{ __html: q.text }}
-        />
+    <!-- START SCREEN -->
+    <div id="start-screen" class="screen">
+        <div style="font-size: 4rem; margin-bottom: 10px;">💎</div>
+        <h1>Bí Mật Căn Thức</h1>
+        <p style="font-size: 1.2rem; max-width: 600px; margin-bottom: 20px;">
+            Chào mừng các em đến với cuộc phiêu lưu! Hãy sử dụng kiến thức về "Biến đổi đơn giản biểu thức chứa căn thức bậc hai" để mở khóa kho báu.
+        </p>
+        <p style="color: #666;">Giáo viên: Cô Thu Bình</p>
+        <button class="btn" onclick="startGame()">Bắt Đầu Hành Trình</button>
+    </div>
 
-        <div className="grid md:grid-cols-2 gap-3 mb-4">
-          {q.options.map((o, idx) => {
-            const isCorrect = idx === q.correct;
-            const isChosen = idx === chosen;
-            const locked = chosen !== null;
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="screen hidden">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
 
-            let cls = "border rounded-lg p-3 text-left nowrap-line w-full transition ";
-            if (!locked) cls += "hover:bg-blue-50";
-            else if (isCorrect) cls += "bg-green-100 border-green-500";
-            else if (isChosen) cls += "bg-red-100 border-red-500";
-            else cls += "opacity-50";
+        <div id="question-area">
+            <span id="level-badge" class="level-badge">Nhận Biết</span>
+            <div id="question-text" class="question-text">Câu hỏi sẽ hiện ở đây...</div>
 
-            return (
-              <button key={idx} onClick={() => choose(idx)} disabled={locked} className={cls}>
-                <span className="font-bold mr-2">{String.fromCharCode(65 + idx)}.</span>
-                <span dangerouslySetInnerHTML={{ __html: o }} />
-              </button>
-            );
-          })}
-        </div>
+            <div id="options-container" class="options-grid"></div>
 
-        {showExplain && (
-          <div className="border-t pt-4 mt-4">
-            <div className="font-bold text-blue-600 mb-1">
-              💡 Giải thích {chosen === q.correct ? "✅" : "❌"}
+            <div id="rationale-box" class="hidden">
+                <span id="rationale-title">💡 Giải thích:</span>
+                <span id="rationale-content">Nội dung giải thích...</span>
+                <div style="text-align: right; margin-top: 10px;">
+                    <button class="btn" onclick="nextQuestion()" style="padding: 10px 30px; font-size: 1rem;">Tiếp tục ➡️</button>
+                </div>
             </div>
-            <p className="nowrap-line w-full" dangerouslySetInnerHTML={{ __html: q.rationale }} />
-            <button
-              onClick={next}
-              className="mt-4 w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold"
-            >
-              {i < data.length - 1 ? "CÂU TIẾP THEO ➜" : "XEM KẾT QUẢ 🏆"}
-            </button>
-          </div>
-        )}
-
-        {chosen !== null && chosen === q.correct && <Confetti />}
-      </div>
+        </div>
     </div>
-  );
-};
 
-const App = () => {
-  const [state, setState] = useState("start"); // start | playing | result
-  const [final, setFinal] = useState(0);
+    <!-- END SCREEN -->
+    <div id="end-screen" class="screen hidden">
+        <div style="font-size: 4rem;">🏆</div>
+        <h1 style="color: var(--primary);">Hoàn Thành Nhiệm Vụ!</h1>
+        <div class="score-big" id="final-score">0</div>
+        <p class="message" id="end-message">Bạn làm rất tốt!</p>
+        <button class="btn" onclick="location.reload()">Chơi Lại</button>
+    </div>
+</div>
 
-  const prepared = useMemo(() => {
-    return rawQuestions.map(q => {
-      const qq = {
-        ...q,
-        text: oneLine(q.text),
-        rationale: oneLine(q.rationale),
-        options: q.options.map(oneLine),
-      };
-      return shuffleKeepCorrect(qq);
-    });
-  }, []);
+<script>
+    // --- DATA GỐC ---
+    const questions = [
+        {
+            level: "Nhận Biết",
+            question: "Với A là biểu thức bất kỳ, √A² bằng bao nhiêu?",
+            options: ["A", "-A", "|A|", "A²"],
+            correct: 2,
+            rationale: "Theo hằng đẳng thức căn bậc hai: √A² = |A|."
+        },
+        {
+            level: "Nhận Biết",
+            question: "Điều kiện để √AB = √A.√B là gì?",
+            options: ["A ≥ 0 và B ≥ 0", "A < 0 và B < 0", "A ≥ 0 và B < 0", "A, B tùy ý"],
+            correct: 0,
+            rationale: "Quy tắc khai phương một tích yêu cầu các thừa số phải không âm (A ≥ 0, B ≥ 0)."
+        },
+        {
+            level: "Nhận Biết",
+            question: "Kết quả của phép tính √(3² . 2) là:",
+            options: ["3√2", "2√3", "6", "√6"],
+            correct: 0,
+            rationale: "√(3² . 2) = √3² . √2 = 3√2."
+        },
+        {
+            level: "Nhận Biết",
+            question: "Đưa thừa số ra ngoài dấu căn: √(4x) với x ≥ 0",
+            options: ["4√x", "2√x", "x√4", "-2√x"],
+            correct: 1,
+            rationale: "Vì 4 = 2², nên √(4x) = √2² . √x = 2√x."
+        },
+        {
+            level: "Nhận Biết",
+            question: "Đưa thừa số vào trong dấu căn: 3√2",
+            options: ["√6", "√12", "√18", "√9"],
+            correct: 2,
+            rationale: "3√2 = √(3² . 2) = √(9 . 2) = √18."
+        },
+        {
+            level: "Nhận Biết",
+            question: "Phép biến đổi làm mất căn thức ở mẫu gọi là gì?",
+            options: ["Khai phương", "Trục căn thức ở mẫu", "Đưa thừa số ra ngoài", "Rút gọn phân thức"],
+            correct: 1,
+            rationale: "Đây là định nghĩa của phép trục căn thức ở mẫu."
+        },
+        {
+            level: "Thông Hiểu",
+            question: "Tính giá trị của biểu thức: √8 + √18",
+            options: ["√26", "5√2", "2√13", "7"],
+            correct: 1,
+            rationale: "√8 + √18 = √(4.2) + √(9.2) = 2√2 + 3√2 = 5√2."
+        },
+        {
+            level: "Thông Hiểu",
+            question: "Với x < 0, kết quả rút gọn của √(x²) là:",
+            options: ["x", "-x", "|-x|", "x²"],
+            correct: 1,
+            rationale: "√(x²) = |x|. Vì x < 0 nên |x| = -x."
+        },
+        {
+            level: "Thông Hiểu",
+            question: "Tính giá trị biểu thức: √2 . √8",
+            options: ["√10", "4", "16", "2√2"],
+            correct: 1,
+            rationale: "√2 . √8 = √(2.8) = √16 = 4."
+        },
+        {
+            level: "Thông Hiểu",
+            question: "Trục căn thức ở mẫu của biểu thức 1 / √3",
+            options: ["3", "√3 / 3", "3 / √3", "1/3"],
+            correct: 1,
+            rationale: "Nhân cả tử và mẫu với √3: 1/√3 = (1.√3) / (√3.√3) = √3 / 3."
+        },
+        {
+            level: "Thông Hiểu",
+            question: "Rút gọn biểu thức: √27a - √3a (với a ≥ 0)",
+            options: ["2√3a", "3√a", "√24a", "4√3a"],
+            correct: 0,
+            rationale: "√27a - √3a = √(9.3a) - √3a = 3√3a - 1√3a = 2√3a."
+        },
+        {
+            level: "Vận Dụng",
+            question: "Tìm x biết: √(9x) = 6 (với x ≥ 0)",
+            options: ["x = 2", "x = 4", "x = 36", "x = 9"],
+            correct: 1,
+            rationale: "√(9x) = 3√x. Vậy 3√x = 6 => √x = 2 => x = 4."
+        },
+        {
+            level: "Vận Dụng Thực Tế",
+            question: "Một mảnh đất hình vuông có diện tích 50 m². Độ dài cạnh mảnh đất là:",
+            options: ["25 m", "5√2 m", "10 m", "50 m"],
+            correct: 1,
+            rationale: "Cạnh hình vuông = √Diện tích = √50 = √(25.2) = 5√2 (m)."
+        },
+        {
+            level: "Vận Dụng",
+            question: "Rút gọn biểu thức: √[(2 - √5)²]",
+            options: ["2 - √5", "√5 - 2", "±(2 - √5)", "3"],
+            correct: 1,
+            rationale: "√A² = |A|. Vậy ta có |2 - √5|. Vì √5 ≈ 2.23 > 2 nên (2 - √5) < 0. Do đó kết quả là -(2 - √5) = √5 - 2."
+        },
+        {
+            level: "Vận Dụng Cao",
+            question: "Rút gọn biểu thức A = √(9 - 4√5)",
+            options: ["3 - 2√5", "√5 - 2", "2 - √5", "5 - √2"],
+            correct: 1,
+            rationale: "Ta biến đổi: 9 - 4√5 = (√5 - 2)². Vì √5 > 2 nên √(9 - 4√5) = √5 - 2."
+        }
+    ];
 
-  const start = () => { setFinal(0); setState("playing"); };
-  const finish = (score) => { setFinal(score); setState("result"); };
+    // --- GAME STATE ---
+    let preparedQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let isAnswering = true;
 
-  if (state === "start") return <Start onStart={start} />;
-  if (state === "result") return <Result score={final} total={prepared.length} onRestart={start} />;
-  return <Game data={prepared} onFinish={finish} />;
-};
+    // --- AUDIO ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+        if (type === 'correct') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        } else if (type === 'wrong') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        } else if (type === 'end') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(554, audioCtx.currentTime + 0.2);
+            osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.4);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 1.5);
+        }
+    }
+
+    // --- SHUFFLE + CHIA ĐỀU ABCD ---
+    function shuffle(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    // Pattern 15 câu: A,B,C,D,A,B,C,D,A,B,C,D,A,B,C  -> A4,B4,C4,D3
+    const correctPattern = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2];
+
+    function prepareAllQuestions() {
+        return questions.map((q, idx) => {
+            const desiredCorrect = correctPattern[idx]; // vị trí đáp án đúng muốn đặt (0..3)
+            const correctText = q.options[q.correct];
+            const wrongs = q.options.filter((_, i) => i !== q.correct);
+            const wrongsShuffled = shuffle(wrongs);
+
+            const newOptions = [];
+            let wi = 0;
+            for (let k = 0; k < 4; k++) {
+                if (k === desiredCorrect) newOptions.push(correctText);
+                else newOptions.push(wrongsShuffled[wi++]);
+            }
+
+            return { ...q, options: newOptions, correct: desiredCorrect };
+        });
+    }
+
+    // --- LOGIC ---
+    function startGame() {
+        preparedQuestions = prepareAllQuestions(); // ✅ random + chia đều ABCD
+        currentQuestionIndex = 0;
+        score = 0;
+        document.getElementById('score').innerText = score;
+
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const q = preparedQuestions[currentQuestionIndex];
+
+        document.getElementById('q-current').innerText = currentQuestionIndex + 1;
+        document.getElementById('level-badge').innerText = q.level;
+        document.getElementById('question-text').innerText = q.question;
+
+        // ✅ Progress chuẩn (lên 100% ở câu cuối)
+        const pct = ((currentQuestionIndex + 1) / preparedQuestions.length) * 100;
+        document.getElementById('progress-fill').style.width = pct + "%";
+
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+
+        q.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(index, btn);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('rationale-box').classList.add('hidden');
+        isAnswering = true;
+    }
+
+    function checkAnswer(selectedIndex, btnElement) {
+        if (!isAnswering) return;
+        isAnswering = false;
+
+        const q = preparedQuestions[currentQuestionIndex];
+        const buttons = document.querySelectorAll('.option-btn');
+
+        if (selectedIndex === q.correct) {
+            btnElement.classList.add('correct');
+            btnElement.innerHTML += " 😃 <span style='color:green; font-weight:bold;'>Đúng!</span>";
+            score += 10;
+            document.getElementById('score').innerText = score;
+            playSound('correct');
+            fireConfetti();
+        } else {
+            btnElement.classList.add('wrong');
+            btnElement.innerHTML += " 😢";
+            buttons[q.correct].classList.add('correct');
+            playSound('wrong');
+        }
+
+        buttons.forEach(b => b.disabled = true);
+
+        document.getElementById('rationale-content').innerText = q.rationale;
+        document.getElementById('rationale-box').classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < preparedQuestions.length) loadQuestion();
+        else endGame();
+    }
+
+    function endGame() {
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+
+        document.getElementById('final-score').innerText = score + "/150";
+        const msg = document.getElementById('end-message');
+
+        playSound('end');
+        fireConfetti();
+
+        if (score >= 130) msg.innerText = "Xuất sắc! Cô Thu Bình rất tự hào về em!";
+        else if (score >= 100) msg.innerText = "Làm tốt lắm! Em đã nắm vững kiến thức.";
+        else msg.innerText = "Cố gắng thêm nhé! Hãy xem lại phần giải thích.";
+    }
+
+    // --- CONFETTI ---
+    function fireConfetti() {
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'];
+
+        for (let i = 0; i < 100; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                w: Math.random() * 10 + 5,
+                h: Math.random() * 10 + 5,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                speed: Math.random() * 5 + 2,
+                angle: Math.random() * 6.2
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+
+            particles.forEach(p => {
+                p.y += p.speed;
+                p.angle += 0.1;
+                ctx.fillStyle = p.color;
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle);
+                ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+                ctx.restore();
+
+                if (p.y < canvas.height) active = true;
+            });
+
+            if (active) requestAnimationFrame(draw);
+        }
+        draw();
+    }
 </script>
+
 </body>
 </html>
