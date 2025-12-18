@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thợ Săn Kho Báu: Biến Đổi Căn Thức (Bài 4) - Toán 9</title>
+
+  <!-- ✅ MathJax (hiển thị căn thức, ký hiệu) -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <style>
+    :root {
+      --primary: #8B4513;
+      --secondary: #DAA520;
+      --bg-color: #FEF9E7;
+      --text-color: #3e2723;
+      --success: #2E7D32;
+      --error: #C62828;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #2c3e50;
+      background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2334495e" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: var(--text-color);
+    }
+    #game-container {
+      width: 100%;
+      max-width: 900px;
+      background-color: var(--bg-color);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      overflow: hidden;
+      border: 8px solid var(--primary);
+      position: relative;
+    }
+    header {
+      background-color: var(--primary);
+      color: var(--secondary);
+      padding: 15px;
+      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 4px solid #5D4037;
+    }
+    .game-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .stats {
+      font-size: 1.1rem;
+      font-weight: bold;
+      display: flex;
+      gap: 20px;
+    }
+    .screen {
+      padding: 30px;
+      text-align: center;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .hidden { display: none !important; }
+    #start-screen h1 {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    .btn {
+      background: linear-gradient(to bottom, #DAA520, #B8860B);
+      color: #fff;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 0 #8B4513;
+      margin-top: 20px;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #8B4513; }
+    .btn:active { transform: translateY(2px); box-shadow: 0 0 0 #8B4513; }
+
+    #question-area { width: 100%; }
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background-color: #ddd;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background-color: var(--secondary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .level-badge {
+      display: inline-block;
+      padding: 5px 15px;
+      background-color: #607D8B;
+      color: white;
+      border-radius: 15px;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+    .question-text {
+      font-size: 1.6rem;
+      margin-bottom: 25px;
+      color: var(--text-color);
+      font-weight: 600;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      width: 100%;
+      max-width: 800px;
+    }
+    .option-btn {
+      background-color: white;
+      border: 2px solid #D7CCC8;
+      padding: 18px;
+      font-size: 1.2rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #4e342e;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 78px;
+      text-align: center;
+      line-height: 1.25;
+    }
+    .option-btn:hover:not(:disabled) {
+      background-color: #FFF8E1;
+      border-color: var(--secondary);
+      transform: scale(1.02);
+    }
+    .option-btn.correct {
+      background-color: #C8E6C9;
+      border-color: var(--success);
+      color: var(--success);
+    }
+    .option-btn.wrong {
+      background-color: #FFCDD2;
+      border-color: var(--error);
+      color: var(--error);
+      opacity: 0.7;
+    }
+    #rationale-box {
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 10px;
+      background-color: #FFF3E0;
+      border-left: 5px solid var(--secondary);
+      text-align: left;
+      animation: slideIn 0.3s ease;
+      width: 100%;
+      max-width: 800px;
+    }
+    #rationale-title {
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 5px;
+      display: block;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .score-big {
+      font-size: 4rem;
+      color: var(--primary);
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    .message {
+      font-size: 1.5rem;
+      color: #555;
+      margin-bottom: 30px;
+    }
+    #confetti-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+    @media (max-width: 600px) {
+      .options-grid { grid-template-columns: 1fr; }
+      .question-text { font-size: 1.3rem; }
+      .stats { font-size: 0.9rem; gap: 10px; }
+    }
+  </style>
+</head>
+
+<body>
+<div id="game-container">
+  <canvas id="confetti-canvas"></canvas>
+
+  <header>
+    <div class="game-title">🗝️ Thợ Săn Kho Báu</div>
+    <div class="stats">
+      <span>Câu: <span id="q-current">1</span>/<span id="q-total">15</span></span>
+      <span>Điểm: <span id="score">0</span></span>
+    </div>
+  </header>
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div style="font-size: 4rem; margin-bottom: 10px;">💎</div>
+    <h1>Bí Mật Căn Thức</h1>
+    <p style="font-size: 1.15rem; max-width: 640px; margin-bottom: 18px;">
+      Chào mừng các em đến với Bài 4: <b>Biến đổi đơn giản biểu thức chứa căn thức bậc hai</b>.<br>
+      Hãy áp dụng các quy tắc để giải mã kho báu nhé!
+    </p>
+    <p style="color: #666;">Giáo viên: Cô Thu Bình</p>
+    <button class="btn" onclick="startGame()">Bắt Đầu Hành Trình</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="game-screen" class="screen hidden">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+
+    <div id="question-area">
+      <span id="level-badge" class="level-badge">Nhận biết</span>
+      <div id="question-text" class="question-text">Câu hỏi sẽ hiện ở đây...</div>
+
+      <div id="options-container" class="options-grid"></div>
+
+      <div id="rationale-box" class="hidden">
+        <span id="rationale-title">💡 Giải thích:</span>
+        <span id="rationale-content">Nội dung giải thích...</span>
+        <div style="text-align: right; margin-top: 10px;">
+          <button class="btn" onclick="nextQuestion()" style="padding: 10px 30px; font-size: 1rem;">Tiếp tục ➡️</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- END -->
+  <div id="end-screen" class="screen hidden">
+    <div style="font-size: 4rem;">🏆</div>
+    <h1 style="color: var(--primary);">Hoàn Thành Nhiệm Vụ!</h1>
+    <div class="score-big" id="final-score">0</div>
+    <p class="message" id="end-message">Bạn làm rất tốt!</p>
+    <button class="btn" onclick="location.reload()">Chơi Lại</button>
+  </div>
+</div>
+
+<script>
+  // =========================
+  // ✅ DATA (15 câu) — đã chuẩn hoá cấu trúc
+  // Gốc đã cân đáp án đúng A/B/C/D (trước khi random hiển thị)
+  // =========================
+  const questions = [
+    // 1 (B)
+    {
+      level: "Nhận biết",
+      question: "Với $A, B$ là các biểu thức mà $B\\ge 0$, công thức đưa thừa số ra ngoài dấu căn là:",
+      options: [
+        "$\\sqrt{A^2B}=A\\sqrt{B}$",
+        "$\\sqrt{A^2B}=|A|\\sqrt{B}$",
+        "$\\sqrt{A^2B}=-A\\sqrt{B}$",
+        "$\\sqrt{A^2B}=A^2\\sqrt{B}$"
+      ],
+      correct: 1,
+      rationale: "Đúng là $\\sqrt{A^2B}=|A|\\sqrt{B}$ (vì $A$ có thể âm)."
+    },
+    // 2 (B)
+    {
+      level: "Nhận biết",
+      question: "Trục căn thức ở mẫu là phép biến đổi nhằm mục đích gì?",
+      options: [
+        "Làm cho biểu thức phức tạp hơn",
+        "Khử căn thức ở mẫu số của biểu thức",
+        "Thêm căn thức vào tử số",
+        "Đổi dấu của biểu thức"
+      ],
+      correct: 1,
+      rationale: "Trục căn thức ở mẫu nhằm khử căn thức ở mẫu số để biểu thức gọn và dễ tính hơn."
+    },
+    // 3 (C)
+    {
+      level: "Nhận biết",
+      question: "Trục căn thức ở mẫu giúp biểu thức trở nên như thế nào?",
+      options: [
+        "Khó tính toán hơn",
+        "Không thay đổi",
+        "Đơn giản và thuận tiện hơn cho việc tính toán",
+        "Chỉ dùng trong hình học"
+      ],
+      correct: 2,
+      rationale: "Mục tiêu là làm biểu thức đơn giản, thuận tiện khi tính toán và biến đổi."
+    },
+    // 4 (C)
+    {
+      level: "Nhận biết",
+      question: "Ý tưởng cơ bản của phép trục căn thức ở mẫu là:",
+      options: [
+        "Chỉ nhân mẫu với một số bất kỳ",
+        "Chỉ nhân tử với một biểu thức thích hợp",
+        "Nhân cả tử và mẫu với một biểu thức thích hợp",
+        "Chia cả tử và mẫu cho căn thức"
+      ],
+      correct: 2,
+      rationale: "Nhân cả tử và mẫu với biểu thức thích hợp để mẫu không còn chứa căn thức."
+    },
+    // 5 (A)
+    {
+      level: "Nhận biết",
+      question: "Đưa thừa số $3$ vào trong dấu căn của $3\\sqrt{2}$ ta được:",
+      options: [
+        "$\\sqrt{18}$",
+        "$\\sqrt{12}$",
+        "$\\sqrt{6}$",
+        "$\\sqrt{9}$"
+      ],
+      correct: 0,
+      rationale: "$3\\sqrt{2}=\\sqrt{3^2\\cdot 2}=\\sqrt{18}$."
+    },
+    // 6 (D)
+    {
+      level: "Nhận biết",
+      question: "Với số thực âm $a$ $(a<0)$, đưa thừa số vào trong dấu căn của $a\\sqrt{5}$ ta được:",
+      options: [
+        "$\\sqrt{5a^2}$",
+        "$\\sqrt{5a}$",
+        "$5a$",
+        "$-\\sqrt{5a^2}$"
+      ],
+      correct: 3,
+      rationale: "Vì $a<0$ nên $a\\sqrt{5}=-\\sqrt{a^2\\cdot 5}=-\\sqrt{5a^2}$."
+    },
+    // 7 (A)
+    {
+      level: "Thông hiểu",
+      question: "Cặp biểu thức nào sau đây là <b>hai biểu thức liên hợp</b>?",
+      options: [
+        "$\\sqrt{A}+\\sqrt{B}$ và $\\sqrt{A}-\\sqrt{B}$",
+        "$\\sqrt{A}+\\sqrt{B}$ và $\\sqrt{A}+\\sqrt{B}$",
+        "$\\sqrt{A}-\\sqrt{B}$ và $\\sqrt{B}-\\sqrt{A}$",
+        "$\\sqrt{A}+\\sqrt{A}$ và $\\sqrt{B}-\\sqrt{B}$"
+      ],
+      correct: 0,
+      rationale: "Liên hợp: cùng phần căn, khác dấu ở giữa: $\\sqrt{A}+\\sqrt{B}$ và $\\sqrt{A}-\\sqrt{B}$."
+    },
+    // 8 (B)
+    {
+      level: "Thông hiểu",
+      question: "Khi nhân hai biểu thức liên hợp với nhau, ta thu được:",
+      options: [
+        "Tổng hai bình phương",
+        "Hiệu hai bình phương",
+        "Tích hai căn thức",
+        "Một căn thức mới"
+      ],
+      correct: 1,
+      rationale: "$(x+y)(x-y)=x^2-y^2$ nên tích hai liên hợp là hiệu hai bình phương."
+    },
+    // 9 (C)
+    {
+      level: "Thông hiểu",
+      question: "Trong trục căn thức ở mẫu, ta thường nhân với biểu thức nào?",
+      options: [
+        "Biểu thức ngẫu nhiên",
+        "Một số nguyên bất kỳ",
+        "Biểu thức liên hợp của mẫu",
+        "Một căn thức đơn"
+      ],
+      correct: 2,
+      rationale: "Thường nhân cả tử và mẫu với biểu thức liên hợp của mẫu để khử căn ở mẫu."
+    },
+    // 10 (D)
+    {
+      level: "Thông hiểu",
+      question: "Biểu thức liên hợp của $(\\sqrt{A}-B)$ là:",
+      options: [
+        "$(\\sqrt{A}-B)$",
+        "$-(\\sqrt{A}-B)$",
+        "$(-\\sqrt{A}-B)$",
+        "$(\\sqrt{A}+B)$"
+      ],
+      correct: 3,
+      rationale: "Đổi dấu ở giữa: liên hợp của $(\\sqrt{A}-B)$ là $(\\sqrt{A}+B)$."
+    },
+    ];
+
+  // =========================
+  // ✅ GAME STATE
+  // =========================
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let isAnswering = true;
+
+  // =========================
+  // ✅ AUDIO (Web Audio API)
+  // =========================
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playSound(type) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    if (type === 'correct') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.5);
+    } else if (type === 'wrong') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.3);
+    } else if (type === 'end') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(554, audioCtx.currentTime + 0.2);
+      osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.4);
+      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 1.5);
+    }
+  }
+
+  // =========================
+  // ✅ HELPERS
+  // =========================
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function typesetMathSafe() {
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise().catch(() => {});
+    }
+  }
+
+  function validateQuestionsOrThrow() {
+    if (!Array.isArray(questions) || questions.length === 0) {
+      throw new Error("questions rỗng hoặc không phải mảng");
+    }
+    questions.forEach((q, i) => {
+      const ok = q && typeof q.question === 'string' && Array.isArray(q.options)
+        && q.options.length === 4 && Number.isInteger(q.correct)
+        && q.correct >= 0 && q.correct < 4 && typeof q.rationale === 'string';
+      if (!ok) throw new Error("Lỗi cấu trúc câu hỏi ở index " + i);
+    });
+  }
+
+  // =========================
+  // ✅ LOGIC
+  // =========================
+  function startGame() {
+    validateQuestionsOrThrow();
+
+    document.getElementById('q-total').innerText = questions.length;
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('game-screen').classList.remove('hidden');
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    const q = questions[currentQuestionIndex];
+
+    // UI
+    document.getElementById('q-current').innerText = currentQuestionIndex + 1;
+    document.getElementById('level-badge').innerText = q.level;
+
+    // Use innerHTML for MathJax
+    document.getElementById('question-text').innerHTML = q.question;
+
+    // Progress (đầy đủ tới 100% khi câu cuối)
+    const pct = (currentQuestionIndex / questions.length) * 100;
+    document.getElementById('progress-fill').style.width = pct + "%";
+
+    // ✅ Random đáp án nhưng giữ đúng đáp án đúng
+    const optionObjs = q.options.map((text, idx) => ({ text, originalIndex: idx }));
+    shuffleArray(optionObjs);
+    q._shuffled = optionObjs;
+    q._correctShuffledIndex = optionObjs.findIndex(o => o.originalIndex === q.correct);
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = "";
+
+    optionObjs.forEach((o, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerHTML = o.text;           // ✅ để MathJax render
+      btn.onclick = () => checkAnswer(idx, btn);
+      container.appendChild(btn);
+    });
+
+    // Hide rationale
+    document.getElementById('rationale-box').classList.add('hidden');
+    isAnswering = true;
+
+    // Render MathJax
+    typesetMathSafe();
+  }
+
+  function checkAnswer(selectedIndex, btnElement) {
+    if (!isAnswering) return;
+    isAnswering = false;
+
+    const q = questions[currentQuestionIndex];
+    const buttons = document.querySelectorAll('.option-btn');
+    const correctIndex = q._correctShuffledIndex;
+
+    if (selectedIndex === correctIndex) {
+      btnElement.classList.add('correct');
+      btnElement.innerHTML += " 😃 <span style='font-weight:bold;'>Đúng!</span>";
+      score += 10;
+      document.getElementById('score').innerText = score;
+      playSound('correct');
+      fireConfetti();
+    } else {
+      btnElement.classList.add('wrong');
+      btnElement.innerHTML += " 😢";
+      buttons[correctIndex].classList.add('correct');
+      playSound('wrong');
+    }
+
+    buttons.forEach(b => b.disabled = true);
+
+    document.getElementById('rationale-content').innerHTML = q.rationale; // có thể có MathJax
+    document.getElementById('rationale-box').classList.remove('hidden');
+
+    typesetMathSafe();
+  }
+
+  function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+      loadQuestion();
+    } else {
+      endGame();
+    }
+  }
+
+  function endGame() {
+    document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('end-screen').classList.remove('hidden');
+
+    const total = questions.length * 10;
+    document.getElementById('final-score').innerText = score + "/" + total;
+
+    const msg = document.getElementById('end-message');
+    playSound('end');
+    fireConfetti();
+
+    if (score >= total * 0.87) {
+      msg.innerText = "Xuất sắc! Cô Thu Bình rất tự hào về em!";
+    } else if (score >= total * 0.67) {
+      msg.innerText = "Làm tốt lắm! Em đã nắm vững kiến thức.";
+    } else {
+      msg.innerText = "Cố gắng thêm nhé! Hãy xem lại phần giải thích.";
+    }
+  }
+
+  // =========================
+  // ✅ CONFETTI
+  // =========================
+  function fireConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Fit canvas to container
+    const rect = document.getElementById('game-container').getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
+    const particles = [];
+    const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3',
+                    '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39',
+                    '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'];
+
+    for (let i = 0; i < 110; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height * 0.6,
+        w: Math.random() * 10 + 5,
+        h: Math.random() * 10 + 5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        speed: Math.random() * 5 + 2,
+        angle: Math.random() * 6.2
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let active = false;
+
+      particles.forEach(p => {
+        p.y += p.speed;
+        p.angle += 0.1;
+        ctx.fillStyle = p.color;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+        if (p.y < canvas.height) active = true;
+      });
+
+      if (active) requestAnimationFrame(draw);
+    }
+    draw();
+  }
+</script>
+</body>
+</html>
