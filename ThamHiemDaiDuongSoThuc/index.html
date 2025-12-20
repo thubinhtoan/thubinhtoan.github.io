@@ -233,9 +233,11 @@
     </div>
 
 <script>
-/* ================== RANDOM HELPERS ================== */
+/* =========================
+   UTIL: SHUFFLE (random)
+========================= */
 function shuffleArray(arr) {
-  const a = arr.slice();
+  const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
@@ -243,225 +245,207 @@ function shuffleArray(arr) {
   return a;
 }
 
-function buildShuffledQuestions(baseQuestions) {
-  // clone sâu để không làm hỏng QUESTIONS gốc
-  const cloned = baseQuestions.map(q => ({
-    ...q,
-    options: q.options.map(o => ({ ...o }))
-  }));
+/* =========================
+   DATABASE (15 câu)
+   Lưu ý: rationale/hint dùng LaTeX $...$
+========================= */
+const QUESTIONS = [
+  // --- NHẬN BIẾT (6) ---
+  {
+    level: "Nhận biết",
+    text: "Tập hợp các số thực được kí hiệu là:",
+    options: [
+      { text: "$\\mathbb{R}$", correct: true,  rationale: "Chính xác! $\\mathbb{R}$ là kí hiệu của tập số thực." },
+      { text: "$\\mathbb{Q}$", correct: false, rationale: "Sai. $\\mathbb{Q}$ là tập số hữu tỉ." },
+      { text: "$\\mathbb{Z}$", correct: false, rationale: "Sai. $\\mathbb{Z}$ là tập số nguyên." },
+      { text: "$\\mathbb{N}$", correct: false, rationale: "Sai. $\\mathbb{N}$ là tập số tự nhiên." }
+    ],
+    hint: "Real numbers → chữ cái đầu là $\\mathbb{R}$."
+  },
+  {
+    level: "Nhận biết",
+    text: "Phát biểu nào sau đây là <b>đúng</b> về mối quan hệ giữa các tập hợp số?",
+    options: [
+      { text: "$\\mathbb{Q} \\subset \\mathbb{R}$", correct: true,  rationale: "Đúng! Số hữu tỉ là một phần của số thực." },
+      { text: "$\\mathbb{R} \\subset \\mathbb{Q}$", correct: false, rationale: "Sai. Số thực còn có cả số vô tỉ." },
+      { text: "$\\mathbb{I} \\subset \\mathbb{Q}$", correct: false, rationale: "Sai. Vô tỉ và hữu tỉ là hai tập rời nhau." },
+      { text: "$\\mathbb{R} \\subset \\mathbb{Z}$", correct: false, rationale: "Sai. Số nguyên chỉ là một phần của số thực." }
+    ],
+    hint: "Tập lớn nhất là $\\mathbb{R}$."
+  },
+  {
+    level: "Nhận biết",
+    text: "Giá trị tuyệt đối của số thực $a$, kí hiệu $|a|$, là:",
+    options: [
+      { text: "Khoảng cách từ điểm $a$ đến điểm $0$ trên trục số.", correct: true,  rationale: "Chuẩn! $|a|$ là khoảng cách từ $a$ đến $0$." },
+      { text: "Chính số $a$.", correct: false, rationale: "Sai. Nếu $a<0$ thì $|a|\\ne a$." },
+      { text: "Số đối của $a$.", correct: false, rationale: "Sai. Nếu $a>0$ thì số đối là âm." },
+      { text: "Luôn là một số dương.", correct: false, rationale: "Sai. Có thể bằng $0$ khi $a=0$." }
+    ],
+    hint: "Giá trị tuyệt đối là “độ dài/ khoảng cách”."
+  },
+  {
+    level: "Nhận biết",
+    text: "Nếu $x$ là một số thực âm, thì $|x|$ bằng:",
+    options: [
+      { text: "$-x$", correct: true,  rationale: "Đúng. Nếu $x<0$ thì $|x|=-x$ để ra số không âm." },
+      { text: "$x$",  correct: false, rationale: "Sai. Vì $x$ đang âm." },
+      { text: "$0$",  correct: false, rationale: "Sai." },
+      { text: "$1$",  correct: false, rationale: "Sai." }
+    ],
+    hint: "Ví dụ: $|-5|=5=-(-5)$."
+  },
+  {
+    level: "Nhận biết",
+    text: "Số đối của số thực $\\sqrt{2}$ là:",
+    options: [
+      { text: "$-\\sqrt{2}$", correct: true,  rationale: "Đúng. Số đối của $a$ là $-a$." },
+      { text: "$\\sqrt{2}$",  correct: false, rationale: "Sai. Đây là chính nó." },
+      { text: "$\\dfrac{1}{\\sqrt{2}}$", correct: false, rationale: "Sai. Đây là số nghịch đảo." },
+      { text: "$2$", correct: false, rationale: "Sai." }
+    ],
+    hint: "Thêm dấu “−” phía trước."
+  },
+  {
+    level: "Nhận biết",
+    text: "Chọn khẳng định <b>sai</b> trong các khẳng định sau:",
+    options: [
+      { text: "$|-2{,}5|=-2{,}5$", correct: true,  rationale: "Đúng! Đây là câu SAI vì $|-2{,}5|=2{,}5$." },
+      { text: "$|1{,}5|=1{,}5$",   correct: false, rationale: "Câu này ĐÚNG." },
+      { text: "$|-\\sqrt{3}|=\\sqrt{3}$", correct: false, rationale: "Câu này ĐÚNG." },
+      { text: "$|0|=0$",          correct: false, rationale: "Câu này ĐÚNG." }
+    ],
+    hint: "Giá trị tuyệt đối không bao giờ âm."
+  },
 
-  // random đáp án trong từng câu
-  const withShuffledOptions = cloned.map(q => ({
-    ...q,
-    options: shuffleArray(q.options)
-  }));
+  // --- THÔNG HIỂU (5) ---
+  {
+    level: "Thông hiểu",
+    text: "So sánh hai số thực: $-1{,}25$ và $-1{,}3$.",
+    options: [
+      { text: "$-1{,}25>-1{,}3$", correct: true,  rationale: "Đúng! Trên trục số, $-1{,}25$ nằm bên phải $-1{,}3$." },
+      { text: "$-1{,}25<-1{,}3$", correct: false, rationale: "Sai." },
+      { text: "$-1{,}25=-1{,}3$", correct: false, rationale: "Sai." },
+      { text: "Không so sánh được", correct: false, rationale: "Sai." }
+    ],
+    hint: "Số âm “ít âm hơn” thì lớn hơn."
+  },
+  {
+    level: "Thông hiểu",
+    text: "Tìm $x$ biết $|x|=\\sqrt{5}$.",
+    options: [
+      { text: "$x=\\sqrt{5}$ hoặc $x=-\\sqrt{5}$", correct: true,  rationale: "Đúng! Có 2 số cách 0 một khoảng $\\sqrt{5}$." },
+      { text: "Chỉ có $x=\\sqrt{5}$", correct: false, rationale: "Thiếu nghiệm âm." },
+      { text: "Chỉ có $x=-\\sqrt{5}$", correct: false, rationale: "Thiếu nghiệm dương." },
+      { text: "$x=5$ hoặc $x=-5$", correct: false, rationale: "Sai vì $|5|=5\\ne\\sqrt{5}$." }
+    ],
+    hint: "Giá trị tuyệt đối tạo ra 2 trường hợp."
+  },
+  {
+    level: "Thông hiểu",
+    text: "Kết quả của phép tính $|-3{,}5|+|1{,}5|-\\sqrt{4}$ là:",
+    options: [
+      { text: "$3$", correct: true,  rationale: "Đúng! $3{,}5+1{,}5-2=3$." },
+      { text: "$7$", correct: false, rationale: "Sai." },
+      { text: "$-3$", correct: false, rationale: "Sai." },
+      { text: "$0$", correct: false, rationale: "Sai." }
+    ],
+    hint: "Tính từng phần: $|-3{,}5|=3{,}5$, $\\sqrt{4}=2$."
+  },
+  {
+    level: "Thông hiểu",
+    text: "Sắp xếp từ nhỏ đến lớn: $-2;\\,0;\\,-\\sqrt{5};\\,1{,}5$.",
+    options: [
+      { text: "$-\\sqrt{5};\\,-2;\\,0;\\,1{,}5$", correct: true,  rationale: "Đúng! Vì $\\sqrt{5}\\approx2{,}236$ nên $-\\sqrt{5}<-2$." },
+      { text: "$-2;\\,-\\sqrt{5};\\,0;\\,1{,}5$", correct: false, rationale: "Sai." },
+      { text: "$0;\\,-2;\\,-\\sqrt{5};\\,1{,}5$", correct: false, rationale: "Sai." },
+      { text: "$-\\sqrt{5};\\,1{,}5;\\,-2;\\,0$", correct: false, rationale: "Sai." }
+    ],
+    hint: "Ước lượng $\\sqrt{5}$ để so sánh."
+  },
+  {
+    level: "Thông hiểu",
+    text: "Tính $M=a-|a|$ với $a=-5$.",
+    options: [
+      { text: "$-10$", correct: true,  rationale: "Đúng! $(-5)-|-5|=-5-5=-10$." },
+      { text: "$0$",   correct: false, rationale: "Sai." },
+      { text: "$10$",  correct: false, rationale: "Sai." },
+      { text: "$-5$",  correct: false, rationale: "Sai." }
+    ],
+    hint: "Cẩn thận dấu trừ."
+  },
 
-  // random thứ tự câu hỏi
-  return shuffleArray(withShuffledOptions);
-}
-/* ================== DATABASE ================== */
-    const QUESTIONS = [
-        // --- NHẬN BIẾT (6 câu) ---
-        {
-            level: "Nhận biết",
-            text: "Tập hợp các số thực được kí hiệu là:",
-            options: [
-                { text: "$\\mathbb{R}$", correct: true, rationale: "Chính xác! $\\mathbb{R}$ là kí hiệu chuẩn của tập hợp số thực (Real numbers)." },
-                { text: "$\\mathbb{Q}$", correct: false, rationale: "Sai. $\\mathbb{Q}$ là kí hiệu của tập số hữu tỉ." },
-                { text: "$\\mathbb{Z}$", correct: false, rationale: "Sai. $\\mathbb{Z}$ là kí hiệu của tập số nguyên." },
-                { text: "$\\mathbb{N}$", correct: false, rationale: "Sai. $\\mathbb{N}$ là kí hiệu của tập số tự nhiên." }
-            ],
-            hint: "Tên tiếng Anh là Real numbers, bắt đầu bằng chữ cái gì?"
-        },
-        {
-            level: "Nhận biết",
-            text: "Khẳng định nào sau đây là <b>đúng</b>?",
-            options: [
-                { text: "Mỗi số thực là một số hữu tỉ hoặc một số vô tỉ.", correct: true, rationale: "Đúng. Tập số thực $\\mathbb{R}$ là hợp của tập số hữu tỉ $\\mathbb{Q}$ và tập số vô tỉ $\\mathbb{I}$." },
-                { text: "Số thực dương luôn lớn hơn số thực âm.", correct: true, rationale: "Câu này cũng đúng, nhưng câu A bao quát định nghĩa hơn. (Trong ngữ cảnh này ưu tiên định nghĩa cấu tạo tập hợp)." }, // Wait, multiple correct? Let's fix.
-                // FIXING OPTION B to make it clearly wrong/less preferred or rephrase question.
-                // Rephrasing B to be wrong.
-            ],
-            // Let's rewrite the options for Question 2 to be stricter.
-            override: true 
-        },
-        // RE-DO Question 2
-        {
-            level: "Nhận biết",
-            text: "Phát biểu nào sau đây là <b>đúng</b> về mối quan hệ giữa các tập hợp số?",
-            options: [
-                { text: "$\\mathbb{Q} \\subset \\mathbb{R}$", correct: true, rationale: "Chính xác! Tập số hữu tỉ là con của tập số thực." },
-                { text: "$\\mathbb{R} \\subset \\mathbb{Q}$", correct: false, rationale: "Sai. Tập số thực chứa cả số vô tỉ nên không thể là con của số hữu tỉ." },
-                { text: "$\\mathbb{I} \\subset \\mathbb{Q}$", correct: false, rationale: "Sai. Số vô tỉ và số hữu tỉ là hai tập hợp rời nhau." },
-                { text: "$\\mathbb{R} \\subset \\mathbb{Z}$", correct: false, rationale: "Sai hoàn toàn." }
-            ],
-            hint: "Tập nào rộng nhất chứa tất cả các tập còn lại?"
-        },
-        {
-            level: "Nhận biết",
-            text: "Giá trị tuyệt đối của số thực $a$, kí hiệu $|a|$, là:",
-            options: [
-                { text: "Khoảng cách từ điểm $a$ đến điểm $0$ trên trục số.", correct: true, rationale: "Rất chuẩn! Giá trị tuyệt đối chính là khoảng cách hình học đến gốc tọa độ." },
-                { text: "Chính số $a$.", correct: false, rationale: "Chưa đủ. Nếu $a$ âm thì $|a|$ không bằng $a$." },
-                { text: "Số đối của $a$.", correct: false, rationale: "Chưa đủ. Nếu $a$ dương thì sai." },
-                { text: "Luôn là một số dương.", correct: false, rationale: "Thiếu trường hợp bằng $0$." }
-            ],
-            hint: "Nghĩ về hình ảnh trục số, độ dài đoạn thẳng nối từ 0 đến a gọi là gì?"
-        },
-        {
-            level: "Nhận biết",
-            text: "Nếu $x$ là một số thực âm, thì $|x|$ bằng:",
-            options: [
-                { text: "$-x$", correct: true, rationale: "Đúng. Nếu $x < 0$ thì bỏ dấu giá trị tuyệt đối phải thêm dấu trừ đằng trước để kết quả thành dương." },
-                { text: "$x$", correct: false, rationale: "Sai. Vì $x$ đang âm, mà giá trị tuyệt đối không thể âm." },
-                { text: "$0$", correct: false, rationale: "Sai." },
-                { text: "$1$", correct: false, rationale: "Sai." }
-            ],
-            hint: "Ví dụ $|-5| = 5 = -(-5)$."
-        },
-        {
-            level: "Nhận biết",
-            text: "Số đối của số thực $\\sqrt{2}$ là:",
-            options: [
-                { text: "$-\\sqrt{2}$", correct: true, rationale: "Chính xác. Số đối của $a$ là $-a$." },
-                { text: "$\\sqrt{2}$", correct: false, rationale: "Sai. Đây là chính nó." },
-                { text: "$\\frac{1}{\\sqrt{2}}$", correct: false, rationale: "Sai. Đây là số nghịch đảo." },
-                { text: "$2$", correct: false, rationale: "Sai." }
-            ],
-            hint: "Chỉ cần thêm dấu trừ vào trước số đó."
-        },
-        {
-            level: "Nhận biết",
-            text: "Chọn khẳng định <b>sai</b> trong các khẳng định sau:",
-            options: [
-                { text: "$| -2,5 | = -2,5$", correct: true, rationale: "Đúng là câu này Sai! Giá trị tuyệt đối không bao giờ âm. $|-2,5|$ phải bằng $2,5$." },
-                { text: "$| 1,5 | = 1,5$", correct: false, rationale: "Câu này Đúng." },
-                { text: "$| -\\sqrt{3} | = \\sqrt{3}$", correct: false, rationale: "Câu này Đúng." },
-                { text: "$| 0 | = 0$", correct: false, rationale: "Câu này Đúng." }
-            ],
-            hint: "Hãy tìm câu nào có kết quả của giá trị tuyệt đối là một số âm."
-        },
+  // --- VẬN DỤNG (3) ---
+  {
+    level: "Vận dụng",
+    text: "Tìm $x$ biết $|x-0{,}5|-1{,}5=2$.",
+    options: [
+      { text: "$x=4$ hoặc $x=-3$", correct: true,  rationale: "Đúng! $|x-0{,}5|=3{,}5\\Rightarrow x-0{,}5=\\pm 3{,}5\\Rightarrow x=4$ hoặc $x=-3$." },
+      { text: "Chỉ $x=4$",  correct: false, rationale: "Thiếu nghiệm." },
+      { text: "$x=4$ hoặc $x=3$", correct: false, rationale: "Sai nghiệm thứ hai." },
+      { text: "$x=2$ hoặc $x=-2$", correct: false, rationale: "Sai." }
+    ],
+    hint: "Chuyển vế để được $|x-0{,}5|$ rồi xét 2 trường hợp."
+  },
+  {
+    level: "Vận dụng",
+    text: "Tính $A=\\sqrt{(-4)^2}-\\sqrt{16}+|-3|\\cdot\\sqrt{9}$.",
+    options: [
+      { text: "$9$",  correct: true,  rationale: "Đúng! $\\sqrt{(-4)^2}=4$, $\\sqrt{16}=4$, $|-3|=3$, $\\sqrt{9}=3$ nên $A=4-4+3\\cdot3=9$." },
+      { text: "$17$", correct: false, rationale: "Sai." },
+      { text: "$1$",  correct: false, rationale: "Sai." },
+      { text: "$-9$", correct: false, rationale: "Sai." }
+    ],
+    hint: "Nhớ $\\sqrt{a^2}=|a|$."
+  },
+  {
+    level: "Vận dụng (Thực tế)",
+    text: "Một chi tiết máy có chiều dài chuẩn $20$ cm, sai số không quá $0{,}05$ cm. Điều kiện đạt chuẩn là:",
+    options: [
+      { text: "$|x-20|\\le 0{,}05$", correct: true,  rationale: "Đúng! Sai số là khoảng cách giữa $x$ và $20$." },
+      { text: "$x-20\\le 0{,}05$",   correct: false, rationale: "Sai vì thiếu trường hợp $x<20$ quá nhiều." },
+      { text: "$|x|-20\\le 0{,}05$", correct: false, rationale: "Sai công thức." },
+      { text: "$x\\le 20{,}05$",     correct: false, rationale: "Sai vì thiếu cận dưới." }
+    ],
+    hint: "Sai số = khoảng cách → dùng giá trị tuyệt đối."
+  },
 
-        // --- THÔNG HIỂU (5 câu) ---
-        {
-            level: "Thông hiểu",
-            text: "So sánh hai số thực: $-1,25$ và $-1,3$.",
-            options: [
-                { text: "$-1,25 > -1,3$", correct: true, rationale: "Tuyệt vời! Với hai số âm, số nào có giá trị tuyệt đối nhỏ hơn thì lớn hơn ($1,25 < 1,3 \\Rightarrow -1,25 > -1,3$)." },
-                { text: "$-1,25 < -1,3$", correct: false, rationale: "Sai rồi. Trên trục số, -1,25 nằm bên phải -1,3." },
-                { text: "$-1,25 = -1,3$", correct: false, rationale: "Sai." },
-                { text: "Không so sánh được", correct: false, rationale: "Sai." }
-            ],
-            hint: "Số âm 'nợ ít hơn' thì 'giàu hơn' (lớn hơn)."
-        },
-        {
-            level: "Thông hiểu",
-            text: "Tìm $x$ biết $|x| = \\sqrt{5}$.",
-            options: [
-                { text: "$x = \\sqrt{5}$ hoặc $x = -\\sqrt{5}$", correct: true, rationale: "Chính xác! Có hai số thực có giá trị tuyệt đối bằng $\\sqrt{5}$ là chính nó và số đối của nó." },
-                { text: "Chỉ có $x = \\sqrt{5}$", correct: false, rationale: "Thiếu nghiệm âm." },
-                { text: "Chỉ có $x = -\\sqrt{5}$", correct: false, rationale: "Thiếu nghiệm dương." },
-                { text: "$x = 5$ hoặc $x = -5$", correct: false, rationale: "Sai. $|5| = 5$ chứ không phải $\\sqrt{5}$." }
-            ],
-            hint: "Có bao nhiêu số có khoảng cách đến 0 bằng $\\sqrt{5}$?"
-        },
-        {
-            level: "Thông hiểu",
-            text: "Kết quả của phép tính: $|-3,5| + |1,5| - \\sqrt{4}$ là:",
-            options: [
-                { text: "$3$", correct: true, rationale: "Đúng! $3,5 + 1,5 - 2 = 5 - 2 = 3$." },
-                { text: "$7$", correct: false, rationale: "Sai. Bạn có thể đã cộng nhầm hoặc không khai căn." },
-                { text: "$-3$", correct: false, rationale: "Sai dấu." },
-                { text: "$0$", correct: false, rationale: "Sai." }
-            ],
-            hint: "Tính từng giá trị tuyệt đối và căn trước: $3,5 + 1,5 - 2 = ?$"
-        },
-        {
-            level: "Thông hiểu",
-            text: "Sắp xếp các số sau theo thứ tự từ nhỏ đến lớn: $-2; \\, 0; \\, -\\sqrt{5}; \\, 1,5$.",
-            options: [
-                { text: "$-\\sqrt{5}; \\, -2; \\, 0; \\, 1,5$", correct: true, rationale: "Chính xác! Vì $\\sqrt{5} \\approx 2,236$ nên $-\\sqrt{5} \\approx -2,236 < -2$." },
-                { text: "$-2; \\, -\\sqrt{5}; \\, 0; \\, 1,5$", correct: false, rationale: "Sai. $-2$ lớn hơn $-\\sqrt{5}$." },
-                { text: "$0; \\, -2; \\, -\\sqrt{5}; \\, 1,5$", correct: false, rationale: "Sai. Số âm phải nhỏ hơn 0." },
-                { text: "$-\\sqrt{5}; \\, 1,5; \\, -2; \\, 0$", correct: false, rationale: "Sai thứ tự." }
-            ],
-            hint: "Hãy ước lượng $\\sqrt{5}$ khoảng $2,2...$ rồi so sánh hai số âm."
-        },
-        {
-            level: "Thông hiểu",
-            text: "Tính giá trị biểu thức $M = a - |a|$ với $a = -5$.",
-            options: [
-                { text: "$-10$", correct: true, rationale: "Đúng! Thay vào ta có: $(-5) - |-5| = (-5) - 5 = -10$." },
-                { text: "$0$", correct: false, rationale: "Sai. Bạn nhầm dấu rồi: $(-5) - 5$ không bằng 0." },
-                { text: "$10$", correct: false, rationale: "Sai." },
-                { text: "$-5$", correct: false, rationale: "Sai." }
-            ],
-            hint: "Thay số cẩn thận: $a$ là âm 5, trừ đi giá trị tuyệt đối của âm 5."
-        },
+  // --- VẬN DỤNG CAO (1) ---
+  {
+    level: "Vận dụng cao",
+    text: "Giá trị nhỏ nhất của $A=|x-2|+|x-10|$ là:",
+    options: [
+      { text: "$8$",  correct: true,  rationale: "Đúng! $|x-2|+|10-x|\\ge |(x-2)+(10-x)|=8$, đạt được khi $2\\le x\\le 10$." },
+      { text: "$0$",  correct: false, rationale: "Sai." },
+      { text: "$12$", correct: false, rationale: "Sai." },
+      { text: "$2$",  correct: false, rationale: "Sai." }
+    ],
+    hint: "Dùng $|a|+|b|\\ge |a+b|$."
+  }
+];
 
-        // --- VẬN DỤNG (3 câu) ---
-        {
-            level: "Vận dụng",
-            text: "Tìm $x$ biết: $|x - 0,5| - 1,5 = 2$.",
-            options: [
-                { text: "$x = 4$ hoặc $x = -3$", correct: true, rationale: "Xuất sắc! $|x - 0,5| = 3,5$. Suy ra $x-0,5=3,5$ hoặc $x-0,5=-3,5$. Vậy $x=4$ hoặc $x=-3$." },
-                { text: "$x = 4$", correct: false, rationale: "Thiếu một trường hợp." },
-                { text: "$x = 4$ hoặc $x = 3$", correct: false, rationale: "Sai nghiệm thứ hai." },
-                { text: "$x = 2$ hoặc $x = -2$", correct: false, rationale: "Sai bước chuyển vế đầu tiên." }
-            ],
-            hint: "Bước 1: Chuyển $-1,5$ sang vế phải để tìm $|x - 0,5|$. Bước 2: Chia 2 trường hợp."
-        },
-        {
-            level: "Vận dụng",
-            text: "Tính giá trị biểu thức: $A = \\sqrt{(-4)^2} - \\sqrt{16} + |-3| \\cdot \\sqrt{9}$.",
-            options: [
-                { text: "$9$", correct: true, rationale: "Giỏi lắm! $A = 4 - 4 + 3 \\cdot 3 = 0 + 9 = 9$." },
-                { text: "$17$", correct: false, rationale: "Sai. Lưu ý $\\sqrt{(-4)^2} = 4$ và $\\sqrt{16} = 4$, chúng triệt tiêu nhau." },
-                { text: "$1$", correct: false, rationale: "Sai tính toán." },
-                { text: "$-9$", correct: false, rationale: "Sai dấu giá trị tuyệt đối." }
-            ],
-            hint: "Lưu ý $\\sqrt{A^2} = |A|$. Hãy tính từng số hạng một."
-        },
-        {
-            level: "Vận dụng (Thực tế)",
-            text: "Một chi tiết máy có chiều dài chuẩn là $20$ cm. Kĩ sư cho phép sai số không quá $0,05$ cm. Gọi $x$ là chiều dài thực tế của chi tiết máy. Điều kiện để chi tiết máy ĐẠT CHUẨN là:",
-            options: [
-                { text: "$|x - 20| \\le 0,05$", correct: true, rationale: "Chính xác! Sai số chính là khoảng cách (trị tuyệt đối) giữa chiều dài thực tế ($x$) và chiều dài chuẩn ($20$)." },
-                { text: "$x - 20 \\le 0,05$", correct: false, rationale: "Chưa đủ. Nếu $x$ nhỏ hơn $20$ quá nhiều (ví dụ 10cm) thì biểu thức này vẫn đúng nhưng máy hỏng." },
-                { text: "$|x| - 20 \\le 0,05$", correct: false, rationale: "Sai công thức." },
-                { text: "$x \\le 20,05$", correct: false, rationale: "Thiếu cận dưới ($x$ không được quá nhỏ)." }
-            ],
-            hint: "Sai số là khoảng cách chênh lệch giữa thực tế và chuẩn. Dùng giá trị tuyệt đối để biểu diễn khoảng cách."
-        },
-
-        // --- VẬN DỤNG CAO (1 câu) ---
-        {
-            level: "Vận dụng cao",
-            text: "Tìm giá trị nhỏ nhất của biểu thức $A = |x - 2| + |x - 10|$.",
-            options: [
-                { text: "8", correct: true, rationale: "Đỉnh cao! $A = |x-2| + |10-x| \\ge |x-2 + 10-x| = |8| = 8$. Dấu bằng xảy ra khi $2 \\le x \\le 10$." },
-                { text: "0", correct: false, rationale: "Không thể bằng 0 vì $x$ không thể vừa bằng 2 vừa bằng 10." },
-                { text: "12", correct: false, rationale: "Sai." },
-                { text: "2", correct: false, rationale: "Sai." }
-            ],
-            hint: "Sử dụng bất đẳng thức $|a| + |b| \\ge |a+b|$. Hãy đổi $|x-10|$ thành $|10-x|$."
-        }
-    ];
-
-    /* ================== GAME ENGINE ================== */
+/* =========================
+   GAME ENGINE
+   - Random câu hỏi + đáp án
+   - Next ẩn giải thích
+   - Rationale font lớn + LaTeX (innerHTML)
+========================= */
 const Game = {
   score: 0,
   currentIdx: 0,
   answered: false,
-  questions: [],
+  playList: [], // danh sách câu đã random
 
   start() {
     this.score = 0;
     this.currentIdx = 0;
     this.answered = false;
 
-    // ✅ RANDOM câu hỏi + đáp án
-    this.questions = buildShuffledQuestions(QUESTIONS);
+    // ✅ random thứ tự câu hỏi + random đáp án
+    this.playList = shuffleArray(QUESTIONS).map(q => ({
+      ...q,
+      options: shuffleArray(q.options)
+    }));
 
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('end-screen').classList.add('hidden');
@@ -473,15 +457,18 @@ const Game = {
 
   loadQuestion() {
     this.answered = false;
-    const q = this.questions[this.currentIdx];
+    const q = this.playList[this.currentIdx];
 
+    // Update UI
     document.getElementById('q-current').innerText = this.currentIdx + 1;
-    document.getElementById('q-progress').innerText =
-      `${this.currentIdx + 1}/${this.questions.length}`;
+    document.getElementById('q-progress').innerText = `${this.currentIdx + 1}/${this.playList.length}`;
     document.getElementById('score').innerText = this.score;
     document.getElementById('level-badge').innerText = q.level;
+
+    // Question
     document.getElementById('question-text').innerHTML = q.text;
 
+    // Options
     const grid = document.getElementById('options-grid');
     grid.innerHTML = '';
 
@@ -489,19 +476,20 @@ const Game = {
       const btn = document.createElement('button');
       btn.className =
         'option-btn bg-white border-2 border-blue-100 p-4 rounded-2xl text-left text-lg font-semibold text-gray-700 hover:border-blue-400 shadow-sm w-full h-full flex items-center';
-
       btn.innerHTML = `
         <span class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mr-3 text-sm font-bold border border-blue-200 shrink-0">
           ${String.fromCharCode(65 + i)}
         </span>
         <span>${opt.text}</span>
       `;
-
       btn.onclick = () => this.check(btn, opt, q);
       grid.appendChild(btn);
     });
 
+    // ✅ Ẩn giải thích khi sang câu mới
     document.getElementById('feedback-panel').classList.add('translate-y-full');
+
+    // MathJax
     if (window.MathJax) MathJax.typesetPromise();
   },
 
@@ -510,67 +498,68 @@ const Game = {
     this.answered = true;
 
     const btns = document.querySelectorAll('.option-btn');
-    btns.forEach(b => b.disabled = true);
+    btns.forEach(b => (b.disabled = true));
 
-    const fbPanel = document.getElementById('feedback-panel');
+    const feedbackPanel = document.getElementById('feedback-panel');
     const fbIcon = document.getElementById('fb-icon');
     const fbTitle = document.getElementById('fb-title');
     const fbContent = document.getElementById('fb-content');
     const fbHintBox = document.getElementById('fb-hint-box');
+    const fbHint = document.getElementById('fb-hint');
+
+    // ✅ Tăng cỡ chữ phần giải thích (dễ nhìn)
+    fbContent.className = "text-gray-700 text-xl md:text-2xl leading-relaxed mb-2";
 
     if (opt.correct) {
       this.score += 10;
       document.getElementById('score').innerText = this.score;
       btn.classList.add('correct');
 
-      fbIcon.innerText = '🐠';
-      fbTitle.innerText = 'Chính xác!';
-      fbTitle.className = 'text-xl font-extrabold mb-1 text-green-600';
+      fbIcon.innerText = '🐡';
+      fbTitle.innerText = "Chính Xác!";
+      fbTitle.className = "text-xl font-extrabold mb-1 text-green-600";
 
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.8 }
-        });
+      this.playTone(600, 'sine');
+      setTimeout(() => this.playTone(800, 'sine'), 100);
+
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
+
+      fbHintBox.classList.add('hidden'); // đúng thì ẩn gợi ý
     } else {
       btn.classList.add('wrong');
+
+      // highlight correct
       const correctIdx = q.options.findIndex(o => o.correct);
       btns[correctIdx].classList.add('correct', 'opacity-70');
 
       fbIcon.innerText = '🐙';
-      fbTitle.innerText = 'Chưa đúng!';
-      fbTitle.className = 'text-xl font-extrabold mb-1 text-red-500';
-    }
+      fbTitle.innerText = "Chưa đúng rồi!";
+      fbTitle.className = "text-xl font-extrabold mb-1 text-red-500";
 
-    fbContent.innerText = opt.rationale;
+      this.playTone(200, 'sawtooth');
 
-    if (!opt.correct) {
       fbHintBox.classList.remove('hidden');
-      document.getElementById('fb-hint').innerText = q.hint;
-    } else {
-      fbHintBox.classList.add('hidden');
+      fbHint.innerHTML = q.hint;
     }
 
-    fbPanel.classList.remove('translate-y-full');
+    // ✅ Rationale dùng innerHTML để chứa LaTeX $...$
+    fbContent.innerHTML = opt.rationale;
+
+    // Show panel
+    feedbackPanel.classList.remove('translate-y-full');
+
     if (window.MathJax) MathJax.typesetPromise();
   },
 
   next() {
-    // Ẩn hoàn toàn bảng giải thích trước
-    const feedbackPanel = document.getElementById('feedback-panel');
-    feedbackPanel.classList.add('translate-y-full');
-
-    // Reset nội dung giải thích (tránh sót)
-    document.getElementById('fb-content').innerText = '';
-    document.getElementById('fb-hint').innerText = '';
-    document.getElementById('fb-hint-box').classList.add('hidden');
+    // ✅ bấm Next là “mất giải thích” ngay
+    document.getElementById('feedback-panel').classList.add('translate-y-full');
 
     this.currentIdx++;
-
-    if (this.currentIdx < QUESTIONS.length) {
-        this.loadQuestion();
+    if (this.currentIdx < this.playList.length) {
+      this.loadQuestion();
     } else {
-        this.finish();
+      this.finish();
     }
   },
 
@@ -581,25 +570,41 @@ const Game = {
     document.getElementById('end-screen').classList.add('flex');
 
     document.getElementById('final-score').innerText = this.score;
-    document.getElementById('final-correct').innerText =
-      Math.round(this.score / 10);
+    document.getElementById('final-correct').innerText = Math.round(this.score / 10);
 
     const msg = document.getElementById('end-msg');
-    if (this.score === this.questions.length * 10)
-      msg.innerText = 'Tuyệt đỉnh! Bạn là Vua Biển Cả! 🧜‍♂️';
-    else if (this.score >= this.questions.length * 8)
-      msg.innerText = 'Rất giỏi! Thuyền trưởng tài ba! 🛳️';
-    else if (this.score >= this.questions.length * 5)
-      msg.innerText = 'Khá lắm! Cố gắng thêm nhé! 🐬';
-    else
-      msg.innerText = 'Đừng nản! Hãy thử lại nào! 🛟';
+    if (this.score === this.playList.length * 10) msg.innerText = "Tuyệt đỉnh! Bạn là Vua Biển Cả! 🧜‍♂️";
+    else if (this.score >= (this.playList.length * 10) * 0.8) msg.innerText = "Rất giỏi! Thuyền trưởng tài ba! 🛳️";
+    else if (this.score >= (this.playList.length * 10) * 0.5) msg.innerText = "Khá lắm! Cố gắng lặn sâu hơn nhé! 🏊";
+    else msg.innerText = "Đừng nản! Trang bị thêm kiến thức và thử lại nhé! 🛟";
+
+    this.playTone(400, 'square');
+    setTimeout(() => this.playTone(600, 'square'), 200);
+  },
+
+  playTone(freq, type) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = freq;
+    osc.type = type;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.5);
+    osc.stop(ctx.currentTime + 0.5);
   }
 };
 
-/* ================== BUBBLES ================== */
+/* Bubble Generator (giữ nguyên) */
 function createBubbles() {
   const container = document.getElementById('bubbles-container');
-  for (let i = 0; i < 15; i++) {
+  if (!container) return;
+  const bubbleCount = 15;
+  container.innerHTML = "";
+  for (let i = 0; i < bubbleCount; i++) {
     const bubble = document.createElement('div');
     bubble.classList.add('bubble');
     const size = Math.random() * 60 + 20 + 'px';
