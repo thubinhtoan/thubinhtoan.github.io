@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đấu Trường Toán 7: Chinh Phục Số Hữu Tỉ</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0f9ff;
+            background-image: radial-gradient(#bae6fd 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .math-content { font-size: 1.1em; }
+
+        /* Animations */
+        @keyframes bounce-in {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .animate-bounce-in { animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+
+        .option-card { transition: all 0.2s ease; }
+        .option-card:hover:not(.disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .option-card.correct {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+            color: #14532d;
+        }
+
+        .option-card.wrong {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #7f1d1d;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4">
+
+<div id="app" class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden relative min-h-[600px] flex flex-col">
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-blue-500 to-cyan-400 text-white z-20">
+        <div class="mb-6 animate-float">
+            <i class="ph-fill ph-calculator text-8xl text-yellow-300 drop-shadow-lg"></i>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-extrabold text-center mb-4 text-shadow">Đấu Trường Toán 7</h1>
+        <p class="text-xl mb-8 text-blue-100 text-center">Chinh Phục Thế Giới Số Hữu Tỉ</p>
+
+        <div class="bg-white/20 backdrop-blur-sm rounded-xl p-6 mb-8 max-w-md w-full">
+            <h3 class="font-bold text-lg mb-2 flex items-center"><i class="ph-bold ph-info mr-2"></i> Luật chơi:</h3>
+            <ul class="space-y-2 text-sm md:text-base">
+                <li class="flex items-center"><i class="ph-bold ph-check-circle mr-2 text-green-300"></i> 15 Câu hỏi trắc nghiệm</li>
+                <li class="flex items-center"><i class="ph-bold ph-brain mr-2 text-yellow-300"></i> Kiến thức từ cơ bản đến nâng cao</li>
+                <li class="flex items-center"><i class="ph-bold ph-star mr-2 text-orange-300"></i> Xem giải thích ngay sau khi chọn</li>
+            </ul>
+        </div>
+
+        <button onclick="startGame()" class="group relative px-8 py-4 bg-yellow-400 text-blue-900 font-bold text-xl rounded-full shadow-[0_4px_0_rgb(202,138,4)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-yellow-300">
+            <span class="flex items-center">
+                Bắt Đầu Ngay
+                <i class="ph-bold ph-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+            </span>
+        </button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="flex-1 flex flex-col hidden">
+        <!-- Header -->
+        <div class="bg-blue-600 text-white p-4 shadow-md flex justify-between items-center z-10">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-bold border-2 border-blue-400">
+                    <span id="q-current">1</span>
+                </div>
+                <span class="text-blue-200 text-sm">/ <span id="q-total">15</span></span>
+            </div>
+            <div class="font-bold text-xl flex items-center">
+                <i class="ph-fill ph-trophy text-yellow-400 mr-2"></i>
+                <span id="score">0</span>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-200 h-2">
+            <div id="progress-bar" class="bg-yellow-400 h-2 transition-all duration-500 ease-out" style="width: 0%"></div>
+        </div>
+
+        <!-- Question Area -->
+        <div class="flex-1 p-6 md:p-8 overflow-y-auto">
+            <div class="mb-2">
+                <span id="difficulty-badge" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 uppercase tracking-wide">
+                    Mức độ: Nhận biết
+                </span>
+            </div>
+
+            <h2 id="question-text" class="text-2xl font-bold text-gray-800 mb-6 math-content leading-relaxed"></h2>
+
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+
+        <!-- Footer / Feedback -->
+        <div id="feedback-area" class="hidden border-t-2 border-gray-100 p-6 bg-gray-50 animate-bounce-in z-10">
+            <div class="flex items-start gap-4">
+                <div id="feedback-icon" class="text-4xl flex-shrink-0"></div>
+                <div class="flex-1">
+                    <h3 id="feedback-title" class="font-bold text-lg mb-1"></h3>
+                    <p id="feedback-rationale" class="text-gray-600 text-sm md:text-base mb-2"></p>
+                    <p id="feedback-hint" class="text-blue-600 text-xs italic border-l-2 border-blue-300 pl-2"></p>
+                </div>
+                <button onclick="nextQuestion()" class="flex-shrink-0 px-6 py-2 bg-blue-600 text-white rounded-lg font-bold shadow-lg hover:bg-blue-700 active:scale-95 transition-transform flex items-center">
+                    Tiếp tục <i class="ph-bold ph-caret-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div id="end-screen" class="absolute inset-0 flex flex-col items-center justify-center p-8 bg-white hidden z-20">
+        <div class="text-center">
+            <div class="mb-6 relative inline-block">
+                <div class="absolute inset-0 bg-yellow-200 rounded-full animate-ping opacity-75"></div>
+                <i class="ph-fill ph-medal text-9xl text-yellow-400 relative z-10 drop-shadow-xl"></i>
+            </div>
+
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Hoàn Thành!</h2>
+            <p class="text-gray-500 mb-8">Bạn đã chinh phục bài ôn tập chương 1</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8 w-full max-w-sm mx-auto">
+                <div class="bg-blue-50 p-4 rounded-xl text-center border border-blue-100">
+                    <div class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Điểm số</div>
+                    <div class="text-3xl font-black text-blue-600" id="final-score">0</div>
+                </div>
+                <div class="bg-green-50 p-4 rounded-xl text-center border border-green-100">
+                    <div class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Đúng</div>
+                    <div class="text-3xl font-black text-green-600"><span id="correct-count">0</span>/15</div>
+                </div>
+            </div>
+
+            <div id="final-message" class="text-lg font-medium text-gray-700 mb-8 italic"></div>
+
+            <button onclick="location.reload()" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition-colors flex items-center mx-auto">
+                <i class="ph-bold ph-arrow-counter-clockwise mr-2"></i> Chơi Lại
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // =========================
+    // SETTINGS (CÔ BẬT/TẮT Ở ĐÂY)
+    // =========================
+    const RANDOM_QUESTIONS = true; // ✅ random thứ tự câu hỏi
+    const RANDOM_OPTIONS   = true; // ✅ random thứ tự đáp án
+
+    // =========================
+    // DATA
+    // =========================
+    const quizData = [
+        {
+            "questionNumber": 1,
+            "level": "Nhận biết",
+            "question": "Số hữu tỉ là số được viết dưới dạng $\\frac{a}{b}$ với điều kiện nào sau đây?",
+            "answerOptions": [
+                { "text": "$a, b \\in \\mathbb{Z}; b \\ne 0$", "rationale": "Chính xác! Số hữu tỉ là số viết được dưới dạng phân số a/b với tử và mẫu là số nguyên, mẫu khác 0.", "isCorrect": true },
+                { "text": "$a, b \\in \\mathbb{N}; b \\ne 0$", "rationale": "Chưa đủ. Tử số và mẫu số có thể là số nguyên âm, không nhất thiết phải là số tự nhiên.", "isCorrect": false },
+                { "text": "$a, b \\in \\mathbb{Z}$", "rationale": "Thiếu điều kiện quan trọng. Mẫu số b phải luôn khác 0 thì phân số mới có nghĩa.", "isCorrect": false },
+                { "text": "$a \\in \\mathbb{N}, b \\in \\mathbb{Z}$", "rationale": "Chưa chính xác. Tử số a cũng có thể là số nguyên âm.", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Hãy nhớ lại định nghĩa cơ bản về số hữu tỉ trong bài 1. Chú ý đến tập hợp chứa a, b và điều kiện của mẫu số."
+        },
+        {
+            "questionNumber": 2,
+            "level": "Nhận biết",
+            "question": "Số đối của số hữu tỉ $\\frac{-3}{5}$ là số nào?",
+            "answerOptions": [
+                { "text": "$\\frac{3}{5}$", "rationale": "Tuyệt vời! Số đối của một số âm là số dương tương ứng. Tổng của chúng bằng 0.", "isCorrect": true },
+                { "text": "$\\frac{-5}{3}$", "rationale": "Đây là số nghịch đảo, không phải số đối nhé.", "isCorrect": false },
+                { "text": "$\\frac{3}{-5}$", "rationale": "Số này vẫn bằng -3/5, nghĩa là chính nó chứ không phải số đối.", "isCorrect": false },
+                { "text": "$0$", "rationale": "Sai rồi. Số 0 là số đối của chính nó.", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Số đối của số x là số y sao cho x + y = 0. Nói đơn giản là chỉ cần đổi dấu."
+        },
+        {
+            "questionNumber": 3,
+            "level": "Nhận biết",
+            "question": "Kết quả của phép tính $(-0,5)^2$ là bao nhiêu?",
+            "answerOptions": [
+                { "text": "$0,25$", "rationale": "Chính xác! Bình phương của một số (dù âm hay dương) luôn là số không âm. (-0,5).(-0,5) = 0,25.", "isCorrect": true },
+                { "text": "$-0,25$", "rationale": "Rất tiếc. Lũy thừa bậc chẵn của số âm phải ra kết quả dương.", "isCorrect": false },
+                { "text": "$0,1$", "rationale": "Sai rồi. Bạn đang tính nhầm sang 0,5 x 2 phải không? Đây là mũ 2 nhé.", "isCorrect": false },
+                { "text": "$-1$", "rationale": "Sai. Đây là phép lũy thừa, không phải phép nhân với 2.", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Lũy thừa bậc chẵn của số âm luôn mang dấu dương. Hãy tính 0,5 nhân 0,5."
+        },
+        {
+            "questionNumber": 4,
+            "level": "Nhận biết",
+            "question": "Giá trị tuyệt đối của một số hữu tỉ $x$, kí hiệu là $|x|$, luôn thỏa mãn điều kiện nào?",
+            "answerOptions": [
+                { "text": "$|x| \\ge 0$", "rationale": "Đúng rồi! Giá trị tuyệt đối là khoảng cách từ điểm x đến điểm 0 trên trục số, nên không bao giờ âm.", "isCorrect": true },
+                { "text": "$|x| = x$", "rationale": "Chỉ đúng khi x là số dương hoặc bằng 0. Nếu x âm thì sai.", "isCorrect": false },
+                { "text": "$|x| < 0$", "rationale": "Sai hoàn toàn. Khoảng cách không thể là số âm.", "isCorrect": false },
+                { "text": "$|x| = -x$", "rationale": "Chỉ đúng khi x là số âm hoặc bằng 0. Nếu x dương thì sai.", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Giá trị tuyệt đối biểu diễn khoảng cách. Khoảng cách có bao giờ là số âm không?"
+        },
+        {
+            "questionNumber": 5,
+            "level": "Nhận biết",
+            "question": "Công thức nào sau đây đúng khi nhân hai lũy thừa cùng cơ số?",
+            "answerOptions": [
+                { "text": "$x^m . x^n = x^{m+n}$", "rationale": "Chính xác! Khi nhân hai lũy thừa cùng cơ số, ta giữ nguyên cơ số và cộng các số mũ.", "isCorrect": true },
+                { "text": "$x^m . x^n = x^{m.n}$", "rationale": "Sai rồi. Đây là lỗi sai thường gặp. Nhân hai lũy thừa thì CỘNG số mũ, không phải nhân số mũ.", "isCorrect": false },
+                { "text": "$x^m . x^n = x^{m-n}$", "rationale": "Sai. Trừ số mũ là quy tắc của phép chia, không phải phép nhân.", "isCorrect": false },
+                { "text": "$x^m . x^n = (x.x)^{m+n}$", "rationale": "Sai. Cơ số phải được giữ nguyên là x.", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Nhớ câu thần chú: 'Nhân thì cộng (mũ), Chia thì trừ (mũ)'."
+        },
+        {
+            "questionNumber": 6,
+            "level": "Nhận biết",
+            "question": "Phân số nào dưới đây biểu diễn số hữu tỉ $0,75$?",
+            "answerOptions": [
+                { "text": "$\\frac{3}{4}$", "rationale": "Hoan hô! 0,75 chính là 75/100, rút gọn cho 25 ta được 3/4.", "isCorrect": true },
+                { "text": "$\\frac{1}{4}$", "rationale": "Sai rồi. 1/4 là 0,25.", "isCorrect": false },
+                { "text": "$\\frac{7}{5}$", "rationale": "Sai. 7/5 là 1,4.", "isCorrect": false },
+                { "text": "$\\frac{3}{5}$", "rationale": "Sai. 3/5 là 0,6.", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Hãy viết 0,75 dưới dạng phân số thập phân 75/100 rồi rút gọn."
+        },
+        {
+            "questionNumber": 7,
+            "level": "Thông hiểu",
+            "question": "Kết quả của phép tính $\\frac{-1}{3} + \\frac{1}{2}$ là:",
+            "answerOptions": [
+                { "text": "$\\frac{1}{6}$", "rationale": "Giỏi lắm! Quy đồng mẫu số chung là 6: (-2/6) + (3/6) = 1/6.", "isCorrect": true },
+                { "text": "$\\frac{-1}{6}$", "rationale": "Tiếc quá, bạn đã tính nhầm dấu. -2 cộng 3 phải ra dương 1.", "isCorrect": false },
+                { "text": "$\\frac{2}{5}$", "rationale": "Sai. Không được cộng tử với tử, mẫu với mẫu nhé!", "isCorrect": false },
+                { "text": "$\\frac{-5}{6}$", "rationale": "Sai. Kiểm tra lại bước quy đồng nhé.", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Hãy quy đồng mẫu số hai phân số về mẫu chung là 6 rồi thực hiện phép cộng tử số."
+        },
+        {
+            "questionNumber": 8,
+            "level": "Thông hiểu",
+            "question": "So sánh hai số hữu tỉ $x = \\frac{-2}{3}$ và $y = \\frac{-3}{4}$:",
+            "answerOptions": [
+                { "text": "$x > y$", "rationale": "Đúng rồi! Quy đồng lên ta có x = -8/12 và y = -9/12. Vì -8 > -9 nên x > y.", "isCorrect": true },
+                { "text": "$x < y$", "rationale": "Sai rồi. Trong số âm, số nào có phần số tự nhiên lớn hơn thì nhỏ hơn.", "isCorrect": false },
+                { "text": "$x = y$", "rationale": "Hai phân số này không bằng nhau.", "isCorrect": false },
+                { "text": "Không so sánh được", "rationale": "Mọi số hữu tỉ đều có thể so sánh được với nhau.", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Quy đồng mẫu số chung là 12, sau đó so sánh tử số. Nhớ quy tắc so sánh hai số âm nhé!"
+        },
+        {
+            "questionNumber": 9,
+            "level": "Thông hiểu",
+            "question": "Tìm $x$, biết: $x - \\frac{1}{4} = \\frac{5}{8}$",
+            "answerOptions": [
+                { "text": "$x = \\frac{7}{8}$", "rationale": "Chính xác! x = 5/8 + 1/4 = 5/8 + 2/8 = 7/8.", "isCorrect": true },
+                { "text": "$x = \\frac{3}{8}$", "rationale": "Sai. Muốn tìm số bị trừ, ta phải lấy hiệu CỘNG với số trừ. Bạn đã làm phép trừ rồi.", "isCorrect": false },
+                { "text": "$x = \\frac{1}{2}$", "rationale": "Sai. Hãy quy đồng mẫu số cẩn thận hơn.", "isCorrect": false },
+                { "text": "$x = \\frac{-3}{8}$", "rationale": "Sai dấu rồi.", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Muốn tìm số bị trừ (x), ta lấy hiệu cộng với số trừ. Chuyển -1/4 sang vế phải thành +1/4."
+        },
+        {
+            "questionNumber": 10,
+            "level": "Thông hiểu",
+            "question": "Kết quả của phép tính $\\frac{3}{7} \\cdot \\frac{-2}{5}$ là:",
+            "answerOptions": [
+                { "text": "$\\frac{-6}{35}$", "rationale": "Chuẩn xác! Nhân tử với tử (3.-2 = -6) và mẫu với mẫu (7.5 = 35).", "isCorrect": true },
+                { "text": "$\\frac{6}{35}$", "rationale": "Sai dấu. Dương nhân Âm phải ra Âm.", "isCorrect": false },
+                { "text": "$\\frac{1}{12}$", "rationale": "Sai. Đây là phép nhân, không phải phép cộng.", "isCorrect": false },
+                { "text": "$\\frac{-5}{12}$", "rationale": "Sai hoàn toàn quy tắc nhân phân số.", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Quy tắc nhân phân số: Tử nhân tử, Mẫu nhân mẫu."
+        },
+        {
+            "questionNumber": 11,
+            "level": "Thông hiểu",
+            "question": "Thứ tự thực hiện phép tính đúng đối với biểu thức không có dấu ngoặc là:",
+            "answerOptions": [
+                { "text": "Lũy thừa $\\rightarrow$ Nhân và Chia $\\rightarrow$ Cộng và Trừ", "rationale": "Rất tốt! Đây là quy tắc bất di bất dịch trong thứ tự thực hiện phép tính.", "isCorrect": true },
+                { "text": "Nhân và Chia $\\rightarrow$ Lũy thừa $\\rightarrow$ Cộng và Trừ", "rationale": "Sai. Lũy thừa luôn được ưu tiên tính trước tiên.", "isCorrect": false },
+                { "text": "Cộng và Trừ $\\rightarrow$ Nhân và Chia $\\rightarrow$ Lũy thừa", "rationale": "Sai ngược hoàn toàn.", "isCorrect": false },
+                { "text": "Từ trái sang phải, không cần thứ tự ưu tiên", "rationale": "Sai. Chỉ làm từ trái sang phải khi các phép tính cùng mức ưu tiên (ví dụ chỉ có nhân chia).", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Phép nâng lên lũy thừa là mạnh nhất, sau đó đến phép tính nào?"
+        },
+        {
+            "questionNumber": 12,
+            "level": "Vận dụng",
+            "question": "Tính giá trị của biểu thức: $A = \\left( -\\frac{1}{3} \\right)^2 + \\frac{5}{9} - 1$",
+            "answerOptions": [
+                { "text": "$\\frac{-1}{3}$", "rationale": "Tuyệt vời! (-1/3)^2 = 1/9. Vậy A = 1/9 + 5/9 - 9/9 = 6/9 - 9/9 = -3/9 = -1/3.", "isCorrect": true },
+                { "text": "$\\frac{5}{9}$", "rationale": "Sai. Bạn đã tính sai lũy thừa hoặc sai bước trừ cuối cùng.", "isCorrect": false },
+                { "text": "$0$", "rationale": "Sai. Tổng 1/9 + 5/9 chỉ bằng 6/9, chưa đủ để trừ đi 1 bằng 0.", "isCorrect": false },
+                { "text": "$\\frac{1}{3}$", "rationale": "Sai dấu. Kết quả phải là số âm.", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Hãy tính lũy thừa trước: (-1/3)^2 bằng bao nhiêu? Sau đó thực hiện cộng trừ từ trái sang phải."
+        },
+        {
+            "questionNumber": 13,
+            "level": "Vận dụng",
+            "question": "Tìm $x$ biết: $|x - 1,5| = 2$",
+            "answerOptions": [
+                { "text": "$x = 3,5$ hoặc $x = -0,5$", "rationale": "Xuất sắc! Có 2 trường hợp: x - 1,5 = 2 hoặc x - 1,5 = -2. Giải ra ta được 3,5 và -0,5.", "isCorrect": true },
+                { "text": "Chỉ có $x = 3,5$", "rationale": "Thiếu nghiệm. Giá trị tuyệt đối bằng một số dương luôn sinh ra 2 trường hợp.", "isCorrect": false },
+                { "text": "$x = 3,5$ hoặc $x = 0,5$", "rationale": "Sai nghiệm thứ hai. x - 1,5 = -2 thì x phải là -0,5.", "isCorrect": false },
+                { "text": "Chỉ có $x = -0,5$", "rationale": "Thiếu nghiệm dương.", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Phá dấu giá trị tuyệt đối ra hai trường hợp: biểu thức bên trong bằng 2 hoặc bằng -2."
+        },
+        {
+            "questionNumber": 14,
+            "level": "Vận dụng thực tế",
+            "question": "Bạn Lan có 200.000 đồng để mua vở. Biết giá một quyển vở là 12.000 đồng. Lan được cửa hàng giảm giá 10% trên tổng hóa đơn. Hỏi Lan mua được tối đa bao nhiêu quyển vở?",
+            "answerOptions": [
+                { "text": "18 quyển", "rationale": "Chính xác! Giá 1 quyển sau giảm là 12.000 * 90% = 10.800đ. 200.000 : 10.800 ≈ 18,5. Lan chỉ mua được tối đa 18 quyển.", "isCorrect": true },
+                { "text": "16 quyển", "rationale": "Quá ít. Bạn tính giá gốc là 12.000 thì 200.000/12.000 = 16,6. Nhưng Lan được giảm giá mà!", "isCorrect": false },
+                { "text": "19 quyển", "rationale": "Hơi lố rồi. 19 quyển giá sau giảm sẽ tốn 205.200đ, Lan không đủ tiền.", "isCorrect": false },
+                { "text": "17 quyển", "rationale": "Vẫn còn dư tiền mua thêm 1 quyển nữa đó.", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Đầu tiên tính giá tiền thực tế của một quyển vở sau khi được giảm 10%. Sau đó lấy tổng tiền chia cho giá mới."
+        },
+        {
+            "questionNumber": 15,
+            "level": "Vận dụng cao",
+            "question": "Tìm giá trị nhỏ nhất của biểu thức $A = |x - 2023| + |x - 2024|$",
+            "answerOptions": [
+                { "text": "1", "rationale": "Tuyệt đỉnh! Áp dụng bất đẳng thức |a| + |b| >= |a+b|. Ta có A = |x - 2023| + |2024 - x| >= |x - 2023 + 2024 - x| = 1. Dấu bằng xảy ra khi 2023 <= x <= 2024.", "isCorrect": true },
+                { "text": "0", "rationale": "Sai. Tổng hai giá trị tuyệt đối chỉ bằng 0 khi cả hai số hạng bằng 0 cùng lúc, điều này không thể xảy ra ở đây (x không thể vừa bằng 2023 vừa bằng 2024).", "isCorrect": false },
+                { "text": "2023", "rationale": "Không đúng. Giá trị nhỏ nhất nhỏ hơn nhiều.", "isCorrect": false },
+                { "text": "2024", "rationale": "Không đúng.", "isCorrect": false }
+            ],
+            "hint": "Gợi ý: Sử dụng tính chất |A| + |B| >= |A+B|. Lưu ý viết lại |x - 2024| thành |2024 - x| để triệt tiêu x."
+        }
+    ];
+
+    // =========================
+    // GAME STATE
+    // =========================
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let isAnswered = false;
+
+    // Mảng câu hỏi dùng trong lượt chơi (đã random nếu bật)
+    let gameQuestions = [];
+
+    // =========================
+    // DOM ELEMENTS
+    // =========================
+    const startScreen = document.getElementById('start-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const endScreen = document.getElementById('end-screen');
+
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const difficultyBadge = document.getElementById('difficulty-badge');
+    const progressBar = document.getElementById('progress-bar');
+
+    const feedbackArea = document.getElementById('feedback-area');
+    const feedbackTitle = document.getElementById('feedback-title');
+    const feedbackRationale = document.getElementById('feedback-rationale');
+    const feedbackHint = document.getElementById('feedback-hint');
+    const feedbackIcon = document.getElementById('feedback-icon');
+
+    const scoreDisplay = document.getElementById('score');
+    const qCurrent = document.getElementById('q-current');
+    const qTotal = document.getElementById('q-total');
+
+    // =========================
+    // AUDIO (Web Audio API)
+    // =========================
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playTone(freq, type, duration) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playSuccessSound() {
+        playTone(523.25, 'sine', 0.1); // C5
+        setTimeout(() => playTone(659.25, 'sine', 0.1), 100); // E5
+        setTimeout(() => playTone(783.99, 'sine', 0.3), 200); // G5
+    }
+
+    function playErrorSound() {
+        playTone(150, 'sawtooth', 0.3);
+        setTimeout(() => playTone(130, 'sawtooth', 0.4), 150);
+    }
+
+    function playCompleteSound() {
+        [523, 659, 783, 1046].forEach((freq, i) => {
+            setTimeout(() => playTone(freq, 'square', 0.2), i * 150);
+        });
+    }
+
+    // =========================
+    // SHUFFLE
+    // =========================
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    // =========================
+    // GAME LOGIC
+    // =========================
+    function startGame() {
+        startScreen.classList.add('hidden');
+        gameScreen.classList.remove('hidden');
+        gameScreen.classList.add('flex');
+
+        // reset
+        currentQuestionIndex = 0;
+        score = 0;
+        scoreDisplay.innerText = score;
+        isAnswered = false;
+
+        // build a fresh question list each run
+        gameQuestions = [...quizData];
+        if (RANDOM_QUESTIONS) shuffleArray(gameQuestions);
+
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        isAnswered = false;
+        feedbackArea.classList.add('hidden');
+
+        const qData = gameQuestions[currentQuestionIndex];
+
+        // Update UI Info
+        qCurrent.innerText = currentQuestionIndex + 1;
+        qTotal.innerText = gameQuestions.length;
+        difficultyBadge.innerText = `Mức độ: ${qData.level}`;
+
+        // progress bar
+        const denom = Math.max(1, gameQuestions.length - 1);
+        const progress = (currentQuestionIndex / denom) * 100;
+        progressBar.style.width = `${Math.max(0, Math.min(100, progress))}%`;
+
+        // Render Question
+        questionText.innerHTML = qData.question;
+
+        // Render Options (RANDOM)
+        optionsContainer.innerHTML = '';
+        let currentOptions = qData.answerOptions.map(o => ({ ...o })); // copy
+
+        if (RANDOM_OPTIONS) shuffleArray(currentOptions);
+
+        // lưu để checkAnswer highlight đúng sau random
+        qData._currentOptions = currentOptions;
+
+        currentOptions.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className =
+                `option-card w-full text-left p-4 rounded-xl border-2 border-gray-200 bg-white hover:border-blue-300 text-gray-700 font-medium text-lg relative overflow-hidden math-content`;
+            btn.innerHTML =
+                `<span class="inline-block w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-center leading-8 mr-3 font-bold text-sm border border-blue-100">${String.fromCharCode(65 + index)}</span> ${opt.text}`;
+            btn.onclick = () => checkAnswer(btn, opt, qData);
+            optionsContainer.appendChild(btn);
+        });
+
+        // Trigger MathJax re-render
+        if (window.MathJax) {
+            MathJax.typesetPromise();
+        }
+    }
+
+    function checkAnswer(btn, option, qData) {
+        if (isAnswered) return;
+        isAnswered = true;
+
+        const allBtns = optionsContainer.querySelectorAll('button');
+        allBtns.forEach(b => b.classList.add('disabled', 'cursor-default'));
+
+        if (option.isCorrect) {
+            // CORRECT
+            score += 10;
+            scoreDisplay.innerText = score;
+            btn.classList.add('correct', 'animate-bounce-in');
+
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+
+            playSuccessSound();
+
+            feedbackIcon.innerHTML = '<i class="ph-fill ph-smiley text-green-500"></i>';
+            feedbackTitle.innerText = "Chính xác! 🎉";
+            feedbackTitle.className = "font-bold text-lg mb-1 text-green-700";
+        } else {
+            // WRONG
+            btn.classList.add('wrong', 'animate-shake');
+
+            // Highlight correct answer theo mảng hiện tại (đã random)
+            const correctIndex = (qData._currentOptions || qData.answerOptions).findIndex(o => o.isCorrect);
+            if (correctIndex >= 0) {
+                allBtns[correctIndex].classList.add('correct', 'opacity-75');
+            }
+
+            playErrorSound();
+
+            feedbackIcon.innerHTML = '<i class="ph-fill ph-smiley-sad text-red-500"></i>';
+            feedbackTitle.innerText = "Tiếc quá! 😅";
+            feedbackTitle.className = "font-bold text-lg mb-1 text-red-700";
+        }
+
+        feedbackRationale.innerText = option.rationale;
+        feedbackHint.innerText = qData.hint || "";
+
+        feedbackArea.classList.remove('hidden');
+
+        setTimeout(() => {
+            feedbackArea.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }, 100);
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < gameQuestions.length) {
+            loadQuestion();
+        } else {
+            endGame();
+        }
+    }
+
+    function endGame() {
+        gameScreen.classList.add('hidden');
+        endScreen.classList.remove('hidden');
+        endScreen.classList.add('flex');
+
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('correct-count').innerText = Math.round(score / 10);
+
+        playCompleteSound();
+
+        const finalMsg = document.getElementById('final-message');
+        const correctCount = Math.round(score / 10);
+
+        if (correctCount === gameQuestions.length) {
+            finalMsg.innerText = "Tuyệt đỉnh! Bạn là thần đồng Toán học! 🏆";
+        } else if (correctCount >= Math.ceil(gameQuestions.length * 0.8)) {
+            finalMsg.innerText = "Rất tốt! Kiến thức của bạn rất vững! 🌟";
+        } else if (correctCount >= Math.ceil(gameQuestions.length * 0.55)) {
+            finalMsg.innerText = "Khá lắm! Cố gắng thêm chút nữa nhé! 💪";
+        } else {
+            finalMsg.innerText = "Đừng nản lòng! Hãy ôn lại bài và thử lại nhé! 📚";
+        }
+
+        // Victory confetti
+        const duration = 3000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+        const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+        const interval = setInterval(function() {
+            const timeLeft = animationEnd - Date.now();
+            if (timeLeft <= 0) return clearInterval(interval);
+
+            const particleCount = 50 * (timeLeft / duration);
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+        }, 250);
+    }
+</script>
+
+</body>
+</html>
