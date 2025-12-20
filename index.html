@@ -652,85 +652,477 @@ const grades = [
   },
 
   {
-    id: "lop9",
-    name: "Lớp 9",
-    color: "rose",
-    topics: [
-      {
-        id: "lop9-phuong-trinh-he",
-        name: "Phương trình & Hệ phương trình",
-        description: "Các game về phương trình một ẩn, hai ẩn và hệ phương trình cho Toán 9.",
-        games: [
-          { id: "lop9-tho-san-phuong-trinh", name: "Thợ Săn Phương Trình", path: "ThoSanPhuongTrinh/index.html", icon: "🏹", color: "rose", label: "Trò chơi 31", grade: "Toán 9 – Phương trình", description: "Giải phương trình tích & phương trình chứa ẩn ở mẫu để mở kho báu cổ xưa." },
-          { id: "lop9-hai-trinh-vo-tan", name: "Hải Trình Vô Tận", path: "HaiTrinhVoTan/index.html", icon: "🚢", color: "sky", label: "Trò chơi 32", grade: "Toán 9 – Hệ phương trình", description: "Giải mã 15 hệ phương trình để tìm kho báu dưới lòng đại dương." },
-          { id: "lop9-sherlock-holmes", name: "Vụ Án Bóng Đêm – Sherlock Holmes", path: "SherlockHolmes/index.html", icon: "🕵️‍♂️", color: "indigo", label: "Trò chơi 41", grade: "Toán 9 – Hệ phương trình", description: "15 câu hệ phương trình – Giải mã mật thư cùng Sherlock trong vụ án bóng đêm." },
-          { id: "lop9-bi-mat-kim-tu-thap-pt-he", name: "Bí Mật Kim Tự Tháp", path: "BiMatKimTuThap/index.html", icon: "🏺", color: "yellow", label: "Trò chơi 42", grade: "Toán 9 – Ôn tập Chương 1", description: "Ôn tập Chương 1 – Phương trình & Hệ phương trình qua 15 câu hỏi từ Nhận biết đến Vận dụng cao." }
-        ]
-      },
-      {
-        id: "lop9-bat-dang-thuc-bpt",
-        name: "Bất đẳng thức & Bất phương trình",
-        description: "Luyện tập bất đẳng thức và bất phương trình bậc nhất, bậc hai.",
-        games: [
-          { id: "lop9-bi-an-dem-khuya", name: "Bí Ẩn Đêm Khuya – Thử thách bất đẳng thức", path: "BiAnDemKhuya/index.html", icon: "🌙", color: "indigo", label: "Trò chơi 19", grade: "Toán 9 – Bất đẳng thức", description: "Giải 15 câu hỏi về tính chất bất đẳng thức để thắp sáng con đường dẫn tới Thư Viện Ánh Sáng." },
-          { id: "lop9-diep-vu-bat-kha-thi", name: "Điệp Vụ Bất Khả Thi – Giải mã bất phương trình", path: "DiepVuBatKhaThi/index.html", icon: "🟩", color: "emerald", label: "Trò chơi 18", grade: "Toán 9 – Bất phương trình", description: "Giải 15 mật mã toán học về bất phương trình bậc nhất một ẩn để hoàn thành nhiệm vụ tuyệt mật." }
-        ]
-      },
-      {
-        id: "lop9-can-thuc",
-        name: "Căn thức",
-        description: "Các game ôn tập căn bậc hai, biến đổi căn thức và vận dụng vào bài toán.",
-        games: [
-          { id: "lop9-du-hanh-vu-tru", name: "Du Hành Giữa Các Vì Sao – Căn bậc hai", path: "du-hanh-vu-tru/index.html", icon: "🚀", color: "sky", label: "Trò chơi 5", grade: "Toán 9 – Căn thức", description: "Điều khiển tàu vũ trụ vượt qua thử thách về căn bậc hai." },
-          { id: "lop9-de-che-troi-day", name: "Đế Chế Trỗi Dậy – Biến đổi căn bậc hai", path: "de-che-troi-day/index.html", icon: "🏰", color: "yellow", label: "Trò chơi 6", grade: "Toán 9 – Căn thức", description: "Thu thập tài nguyên xây dựng đế chế bằng các phép biến đổi căn bậc hai." },
-          { id: "lop9-hanh-trinh-can-bac-ba", name: "Hành Trình Căn Bậc Ba – Khối lập phương năng lượng", path: "can-bac-ba/index.html", icon: "📦", color: "sky", label: "Trò chơi 14", grade: "Toán 9 – Căn thức", description: "Vượt qua 12 câu hỏi về căn bậc ba để nạp năng lượng cho thành phố khối lập phương xanh." },
-          { id: "lop9-tho-san-kho-bau-can-thuc", name: "Thợ Săn Kho Báu – Bí Ẩn Căn Thức", path: "tho-san-kho-bau/index.html", icon: "💎", color: "yellow", label: "Trò chơi mới", grade: "Toán 9 – Căn thức", description: "Giải mã 15 thử thách về biến đổi biểu thức chứa căn thức bậc hai để mở kho báu cổ xưa." },
-          { id: "lop9-tho-san-kho-bau-bai4", name: "Thợ Săn Kho Báu – Bí Ẩn Căn Thức - Bài 4", path: "tho-san-kho-bau-can-thuc-bac-hai/index.html", icon: "💎", color: "yellow", label: "Trò chơi Căn thức", grade: "Toán 9 – Căn thức", description: "Giải mã các thử thách về biến đổi biểu thức chứa căn thức bậc hai (bài 4)." },
-          { id: "lop9-vuong-quoc-can-thuc", name: "Vương Quốc Căn Thức – Thử Thách Tối Thượng", path: "tong-hop-can-thuc/index.html", icon: "🌟", color: "emerald", label: "Trò chơi 15", grade: "Toán 9 – Căn thức", description: "30 câu hỏi chia 4 cổng thử thách: Nhận biết, Thông hiểu, Vận dụng và Vận dụng cao về căn thức." }
-        ]
-      },
-      {
-        id: "lop9-he-thuc-luong",
-        name: "Hệ thức lượng trong tam giác vuông",
-        description: "Các game luyện tập hệ thức lượng, sin – cos – tan – cot trong tam giác vuông.",
-        games: [
-          { id: "lop9-loi-nguyen-co-xua", name: "Lời Nguyền Cổ Xưa – Tỉ số lượng giác", path: "loi-nguyen-co-xua/index.html", icon: "🕯️", color: "rose", label: "Trò chơi 16", grade: "Toán 9 – Hệ thức lượng", description: "Giải 15 câu hỏi về sin, cos, tan, cot để hóa giải lời nguyền cổ xưa." },
-          { id: "lop9-thanh-guom-dinh-menh", name: "Thanh Gươm Định Mệnh – Hệ thức cạnh & góc", path: "ThanhGuomDinhMenh/index.html", icon: "⚔️", color: "yellow", label: "Trò chơi 17", grade: "Toán 9 – Hệ thức lượng", description: "Vượt 15 câu hỏi về hệ thức cạnh – góc trong tam giác vuông để đánh bại Quỷ Vương!" },
-          { id: "lop9-cuoc-xam-lang-ngoai-trai-dat", name: "Cuộc Xâm Lăng Ngoài Trái Đất – Ôn tập hệ thức lượng", path: "cuoc-xam-lang-ngoai-trai-dat/index.html", icon: "🛸", color: "emerald", label: "Trò chơi 18", grade: "Toán 9 – Hệ thức lượng", description: "Chinh phục 15 câu hỏi về sin, cos, tan, cot trong tam giác vuông để bảo vệ Trái Đất." }
-        ]
-      },
-      {
-        id: "lop9-duong-tron-tu-giac",
-        name: "Đường tròn – Tứ giác nội tiếp đường tròn",
-        description: "Các game về đường tròn, góc ở tâm, góc nội tiếp, dây cung, tiếp tuyến và tứ giác nội tiếp.",
-        games: [
-          { id: "lop9-khu-vuon-bi-mat", name: "Khu Vườn Bí Mật – Đường tròn", path: "khu-vuon-bi-mat/index.html", icon: "🌸", color: "emerald", label: "Trò chơi 1", grade: "Toán 9 – Đường tròn", description: "Làm nở những bông hoa xinh bằng cách trả lời câu hỏi về đường tròn." },
-          { id: "lop9-cuoc-xam-lang", name: "Cuộc Xâm Lăng – Tiếp tuyến đường tròn", path: "cuoc-xam-lang/index.html", icon: "🛸", color: "indigo", label: "Trò chơi 2", grade: "Toán 9 – Tiếp tuyến", description: "Bắn hạ tàu UFO bằng kiến thức về tiếp tuyến của đường tròn." },
-          { id: "lop9-me-cung-tri-tue", name: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp", path: "me-cung-tri-tue/index.html", icon: "🧠", color: "sky", label: "Trò chơi 3", grade: "Toán 9 – Góc", description: "Vượt qua mê cung bằng cách giải các bài toán về góc ở tâm và góc nội tiếp." },
-          { id: "lop9-chien-binh-rong", name: "Chiến Binh Rồng – Hình quạt và vành khuyên", path: "chien-binh-rong/index.html", icon: "🐉", color: "rose", label: "Trò chơi 4", grade: "Toán 9 – Hình quạt", description: "Cùng chiến binh rồng tiêu diệt quái vật bằng kiến thức về hình quạt và hình vành khuyên." },
-          { id: "lop9-binh-minh-anh-hung", name: "Bình Minh Anh Hùng – Bài tập cuối Chương 5", path: "binh-minh-anh-hung/index.html", icon: "☀️", color: "yellow", label: "Trò chơi 9", grade: "Toán 9 – Đường tròn", description: "Game tổng ôn 15 câu hỏi cuối Chương 5 Đường tròn với đủ 4 mức độ." }
-        ]
-      },
-      { id: "lop9-ham-bac-2", name: "Hàm số bậc 2 & Phương trình bậc 2", description: "Các game về đồ thị hàm số bậc 2 và phương trình bậc 2 một ẩn.", games: [] },
-      { id: "lop9-hinh-khoi", name: "Hình khối", description: "Các game hình học không gian: lăng trụ, chóp, khối tròn xoay…", games: [] },
-      {
-        id: "lop9-xac-suat-thong-ke",
-        name: "Xác suất & Thống kê",
-        description: "Các game luyện tập bảng tần số, biểu đồ và xác suất cho Toán 9.",
-        games: [
-          {
-            id: "lop9-thu-tai-thong-ke",
-            name: "Thử Tài Thống Kê – Chương 7",
-            path: "ThongKe/ThuTaiThongKe/index.html",
-            icon: "📊",
-            description: "Game Toán 9 – Chương 7. Gồm 15 câu hỏi trắc nghiệm từ nhận biết đến vận dụng cao về tần số, bảng tần số, biểu đồ và bài toán thống kê thực tế.",
-            topics: ["Tần số", "Bảng tần số", "Biểu đồ cột", "Biểu đồ đoạn thẳng", "Phân tích số liệu", "Vận dụng thực tế"],
-            difficulty: "Trung bình"
-          }
-        ]
-      }
-    ]
-  }
+  id: "lop9",
+  name: "Lớp 9",
+  color: "rose",
+  topics: [
+    {
+      id: "lop9-phuong-trinh-he",
+      name: "Phương trình & Hệ phương trình",
+      description:
+        "Các game về phương trình một ẩn, hai ẩn và hệ phương trình cho Toán 9.",
+      games: [
+        {
+          id: "lop9-tho-san-phuong-trinh",
+          name: "Thợ Săn Phương Trình",
+          path: "ThoSanPhuongTrinh/index.html",
+          icon: "🏹",
+          color: "rose",
+          label: "Trò chơi 31",
+          grade: "Toán 9 – Phương trình",
+          description:
+            "Giải phương trình tích & phương trình chứa ẩn ở mẫu để mở kho báu cổ xưa.",
+          topics: [
+            "Phương trình một ẩn",
+            "Phương trình tích",
+            "Phương trình chứa ẩn ở mẫu",
+            "Điều kiện xác định",
+            "Biến đổi tương đương"
+          ],
+          difficulty: "Trung bình – Khá"
+        },
+        {
+          id: "lop9-hai-trinh-vo-tan",
+          name: "Hải Trình Vô Tận",
+          path: "HaiTrinhVoTan/index.html",
+          icon: "🚢",
+          color: "sky",
+          label: "Trò chơi 32",
+          grade: "Toán 9 – Hệ phương trình",
+          description:
+            "Giải mã 15 hệ phương trình để tìm kho báu dưới lòng đại dương.",
+          topics: [
+            "Hệ phương trình bậc nhất hai ẩn",
+            "Phương pháp thế",
+            "Phương pháp cộng đại số",
+            "Giải bài toán bằng lập hệ",
+            "Kiểm tra nghiệm"
+          ],
+          difficulty: "Trung bình"
+        },
+        {
+          id: "lop9-sherlock-holmes",
+          name: "Vụ Án Bóng Đêm – Sherlock Holmes",
+          path: "SherlockHolmes/index.html",
+          icon: "🕵️‍♂️",
+          color: "indigo",
+          label: "Trò chơi 41",
+          grade: "Toán 9 – Hệ phương trình",
+          description:
+            "15 câu hệ phương trình – Giải mã mật thư cùng Sherlock trong vụ án bóng đêm.",
+          topics: [
+            "Hệ phương trình bậc nhất hai ẩn",
+            "Phương pháp thế",
+            "Phương pháp cộng đại số",
+            "Bài toán có lời văn (lập hệ)",
+            "Suy luận logic"
+          ],
+          difficulty: "Trung bình – Khá"
+        },
+        {
+          id: "lop9-bi-mat-kim-tu-thap-pt-he",
+          name: "Bí Mật Kim Tự Tháp",
+          path: "BiMatKimTuThap/index.html",
+          icon: "🏺",
+          color: "yellow",
+          label: "Trò chơi 42",
+          grade: "Toán 9 – Ôn tập Chương 1",
+          description:
+            "Ôn tập Chương 1 – Phương trình & Hệ phương trình qua 15 câu hỏi từ Nhận biết đến Vận dụng cao.",
+          topics: [
+            "Phương trình một ẩn",
+            "Hệ phương trình",
+            "Biến đổi tương đương",
+            "Giải bài toán bằng lập phương trình/hệ",
+            "Tổng ôn chương"
+          ],
+          difficulty: "Khá"
+        }
+      ]
+    },
+
+    {
+      id: "lop9-bat-dang-thuc-bpt",
+      name: "Bất đẳng thức & Bất phương trình",
+      description:
+        "Luyện tập bất đẳng thức và bất phương trình bậc nhất, bậc hai.",
+      games: [
+        {
+          id: "lop9-bi-an-dem-khuya",
+          name: "Bí Ẩn Đêm Khuya – Thử thách bất đẳng thức",
+          path: "BiAnDemKhuya/index.html",
+          icon: "🌙",
+          color: "indigo",
+          label: "Trò chơi 19",
+          grade: "Toán 9 – Bất đẳng thức",
+          description:
+            "Giải 15 câu hỏi về tính chất bất đẳng thức để thắp sáng con đường dẫn tới Thư Viện Ánh Sáng.",
+          topics: [
+            "Tính chất bất đẳng thức",
+            "So sánh số",
+            "Biến đổi bất đẳng thức",
+            "Áp dụng vào bài toán",
+            "Sai lầm thường gặp"
+          ],
+          difficulty: "Trung bình – Khá"
+        },
+        {
+          id: "lop9-diep-vu-bat-kha-thi",
+          name: "Điệp Vụ Bất Khả Thi – Giải mã bất phương trình",
+          path: "DiepVuBatKhaThi/index.html",
+          icon: "🟩",
+          color: "emerald",
+          label: "Trò chơi 18",
+          grade: "Toán 9 – Bất phương trình",
+          description:
+            "Giải 15 mật mã toán học về bất phương trình bậc nhất một ẩn để hoàn thành nhiệm vụ tuyệt mật.",
+          topics: [
+            "Bất phương trình bậc nhất một ẩn",
+            "Quy tắc chuyển vế",
+            "Nhân/chia với số âm (đổi chiều)",
+            "Biểu diễn nghiệm trên trục số",
+            "Bài toán thực tế"
+          ],
+          difficulty: "Trung bình"
+        }
+      ]
+    },
+
+    {
+      id: "lop9-can-thuc",
+      name: "Căn thức",
+      description:
+        "Các game ôn tập căn bậc hai, biến đổi căn thức và vận dụng vào bài toán.",
+      games: [
+        {
+          id: "lop9-du-hanh-vu-tru",
+          name: "Du Hành Giữa Các Vì Sao – Căn bậc hai",
+          path: "du-hanh-vu-tru/index.html",
+          icon: "🚀",
+          color: "sky",
+          label: "Trò chơi 5",
+          grade: "Toán 9 – Căn thức",
+          description:
+            "Điều khiển tàu vũ trụ vượt qua thử thách về căn bậc hai.",
+          topics: [
+            "Căn bậc hai",
+            "Điều kiện để có căn bậc hai",
+            "So sánh căn thức",
+            "Biến đổi đơn giản",
+            "Tính toán với căn"
+          ],
+          difficulty: "Trung bình"
+        },
+        {
+          id: "lop9-de-che-troi-day",
+          name: "Đế Chế Trỗi Dậy – Biến đổi căn bậc hai",
+          path: "de-che-troi-day/index.html",
+          icon: "🏰",
+          color: "yellow",
+          label: "Trò chơi 6",
+          grade: "Toán 9 – Căn thức",
+          description:
+            "Thu thập tài nguyên xây dựng đế chế bằng các phép biến đổi căn bậc hai.",
+          topics: [
+            "Rút gọn căn thức",
+            "Đưa thừa số ra ngoài dấu căn",
+            "Đưa thừa số vào trong dấu căn",
+            "Trục căn thức ở mẫu",
+            "Biến đổi biểu thức"
+          ],
+          difficulty: "Trung bình – Khá"
+        },
+        {
+          id: "lop9-hanh-trinh-can-bac-ba",
+          name: "Hành Trình Căn Bậc Ba – Khối lập phương năng lượng",
+          path: "can-bac-ba/index.html",
+          icon: "📦",
+          color: "sky",
+          label: "Trò chơi 14",
+          grade: "Toán 9 – Căn thức",
+          description:
+            "Vượt qua 12 câu hỏi về căn bậc ba để nạp năng lượng cho thành phố khối lập phương xanh.",
+          topics: [
+            "Căn bậc ba",
+            "Nhận biết số lập phương",
+            "Tính toán với căn bậc ba",
+            "Biến đổi đơn giản",
+            "Ứng dụng"
+          ],
+          difficulty: "Trung bình"
+        },
+        {
+          id: "lop9-tho-san-kho-bau-can-thuc",
+          name: "Thợ Săn Kho Báu – Bí Ẩn Căn Thức",
+          path: "tho-san-kho-bau/index.html",
+          icon: "💎",
+          color: "yellow",
+          label: "Trò chơi mới",
+          grade: "Toán 9 – Căn thức",
+          description:
+            "Giải mã 15 thử thách về biến đổi biểu thức chứa căn thức bậc hai để mở kho báu cổ xưa.",
+          topics: [
+            "Biến đổi căn thức",
+            "Rút gọn biểu thức",
+            "Trục căn thức",
+            "Quy đồng – rút gọn",
+            "Bài toán tổng hợp"
+          ],
+          difficulty: "Khá"
+        },
+        {
+          id: "lop9-tho-san-kho-bau-bai4",
+          name: "Thợ Săn Kho Báu – Bí Ẩn Căn Thức - Bài 4",
+          path: "tho-san-kho-bau-can-thuc-bac-hai/index.html",
+          icon: "💎",
+          color: "yellow",
+          label: "Trò chơi Căn thức",
+          grade: "Toán 9 – Căn thức",
+          description:
+            "Giải mã các thử thách về biến đổi biểu thức chứa căn thức bậc hai (bài 4).",
+          topics: [
+            "Biến đổi căn thức (Bài 4)",
+            "Trục căn thức ở mẫu",
+            "Rút gọn – tính giá trị",
+            "Biến đổi biểu thức",
+            "Vận dụng"
+          ],
+          difficulty: "Khá"
+        },
+        {
+          id: "lop9-vuong-quoc-can-thuc",
+          name: "Vương Quốc Căn Thức – Thử Thách Tối Thượng",
+          path: "tong-hop-can-thuc/index.html",
+          icon: "🌟",
+          color: "emerald",
+          label: "Trò chơi 15",
+          grade: "Toán 9 – Căn thức",
+          description:
+            "30 câu hỏi chia 4 cổng thử thách: Nhận biết, Thông hiểu, Vận dụng và Vận dụng cao về căn thức.",
+          topics: [
+            "Căn bậc hai",
+            "Biến đổi căn thức",
+            "Trục căn thức",
+            "Rút gọn biểu thức",
+            "Vận dụng cao"
+          ],
+          difficulty: "Khá – Nâng cao"
+        }
+      ]
+    },
+
+    {
+      id: "lop9-he-thuc-luong",
+      name: "Hệ thức lượng trong tam giác vuông",
+      description:
+        "Các game luyện tập hệ thức lượng, sin – cos – tan – cot trong tam giác vuông.",
+      games: [
+        {
+          id: "lop9-loi-nguyen-co-xua",
+          name: "Lời Nguyền Cổ Xưa – Tỉ số lượng giác",
+          path: "loi-nguyen-co-xua/index.html",
+          icon: "🕯️",
+          color: "rose",
+          label: "Trò chơi 16",
+          grade: "Toán 9 – Hệ thức lượng",
+          description:
+            "Giải 15 câu hỏi về sin, cos, tan, cot để hóa giải lời nguyền cổ xưa.",
+          topics: [
+            "Tỉ số lượng giác",
+            "Sin – Cos – Tan – Cot",
+            "Tam giác vuông",
+            "Tính góc/cạnh",
+            "Bài toán thực tế"
+          ],
+          difficulty: "Trung bình"
+        },
+        {
+          id: "lop9-thanh-guom-dinh-menh",
+          name: "Thanh Gươm Định Mệnh – Hệ thức cạnh & góc",
+          path: "ThanhGuomDinhMenh/index.html",
+          icon: "⚔️",
+          color: "yellow",
+          label: "Trò chơi 17",
+          grade: "Toán 9 – Hệ thức lượng",
+          description:
+            "Vượt 15 câu hỏi về hệ thức cạnh – góc trong tam giác vuông để đánh bại Quỷ Vương!",
+          topics: [
+            "Hệ thức lượng trong tam giác vuông",
+            "Hệ thức giữa cạnh và góc",
+            "Định lý Pythagore (liên hệ)",
+            "Tính chiều cao – khoảng cách",
+            "Vận dụng"
+          ],
+          difficulty: "Trung bình – Khá"
+        },
+        {
+          id: "lop9-cuoc-xam-lang-ngoai-trai-dat",
+          name: "Cuộc Xâm Lăng Ngoài Trái Đất – Ôn tập hệ thức lượng",
+          path: "cuoc-xam-lang-ngoai-trai-dat/index.html",
+          icon: "🛸",
+          color: "emerald",
+          label: "Trò chơi 18",
+          grade: "Toán 9 – Hệ thức lượng",
+          description:
+            "Chinh phục 15 câu hỏi về sin, cos, tan, cot trong tam giác vuông để bảo vệ Trái Đất.",
+          topics: [
+            "Tổng ôn hệ thức lượng",
+            "Sin – Cos – Tan – Cot",
+            "Tính cạnh – tính góc",
+            "Bài toán thực tế",
+            "Vận dụng cao"
+          ],
+          difficulty: "Khá"
+        }
+      ]
+    },
+
+    {
+      id: "lop9-duong-tron-tu-giac",
+      name: "Đường tròn – Tứ giác nội tiếp đường tròn",
+      description:
+        "Các game về đường tròn, góc ở tâm, góc nội tiếp, dây cung, tiếp tuyến và tứ giác nội tiếp.",
+      games: [
+        {
+          id: "lop9-khu-vuon-bi-mat",
+          name: "Khu Vườn Bí Mật – Đường tròn",
+          path: "khu-vuon-bi-mat/index.html",
+          icon: "🌸",
+          color: "emerald",
+          label: "Trò chơi 1",
+          grade: "Toán 9 – Đường tròn",
+          description:
+            "Làm nở những bông hoa xinh bằng cách trả lời câu hỏi về đường tròn.",
+          topics: [
+            "Đường tròn",
+            "Bán kính – đường kính – dây cung",
+            "Góc ở tâm – cung",
+            "Quan hệ dây và khoảng cách",
+            "Bài toán cơ bản"
+          ],
+          difficulty: "Trung bình"
+        },
+        {
+          id: "lop9-cuoc-xam-lang",
+          name: "Cuộc Xâm Lăng – Tiếp tuyến đường tròn",
+          path: "cuoc-xam-lang/index.html",
+          icon: "🛸",
+          color: "indigo",
+          label: "Trò chơi 2",
+          grade: "Toán 9 – Tiếp tuyến",
+          description:
+            "Bắn hạ tàu UFO bằng kiến thức về tiếp tuyến của đường tròn.",
+          topics: [
+            "Tiếp tuyến",
+            "Tính chất tiếp tuyến",
+            "Hai tiếp tuyến cắt nhau",
+            "Đường kính vuông góc tiếp tuyến",
+            "Bài toán chứng minh"
+          ],
+          difficulty: "Trung bình – Khá"
+        },
+        {
+          id: "lop9-me-cung-tri-tue",
+          name: "Mê Cung Trí Tuệ – Góc ở tâm, góc nội tiếp",
+          path: "me-cung-tri-tue/index.html",
+          icon: "🧠",
+          color: "sky",
+          label: "Trò chơi 3",
+          grade: "Toán 9 – Góc",
+          description:
+            "Vượt qua mê cung bằng cách giải các bài toán về góc ở tâm và góc nội tiếp.",
+          topics: [
+            "Góc ở tâm",
+            "Góc nội tiếp",
+            "Số đo cung",
+            "Liên hệ góc và cung",
+            "Bài toán tổng hợp"
+          ],
+          difficulty: "Trung bình"
+        },
+        {
+          id: "lop9-chien-binh-rong",
+          name: "Chiến Binh Rồng – Hình quạt và vành khuyên",
+          path: "chien-binh-rong/index.html",
+          icon: "🐉",
+          color: "rose",
+          label: "Trò chơi 4",
+          grade: "Toán 9 – Hình quạt",
+          description:
+            "Cùng chiến binh rồng tiêu diệt quái vật bằng kiến thức về hình quạt và hình vành khuyên.",
+          topics: [
+            "Hình quạt tròn",
+            "Diện tích hình quạt",
+            "Độ dài cung tròn",
+            "Hình vành khuyên",
+            "Bài toán thực tế"
+          ],
+          difficulty: "Trung bình"
+        },
+        {
+          id: "lop9-binh-minh-anh-hung",
+          name: "Bình Minh Anh Hùng – Bài tập cuối Chương 5",
+          path: "binh-minh-anh-hung/index.html",
+          icon: "☀️",
+          color: "yellow",
+          label: "Trò chơi 9",
+          grade: "Toán 9 – Đường tròn",
+          description:
+            "Game tổng ôn 15 câu hỏi cuối Chương 5 Đường tròn với đủ 4 mức độ.",
+          topics: [
+            "Tổng ôn đường tròn",
+            "Góc – cung",
+            "Tiếp tuyến",
+            "Tứ giác nội tiếp",
+            "Vận dụng cao"
+          ],
+          difficulty: "Khá"
+        }
+      ]
+    },
+
+    {
+      id: "lop9-ham-bac-2",
+      name: "Hàm số bậc 2 & Phương trình bậc 2",
+      description:
+        "Các game về đồ thị hàm số bậc 2 và phương trình bậc 2 một ẩn.",
+      games: []
+    },
+    {
+      id: "lop9-hinh-khoi",
+      name: "Hình khối",
+      description:
+        "Các game hình học không gian: lăng trụ, chóp, khối tròn xoay…",
+      games: []
+    },
+
+    {
+      id: "lop9-xac-suat-thong-ke",
+      name: "Xác suất & Thống kê",
+      description:
+        "Các game luyện tập bảng tần số, biểu đồ và xác suất cho Toán 9.",
+      games: [
+        {
+          id: "lop9-thu-tai-thong-ke",
+          name: "Thử Tài Thống Kê – Chương 7",
+          path: "ThongKe/ThuTaiThongKe/index.html",
+          icon: "📊",
+          description:
+            "Game Toán 9 – Chương 7. Gồm 15 câu hỏi trắc nghiệm từ nhận biết đến vận dụng cao về tần số, bảng tần số, biểu đồ và bài toán thống kê thực tế.",
+          topics: [
+            "Tần số",
+            "Bảng tần số",
+            "Biểu đồ cột",
+            "Biểu đồ đoạn thẳng",
+            "Phân tích số liệu",
+            "Vận dụng thực tế"
+          ],
+          difficulty: "Trung bình"
+        }
+      ]
+    }
+  ]
+}
 ];
 
   // ===== CẤU HÌNH BANNER RIÊNG CHO TỪNG LỚP =====
