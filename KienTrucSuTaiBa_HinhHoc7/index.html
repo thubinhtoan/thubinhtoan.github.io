@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiến Trúc Sư Tài Ba: Hình Hộp & Hình Lập Phương</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Sora', sans-serif;
+            background-color: #e0f2fe; /* Sky-100 */
+            background-image: radial-gradient(#bae6fd 2px, transparent 2px);
+            background-size: 24px 24px;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border: 2px solid #fff;
+            box-shadow: 0 20px 40px rgba(14, 165, 233, 0.15);
+        }
+
+        .btn-game {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-game:active {
+            transform: scale(0.95);
+        }
+
+        .option-card {
+            transition: all 0.3s ease;
+        }
+        .option-card:hover:not(.disabled) {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+            border-color: #38bdf8;
+        }
+        .option-card.correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #15803d;
+        }
+        .option-card.wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #b91c1c;
+        }
+
+        /* 3D Cube Animation for Decor */
+        .scene {
+            width: 80px;
+            height: 80px;
+            perspective: 400px;
+        }
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate 10s infinite linear;
+        }
+        .cube__face {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 2px solid #0ea5e9;
+            background: rgba(14, 165, 233, 0.2);
+            font-size: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0369a1;
+            font-weight: bold;
+        }
+        .cube__face--front  { transform: rotateY(  0deg) translateZ(40px); }
+        .cube__face--right  { transform: rotateY( 90deg) translateZ(40px); }
+        .cube__face--back   { transform: rotateY(180deg) translateZ(40px); }
+        .cube__face--left   { transform: rotateY(-90deg) translateZ(40px); }
+        .cube__face--top    { transform: rotateX( 90deg) translateZ(40px); }
+        .cube__face--bottom { transform: rotateX(-90deg) translateZ(40px); }
+
+        @keyframes rotate {
+            from { transform: rotateX(0deg) rotateY(0deg); }
+            to { transform: rotateX(360deg) rotateY(360deg); }
+        }
+
+        @keyframes bounce-in {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop { animation: bounce-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- GAME CONTAINER -->
+    <div class="w-full max-w-4xl glass-panel rounded-3xl overflow-hidden relative flex flex-col min-h-[650px] shadow-2xl">
+        
+        <!-- DECORATIVE CUBES -->
+        <div class="absolute top-4 right-4 opacity-50 z-0 hidden md:block">
+            <div class="scene">
+                <div class="cube">
+                    <div class="cube__face cube__face--front">1</div>
+                    <div class="cube__face cube__face--back">2</div>
+                    <div class="cube__face cube__face--right">3</div>
+                    <div class="cube__face cube__face--left">4</div>
+                    <div class="cube__face cube__face--top">5</div>
+                    <div class="cube__face cube__face--bottom">6</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- START SCREEN -->
+        <div id="start-screen" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white p-8 text-center">
+            <div class="mb-6 bg-blue-100 p-6 rounded-full inline-block animate-pop">
+                <i class="ph-fill ph-cube text-6xl text-blue-600"></i>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-2 tracking-tight">Kiến Trúc Sư Tài Ba</h1>
+            <h2 class="text-xl md:text-2xl text-blue-500 font-bold mb-8">Chủ đề: Hình Hộp Chữ Nhật & Hình Lập Phương</h2>
+            
+            <div class="bg-slate-50 border border-slate-200 p-6 rounded-2xl mb-8 max-w-lg w-full">
+                <ul class="space-y-3 text-left font-medium text-slate-600">
+                    <li class="flex items-center"><i class="ph-bold ph-check-square text-green-500 mr-3 text-xl"></i> 15 Câu hỏi trắc nghiệm</li>
+                    <li class="flex items-center"><i class="ph-bold ph-brain text-purple-500 mr-3 text-xl"></i> Thử thách tư duy không gian</li>
+                    <li class="flex items-center"><i class="ph-bold ph-trophy text-yellow-500 mr-3 text-xl"></i> Xây dựng thành phố tri thức</li>
+                </ul>
+            </div>
+
+            <button onclick="Game.start()" class="btn-game px-10 py-4 bg-blue-600 text-white font-bold rounded-2xl text-xl shadow-lg hover:bg-blue-700 hover:shadow-blue-500/30 flex items-center gap-2">
+                <i class="ph-bold ph-play-circle text-2xl"></i> Bắt Đầu Thiết Kế
+            </button>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="game-screen" class="hidden flex-col h-full bg-slate-50/50 relative z-10">
+            <!-- Header -->
+            <div class="bg-white p-4 flex justify-between items-center shadow-sm border-b border-slate-100">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
+                        <span id="ui-current">1</span>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Câu hỏi</div>
+                        <div class="font-bold text-slate-700 text-lg">/ <span id="ui-total">15</span></div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3 bg-slate-100 px-4 py-2 rounded-xl border border-slate-200">
+                    <i class="ph-fill ph-coin text-yellow-500 text-2xl"></i>
+                    <span id="ui-score" class="font-bold text-2xl text-slate-700">0</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-200 h-1.5">
+                <div id="ui-progress" class="h-full bg-blue-500 transition-all duration-500 ease-out shadow-[0_0_10px_rgba(59,130,246,0.5)]" style="width: 0%"></div>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto p-6 md:p-8 pb-40">
+                <div class="max-w-3xl mx-auto">
+                    <span id="ui-level" class="inline-block px-3 py-1 rounded-md bg-sky-100 text-sky-700 text-xs font-bold uppercase mb-6 tracking-wide border border-sky-200">
+                        Nhận biết
+                    </span>
+                    
+                    <h2 id="ui-question" class="text-2xl md:text-3xl font-bold text-slate-800 mb-8 leading-snug">
+                        <!-- Question Text -->
+                    </h2>
+
+                    <!-- Image Container (Optional) -->
+                    <div id="ui-image-container" class="hidden mb-6 rounded-xl overflow-hidden shadow-md border border-slate-200">
+                        <!-- Image injected here if needed -->
+                    </div>
+
+                    <div id="ui-options" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Buttons injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Sheet -->
+            <div id="feedback-sheet" class="absolute bottom-0 inset-x-0 bg-white border-t-4 border-blue-500 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] p-6 md:p-8 transform translate-y-full transition-transform duration-300 z-30 rounded-t-3xl">
+                <div class="max-w-4xl mx-auto flex flex-col md:flex-row gap-6 items-start">
+                    <div id="fb-icon" class="text-5xl flex-shrink-0 animate-pop"></div>
+                    <div class="flex-1">
+                        <h3 id="fb-title" class="text-xl font-bold mb-2"></h3>
+                        <div class="text-xs font-bold text-slate-400 uppercase mb-1">Giải thích:</div>
+                        <p id="fb-rationale" class="text-slate-700 text-lg leading-relaxed mb-3"></p>
+                        <div id="fb-hint-box" class="hidden bg-yellow-50 text-yellow-800 p-3 rounded-lg text-sm border border-yellow-200">
+                            <i class="ph-bold ph-lightbulb mr-1"></i> <span id="fb-hint"></span>
+                        </div>
+                    </div>
+                    <button onclick="Game.next()" class="w-full md:w-auto px-8 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+                        Tiếp Tục <i class="ph-bold ph-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- END SCREEN -->
+        <div id="end-screen" class="hidden absolute inset-0 z-30 flex flex-col items-center justify-center bg-white/95 p-8 text-center">
+            <div class="relative mb-8">
+                <div class="absolute inset-0 bg-yellow-200 rounded-full animate-ping opacity-50"></div>
+                <i class="ph-fill ph-crown text-8xl text-yellow-500 relative z-10 drop-shadow-xl"></i>
+            </div>
+
+            <h2 class="text-3xl font-black text-slate-800 mb-2">Công Trình Hoàn Tất!</h2>
+            <p id="end-msg" class="text-lg text-slate-600 mb-8 max-w-md mx-auto">Chúc mừng bạn đã hoàn thành xuất sắc bản thiết kế tri thức.</p>
+
+            <div class="grid grid-cols-2 gap-4 w-full max-w-sm mb-8">
+                <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                    <div class="text-xs font-bold text-blue-400 uppercase">Tổng Điểm</div>
+                    <div class="text-3xl font-black text-blue-600" id="end-score">0</div>
+                </div>
+                <div class="bg-green-50 p-4 rounded-2xl border border-green-100">
+                    <div class="text-xs font-bold text-green-400 uppercase">Đúng</div>
+                    <div class="text-3xl font-black text-green-600"><span id="end-correct">0</span>/15</div>
+                </div>
+            </div>
+
+            <button onclick="location.reload()" class="btn-game px-8 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 flex items-center gap-2">
+                <i class="ph-bold ph-arrow-counter-clockwise"></i> Chơi Lại
+            </button>
+        </div>
+
+    </div>
+
+<script>
+/* =========================
+   UTIL: SHUFFLE (random)
+========================= */
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* =========================
+   DATABASE (15 câu)
+========================= */
+const QUESTIONS = [
+  // --- NHẬN BIẾT (6 câu) ---
+  {
+    level: "Nhận biết",
+    text: "Hình hộp chữ nhật có bao nhiêu đỉnh?",
+    options: [
+      { text: "8 đỉnh", correct: true, rationale: "Chính xác! Hình hộp chữ nhật có 8 đỉnh (4 đỉnh ở mặt trên và 4 đỉnh ở mặt dưới)." },
+      { text: "6 đỉnh", correct: false, rationale: "Sai. 6 là số mặt của hình hộp chữ nhật." },
+      { text: "12 đỉnh", correct: false, rationale: "Sai. 12 là số cạnh." },
+      { text: "4 đỉnh", correct: false, rationale: "Quá ít." }
+    ],
+    hint: "Hãy tưởng tượng một viên gạch hoặc hộp phấn và đếm các góc nhọn của nó."
+  },
+  {
+    level: "Nhận biết",
+    text: "Các mặt của hình hộp chữ nhật là hình gì?",
+    options: [
+      { text: "Hình chữ nhật", correct: true, rationale: "Đúng. Theo định nghĩa, hình hộp chữ nhật có 6 mặt đều là hình chữ nhật." },
+      { text: "Hình vuông", correct: false, rationale: "Chỉ đúng với hình lập phương. Hình hộp chữ nhật tổng quát thì là hình chữ nhật." },
+      { text: "Hình bình hành", correct: false, rationale: "Chưa chính xác nhất. Dù hình chữ nhật là hình bình hành đặc biệt, nhưng tên gọi chính xác nhất phải là hình chữ nhật." },
+      { text: "Hình thoi", correct: false, rationale: "Sai." }
+    ],
+    hint: "Tên gọi của hình đã gợi ý câu trả lời: Hình hộp CHỮ NHẬT."
+  },
+  {
+    level: "Nhận biết",
+    text: "Hình lập phương có bao nhiêu cạnh bằng nhau?",
+    options: [
+      { text: "12 cạnh", correct: true, rationale: "Chính xác! Hình lập phương có 12 cạnh và tất cả các cạnh đều có độ dài bằng nhau." },
+      { text: "6 cạnh", correct: false, rationale: "Sai. 6 là số mặt." },
+      { text: "8 cạnh", correct: false, rationale: "Sai." },
+      { text: "4 cạnh", correct: false, rationale: "Sai." }
+    ],
+    hint: "Hình lập phương được tạo bởi 6 mặt là các hình vuông bằng nhau."
+  },
+  {
+    level: "Nhận biết",
+    text: "Hình lập phương có bao nhiêu đường chéo (đường chéo của khối)?",
+    options: [
+      { text: "4 đường chéo", correct: true, rationale: "Đúng. Có 4 đường chéo nối các cặp đỉnh đối diện xuyên qua tâm của hình." },
+      { text: "2 đường chéo", correct: false, rationale: "Sai." },
+      { text: "6 đường chéo", correct: false, rationale: "Sai." },
+      { text: "8 đường chéo", correct: false, rationale: "Sai." }
+    ],
+    hint: "Đường chéo của khối nối 2 đỉnh đối diện (không cùng 1 mặt). Có 4 cặp đỉnh như vậy."
+  },
+  {
+    level: "Nhận biết",
+    text: "Khẳng định nào sau đây là <b>đúng</b> về hình lập phương?",
+    options: [
+      { text: "Có 6 mặt là các hình vuông bằng nhau.", correct: true, rationale: "Chính xác. Đây là đặc điểm nhận dạng quan trọng nhất của hình lập phương." },
+      { text: "Có 6 mặt là hình chữ nhật.", correct: false, rationale: "Đây là đặc điểm của hình hộp chữ nhật nói chung." },
+      { text: "Có các cạnh không bằng nhau.", correct: false, rationale: "Sai. Hình lập phương có tất cả cạnh bằng nhau." },
+      { text: "Có 4 mặt bên là hình chữ nhật, 2 mặt đáy là hình vuông.", correct: false, rationale: "Không chắc. Mô tả này có thể là hộp chữ nhật có 2 đáy vuông, chưa đủ để kết luận là lập phương." }
+    ],
+    hint: "Hãy nghĩ đến con xúc xắc (xí ngầu)."
+  },
+  {
+    level: "Nhận biết",
+    text: "Số mặt của hình hộp chữ nhật là:",
+    options: [
+      { text: "6 mặt", correct: true, rationale: "Đúng. Gồm 2 mặt đáy và 4 mặt bên." },
+      { text: "4 mặt", correct: false, rationale: "Sai." },
+      { text: "8 mặt", correct: false, rationale: "Sai." },
+      { text: "12 mặt", correct: false, rationale: "Sai." }
+    ],
+    hint: "Giống như con xúc xắc: có 6 mặt."
+  },
+
+  // --- THÔNG HIỂU (5 câu) ---
+  {
+    level: "Thông hiểu",
+    text: "Một hình hộp chữ nhật có chiều dài 5cm, chiều rộng 3cm, chiều cao 4cm. Tổng độ dài tất cả các cạnh của hình hộp đó là bao nhiêu?",
+    options: [
+      { text: "48 cm", correct: true, rationale: "Xuất sắc! Tổng cạnh = 4 × (5 + 3 + 4) = 4 × 12 = 48 cm." },
+      { text: "24 cm", correct: false, rationale: "Sai. Bạn có thể đã quên nhân 4." },
+      { text: "12 cm", correct: false, rationale: "Sai. Đây mới chỉ là tổng 3 kích thước." },
+      { text: "60 cm", correct: false, rationale: "Sai." }
+    ],
+    hint: "Hình hộp chữ nhật có 4 cạnh theo mỗi kích thước."
+  },
+  {
+    level: "Thông hiểu",
+    text: "Nếu một hình lập phương có cạnh bằng 5cm thì diện tích một mặt của nó là bao nhiêu?",
+    options: [
+      { text: "$25\\,cm^2$", correct: true, rationale: "Đúng. Diện tích mặt = $5^2 = 25$." },
+      { text: "$20\\,cm^2$", correct: false, rationale: "Sai. $5\\times 4$ là chu vi, không phải diện tích." },
+      { text: "$125\\,cm^2$", correct: false, rationale: "Sai." },
+      { text: "$10\\,cm^2$", correct: false, rationale: "Sai." }
+    ],
+    hint: "Diện tích hình vuông = cạnh × cạnh."
+  },
+  {
+    level: "Thông hiểu",
+    text: "Cho hình hộp chữ nhật ABCD.MNPQ. Cạnh nào song song với cạnh AB?",
+    options: [
+      { text: "Cạnh MN", correct: true, rationale: "Chính xác! AB song song MN." },
+      { text: "Cạnh AD", correct: false, rationale: "Sai. AB và AD cắt nhau tại A." },
+      { text: "Cạnh AM", correct: false, rationale: "Sai. AB và AM cắt nhau tại A." },
+      { text: "Cạnh BC", correct: false, rationale: "Sai. AB và BC cắt nhau tại B." }
+    ],
+    hint: "Cạnh song song là cạnh đối diện và không cắt nhau."
+  },
+  {
+    level: "Thông hiểu",
+    text: "Tổng độ dài các cạnh của một hình lập phương là 36cm. Độ dài một cạnh là:",
+    options: [
+      { text: "3 cm", correct: true, rationale: "Đúng. Có 12 cạnh nên cạnh = $36:12=3$ cm." },
+      { text: "6 cm", correct: false, rationale: "Sai. 6 là số mặt." },
+      { text: "4 cm", correct: false, rationale: "Sai." },
+      { text: "9 cm", correct: false, rationale: "Sai." }
+    ],
+    hint: "Hình lập phương có 12 cạnh bằng nhau."
+  },
+  {
+    level: "Thông hiểu",
+    text: "Cho hình hộp chữ nhật ABCD.EFGH. Đường chéo của hình hộp này là đoạn thẳng nào?",
+    options: [
+      { text: "AG", correct: true, rationale: "Chính xác. AG là đường chéo của khối (nối 2 đỉnh đối diện)." },
+      { text: "AC", correct: false, rationale: "Sai. AC là đường chéo của mặt đáy." },
+      { text: "AF", correct: false, rationale: "Sai. AF là đường chéo của một mặt bên." },
+      { text: "AH", correct: false, rationale: "Sai. AH là đường chéo của một mặt bên." }
+    ],
+    hint: "Đường chéo của khối đi xuyên qua trong lòng khối."
+  },
+
+  // --- VẬN DỤNG (3 câu) ---
+  {
+    level: "Vận dụng",
+    text: "Một thùng hàng hình lập phương có cạnh 0,5m. Buộc dây viền quanh tất cả các cạnh. Cần ít nhất bao nhiêu mét dây?",
+    options: [
+      { text: "6 m", correct: true, rationale: "Đúng. Có 12 cạnh: $12\\times 0,5=6$ m." },
+      { text: "3 m", correct: false, rationale: "Sai. 3m mới chỉ tương đương 6 cạnh." },
+      { text: "4 m", correct: false, rationale: "Sai." },
+      { text: "2 m", correct: false, rationale: "Sai." }
+    ],
+    hint: "Tính tổng độ dài 12 cạnh."
+  },
+  {
+    level: "Vận dụng (Thực tế)",
+    text: "Dán giấy màu lên toàn bộ mặt ngoài của hộp quà hình lập phương cạnh 10cm. Diện tích giấy cần dùng ít nhất là:",
+    options: [
+      { text: "$600\\,cm^2$", correct: true, rationale: "Đúng. Diện tích toàn phần: $6\\times 10^2 = 600$." },
+      { text: "$100\\,cm^2$", correct: false, rationale: "Sai. Đây là diện tích 1 mặt." },
+      { text: "$400\\,cm^2$", correct: false, rationale: "Sai. Đây là diện tích xung quanh (4 mặt)." },
+      { text: "$1000\\,cm^2$", correct: false, rationale: "Sai. Đây không phải thể tích." }
+    ],
+    hint: "Có 6 mặt bằng nhau."
+  },
+  {
+    level: "Vận dụng",
+    text: "Một căn phòng hình hộp chữ nhật có chiều dài 6m, chiều rộng 4m. Chu vi mặt đáy là:",
+    options: [
+      { text: "20 m", correct: true, rationale: "Đúng. Chu vi đáy: $(6+4)\\times 2=20$ m." },
+      { text: "10 m", correct: false, rationale: "Sai. Đây mới là nửa chu vi." },
+      { text: "24 m", correct: false, rationale: "Sai. 24 là diện tích $6\\times 4$." },
+      { text: "12 m", correct: false, rationale: "Sai." }
+    ],
+    hint: "Chu vi hình chữ nhật: $2(a+b)$."
+  },
+
+  // --- VẬN DỤNG CAO (1 câu) ---
+  {
+    level: "Vận dụng cao",
+    text: "Hình lập phương lớn tạo bởi 27 khối lập phương nhỏ cạnh 1cm. Sơn tất cả mặt ngoài. Hỏi có bao nhiêu khối nhỏ KHÔNG bị sơn mặt nào?",
+    options: [
+      { text: "1 khối", correct: true, rationale: "Đúng. Khối không bị sơn là khối ở giữa. Vì $27=3^3$, lõi trong là $(3-2)^3=1$ khối." },
+      { text: "0 khối", correct: false, rationale: "Sai." },
+      { text: "8 khối", correct: false, rationale: "Sai. 8 là các khối ở 8 góc (bị sơn 3 mặt)." },
+      { text: "6 khối", correct: false, rationale: "Sai. 6 là tâm các mặt (bị sơn 1 mặt)." }
+    ],
+    hint: "Bóc lớp vỏ ngoài đi: còn lại lõi bên trong."
+  }
+];
+
+/* =========================
+   PREP: RANDOM QUESTIONS + OPTIONS
+========================= */
+const GameData = {
+  questions: [],
+  prepare() {
+    // random câu hỏi
+    this.questions = shuffleArray(QUESTIONS).map(q => {
+      // random đáp án (giữ đúng/sai theo thuộc tính correct)
+      return { ...q, options: shuffleArray(q.options) };
+    });
+  }
+};
+
+// --- GAME LOGIC ---
+const Game = {
+  state: { index: 0, score: 0, answered: false },
+
+  start() {
+    GameData.prepare();
+    this.state = { index: 0, score: 0, answered: false };
+
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('end-screen').classList.add('hidden');
+    document.getElementById('game-screen').classList.remove('hidden');
+    document.getElementById('game-screen').classList.add('flex');
+
+    this.render();
+  },
+
+  render() {
+    this.state.answered = false;
+    document.getElementById('feedback-sheet').classList.add('translate-y-full');
+
+    const q = GameData.questions[this.state.index];
+
+    // UI
+    document.getElementById('ui-current').innerText = this.state.index + 1;
+    document.getElementById('ui-total').innerText = GameData.questions.length;
+    document.getElementById('ui-score').innerText = this.state.score;
+    document.getElementById('ui-level').innerText = "Mức độ: " + q.level;
+
+    // Progress
+    const pct = (this.state.index / GameData.questions.length) * 100;
+    document.getElementById('ui-progress').style.width = `${pct}%`;
+
+    // Question
+    document.getElementById('ui-question').innerHTML = q.text;
+
+    // Options
+    const container = document.getElementById('ui-options');
+    container.innerHTML = '';
+
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = `option-card w-full text-left p-6 rounded-2xl bg-white border-2 border-slate-100 font-medium text-slate-600 flex items-center shadow-sm relative overflow-hidden`;
+      btn.innerHTML = `
+        <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 font-bold flex items-center justify-center mr-4 border border-slate-200 shrink-0">
+          ${String.fromCharCode(65 + i)}
+        </div>
+        <span class="text-lg">${opt.text}</span>
+      `;
+      btn.onclick = () => this.check(btn, opt, q);
+      container.appendChild(btn);
+    });
+
+    if (window.MathJax) MathJax.typesetPromise();
+  },
+
+  check(btn, opt, q) {
+    if (this.state.answered) return;
+    this.state.answered = true;
+
+    const allBtns = document.querySelectorAll('.option-card');
+    allBtns.forEach(b => b.classList.add('disabled', 'cursor-default'));
+
+    const fbIcon = document.getElementById('fb-icon');
+    const fbTitle = document.getElementById('fb-title');
+    const hintBox = document.getElementById('fb-hint-box');
+
+    if (opt.correct) {
+      this.state.score += 10;
+      document.getElementById('ui-score').innerText = this.state.score;
+
+      btn.classList.add('correct');
+
+      fbIcon.innerText = "🎉";
+      fbTitle.innerText = "Tuyệt Vời!";
+      fbTitle.className = "text-xl font-bold mb-2 text-green-600";
+      hintBox.classList.add('hidden');
+
+      this.playSound('win');
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
+    } else {
+      btn.classList.add('wrong');
+
+      // Highlight correct
+      const correctIndex = q.options.findIndex(o => o.correct);
+      allBtns[correctIndex].classList.add('correct', 'opacity-70');
+
+      fbIcon.innerText = "🤔";
+      fbTitle.innerText = "Tiếc Quá!";
+      fbTitle.className = "text-xl font-bold mb-2 text-red-500";
+
+      hintBox.classList.remove('hidden');
+      document.getElementById('fb-hint').innerHTML = q.hint;
+
+      this.playSound('lose');
+    }
+
+    // dùng innerHTML để MathJax ăn cả nội dung $...$ nếu có
+    document.getElementById('fb-rationale').innerHTML = opt.rationale;
+
+    document.getElementById('feedback-sheet').classList.remove('translate-y-full');
+
+    if (window.MathJax) MathJax.typesetPromise();
+  },
+
+  next() {
+    this.state.index++;
+    if (this.state.index < GameData.questions.length) {
+      this.render();
+    } else {
+      this.end();
+    }
+  },
+
+  end() {
+    document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('end-screen').classList.remove('hidden');
+    document.getElementById('end-screen').classList.add('flex');
+
+    document.getElementById('end-score').innerText = this.state.score;
+    document.getElementById('end-correct').innerText = Math.round(this.state.score / 10);
+
+    this.playSound('finish');
+  },
+
+  playSound(type) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (type === 'win') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(400, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } else if (type === 'lose') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.2);
+    } else if (type === 'finish') {
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+        setTimeout(() => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g);
+          g.connect(ctx.destination);
+          o.type = 'sine';
+          o.frequency.value = freq;
+          g.gain.setValueAtTime(0.1, ctx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+          o.start();
+          o.stop(ctx.currentTime + 0.5);
+        }, i * 150);
+      });
+    }
+  }
+};
+</script>
+</body>
+</html>
