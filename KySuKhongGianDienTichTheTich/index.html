@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kỹ Sư Không Gian: Diện Tích & Thể Tích</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax for rendering Math formulas -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0fdf4; /* Green-50 */
+            background-image: 
+                linear-gradient(30deg, #dcfce7 12%, transparent 12.5%, transparent 87%, #dcfce7 87.5%, #dcfce7),
+                linear-gradient(150deg, #dcfce7 12%, transparent 12.5%, transparent 87%, #dcfce7 87.5%, #dcfce7),
+                linear-gradient(30deg, #dcfce7 12%, transparent 12.5%, transparent 87%, #dcfce7 87.5%, #dcfce7),
+                linear-gradient(150deg, #dcfce7 12%, transparent 12.5%, transparent 87%, #dcfce7 87.5%, #dcfce7),
+                linear-gradient(60deg, #dcfce777 25%, transparent 25.5%, transparent 75%, #dcfce777 75%, #dcfce777),
+                linear-gradient(60deg, #dcfce777 25%, transparent 25.5%, transparent 75%, #dcfce777 75%, #dcfce777);
+            background-size: 80px 140px;
+            background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
+        }
+
+        .glass-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid #ffffff;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn-option {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-option:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
+        }
+        .btn-option:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        .btn-option.correct {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .btn-option.wrong {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating-icon { animation: float 3s ease-in-out infinite; }
+
+        .progress-bar { transition: width 0.5s ease-in-out; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- GAME WRAPPER -->
+    <div class="w-full max-w-4xl glass-container rounded-3xl overflow-hidden relative flex flex-col min-h-[680px]">
+        
+        <!-- DECORATION -->
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-green-300 rounded-full blur-3xl opacity-30"></div>
+        <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-300 rounded-full blur-3xl opacity-30"></div>
+
+        <!-- START SCREEN -->
+        <div id="start-screen" class="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 text-center bg-white/95">
+            <div class="mb-6 floating-icon">
+                <i class="ph-fill ph-package text-8xl text-green-600 drop-shadow-lg"></i>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-2">Kỹ Sư Không Gian</h1>
+            <p class="text-xl text-green-600 font-bold mb-8">Chuyên gia Diện tích & Thể tích</p>
+            
+            <div class="bg-green-50 p-6 rounded-2xl mb-8 max-w-md w-full border border-green-100">
+                <div class="flex items-center mb-3">
+                    <i class="ph-bold ph-ruler text-green-600 text-xl mr-3"></i>
+                    <span class="text-gray-700 font-semibold">15 Thử thách tính toán</span>
+                </div>
+                <div class="flex items-center mb-3">
+                    <i class="ph-bold ph-cube text-blue-600 text-xl mr-3"></i>
+                    <span class="text-gray-700 font-semibold">Hình hộp & Hình lập phương</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="ph-bold ph-medal text-yellow-500 text-xl mr-3"></i>
+                    <span class="text-gray-700 font-semibold">Nhận huy hiệu Kỹ sư trưởng</span>
+                </div>
+            </div>
+
+            <button onclick="Game.start()" class="group relative px-10 py-4 bg-green-600 text-white font-bold rounded-full text-xl shadow-[0_4px_0_#15803d] active:shadow-none active:translate-y-[4px] transition-all hover:bg-green-500">
+                <span class="flex items-center gap-2">
+                    Bắt Đầu Ngay <i class="ph-bold ph-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                </span>
+            </button>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="game-screen" class="hidden flex-col h-full bg-white/80 relative z-10">
+            <!-- HEADER -->
+            <div class="bg-white p-4 shadow-sm flex justify-between items-center z-20 border-b border-gray-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-green-100 text-green-700 flex items-center justify-center font-bold text-xl border border-green-200">
+                        <span id="q-idx">1</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-gray-400 uppercase">CÂU HỎI</span>
+                        <span class="font-bold text-gray-700">/ <span id="q-total">15</span></span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center bg-gray-50 px-4 py-2 rounded-xl border border-gray-200">
+                    <i class="ph-fill ph-star text-yellow-400 text-2xl mr-2"></i>
+                    <span id="score" class="font-bold text-2xl text-gray-800">0</span>
+                </div>
+            </div>
+
+            <!-- PROGRESS -->
+            <div class="w-full bg-gray-200 h-2">
+                <div id="progress" class="h-full bg-green-500 progress-bar" style="width: 0%"></div>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="flex-1 overflow-y-auto p-6 md:p-8 pb-40">
+                <div class="max-w-3xl mx-auto">
+                    <span id="level-badge" class="inline-block px-3 py-1 rounded-lg bg-blue-100 text-blue-700 text-xs font-bold uppercase mb-4 tracking-wider">
+                        Nhận biết
+                    </span>
+                    
+                    <h2 id="question-text" class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 leading-normal">
+                        <!-- Question goes here -->
+                    </h2>
+
+                    <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Buttons go here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- FEEDBACK AREA -->
+            <div id="feedback-area" class="absolute bottom-0 inset-x-0 bg-white border-t-4 border-green-500 shadow-[0_-10px_50px_rgba(0,0,0,0.1)] p-6 transform translate-y-full transition-transform duration-300 z-30">
+                <div class="max-w-4xl mx-auto flex flex-col md:flex-row gap-6 items-start">
+                    <div id="fb-icon" class="text-5xl shrink-0"></div>
+                    <div class="flex-1">
+                        <h3 id="fb-title" class="text-xl font-bold mb-2"></h3>
+                        <p id="fb-text" class="text-gray-700 text-lg leading-relaxed mb-2"></p>
+                        <div id="hint-box" class="hidden bg-yellow-50 text-yellow-800 p-3 rounded-lg text-sm border border-yellow-200 flex items-start mt-2">
+                            <i class="ph-bold ph-lightbulb text-xl mr-2 mt-0.5"></i>
+                            <span id="fb-hint"></span>
+                        </div>
+                    </div>
+                    <button onclick="Game.next()" class="px-8 py-3 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:scale-105 transition-transform flex items-center justify-center gap-2">
+                        Tiếp Tục <i class="ph-bold ph-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- END SCREEN -->
+        <div id="end-screen" class="hidden absolute inset-0 z-30 flex flex-col items-center justify-center p-8 bg-white text-center">
+            <div class="relative mb-8">
+                <div class="absolute inset-0 bg-green-200 rounded-full animate-ping opacity-50"></div>
+                <i class="ph-fill ph-trophy text-9xl text-yellow-400 relative z-10 drop-shadow-xl"></i>
+            </div>
+            
+            <h2 class="text-3xl font-black text-gray-800 mb-2">Hoàn Thành Nhiệm Vụ!</h2>
+            <p id="end-message" class="text-lg text-gray-600 mb-8">Bạn đã xuất sắc hoàn thành bản vẽ kỹ thuật.</p>
+
+            <div class="flex gap-4 mb-8 justify-center w-full max-w-sm">
+                <div class="flex-1 bg-green-50 p-4 rounded-2xl border border-green-100">
+                    <div class="text-xs font-bold text-green-600 uppercase">Điểm số</div>
+                    <div class="text-3xl font-black text-green-700" id="final-score">0</div>
+                </div>
+                <div class="flex-1 bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                    <div class="text-xs font-bold text-blue-600 uppercase">Đúng</div>
+                    <div class="text-3xl font-black text-blue-700"><span id="final-correct">0</span>/15</div>
+                </div>
+            </div>
+
+            <button onclick="location.reload()" class="px-8 py-3 bg-green-600 text-white font-bold rounded-full shadow-lg hover:bg-green-700 transition-all flex items-center gap-2">
+                <i class="ph-bold ph-arrow-counter-clockwise"></i> Thử Thách Lại
+            </button>
+        </div>
+
+    </div>
+
+<script>
+/* =========================
+   UTIL: SHUFFLE (random)
+========================= */
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* =========================
+   DATABASE (15 câu)
+   ✅ ĐÃ CÂN ĐÁP ÁN ĐÚNG ABCD (trước khi random)
+   ✅ LaTeX dùng $...$
+========================= */
+const QUESTIONS = [
+  // --- NHẬN BIẾT (6 câu) ---
+  {
+    level: "Nhận biết",
+    text: "Công thức tính thể tích của hình hộp chữ nhật có ba kích thước $a, b, h$ là:",
+    options: [
+      { text: "$V = a \\cdot b \\cdot h$", correct: true,  rationale: "Chính xác! Thể tích bằng tích của chiều dài, chiều rộng và chiều cao." },
+      { text: "$V = (a + b) \\cdot h$", correct: false, rationale: "Sai. Đây gần giống công thức diện tích xung quanh nhưng thiếu số 2." },
+      { text: "$V = 2(a + b) \\cdot h$", correct: false, rationale: "Sai. Đây là công thức tính diện tích xung quanh." },
+      { text: "$V = a^2 \\cdot h$", correct: false, rationale: "Sai." }
+    ],
+    hint: "Muốn tính sức chứa (thể tích), ta nhân cả 3 kích thước lại với nhau."
+  },
+  {
+    level: "Nhận biết",
+    text: "Diện tích xung quanh của hình lập phương có cạnh $a$ được tính theo công thức:",
+    options: [
+      { text: "$S_{xq} = 6a^2$", correct: false, rationale: "Sai. Đây là công thức tính diện tích toàn phần." },
+      { text: "$S_{xq} = 4a^2$", correct: true,  rationale: "Đúng. Hình lập phương có 4 mặt bên là các hình vuông bằng nhau, diện tích mỗi mặt là $a^2$." },
+      { text: "$S_{xq} = a^3$",  correct: false, rationale: "Sai. Đây là công thức tính thể tích." },
+      { text: "$S_{xq} = a^2$",  correct: false, rationale: "Sai. Đây là diện tích 1 mặt." }
+    ],
+    hint: "Diện tích xung quanh gồm 4 mặt bên."
+  },
+  {
+    level: "Nhận biết",
+    text: "Nếu cạnh của một hình lập phương là $3$ cm, thì thể tích của nó được tính bằng:",
+    options: [
+      { text: "$3^2$ ($cm^3$)", correct: false, rationale: "Sai. Đây là diện tích 1 mặt." },
+      { text: "$3 \\times 4$ ($cm^3$)", correct: false, rationale: "Sai." },
+      { text: "$3^3$ ($cm^3$)", correct: true,  rationale: "Chính xác. $V = a^3$." },
+      { text: "$3 \\times 6$ ($cm^3$)", correct: false, rationale: "Sai." }
+    ],
+    hint: "Thể tích hình lập phương bằng cạnh lũy thừa 3."
+  },
+  {
+    level: "Nhận biết",
+    text: "Đơn vị nào sau đây <b>không</b> dùng để đo thể tích?",
+    options: [
+      { text: "$m^3$", correct: false, rationale: "Sai. Mét khối là đơn vị đo thể tích." },
+      { text: "$cm^3$", correct: false, rationale: "Sai. Xăng-ti-mét khối là đơn vị đo thể tích." },
+      { text: "Lít ($L$)", correct: false, rationale: "Sai. Lít là đơn vị đo dung tích (thể tích)." },
+      { text: "$m^2$", correct: true,  rationale: "Đúng. $m^2$ (mét vuông) là đơn vị đo diện tích." }
+    ],
+    hint: "Đơn vị đo thể tích thường có số mũ là 3."
+  },
+  {
+    level: "Nhận biết",
+    text: "Công thức tính diện tích xung quanh của hình hộp chữ nhật là:",
+    options: [
+      { text: "$S_{xq} = 2(a + b)h$", correct: true,  rationale: "Chính xác! Bằng chu vi đáy nhân với chiều cao." },
+      { text: "$S_{xq} = ab h$",        correct: false, rationale: "Sai. Đây là thể tích." },
+      { text: "$S_{xq} = (a + b)h$",    correct: false, rationale: "Sai. Thiếu hệ số 2." },
+      { text: "$S_{xq} = 2ab h$",       correct: false, rationale: "Sai." }
+    ],
+    hint: "Lấy chu vi mặt đáy nhân với chiều cao."
+  },
+  {
+    level: "Nhận biết",
+    text: "Diện tích toàn phần của hình lập phương bằng:",
+    options: [
+      { text: "Diện tích xung quanh nhân 2",                    correct: false, rationale: "Sai." },
+      { text: "Diện tích xung quanh cộng với diện tích 2 đáy",  correct: true,  rationale: "Đúng. Toàn phần = Xung quanh + 2 Đáy." },
+      { text: "Diện tích một mặt nhân với 4",                  correct: false, rationale: "Sai. Đây là diện tích xung quanh." },
+      { text: "Thể tích chia cho chiều cao",                   correct: false, rationale: "Sai." }
+    ],
+    hint: "Toàn phần nghĩa là bao gồm cả mặt bên và mặt đáy."
+  },
+
+  // --- THÔNG HIỂU (5 câu) ---
+  {
+    level: "Thông hiểu",
+    text: "Một hình lập phương có cạnh $5$ cm. Diện tích xung quanh của nó là:",
+    options: [
+      { text: "$150 \\, cm^2$", correct: false, rationale: "Sai. Đây là diện tích toàn phần ($6 \\cdot 25$)." },
+      { text: "$125 \\, cm^2$", correct: false, rationale: "Sai. Đây là thể tích ($5^3$)." },
+      { text: "$100 \\, cm^2$", correct: true,  rationale: "Giỏi lắm! $S_{xq} = 4 \\cdot 5^2 = 4 \\cdot 25 = 100$." },
+      { text: "$25 \\, cm^2$",  correct: false, rationale: "Sai. Đây là diện tích 1 mặt." }
+    ],
+    hint: "Tính diện tích một mặt ($5 \\times 5$) rồi nhân với 4."
+  },
+  {
+    level: "Thông hiểu",
+    text: "Một hình hộp chữ nhật có chiều dài $4$m, chiều rộng $3$m, chiều cao $2$m. Thể tích của hình hộp này là:",
+    options: [
+      { text: "$28 \\, m^3$", correct: false, rationale: "Sai. Bạn có thể đã tính diện tích xung quanh ($2(4+3)\\cdot 2 = 28$)." },
+      { text: "$24 \\, m^3$", correct: true,  rationale: "Đúng. $V = 4 \\cdot 3 \\cdot 2 = 24$." },
+      { text: "$9 \\, m^3$",  correct: false, rationale: "Sai." },
+      { text: "$14 \\, m^3$", correct: false, rationale: "Sai." }
+    ],
+    hint: "Nhân ba kích thước lại với nhau."
+  },
+  {
+    level: "Thông hiểu",
+    text: "Biết diện tích xung quanh của một hình lập phương là $64 \\, cm^2$. Độ dài cạnh của hình lập phương đó là:",
+    options: [
+      { text: "$8 \\, cm$",  correct: false, rationale: "Sai. $8^2 = 64$, nhưng phải chia cho 4 trước." },
+      { text: "$16 \\, cm$", correct: false, rationale: "Sai." },
+      { text: "$2 \\, cm$",  correct: false, rationale: "Sai." },
+      { text: "$4 \\, cm$",  correct: true,  rationale: "Xuất sắc! $S_{xq} = 4a^2 = 64 \\Rightarrow a^2 = 16 \\Rightarrow a = 4$." }
+    ],
+    hint: "Lấy 64 chia cho 4 để tìm diện tích một mặt, sau đó tìm số nào bình phương lên bằng kết quả đó."
+  },
+  {
+    level: "Thông hiểu",
+    text: "Một bể nước hình hộp chữ nhật có thể tích $12 \\, m^3$, diện tích đáy là $4 \\, m^2$. Chiều cao của bể là:",
+    options: [
+      { text: "$48 \\, m$",   correct: false, rationale: "Sai. Không phải phép nhân." },
+      { text: "$3 \\, m$",    correct: true,  rationale: "Đúng. $h = V : S_{đáy} = 12 : 4 = 3$." },
+      { text: "$8 \\, m$",    correct: false, rationale: "Sai." },
+      { text: "$0,33 \\, m$", correct: false, rationale: "Sai. Lấy 12 chia 4 chứ không phải 4 chia 12." }
+    ],
+    hint: "Thể tích bằng diện tích đáy nhân chiều cao. Muốn tìm chiều cao, ta làm phép chia."
+  },
+  {
+    level: "Thông hiểu",
+    text: "Diện tích toàn phần của hình hộp chữ nhật có kích thước $2cm, 3cm, 4cm$ là:",
+    options: [
+      { text: "$40 \\, cm^2$", correct: false, rationale: "Sai. Đây mới là diện tích xung quanh." },
+      { text: "$24 \\, cm^2$", correct: false, rationale: "Sai. Đây là thể tích." },
+      { text: "$52 \\, cm^2$", correct: true,  rationale: "Chính xác! $S_{xq} = 2(2+3)\\cdot 4 = 40$. $S_{2đ} = 2 \\cdot 2 \\cdot 3 = 12$. Tổng = $52$." },
+      { text: "$26 \\, cm^2$", correct: false, rationale: "Sai." }
+    ],
+    hint: "Tính $S_{xq}$ trước, sau đó cộng thêm diện tích của 2 mặt đáy."
+  },
+
+  // --- VẬN DỤNG (3 câu) ---
+  {
+    level: "Vận dụng",
+    text: "Một hình lập phương có cạnh bằng $a$. Nếu gấp cạnh của hình lập phương lên $3$ lần thì diện tích xung quanh của nó tăng lên bao nhiêu lần?",
+    options: [
+      { text: "$9$ lần",  correct: true,  rationale: "Tuyệt vời! Diện tích tỉ lệ thuận với bình phương cạnh. $3^2 = 9$." },
+      { text: "$3$ lần",  correct: false, rationale: "Sai. Diện tích không tỉ lệ thuận bậc 1 với cạnh." },
+      { text: "$6$ lần",  correct: false, rationale: "Sai." },
+      { text: "$27$ lần", correct: false, rationale: "Sai. Đây là số lần tăng của thể tích." }
+    ],
+    hint: "Diện tích phụ thuộc vào $a^2$. Nếu thay $a$ bằng $3a$ thì diện tích sẽ chứa $(3a)^2$."
+  },
+  {
+    level: "Vận dụng (Thực tế)",
+    text: "Bác Nam làm một bể cá kính dạng hình hộp chữ nhật không có nắp, chiều dài $80cm$, rộng $50cm$, cao $40cm$. Diện tích kính cần dùng là:",
+    options: [
+      { text: "$18400 \\, cm^2$",  correct: false, rationale: "Sai. Bạn đã tính cả nắp (diện tích toàn phần)." },
+      { text: "$14400 \\, cm^2$",  correct: true,  rationale: "Chính xác! $S_{xq} = 2(80+50)\\cdot 40 = 10400$. $S_{đáy} = 80\\cdot 50 = 4000$. Tổng = $14400$." },
+      { text: "$10400 \\, cm^2$",  correct: false, rationale: "Sai. Đây mới là diện tích xung quanh." },
+      { text: "$160000 \\, cm^2$", correct: false, rationale: "Sai. Đây là thể tích." }
+    ],
+    hint: "Diện tích kính = Diện tích xung quanh + Diện tích 1 mặt đáy (vì không có nắp)."
+  },
+  {
+    level: "Vận dụng",
+    text: "Một hồ bơi có chiều dài $20m$, chiều rộng $8m$, độ sâu trung bình $1,5m$. Cần bao nhiêu mét khối nước để bơm đầy $80\\%$ hồ?",
+    options: [
+      { text: "$240 \\, m^3$", correct: false, rationale: "Sai. Đây là thể tích đầy hồ." },
+      { text: "$300 \\, m^3$", correct: false, rationale: "Sai." },
+      { text: "$192 \\, m^3$", correct: true,  rationale: "Đúng. $V_{hồ} = 20 \\cdot 8 \\cdot 1,5 = 240$. Nước = $240 \\cdot 80\\% = 192$." },
+      { text: "$160 \\, m^3$", correct: false, rationale: "Sai." }
+    ],
+    hint: "Đầu tiên tính thể tích toàn bộ hồ, sau đó nhân với $80\\%$."
+  },
+
+  // --- VẬN DỤNG CAO (1 câu) ---
+  {
+    level: "Vận dụng cao",
+    text: "Một hình lập phương có diện tích toàn phần bằng thể tích của nó (về mặt trị số). Độ dài cạnh của hình lập phương đó là:",
+    options: [
+      { text: "$4$", correct: false, rationale: "Sai. $6\\cdot 16 = 96 \\ne 64$." },
+      { text: "$1$", correct: false, rationale: "Sai. $6 \\ne 1$." },
+      { text: "$6$", correct: true,  rationale: "Đỉnh cao! Ta có phương trình $6a^2 = a^3$. Chia cả hai vế cho $a^2$ (vì $a>0$) được $a=6$." },
+      { text: "$8$", correct: false, rationale: "Sai." }
+    ],
+    hint: "Viết công thức diện tích toàn phần và thể tích, cho chúng bằng nhau rồi giải tìm cạnh $a$."
+  }
+];
+
+/* =========================
+   GAME ENGINE
+   ✅ Random câu hỏi + đáp án mỗi lần Start
+========================= */
+const Game = {
+  state: { idx: 0, score: 0, answered: false },
+  questions: [],
+
+  start() {
+    // Random câu hỏi + random đáp án (mỗi lần start khác nhau)
+    this.questions = shuffleArray(QUESTIONS).map(q => ({
+      ...q,
+      options: shuffleArray(q.options)
+    }));
+
+    this.state = { idx: 0, score: 0, answered: false };
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('end-screen').classList.add('hidden');
+    document.getElementById('game-screen').classList.remove('hidden');
+    document.getElementById('game-screen').classList.add('flex');
+    this.render();
+  },
+
+  render() {
+    this.state.answered = false;
+    document.getElementById('feedback-area').classList.add('translate-y-full');
+
+    const q = this.questions[this.state.idx];
+
+    // Stats
+    document.getElementById('q-idx').innerText = this.state.idx + 1;
+    document.getElementById('q-total').innerText = this.questions.length;
+    document.getElementById('score').innerText = this.state.score;
+    document.getElementById('level-badge').innerText = q.level;
+
+    // Progress
+    const pct = (this.state.idx / this.questions.length) * 100;
+    document.getElementById('progress').style.width = `${pct}%`;
+
+    // Question
+    document.getElementById('question-text').innerHTML = q.text;
+
+    // Options
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
+
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = `btn-option w-full p-6 text-left rounded-2xl bg-white border-2 border-green-50 shadow-sm flex items-center gap-4`;
+      btn.innerHTML = `
+        <div class="w-10 h-10 rounded-full bg-green-50 text-green-600 font-bold flex items-center justify-center border border-green-200 shrink-0">
+          ${String.fromCharCode(65 + i)}
+        </div>
+        <span class="text-lg text-gray-700 font-medium">${opt.text}</span>
+      `;
+      btn.onclick = () => this.check(btn, opt, q);
+      container.appendChild(btn);
+    });
+
+    if (window.MathJax) MathJax.typesetPromise();
+  },
+
+  check(btn, opt, q) {
+    if (this.state.answered) return;
+    this.state.answered = true;
+
+    const allBtns = document.querySelectorAll('.btn-option');
+    allBtns.forEach(b => (b.disabled = true));
+
+    const fbIcon = document.getElementById('fb-icon');
+    const fbTitle = document.getElementById('fb-title');
+    const hintBox = document.getElementById('hint-box');
+
+    if (opt.correct) {
+      this.state.score += 10;
+      document.getElementById('score').innerText = this.state.score;
+
+      btn.classList.add('correct');
+
+      fbIcon.innerHTML = '🎉';
+      fbTitle.innerText = "Tuyệt Vời!";
+      fbTitle.className = "text-xl font-bold mb-2 text-green-600";
+      hintBox.classList.add('hidden');
+
+      this.playSound('success');
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.8 }
+      });
+    } else {
+      btn.classList.add('wrong');
+
+      // Highlight correct
+      const correctIdx = q.options.findIndex(o => o.correct);
+      allBtns[correctIdx].classList.add('correct', 'opacity-75');
+
+      fbIcon.innerHTML = '🔧';
+      fbTitle.innerText = "Cần Điều Chỉnh!";
+      fbTitle.className = "text-xl font-bold mb-2 text-red-500";
+
+      hintBox.classList.remove('hidden');
+      document.getElementById('fb-hint').innerHTML = q.hint;
+      this.playSound('error');
+    }
+
+    // ✅ dùng innerHTML để MathJax render LaTeX trong giải thích
+    document.getElementById('fb-text').innerHTML = opt.rationale;
+
+    document.getElementById('feedback-area').classList.remove('translate-y-full');
+
+    if (window.MathJax) MathJax.typesetPromise();
+  },
+
+  next() {
+    this.state.idx++;
+    if (this.state.idx < this.questions.length) {
+      this.render();
+    } else {
+      this.end();
+    }
+  },
+
+  end() {
+    document.getElementById('game-screen').classList.remove('flex');
+    document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('end-screen').classList.remove('hidden');
+    document.getElementById('end-screen').classList.add('flex');
+
+    document.getElementById('final-score').innerText = this.state.score;
+    document.getElementById('final-correct').innerText = Math.round(this.state.score / 10);
+
+    const msg = document.getElementById('end-message');
+    if (this.state.score >= 130) msg.innerText = "Kỹ năng của bạn thật tuyệt vời! Công trình hoàn hảo! 🏗️";
+    else if (this.state.score >= 100) msg.innerText = "Bạn nắm rất vững kiến thức! Tiếp tục phát huy nhé! 📐";
+    else msg.innerText = "Hãy ôn lại các công thức một chút rồi thử lại nhé! 📚";
+
+    this.playSound('finish');
+  },
+
+  playSound(type) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (type === 'success') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+    } else if (type === 'error') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.2);
+    } else if (type === 'finish') {
+      [440, 554, 659, 880].forEach((f, i) => {
+        setTimeout(() => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g);
+          g.connect(ctx.destination);
+          o.type = 'triangle';
+          o.frequency.value = f;
+          g.gain.setValueAtTime(0.1, ctx.currentTime);
+          g.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+          o.start();
+          o.stop(ctx.currentTime + 0.3);
+        }, i * 150);
+      });
+    }
+  }
+};
+</script>
+
+</body>
+</html>
