@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thám Hiểm Đại Dương Số Thực</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
+            overflow-x: hidden;
+            background-attachment: fixed;
+        }
+
+        /* Bubble Animation Background */
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            bottom: -50px;
+            animation: rise 10s infinite ease-in;
+            pointer-events: none;
+            z-index: 0;
+        }
+        @keyframes rise {
+            0% { bottom: -50px; transform: translateX(0); }
+            50% { transform: translateX(100px); }
+            100% { bottom: 100vh; transform: translateX(-100px); }
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 4px solid #fff;
+            box-shadow: 0 20px 50px rgba(0, 78, 146, 0.3);
+            border-radius: 30px;
+        }
+
+        .option-btn {
+            transition: all 0.2s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 0 #e2e8f0;
+        }
+        
+        .option-btn:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .option-btn.correct {
+            background-color: #86efac;
+            border-color: #22c55e;
+            color: #14532d;
+            box-shadow: 0 4px 0 #15803d;
+        }
+
+        .option-btn.wrong {
+            background-color: #fca5a5;
+            border-color: #ef4444;
+            color: #7f1d1d;
+            box-shadow: 0 4px 0 #b91c1c;
+        }
+
+        /* Animations */
+        @keyframes submarine-float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        .submarine { animation: submarine-float 4s ease-in-out infinite; }
+
+        @keyframes fish-swim {
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-100vw); }
+        }
+        .fish { position: absolute; animation: fish-swim 20s linear infinite; opacity: 0.6; z-index: 0; }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 relative">
+
+    <!-- Background Elements -->
+    <div id="bubbles-container"></div>
+    <div class="fish text-6xl" style="top: 20%; animation-duration: 25s;">🐠</div>
+    <div class="fish text-5xl" style="top: 60%; animation-duration: 18s; animation-delay: 5s;">🐡</div>
+    <div class="fish text-7xl" style="top: 80%; animation-duration: 30s; animation-delay: 2s;">🐋</div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="app" class="w-full max-w-4xl z-10 min-h-[600px] relative">
+        
+        <!-- START SCREEN -->
+        <div id="start-screen" class="game-card absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-20">
+            <div class="submarine text-9xl mb-6">🤿</div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-blue-600 mb-2 drop-shadow-sm">
+                Thám Hiểm Đại Dương
+            </h1>
+            <h2 class="text-2xl font-bold text-cyan-600 mb-6">Số Thực & Giá Trị Tuyệt Đối</h2>
+            
+            <div class="bg-blue-50 p-6 rounded-2xl mb-8 border-2 border-blue-100 max-w-lg">
+                <p class="text-gray-600 text-lg mb-4">Chào mừng các nhà thám hiểm nhí! Hãy dùng kiến thức Toán học để lặn sâu xuống đáy đại dương và tìm kho báu nhé!</p>
+                <div class="flex justify-center space-x-4 text-sm font-bold text-blue-400">
+                    <span class="flex items-center"><i class="ph-fill ph-check-circle mr-1"></i> 15 Câu hỏi</span>
+                    <span class="flex items-center"><i class="ph-fill ph-clock mr-1"></i> Tự do</span>
+                </div>
+            </div>
+
+            <button onclick="Game.start()" class="group relative px-10 py-4 bg-yellow-400 text-yellow-900 font-bold text-2xl rounded-full shadow-[0_6px_0_#b45309] active:shadow-none active:translate-y-[6px] transition-all hover:bg-yellow-300">
+                Lặn Ngay! 🌊
+            </button>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="game-screen" class="game-card hidden flex-col h-full absolute inset-0 bg-white/90">
+            <!-- Header -->
+            <div class="bg-blue-600 text-white p-4 rounded-t-[26px] flex justify-between items-center shadow-lg">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-xl font-bold border-2 border-white/40">
+                        <span id="q-current">1</span>
+                    </div>
+                    <div class="leading-tight">
+                        <div class="text-xs font-bold text-blue-200 uppercase">Tiến độ</div>
+                        <div class="font-bold"><span id="q-progress">1/15</span></div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/20 backdrop-blur-sm">
+                    <span class="text-blue-200 text-xs font-bold uppercase mr-2">Điểm</span>
+                    <span id="score" class="text-2xl font-bold text-yellow-300">0</span>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="flex-1 overflow-y-auto p-6 md:p-8 pb-32 custom-scrollbar">
+                
+                <!-- Question Block -->
+                <div class="max-w-3xl mx-auto">
+                    <div class="mb-4 flex items-center">
+                        <span id="level-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-600 uppercase tracking-wider border border-purple-200">
+                            Nhận biết
+                        </span>
+                    </div>
+
+                    <h2 id="question-text" class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 leading-snug">
+                        <!-- Question content -->
+                    </h2>
+
+                    <!-- Options Grid -->
+                    <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Buttons injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Panel (Slide up) -->
+            <div id="feedback-panel" class="absolute bottom-0 inset-x-0 bg-white border-t-4 border-blue-100 p-6 rounded-b-[26px] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transform translate-y-full transition-transform duration-300 z-30">
+                <div class="max-w-3xl mx-auto flex gap-4 md:gap-6 items-start">
+                    <div id="fb-icon" class="text-5xl shrink-0 bounce"></div>
+                    <div class="flex-1">
+                        <h3 id="fb-title" class="text-xl font-extrabold mb-1"></h3>
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">GIẢI THÍCH</div>
+                        <p id="fb-content" class="text-gray-700 text-lg leading-relaxed mb-2"></p>
+                        <div id="fb-hint-box" class="hidden bg-yellow-50 text-yellow-800 p-3 rounded-lg text-sm border border-yellow-200 flex items-start">
+                            <i class="ph-bold ph-lightbulb text-lg mr-2 mt-0.5"></i>
+                            <span id="fb-hint"></span>
+                        </div>
+                    </div>
+                    <button onclick="Game.next()" class="shrink-0 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl shadow-lg transition-transform hover:scale-105 active:scale-95">
+                        <i class="ph-bold ph-arrow-right text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- END SCREEN -->
+        <div id="end-screen" class="game-card hidden absolute inset-0 flex-col items-center justify-center p-8 z-20 text-center">
+            <div class="relative mb-8">
+                <div class="absolute inset-0 bg-yellow-300 blur-3xl opacity-40 rounded-full animate-pulse"></div>
+                <div class="text-9xl relative z-10 drop-shadow-2xl">👑</div>
+            </div>
+            
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Chuyến Thám Hiểm Kết Thúc!</h2>
+            <p id="end-msg" class="text-gray-600 text-lg mb-8">Bạn đã thu thập được bao nhiêu kiến thức?</p>
+
+            <div class="grid grid-cols-2 gap-6 w-full max-w-md mb-8">
+                <div class="bg-blue-50 p-4 rounded-2xl border-2 border-blue-100">
+                    <div class="text-blue-500 text-xs font-bold uppercase">Tổng điểm</div>
+                    <div id="final-score" class="text-4xl font-black text-blue-700">0</div>
+                </div>
+                <div class="bg-green-50 p-4 rounded-2xl border-2 border-green-100">
+                    <div class="text-green-500 text-xs font-bold uppercase">Trả lời đúng</div>
+                    <div class="text-4xl font-black text-green-700"><span id="final-correct">0</span>/15</div>
+                </div>
+            </div>
+
+            <button onclick="location.reload()" class="px-8 py-3 bg-gray-800 text-white font-bold rounded-full shadow-lg hover:bg-gray-900 transition-all flex items-center space-x-2">
+                <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                <span>Chơi Lại Từ Đầu</span>
+            </button>
+        </div>
+
+    </div>
+
+<script>
+/* ================== RANDOM HELPERS ================== */
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildShuffledQuestions(baseQuestions) {
+  // clone sâu để không làm hỏng QUESTIONS gốc
+  const cloned = baseQuestions.map(q => ({
+    ...q,
+    options: q.options.map(o => ({ ...o }))
+  }));
+
+  // random đáp án trong từng câu
+  const withShuffledOptions = cloned.map(q => ({
+    ...q,
+    options: shuffleArray(q.options)
+  }));
+
+  // random thứ tự câu hỏi
+  return shuffleArray(withShuffledOptions);
+}
+/* ================== DATABASE ================== */
+    const QUESTIONS = [
+        // --- NHẬN BIẾT (6 câu) ---
+        {
+            level: "Nhận biết",
+            text: "Tập hợp các số thực được kí hiệu là:",
+            options: [
+                { text: "$\\mathbb{R}$", correct: true, rationale: "Chính xác! $\\mathbb{R}$ là kí hiệu chuẩn của tập hợp số thực (Real numbers)." },
+                { text: "$\\mathbb{Q}$", correct: false, rationale: "Sai. $\\mathbb{Q}$ là kí hiệu của tập số hữu tỉ." },
+                { text: "$\\mathbb{Z}$", correct: false, rationale: "Sai. $\\mathbb{Z}$ là kí hiệu của tập số nguyên." },
+                { text: "$\\mathbb{N}$", correct: false, rationale: "Sai. $\\mathbb{N}$ là kí hiệu của tập số tự nhiên." }
+            ],
+            hint: "Tên tiếng Anh là Real numbers, bắt đầu bằng chữ cái gì?"
+        },
+        {
+            level: "Nhận biết",
+            text: "Khẳng định nào sau đây là <b>đúng</b>?",
+            options: [
+                { text: "Mỗi số thực là một số hữu tỉ hoặc một số vô tỉ.", correct: true, rationale: "Đúng. Tập số thực $\\mathbb{R}$ là hợp của tập số hữu tỉ $\\mathbb{Q}$ và tập số vô tỉ $\\mathbb{I}$." },
+                { text: "Số thực dương luôn lớn hơn số thực âm.", correct: true, rationale: "Câu này cũng đúng, nhưng câu A bao quát định nghĩa hơn. (Trong ngữ cảnh này ưu tiên định nghĩa cấu tạo tập hợp)." }, // Wait, multiple correct? Let's fix.
+                // FIXING OPTION B to make it clearly wrong/less preferred or rephrase question.
+                // Rephrasing B to be wrong.
+            ],
+            // Let's rewrite the options for Question 2 to be stricter.
+            override: true 
+        },
+        // RE-DO Question 2
+        {
+            level: "Nhận biết",
+            text: "Phát biểu nào sau đây là <b>đúng</b> về mối quan hệ giữa các tập hợp số?",
+            options: [
+                { text: "$\\mathbb{Q} \\subset \\mathbb{R}$", correct: true, rationale: "Chính xác! Tập số hữu tỉ là con của tập số thực." },
+                { text: "$\\mathbb{R} \\subset \\mathbb{Q}$", correct: false, rationale: "Sai. Tập số thực chứa cả số vô tỉ nên không thể là con của số hữu tỉ." },
+                { text: "$\\mathbb{I} \\subset \\mathbb{Q}$", correct: false, rationale: "Sai. Số vô tỉ và số hữu tỉ là hai tập hợp rời nhau." },
+                { text: "$\\mathbb{R} \\subset \\mathbb{Z}$", correct: false, rationale: "Sai hoàn toàn." }
+            ],
+            hint: "Tập nào rộng nhất chứa tất cả các tập còn lại?"
+        },
+        {
+            level: "Nhận biết",
+            text: "Giá trị tuyệt đối của số thực $a$, kí hiệu $|a|$, là:",
+            options: [
+                { text: "Khoảng cách từ điểm $a$ đến điểm $0$ trên trục số.", correct: true, rationale: "Rất chuẩn! Giá trị tuyệt đối chính là khoảng cách hình học đến gốc tọa độ." },
+                { text: "Chính số $a$.", correct: false, rationale: "Chưa đủ. Nếu $a$ âm thì $|a|$ không bằng $a$." },
+                { text: "Số đối của $a$.", correct: false, rationale: "Chưa đủ. Nếu $a$ dương thì sai." },
+                { text: "Luôn là một số dương.", correct: false, rationale: "Thiếu trường hợp bằng $0$." }
+            ],
+            hint: "Nghĩ về hình ảnh trục số, độ dài đoạn thẳng nối từ 0 đến a gọi là gì?"
+        },
+        {
+            level: "Nhận biết",
+            text: "Nếu $x$ là một số thực âm, thì $|x|$ bằng:",
+            options: [
+                { text: "$-x$", correct: true, rationale: "Đúng. Nếu $x < 0$ thì bỏ dấu giá trị tuyệt đối phải thêm dấu trừ đằng trước để kết quả thành dương." },
+                { text: "$x$", correct: false, rationale: "Sai. Vì $x$ đang âm, mà giá trị tuyệt đối không thể âm." },
+                { text: "$0$", correct: false, rationale: "Sai." },
+                { text: "$1$", correct: false, rationale: "Sai." }
+            ],
+            hint: "Ví dụ $|-5| = 5 = -(-5)$."
+        },
+        {
+            level: "Nhận biết",
+            text: "Số đối của số thực $\\sqrt{2}$ là:",
+            options: [
+                { text: "$-\\sqrt{2}$", correct: true, rationale: "Chính xác. Số đối của $a$ là $-a$." },
+                { text: "$\\sqrt{2}$", correct: false, rationale: "Sai. Đây là chính nó." },
+                { text: "$\\frac{1}{\\sqrt{2}}$", correct: false, rationale: "Sai. Đây là số nghịch đảo." },
+                { text: "$2$", correct: false, rationale: "Sai." }
+            ],
+            hint: "Chỉ cần thêm dấu trừ vào trước số đó."
+        },
+        {
+            level: "Nhận biết",
+            text: "Chọn khẳng định <b>sai</b> trong các khẳng định sau:",
+            options: [
+                { text: "$| -2,5 | = -2,5$", correct: true, rationale: "Đúng là câu này Sai! Giá trị tuyệt đối không bao giờ âm. $|-2,5|$ phải bằng $2,5$." },
+                { text: "$| 1,5 | = 1,5$", correct: false, rationale: "Câu này Đúng." },
+                { text: "$| -\\sqrt{3} | = \\sqrt{3}$", correct: false, rationale: "Câu này Đúng." },
+                { text: "$| 0 | = 0$", correct: false, rationale: "Câu này Đúng." }
+            ],
+            hint: "Hãy tìm câu nào có kết quả của giá trị tuyệt đối là một số âm."
+        },
+
+        // --- THÔNG HIỂU (5 câu) ---
+        {
+            level: "Thông hiểu",
+            text: "So sánh hai số thực: $-1,25$ và $-1,3$.",
+            options: [
+                { text: "$-1,25 > -1,3$", correct: true, rationale: "Tuyệt vời! Với hai số âm, số nào có giá trị tuyệt đối nhỏ hơn thì lớn hơn ($1,25 < 1,3 \\Rightarrow -1,25 > -1,3$)." },
+                { text: "$-1,25 < -1,3$", correct: false, rationale: "Sai rồi. Trên trục số, -1,25 nằm bên phải -1,3." },
+                { text: "$-1,25 = -1,3$", correct: false, rationale: "Sai." },
+                { text: "Không so sánh được", correct: false, rationale: "Sai." }
+            ],
+            hint: "Số âm 'nợ ít hơn' thì 'giàu hơn' (lớn hơn)."
+        },
+        {
+            level: "Thông hiểu",
+            text: "Tìm $x$ biết $|x| = \\sqrt{5}$.",
+            options: [
+                { text: "$x = \\sqrt{5}$ hoặc $x = -\\sqrt{5}$", correct: true, rationale: "Chính xác! Có hai số thực có giá trị tuyệt đối bằng $\\sqrt{5}$ là chính nó và số đối của nó." },
+                { text: "Chỉ có $x = \\sqrt{5}$", correct: false, rationale: "Thiếu nghiệm âm." },
+                { text: "Chỉ có $x = -\\sqrt{5}$", correct: false, rationale: "Thiếu nghiệm dương." },
+                { text: "$x = 5$ hoặc $x = -5$", correct: false, rationale: "Sai. $|5| = 5$ chứ không phải $\\sqrt{5}$." }
+            ],
+            hint: "Có bao nhiêu số có khoảng cách đến 0 bằng $\\sqrt{5}$?"
+        },
+        {
+            level: "Thông hiểu",
+            text: "Kết quả của phép tính: $|-3,5| + |1,5| - \\sqrt{4}$ là:",
+            options: [
+                { text: "$3$", correct: true, rationale: "Đúng! $3,5 + 1,5 - 2 = 5 - 2 = 3$." },
+                { text: "$7$", correct: false, rationale: "Sai. Bạn có thể đã cộng nhầm hoặc không khai căn." },
+                { text: "$-3$", correct: false, rationale: "Sai dấu." },
+                { text: "$0$", correct: false, rationale: "Sai." }
+            ],
+            hint: "Tính từng giá trị tuyệt đối và căn trước: $3,5 + 1,5 - 2 = ?$"
+        },
+        {
+            level: "Thông hiểu",
+            text: "Sắp xếp các số sau theo thứ tự từ nhỏ đến lớn: $-2; \\, 0; \\, -\\sqrt{5}; \\, 1,5$.",
+            options: [
+                { text: "$-\\sqrt{5}; \\, -2; \\, 0; \\, 1,5$", correct: true, rationale: "Chính xác! Vì $\\sqrt{5} \\approx 2,236$ nên $-\\sqrt{5} \\approx -2,236 < -2$." },
+                { text: "$-2; \\, -\\sqrt{5}; \\, 0; \\, 1,5$", correct: false, rationale: "Sai. $-2$ lớn hơn $-\\sqrt{5}$." },
+                { text: "$0; \\, -2; \\, -\\sqrt{5}; \\, 1,5$", correct: false, rationale: "Sai. Số âm phải nhỏ hơn 0." },
+                { text: "$-\\sqrt{5}; \\, 1,5; \\, -2; \\, 0$", correct: false, rationale: "Sai thứ tự." }
+            ],
+            hint: "Hãy ước lượng $\\sqrt{5}$ khoảng $2,2...$ rồi so sánh hai số âm."
+        },
+        {
+            level: "Thông hiểu",
+            text: "Tính giá trị biểu thức $M = a - |a|$ với $a = -5$.",
+            options: [
+                { text: "$-10$", correct: true, rationale: "Đúng! Thay vào ta có: $(-5) - |-5| = (-5) - 5 = -10$." },
+                { text: "$0$", correct: false, rationale: "Sai. Bạn nhầm dấu rồi: $(-5) - 5$ không bằng 0." },
+                { text: "$10$", correct: false, rationale: "Sai." },
+                { text: "$-5$", correct: false, rationale: "Sai." }
+            ],
+            hint: "Thay số cẩn thận: $a$ là âm 5, trừ đi giá trị tuyệt đối của âm 5."
+        },
+
+        // --- VẬN DỤNG (3 câu) ---
+        {
+            level: "Vận dụng",
+            text: "Tìm $x$ biết: $|x - 0,5| - 1,5 = 2$.",
+            options: [
+                { text: "$x = 4$ hoặc $x = -3$", correct: true, rationale: "Xuất sắc! $|x - 0,5| = 3,5$. Suy ra $x-0,5=3,5$ hoặc $x-0,5=-3,5$. Vậy $x=4$ hoặc $x=-3$." },
+                { text: "$x = 4$", correct: false, rationale: "Thiếu một trường hợp." },
+                { text: "$x = 4$ hoặc $x = 3$", correct: false, rationale: "Sai nghiệm thứ hai." },
+                { text: "$x = 2$ hoặc $x = -2$", correct: false, rationale: "Sai bước chuyển vế đầu tiên." }
+            ],
+            hint: "Bước 1: Chuyển $-1,5$ sang vế phải để tìm $|x - 0,5|$. Bước 2: Chia 2 trường hợp."
+        },
+        {
+            level: "Vận dụng",
+            text: "Tính giá trị biểu thức: $A = \\sqrt{(-4)^2} - \\sqrt{16} + |-3| \\cdot \\sqrt{9}$.",
+            options: [
+                { text: "$9$", correct: true, rationale: "Giỏi lắm! $A = 4 - 4 + 3 \\cdot 3 = 0 + 9 = 9$." },
+                { text: "$17$", correct: false, rationale: "Sai. Lưu ý $\\sqrt{(-4)^2} = 4$ và $\\sqrt{16} = 4$, chúng triệt tiêu nhau." },
+                { text: "$1$", correct: false, rationale: "Sai tính toán." },
+                { text: "$-9$", correct: false, rationale: "Sai dấu giá trị tuyệt đối." }
+            ],
+            hint: "Lưu ý $\\sqrt{A^2} = |A|$. Hãy tính từng số hạng một."
+        },
+        {
+            level: "Vận dụng (Thực tế)",
+            text: "Một chi tiết máy có chiều dài chuẩn là $20$ cm. Kĩ sư cho phép sai số không quá $0,05$ cm. Gọi $x$ là chiều dài thực tế của chi tiết máy. Điều kiện để chi tiết máy ĐẠT CHUẨN là:",
+            options: [
+                { text: "$|x - 20| \\le 0,05$", correct: true, rationale: "Chính xác! Sai số chính là khoảng cách (trị tuyệt đối) giữa chiều dài thực tế ($x$) và chiều dài chuẩn ($20$)." },
+                { text: "$x - 20 \\le 0,05$", correct: false, rationale: "Chưa đủ. Nếu $x$ nhỏ hơn $20$ quá nhiều (ví dụ 10cm) thì biểu thức này vẫn đúng nhưng máy hỏng." },
+                { text: "$|x| - 20 \\le 0,05$", correct: false, rationale: "Sai công thức." },
+                { text: "$x \\le 20,05$", correct: false, rationale: "Thiếu cận dưới ($x$ không được quá nhỏ)." }
+            ],
+            hint: "Sai số là khoảng cách chênh lệch giữa thực tế và chuẩn. Dùng giá trị tuyệt đối để biểu diễn khoảng cách."
+        },
+
+        // --- VẬN DỤNG CAO (1 câu) ---
+        {
+            level: "Vận dụng cao",
+            text: "Tìm giá trị nhỏ nhất của biểu thức $A = |x - 2| + |x - 10|$.",
+            options: [
+                { text: "8", correct: true, rationale: "Đỉnh cao! $A = |x-2| + |10-x| \\ge |x-2 + 10-x| = |8| = 8$. Dấu bằng xảy ra khi $2 \\le x \\le 10$." },
+                { text: "0", correct: false, rationale: "Không thể bằng 0 vì $x$ không thể vừa bằng 2 vừa bằng 10." },
+                { text: "12", correct: false, rationale: "Sai." },
+                { text: "2", correct: false, rationale: "Sai." }
+            ],
+            hint: "Sử dụng bất đẳng thức $|a| + |b| \\ge |a+b|$. Hãy đổi $|x-10|$ thành $|10-x|$."
+        }
+    ];
+
+    /* ================== GAME ENGINE ================== */
+const Game = {
+  score: 0,
+  currentIdx: 0,
+  answered: false,
+  questions: [],
+
+  start() {
+    this.score = 0;
+    this.currentIdx = 0;
+    this.answered = false;
+
+    // ✅ RANDOM câu hỏi + đáp án
+    this.questions = buildShuffledQuestions(QUESTIONS);
+
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('end-screen').classList.add('hidden');
+    document.getElementById('game-screen').classList.remove('hidden');
+    document.getElementById('game-screen').classList.add('flex');
+
+    this.loadQuestion();
+  },
+
+  loadQuestion() {
+    this.answered = false;
+    const q = this.questions[this.currentIdx];
+
+    document.getElementById('q-current').innerText = this.currentIdx + 1;
+    document.getElementById('q-progress').innerText =
+      `${this.currentIdx + 1}/${this.questions.length}`;
+    document.getElementById('score').innerText = this.score;
+    document.getElementById('level-badge').innerText = q.level;
+    document.getElementById('question-text').innerHTML = q.text;
+
+    const grid = document.getElementById('options-grid');
+    grid.innerHTML = '';
+
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className =
+        'option-btn bg-white border-2 border-blue-100 p-4 rounded-2xl text-left text-lg font-semibold text-gray-700 hover:border-blue-400 shadow-sm w-full h-full flex items-center';
+
+      btn.innerHTML = `
+        <span class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mr-3 text-sm font-bold border border-blue-200 shrink-0">
+          ${String.fromCharCode(65 + i)}
+        </span>
+        <span>${opt.text}</span>
+      `;
+
+      btn.onclick = () => this.check(btn, opt, q);
+      grid.appendChild(btn);
+    });
+
+    document.getElementById('feedback-panel').classList.add('translate-y-full');
+    if (window.MathJax) MathJax.typesetPromise();
+  },
+
+  check(btn, opt, q) {
+    if (this.answered) return;
+    this.answered = true;
+
+    const btns = document.querySelectorAll('.option-btn');
+    btns.forEach(b => b.disabled = true);
+
+    const fbPanel = document.getElementById('feedback-panel');
+    const fbIcon = document.getElementById('fb-icon');
+    const fbTitle = document.getElementById('fb-title');
+    const fbContent = document.getElementById('fb-content');
+    const fbHintBox = document.getElementById('fb-hint-box');
+
+    if (opt.correct) {
+      this.score += 10;
+      document.getElementById('score').innerText = this.score;
+      btn.classList.add('correct');
+
+      fbIcon.innerText = '🐠';
+      fbTitle.innerText = 'Chính xác!';
+      fbTitle.className = 'text-xl font-extrabold mb-1 text-green-600';
+
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.8 }
+      });
+    } else {
+      btn.classList.add('wrong');
+      const correctIdx = q.options.findIndex(o => o.correct);
+      btns[correctIdx].classList.add('correct', 'opacity-70');
+
+      fbIcon.innerText = '🐙';
+      fbTitle.innerText = 'Chưa đúng!';
+      fbTitle.className = 'text-xl font-extrabold mb-1 text-red-500';
+    }
+
+    fbContent.innerText = opt.rationale;
+
+    if (!opt.correct) {
+      fbHintBox.classList.remove('hidden');
+      document.getElementById('fb-hint').innerText = q.hint;
+    } else {
+      fbHintBox.classList.add('hidden');
+    }
+
+    fbPanel.classList.remove('translate-y-full');
+    if (window.MathJax) MathJax.typesetPromise();
+  },
+
+  next() {
+    this.currentIdx++;
+    if (this.currentIdx < this.questions.length) {
+      this.loadQuestion();
+    } else {
+      this.finish();
+    }
+  },
+
+  finish() {
+    document.getElementById('game-screen').classList.remove('flex');
+    document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('end-screen').classList.remove('hidden');
+    document.getElementById('end-screen').classList.add('flex');
+
+    document.getElementById('final-score').innerText = this.score;
+    document.getElementById('final-correct').innerText =
+      Math.round(this.score / 10);
+
+    const msg = document.getElementById('end-msg');
+    if (this.score === this.questions.length * 10)
+      msg.innerText = 'Tuyệt đỉnh! Bạn là Vua Biển Cả! 🧜‍♂️';
+    else if (this.score >= this.questions.length * 8)
+      msg.innerText = 'Rất giỏi! Thuyền trưởng tài ba! 🛳️';
+    else if (this.score >= this.questions.length * 5)
+      msg.innerText = 'Khá lắm! Cố gắng thêm nhé! 🐬';
+    else
+      msg.innerText = 'Đừng nản! Hãy thử lại nào! 🛟';
+  }
+};
+
+/* ================== BUBBLES ================== */
+function createBubbles() {
+  const container = document.getElementById('bubbles-container');
+  for (let i = 0; i < 15; i++) {
+    const bubble = document.createElement('div');
+    bubble.classList.add('bubble');
+    const size = Math.random() * 60 + 20 + 'px';
+    bubble.style.width = size;
+    bubble.style.height = size;
+    bubble.style.left = Math.random() * 100 + 'vw';
+    bubble.style.animationDuration = Math.random() * 5 + 5 + 's';
+    bubble.style.animationDelay = Math.random() * 5 + 's';
+    container.appendChild(bubble);
+  }
+}
+createBubbles();
+</script>
+</body>
+</html>
