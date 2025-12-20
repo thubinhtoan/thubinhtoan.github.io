@@ -29,6 +29,15 @@
             overflow-x: hidden;
             background-attachment: fixed;
         }
+        #fb-content {
+    font-size: 1.25rem;   /* ~20px */
+    line-height: 1.8;
+    font-weight: 600;
+}
+
+#fb-hint {
+    font-size: 1.05rem;
+}
 
         /* Bubble Animation Background */
         .bubble {
@@ -522,7 +531,7 @@ const Game = {
         particleCount: 100,
         spread: 70,
         origin: { y: 0.8 }
-      });
+        });
     } else {
       btn.classList.add('wrong');
       const correctIdx = q.options.findIndex(o => o.correct);
