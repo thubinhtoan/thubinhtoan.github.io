@@ -96,6 +96,7 @@
             100% { transform: translateX(-100vw); }
         }
         .fish { position: absolute; animation: fish-swim 20s linear infinite; opacity: 0.6; z-index: 0; }
+        
 
     </style>
 </head>
@@ -546,11 +547,21 @@ const Game = {
   },
 
   next() {
+    // Ẩn hoàn toàn bảng giải thích trước
+    const feedbackPanel = document.getElementById('feedback-panel');
+    feedbackPanel.classList.add('translate-y-full');
+
+    // Reset nội dung giải thích (tránh sót)
+    document.getElementById('fb-content').innerText = '';
+    document.getElementById('fb-hint').innerText = '';
+    document.getElementById('fb-hint-box').classList.add('hidden');
+
     this.currentIdx++;
-    if (this.currentIdx < this.questions.length) {
-      this.loadQuestion();
+
+    if (this.currentIdx < QUESTIONS.length) {
+        this.loadQuestion();
     } else {
-      this.finish();
+        this.finish();
     }
   },
 
