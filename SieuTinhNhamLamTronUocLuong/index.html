@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siêu Tính Nhẩm: Làm Tròn & Ước Lượng</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Baloo 2', cursive;
+            background-color: #ecfccb;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2384cc16' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .card-shadow {
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.15);
+        }
+
+        .btn-shadow {
+            box-shadow: 0 4px 0 #166534; /* Green-800 */
+            transition: all 0.1s;
+        }
+        .btn-shadow:active {
+            box-shadow: 0 0 0 #166534;
+            transform: translateY(4px);
+        }
+
+        .option-card {
+            transition: transform 0.2s, background-color 0.2s;
+            cursor: pointer;
+        }
+        .option-card:hover:not(.disabled) {
+            transform: scale(1.02);
+            background-color: #f0fdf4; /* Green-50 */
+        }
+        .option-card.correct {
+            background-color: #dcfce7 !important; /* Green-100 */
+            border-color: #22c55e !important;
+            color: #14532d;
+        }
+        .option-card.wrong {
+            background-color: #fee2e2 !important; /* Red-100 */
+            border-color: #ef4444 !important;
+            color: #7f1d1d;
+        }
+
+        /* Float Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- MAIN CONTAINER -->
+    <div class="w-full max-w-4xl bg-white rounded-3xl border-4 border-green-600 card-shadow overflow-hidden relative flex flex-col min-h-[650px]">
+        
+        <!-- DECORATION -->
+        <div class="absolute top-0 right-0 p-4 opacity-20 pointer-events-none">
+            <i class="ph-fill ph-calculator text-9xl text-green-700"></i>
+        </div>
+
+        <!-- START SCREEN -->
+        <div id="start-screen" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gradient-to-br from-green-400 to-emerald-600 text-white p-6 text-center">
+            <div class="text-8xl mb-4 animate-float">🎯</div>
+            <h1 class="text-5xl md:text-6xl font-extrabold mb-2 drop-shadow-md">Siêu Tính Nhẩm</h1>
+            <p class="text-2xl font-semibold text-green-100 mb-8">Thử Thách Làm Tròn & Ước Lượng</p>
+            
+            <div class="bg-white/20 backdrop-blur-sm p-6 rounded-2xl mb-8 max-w-md border-2 border-white/30">
+                <ul class="text-left space-y-3 font-bold text-lg">
+                    <li class="flex items-center"><i class="ph-fill ph-check-circle mr-3 text-yellow-300"></i> 15 Câu hỏi trắc nghiệm</li>
+                    <li class="flex items-center"><i class="ph-fill ph-brain mr-3 text-yellow-300"></i> Rèn luyện tư duy nhanh</li>
+                    <li class="flex items-center"><i class="ph-fill ph-trophy mr-3 text-yellow-300"></i> Trở thành bậc thầy ước lượng</li>
+                </ul>
+            </div>
+
+            <button onclick="Game.start()" class="bg-yellow-400 text-yellow-900 px-10 py-4 rounded-full font-black text-2xl btn-shadow border-b-4 border-yellow-600 hover:bg-yellow-300 flex items-center gap-2">
+                <i class="ph-bold ph-play"></i> Bắt Đầu
+            </button>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="game-screen" class="hidden flex-col h-full bg-slate-50 relative">
+            <!-- Header -->
+            <div class="bg-green-600 p-4 text-white flex justify-between items-center shadow-md z-10">
+                <div class="flex items-center gap-3">
+                    <div class="bg-green-700 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-2xl border-2 border-green-400">
+                        <span id="ui-current">1</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-green-200 uppercase tracking-widest">Câu hỏi</span>
+                        <span class="text-sm font-semibold">/ <span id="ui-total">15</span></span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-2 bg-black/20 px-4 py-2 rounded-lg">
+                    <i class="ph-fill ph-star text-yellow-400 text-xl"></i>
+                    <span id="ui-score" class="font-bold text-2xl">0</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 h-3">
+                <div id="ui-progress" class="h-full bg-yellow-400 transition-all duration-500 ease-out" style="width: 0%"></div>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto p-6 pb-40">
+                <div class="max-w-3xl mx-auto">
+                    <!-- Question Level Badge -->
+                    <span id="ui-level" class="inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-sm mb-4 border border-blue-200 shadow-sm">
+                        Mức độ: Nhận biết
+                    </span>
+
+                    <!-- Question Text -->
+                    <h2 id="ui-question" class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 leading-snug">
+                        <!-- Content -->
+                    </h2>
+
+                    <!-- Options Grid -->
+                    <div id="ui-options" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Buttons injected via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Sheet (Fixed Bottom) -->
+            <div id="feedback-sheet" class="absolute bottom-0 inset-x-0 bg-white border-t-4 border-green-500 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] p-6 transform translate-y-full transition-transform duration-300 z-20">
+                <div class="max-w-3xl mx-auto flex items-start gap-4">
+                    <div id="fb-icon" class="text-5xl flex-shrink-0 animate-bounce"></div>
+                    <div class="flex-1">
+                        <h3 id="fb-title" class="text-xl font-bold mb-1"></h3>
+                        <p id="fb-rationale" class="text-gray-700 text-lg mb-2 leading-relaxed"></p>
+                        <div class="text-sm text-blue-600 bg-blue-50 p-2 rounded border border-blue-100 italic">
+                            <i class="ph-bold ph-lightbulb mr-1"></i> <span id="fb-hint"></span>
+                        </div>
+                    </div>
+                    <button onclick="Game.next()" class="bg-gray-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-black transition-colors flex items-center gap-2 h-fit mt-1 shadow-lg">
+                        Tiếp tục <i class="ph-bold ph-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- END SCREEN -->
+        <div id="end-screen" class="hidden absolute inset-0 z-20 flex-col items-center justify-center bg-white p-8 text-center">
+            <div class="relative mb-6">
+                <div class="absolute inset-0 bg-yellow-200 rounded-full animate-ping opacity-75"></div>
+                <i class="ph-fill ph-crown text-8xl text-yellow-500 relative z-10"></i>
+            </div>
+
+            <h2 class="text-4xl font-extrabold text-gray-800 mb-2">Hoàn Thành!</h2>
+            <p id="end-msg" class="text-xl text-gray-600 mb-8">Bạn đã làm rất tốt nhiệm vụ của mình.</p>
+
+            <div class="flex gap-4 mb-8">
+                <div class="bg-green-100 p-6 rounded-2xl border-2 border-green-200">
+                    <div class="text-xs font-bold text-green-600 uppercase">Điểm số</div>
+                    <div class="text-4xl font-black text-green-800" id="end-score">0</div>
+                </div>
+                <div class="bg-blue-100 p-6 rounded-2xl border-2 border-blue-200">
+                    <div class="text-xs font-bold text-blue-600 uppercase">Đúng</div>
+                    <div class="text-4xl font-black text-blue-800"><span id="end-correct">0</span>/15</div>
+                </div>
+            </div>
+
+            <button onclick="location.reload()" class="bg-green-600 text-white px-8 py-3 rounded-full font-bold text-xl shadow-lg hover:bg-green-700 transition-all flex items-center gap-2">
+                <i class="ph-bold ph-arrow-counter-clockwise"></i> Chơi Lại
+            </button>
+        </div>
+
+    </div>
+
+<script>
+    // --- DATABASE ---
+    const QUESTIONS = [
+        // --- NHẬN BIẾT (6 câu) ---
+        {
+            level: "Nhận biết",
+            text: "Quy tắc làm tròn số: Nếu chữ số đầu tiên trong các chữ số bị bỏ đi <b>nhỏ hơn 5</b> thì ta làm gì?",
+            options: [
+                { text: "Giữ nguyên bộ phận còn lại.", correct: true, rationale: "Chính xác! Nếu chữ số ngay sau hàng làm tròn < 5 thì ta giữ nguyên chữ số hàng làm tròn." },
+                { text: "Cộng thêm 1 vào chữ số cuối cùng của bộ phận còn lại.", correct: false, rationale: "Sai. Ta chỉ cộng thêm 1 khi chữ số đó lớn hơn hoặc bằng 5." },
+                { text: "Trừ đi 1 ở bộ phận còn lại.", correct: false, rationale: "Sai. Không bao giờ có quy tắc trừ đi 1." },
+                { text: "Thay chữ số đó bằng số 5.", correct: false, rationale: "Sai." }
+            ],
+            hint: "Ví dụ: Làm tròn 1,2 về hàng đơn vị thì được 1 (giữ nguyên)."
+        },
+        {
+            level: "Nhận biết",
+            text: "Làm tròn số thập phân $12,345$ đến hàng phần mười.",
+            options: [
+                { text: "$12,3$", correct: true, rationale: "Đúng. Chữ số sau hàng phần mười là 4 (< 5) nên ta giữ nguyên số 3." },
+                { text: "$12,4$", correct: false, rationale: "Sai. Chỉ làm tròn lên khi chữ số sau nó >= 5." },
+                { text: "$12,35$", correct: false, rationale: "Sai. Đây là làm tròn đến hàng phần trăm." },
+                { text: "$12$", correct: false, rationale: "Sai. Đây là làm tròn đến hàng đơn vị." }
+            ],
+            hint: "Hàng phần mười là chữ số ngay sau dấu phẩy (số 3). Nhìn số kế tiếp (số 4) để quyết định."
+        },
+        {
+            level: "Nhận biết",
+            text: "Kí hiệu nào sau đây dùng để chỉ sự xấp xỉ (gần bằng)?",
+            options: [
+                { text: "$\\approx$", correct: true, rationale: "Chính xác. Hai dấu ngã biểu thị sự xấp xỉ." },
+                { text: "$=$", correct: false, rationale: "Sai. Đây là dấu bằng tuyệt đối." },
+                { text: "$\\in$", correct: false, rationale: "Sai. Đây là dấu thuộc tập hợp." },
+                { text: "$\\ge$", correct: false, rationale: "Sai. Đây là dấu lớn hơn hoặc bằng." }
+            ],
+            hint: "Nó trông giống dấu bằng nhưng uốn lượn."
+        },
+        {
+            level: "Nhận biết",
+            text: "Làm tròn số $79,99$ đến hàng đơn vị.",
+            options: [
+                { text: "$80$", correct: true, rationale: "Đúng. Chữ số sau hàng đơn vị là 9 (>= 5) nên cộng 1 vào 79 thành 80." },
+                { text: "$79$", correct: false, rationale: "Sai quy tắc." },
+                { text: "$79,9$", correct: false, rationale: "Sai. Yêu cầu làm tròn đến hàng đơn vị (số nguyên)." },
+                { text: "$80,0$", correct: false, rationale: "Sai định dạng số nguyên." }
+            ],
+            hint: "Hàng đơn vị là số 9 (trước dấu phẩy). Số sau nó là 9 (lớn hơn 5)."
+        },
+        {
+            level: "Nhận biết",
+            text: "Làm tròn số $1567$ với độ chính xác $50$ (tức là làm tròn đến hàng trăm).",
+            options: [
+                { text: "$1600$", correct: true, rationale: "Đúng. Hàng trăm là số 5. Số sau nó là 6 (>=5) nên tăng 5 lên 6 và thay các số sau bằng 0." },
+                { text: "$1500$", correct: false, rationale: "Sai." },
+                { text: "$1570$", correct: false, rationale: "Sai. Đây là làm tròn đến hàng chục." },
+                { text: "$1550$", correct: false, rationale: "Sai." }
+            ],
+            hint: "Quan sát chữ số hàng trăm (số 5) và chữ số ngay sau nó (số 6)."
+        },
+        {
+            level: "Nhận biết",
+            text: "Số nào sau đây khi làm tròn đến hàng phần mười thì được kết quả là $3,5$?",
+            options: [
+                { text: "$3,52$", correct: true, rationale: "Chính xác. Số 2 < 5 nên giữ nguyên 3,5." },
+                { text: "$3,44$", correct: false, rationale: "Sai. Làm tròn thành 3,4." },
+                { text: "$3,56$", correct: false, rationale: "Sai. Làm tròn thành 3,6 (vì 6 >= 5)." },
+                { text: "$3,41$", correct: false, rationale: "Sai. Làm tròn thành 3,4." }
+            ],
+            hint: "Tìm số mà chữ số hàng phần trăm nhỏ hơn 5 (nếu hàng phần mười là 5)."
+        },
+
+        // --- THÔNG HIỂU (5 câu) ---
+        {
+            level: "Thông hiểu",
+            text: "Làm tròn số âm $-4,285$ đến hàng phần mười.",
+            options: [
+                { text: "$-4,3$", correct: true, rationale: "Đúng. Xét số đối 4,285 làm tròn thành 4,3. Thêm dấu trừ thành -4,3." },
+                { text: "$-4,2$", correct: false, rationale: "Sai. Chữ số sau số 2 là 8 (>=5) nên phải tăng lên." },
+                { text: "$-4,29$", correct: false, rationale: "Sai. Đây là hàng phần trăm." },
+                { text: "$-5,3$", correct: false, rationale: "Sai." }
+            ],
+            hint: "Làm tròn số dương tương ứng rồi đặt dấu trừ đằng trước."
+        },
+        {
+            level: "Thông hiểu",
+            text: "Ước lượng kết quả của phép tính: $19,8 \\cdot 4,1$.",
+            options: [
+                { text: "$80$", correct: true, rationale: "Xuất sắc! $19,8 \\approx 20$, $4,1 \\approx 4$ nên $\\approx 80$." },
+                { text: "$100$", correct: false, rationale: "Quá cao." },
+                { text: "$60$", correct: false, rationale: "Quá thấp." },
+                { text: "$76$", correct: false, rationale: "Khó nhẩm hơn và không phải ước lượng tròn số." }
+            ],
+            hint: "Làm tròn về 20 và 4."
+        },
+        {
+            level: "Thông hiểu",
+            text: "Một mảnh vườn hình chữ nhật có chiều dài $11,8m$ và chiều rộng $9,2m$. Ước lượng diện tích mảnh vườn.",
+            options: [
+                { text: "$108 \\, m^2$", correct: true, rationale: "Đúng. $11,8 \\approx 12$, $9,2 \\approx 9$ nên $\\approx 108$." },
+                { text: "$120 \\, m^2$", correct: false, rationale: "Sai. Làm tròn lên 10 gây sai số lớn." },
+                { text: "$99 \\, m^2$", correct: false, rationale: "Sai. Làm tròn xuống 11 gây lệch." },
+                { text: "$100 \\, m^2$", correct: false, rationale: "Ước lượng chưa sát." }
+            ],
+            hint: "Làm tròn: 11,8→12 và 9,2→9."
+        },
+        {
+            level: "Thông hiểu",
+            text: "Kết quả làm tròn số $\\sqrt{5}$ đến hàng phần nghìn là:",
+            options: [
+                { text: "$2,236$", correct: true, rationale: "Chính xác. $\\sqrt{5} \\approx 2,23606...$ nên làm tròn đến phần nghìn là 2,236." },
+                { text: "$2,237$", correct: false, rationale: "Sai." },
+                { text: "$2,24$", correct: false, rationale: "Sai. Đây là hàng phần trăm." },
+                { text: "$2,23$", correct: false, rationale: "Sai." }
+            ],
+            hint: "Nhớ gần đúng: 2,2360..."
+        },
+        {
+            level: "Thông hiểu",
+            text: "Biết 1 inch $\\approx 2,54$ cm. Một chiếc TV 50 inch có đường chéo khoảng bao nhiêu mét?",
+            options: [
+                { text: "$1,27 \\, m$", correct: true, rationale: "Đúng. $50\\cdot2,54=127$ cm = 1,27 m." },
+                { text: "$127 \\, m$", correct: false, rationale: "Sai đơn vị." },
+                { text: "$1,5 \\, m$", correct: false, rationale: "Sai." },
+                { text: "$2,54 \\, m$", correct: false, rationale: "Sai." }
+            ],
+            hint: "Nhân rồi đổi cm → m."
+        },
+
+        // --- VẬN DỤNG (3 câu) ---
+        {
+            level: "Vận dụng thực tế",
+            text: "Bạn Lan mua: Rau (28.500đ), Thịt (102.000đ), Gạo (58.000đ). Lan mang 200.000đ. Ước lượng Lan có đủ tiền không?",
+            options: [
+                { text: "Đủ tiền", correct: true, rationale: "Đúng! Ước lượng: 30 + 100 + 60 = 190 (nghìn) < 200." },
+                { text: "Không đủ tiền", correct: false, rationale: "Sai. Tổng khoảng 188.500đ." },
+                { text: "Thiếu 10.000đ", correct: false, rationale: "Sai." },
+                { text: "Vừa đủ y chang", correct: false, rationale: "Sai. Còn dư." }
+            ],
+            hint: "Làm tròn đến chục nghìn: 30 + 100 + 60."
+        },
+        {
+            level: "Vận dụng",
+            text: "Tính diện tích hình tròn bán kính $r=4,8$ cm (lấy $\\pi\\approx3,14$, làm tròn kết quả đến hàng đơn vị).",
+            options: [
+                { text: "$72 \\, cm^2$", correct: true, rationale: "Đúng. $S\\approx3,14\\cdot23,04\\approx72,3456$ → 72." },
+                { text: "$75 \\, cm^2$", correct: false, rationale: "Sai. Ước lượng thô thì ra 75 nhưng đề yêu cầu tính và làm tròn." },
+                { text: "$15 \\, cm^2$", correct: false, rationale: "Sai công thức." },
+                { text: "$30 \\, cm^2$", correct: false, rationale: "Sai." }
+            ],
+            hint: "Tính (4,8)^2 trước."
+        },
+        {
+            level: "Vận dụng",
+            text: "Dân số Việt Nam năm 2020 ước tính $97.582.700$ người. Làm tròn đến hàng triệu.",
+            options: [
+                { text: "$98.000.000$", correct: true, rationale: "Đúng. Hàng trăm nghìn là 5 nên làm tròn lên." },
+                { text: "$97.000.000$", correct: false, rationale: "Sai." },
+                { text: "$97.600.000$", correct: false, rationale: "Sai hàng làm tròn." },
+                { text: "$97.500.000$", correct: false, rationale: "Sai." }
+            ],
+            hint: "Nhìn chữ số hàng trăm nghìn."
+        },
+
+        // --- VẬN DỤNG CAO (1 câu) ---
+        {
+            level: "Vận dụng cao",
+            text: "Tìm số tự nhiên $n$ <b>lớn nhất</b> sao cho khi làm tròn $n$ đến hàng trăm được $500$.",
+            options: [
+                { text: "$549$", correct: true, rationale: "Đúng! Để làm tròn về 500 thì $n$ phải < 550. Lớn nhất là 549." },
+                { text: "$550$", correct: false, rationale: "Sai. 550 làm tròn thành 600." },
+                { text: "$499$", correct: false, rationale: "Sai. Chưa lớn nhất." },
+                { text: "$599$", correct: false, rationale: "Sai. Làm tròn thành 600." }
+            ],
+            hint: "Muốn ra 500 thì phải nhỏ hơn 550."
+        }
+    ];
+
+    // --- UTILS: shuffle + cân đáp án ABCD trong dữ liệu ---
+    function shuffleArray(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    // Đưa đáp án đúng của mỗi câu về vị trí mục tiêu (0..3) để "chia đều ABCD" ở dữ liệu gốc
+    function balanceCorrectPositions(questions) {
+        return questions.map((q, idx) => {
+            const options = [...q.options];
+            const correctIdx = options.findIndex(o => o.correct);
+            if (correctIdx === -1) return q; // phòng khi thiếu correct
+            const target = idx % 4; // A,B,C,D,A,B,C,D...
+            const [correctOpt] = options.splice(correctIdx, 1);
+            options.splice(target, 0, correctOpt);
+            return { ...q, options };
+        });
+    }
+
+    // --- GAME ENGINE ---
+    const Game = {
+        state: {
+            score: 0,
+            index: 0,
+            answered: false,
+            questions: []
+        },
+
+        start() {
+            this.state.score = 0;
+            this.state.index = 0;
+            this.state.answered = false;
+
+            // 1) Cân ABCD trong dữ liệu (đúng yêu cầu cô)
+            const balanced = balanceCorrectPositions(QUESTIONS);
+
+            // 2) Random thứ tự câu hỏi
+            this.state.questions = shuffleArray(balanced);
+
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+
+            this.render();
+        },
+
+        render() {
+            this.state.answered = false;
+            document.getElementById('feedback-sheet').classList.add('translate-y-full');
+
+            const q = this.state.questions[this.state.index];
+
+            // UI Updates
+            document.getElementById('ui-current').innerText = this.state.index + 1;
+            document.getElementById('ui-total').innerText = this.state.questions.length;
+            document.getElementById('ui-score').innerText = this.state.score;
+            document.getElementById('ui-level').innerText = "Mức độ: " + q.level;
+
+            // Progress (câu cuối đầy 100%)
+            const pct = ((this.state.index) / (this.state.questions.length - 1)) * 100;
+            document.getElementById('ui-progress').style.width = `${isFinite(pct) ? pct : 0}%`;
+
+            // Content
+            document.getElementById('ui-question').innerHTML = q.text;
+
+            // Options (random đáp án mỗi câu)
+            const randomizedOptions = shuffleArray(q.options);
+
+            const container = document.getElementById('ui-options');
+            container.innerHTML = '';
+
+            randomizedOptions.forEach((opt, i) => {
+                const btn = document.createElement('div');
+                btn.className = `option-card bg-white border-2 border-gray-200 p-5 rounded-2xl flex items-center shadow-sm`;
+                btn.innerHTML = `
+                    <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 font-bold flex items-center justify-center mr-4 border border-gray-300 flex-shrink-0">
+                        ${String.fromCharCode(65 + i)}
+                    </div>
+                    <div class="font-semibold text-lg text-gray-700">${opt.text}</div>
+                `;
+                btn.onclick = () => this.check(btn, opt, randomizedOptions, q);
+                container.appendChild(btn);
+            });
+
+            if (window.MathJax) MathJax.typesetPromise();
+        },
+
+        check(btn, opt, renderedOptions, q) {
+            if (this.state.answered) return;
+            this.state.answered = true;
+
+            const allBtns = document.querySelectorAll('.option-card');
+            allBtns.forEach(b => {
+                b.classList.add('disabled', 'cursor-default');
+                b.style.pointerEvents = 'none';
+            });
+
+            const fbIcon = document.getElementById('fb-icon');
+            const fbTitle = document.getElementById('fb-title');
+
+            if (opt.correct) {
+                this.state.score += 10;
+                document.getElementById('ui-score').innerText = this.state.score;
+                btn.classList.add('correct');
+
+                fbIcon.innerText = "🎉";
+                fbTitle.innerText = "Chính Xác!";
+                fbTitle.className = "text-xl font-bold mb-1 text-green-600";
+
+                this.playSound('success');
+                confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
+            } else {
+                btn.classList.add('wrong');
+
+                const correctIndex = renderedOptions.findIndex(o => o.correct);
+                if (correctIndex >= 0) allBtns[correctIndex].classList.add('correct', 'opacity-75');
+
+                fbIcon.innerText = "🤔";
+                fbTitle.innerText = "Tiếc quá!";
+                fbTitle.className = "text-xl font-bold mb-1 text-red-600";
+
+                this.playSound('error');
+            }
+
+            document.getElementById('fb-rationale').innerText = opt.rationale;
+            document.getElementById('fb-hint').innerText = "Gợi ý: " + q.hint;
+            document.getElementById('feedback-sheet').classList.remove('translate-y-full');
+
+            if (window.MathJax) MathJax.typesetPromise();
+        },
+
+        next() {
+            this.state.index++;
+            if (this.state.index < this.state.questions.length) {
+                this.render();
+            } else {
+                this.end();
+            }
+        },
+
+        end() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('end-screen').classList.add('flex');
+
+            document.getElementById('end-score').innerText = this.state.score;
+            document.getElementById('end-correct').innerText = Math.round(this.state.score / 10);
+
+            this.playSound('complete');
+
+            const msg = document.getElementById('end-msg');
+            if (this.state.score >= 130) msg.innerText = "Tuyệt đỉnh! Bạn là máy tính sống! 🤖";
+            else if (this.state.score >= 100) msg.innerText = "Rất tốt! Khả năng ước lượng của bạn rất cừ! 👍";
+            else msg.innerText = "Hãy cẩn thận hơn một chút khi làm tròn nhé! 💪";
+        },
+
+        playSound(type) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            if (type === 'success') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.5);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            } else if (type === 'complete') {
+                [523, 659, 783, 1046].forEach((f, i) => {
+                    setTimeout(() => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        o.type = 'triangle';
+                        o.frequency.value = f;
+                        g.gain.setValueAtTime(0.1, ctx.currentTime);
+                        g.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+                        o.start();
+                        o.stop(ctx.currentTime + 0.2);
+                    }, i * 150);
+                });
+            }
+        }
+    };
+</script>
+
+</body>
+</html>
