@@ -110,6 +110,7 @@
   // ===== DỮ LIỆU: CÁC LỚP → CHỦ ĐỀ → GAME =====
  // ===== DỮ LIỆU: CÁC LỚP → CHỦ ĐỀ → GAME =====
 const grades = [
+  const grades = [
   {
     id: "lop6",
     name: "Lớp 6",
@@ -135,57 +136,57 @@ const grades = [
         name: "Số hữu tỉ",
         description: "Các game luyện tập cộng, trừ, nhân, chia số hữu tỉ và vận dụng vào bài toán thực tế.",
         games: [
-  {
-    id: "lop7-chinh-phuc-so-huu-ti",
-    name: "Chinh Phục Thế Giới Số Hữu Tỉ",
-    path: "ChinhPhucSoHuuTi/index.html",
-    icon: "🧠",
-    description:
-      "Game luyện 15 câu hỏi trắc nghiệm về phép cộng, trừ, nhân, chia số hữu tỉ, kèm giải thích chi tiết và hiệu ứng trò chơi.",
-    topics: [
-      "Cộng số hữu tỉ",
-      "Trừ số hữu tỉ",
-      "Nhân số hữu tỉ",
-      "Chia số hữu tỉ",
-      "Bài toán thực tế"
-    ],
-    difficulty: "Trung bình"
-  },
+          {
+            id: "lop7-chinh-phuc-so-huu-ti",
+            name: "Chinh Phục Thế Giới Số Hữu Tỉ",
+            path: "ChinhPhucSoHuuTi/index.html",
+            icon: "🧠",
+            description:
+              "Game luyện 15 câu hỏi trắc nghiệm về phép cộng, trừ, nhân, chia số hữu tỉ, kèm giải thích chi tiết và hiệu ứng trò chơi.",
+            topics: [
+              "Cộng số hữu tỉ",
+              "Trừ số hữu tỉ",
+              "Nhân số hữu tỉ",
+              "Chia số hữu tỉ",
+              "Bài toán thực tế"
+            ],
+            difficulty: "Trung bình"
+          },
 
-  {
-    id: "lop7-chinh-phuc-phep-tinh-so-huu-ti",
-    name: "Chinh Phục Phép Tính Số Hữu Tỉ",
-    path: "ChinhPhucPhepTinhSoHuuTi/index.html", // nhớ trùng tên thư mục game của cô
-    icon: "➗",
-    description:
-      "Game trắc nghiệm 15 câu, 4 mức độ: Nhận biết, Thông hiểu, Vận dụng và Vận dụng cao về các phép tính với số hữu tỉ.",
-    topics: ["Số hữu tỉ", "Cộng", "Trừ", "Nhân", "Chia"],
-    difficulty: "Trung bình"
-  },
+          {
+            id: "lop7-chinh-phuc-phep-tinh-so-huu-ti",
+            name: "Chinh Phục Phép Tính Số Hữu Tỉ",
+            path: "ChinhPhucPhepTinhSoHuuTi/index.html", // nhớ trùng tên thư mục game của cô
+            icon: "➗",
+            description:
+              "Game trắc nghiệm 15 câu, 4 mức độ: Nhận biết, Thông hiểu, Vận dụng và Vận dụng cao về các phép tính với số hữu tỉ.",
+            topics: ["Số hữu tỉ", "Cộng", "Trừ", "Nhân", "Chia"],
+            difficulty: "Trung bình"
+          },
 
-  {
-    id: "lop7-dinh-cao-luy-thua",
-    name: "Chinh Phục Đỉnh Cao Lũy Thừa",
-    path: "ChinhPhucDinhCaoLuyThua/index.html",
-    icon: "📦",
-    description:
-      "Game luyện tập lũy thừa của một số hữu tỉ – Toán 7 Bài 3, gồm 15 câu hỏi với 4 mức độ từ Nhận biết đến Vận dụng cao.",
-    topics: ["Lũy thừa", "Số hữu tỉ", "Toán 7 Chương 1"],
-    difficulty: "Trung bình"
-  },
+          {
+            id: "lop7-dinh-cao-luy-thua",
+            name: "Chinh Phục Đỉnh Cao Lũy Thừa",
+            path: "ChinhPhucDinhCaoLuyThua/index.html",
+            icon: "📦",
+            description:
+              "Game luyện tập lũy thừa của một số hữu tỉ – Toán 7 Bài 3, gồm 15 câu hỏi với 4 mức độ từ Nhận biết đến Vận dụng cao.",
+            topics: ["Lũy thừa", "Số hữu tỉ", "Toán 7 Chương 1"],
+            difficulty: "Trung bình"
+          },
 
-  {
-    id: "lop7-thu-thach-dau-ngoac",
-    name: "Thử Thách Dấu Ngoặc & Chuyển Vế",
-    path: "Lop7_DauNgoac_ChuyenVe/index.html",
-    icon: "🧩",
-    description:
-      "Game trắc nghiệm 15 câu với 4 mức độ (Nhận biết – Thông hiểu – Vận dụng – Vận dụng cao), luyện kỹ năng bỏ dấu ngoặc, đổi dấu, chuyển vế và rút gọn biểu thức.",
-    topics: ["Dấu ngoặc", "Bỏ ngoặc", "Chuyển vế", "Rút gọn biểu thức"],
-    difficulty: "Trung bình – Khá"
-  },
- 
-      {
+          {
+            id: "lop7-thu-thach-dau-ngoac",
+            name: "Thử Thách Dấu Ngoặc & Chuyển Vế",
+            path: "Lop7_DauNgoac_ChuyenVe/index.html",
+            icon: "🧩",
+            description:
+              "Game trắc nghiệm 15 câu với 4 mức độ (Nhận biết – Thông hiểu – Vận dụng – Vận dụng cao), luyện kỹ năng bỏ dấu ngoặc, đổi dấu, chuyển vế và rút gọn biểu thức.",
+            topics: ["Dấu ngoặc", "Bỏ ngoặc", "Chuyển vế", "Rút gọn biểu thức"],
+            difficulty: "Trung bình – Khá"
+          },
+
+          {
             id: "lop7-dau-truong-toan7-chuong1",
             name: "Đấu Trường Toán 7 – Chương 1",
             path: "DauTruongToan7Chuong1/index.html",
@@ -195,7 +196,8 @@ const grades = [
             difficulty: "Trung bình"
           }
         ]
-      }
+      }, // ✅ THÊM DẤU PHẨY Ở ĐÂY
+
       { id: "lop7-so-thuc", name: "Số thực", description: "Các game giúp ôn tập tập hợp số, trục số và so sánh – xấp xỉ số thực.", games: [] },
       { id: "lop7-hinh-hop-lang-tru-dung", name: "Hình hộp – Hình lăng trụ đứng", description: "Các game hình học không gian về diện tích, thể tích hình hộp chữ nhật và hình lăng trụ đứng.", games: [] },
       { id: "lop7-goc-song-song", name: "Góc và đường thẳng song song", description: "Các game về các loại góc, quan hệ giữa các góc tạo bởi hai đường thẳng song song cắt bởi một đường thẳng.", games: [] },
@@ -205,6 +207,7 @@ const grades = [
       { id: "lop7-tam-giac", name: "Tam giác", description: "Các game về tính chất tam giác, đường cao, trung tuyến, phân giác và áp dụng vào bài toán.", games: [] }
     ]
   },
+
    {
   id: "lop8",
   name: "Lớp 8",
@@ -651,7 +654,7 @@ const grades = [
   ]
   },
 
-  {
+ {
   id: "lop9",
   name: "Lớp 9",
   color: "rose",
@@ -1107,6 +1110,9 @@ const grades = [
           name: "Thử Tài Thống Kê – Chương 7",
           path: "ThongKe/ThuTaiThongKe/index.html",
           icon: "📊",
+          color: "emerald",
+          label: "Trò chơi Thống kê",
+          grade: "Toán 9 – Thống kê",
           description:
             "Game Toán 9 – Chương 7. Gồm 15 câu hỏi trắc nghiệm từ nhận biết đến vận dụng cao về tần số, bảng tần số, biểu đồ và bài toán thống kê thực tế.",
           topics: [
