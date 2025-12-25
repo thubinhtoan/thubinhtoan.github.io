@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="vi" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trò Chơi Toán Học - Cộng Trừ Phân Số</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      box-sizing: border-box;
+      font-family: 'Baloo 2', cursive;
+    }
+    
+    @keyframes floatBg {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+    
+    @keyframes sparkle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-15px) rotate(5deg); }
+      75% { transform: translateY(-5px) rotate(-5deg); }
+    }
+    
+    @keyframes pulse3d {
+      0%, 100% { transform: scale(1) translateZ(0); }
+      50% { transform: scale(1.05) translateZ(10px); }
+    }
+    
+    .animate-float-bg {
+      animation: floatBg 20s linear infinite;
+    }
+    
+    .animate-bounce-slow {
+      animation: bounce 2s ease-in-out infinite;
+    }
+    
+    .animate-wiggle {
+      animation: wiggle 1s ease-in-out infinite;
+    }
+    
+    .animate-sparkle {
+      animation: sparkle 1.5s ease-in-out infinite;
+    }
+    
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .card-3d {
+      transform-style: preserve-3d;
+      perspective: 1000px;
+      transition: all 0.3s ease;
+    }
+    
+    .card-3d:hover {
+      transform: translateY(-5px) rotateX(5deg) rotateY(5deg);
+    }
+    
+    .btn-3d {
+      transform-style: preserve-3d;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 0 #0002, 0 8px 20px #0003;
+    }
+    
+    .btn-3d:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 #0002, 0 12px 25px #0003;
+    }
+    
+    .btn-3d:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #0002, 0 4px 10px #0003;
+    }
+    
+    .draggable {
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+    
+    .draggable:active {
+      cursor: grabbing;
+    }
+    
+    .dragging {
+      opacity: 0.8;
+      transform: scale(1.1) rotate(5deg);
+      z-index: 1000;
+    }
+    
+    .drop-zone {
+      transition: all 0.3s ease;
+    }
+    
+    .drop-zone.drag-over {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(255, 200, 100, 0.8);
+    }
+    
+    .correct-answer {
+      animation: pulse3d 0.5s ease-in-out;
+      background: linear-gradient(135deg, #4ade80, #22c55e) !important;
+    }
+    
+    .wrong-answer {
+      animation: wiggle 0.5s ease-in-out;
+      background: linear-gradient(135deg, #f87171, #ef4444) !important;
+    }
+    
+    .fraction {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 4px;
+    }
+    
+    .fraction-line {
+      width: 100%;
+      height: 3px;
+      background: currentColor;
+      border-radius: 2px;
+    }
+    
+    .bg-pattern {
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(255,182,193,0.4) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(173,216,230,0.4) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255,255,224,0.3) 0%, transparent 70%);
+    }
+    
+    .floating-icons {
+      position: absolute;
+      width: 200%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 100px;
+      font-size: 2rem;
+      opacity: 0.6;
+    }
+    
+    .leaderboard-row {
+      transition: all 0.3s ease;
+    }
+    
+    .leaderboard-row:hover {
+      transform: translateX(5px);
+    }
+    
+    .medal-1 { color: #FFD700; text-shadow: 0 2px 10px rgba(255,215,0,0.5); }
+    .medal-2 { color: #C0C0C0; text-shadow: 0 2px 10px rgba(192,192,192,0.5); }
+    .medal-3 { color: #CD7F32; text-shadow: 0 2px 10px rgba(205,127,50,0.5); }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+</head>
+<body class="h-full m-0 p-0 overflow-hidden">
+  <div id="app" class="h-full w-full relative overflow-auto bg-gradient-to-br from-pink-200 via-purple-100 to-blue-200">
+    <!-- Floating Background -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="floating-icons animate-float-bg" style="top: 10%;">
+        <span>🌟</span><span>✨</span><span>🎀</span><span>🌈</span><span>💫</span><span>🎪</span><span>🎠</span><span>🦋</span><span>🌸</span><span>🍭</span>
+        <span>🌟</span><span>✨</span><span>🎀</span><span>🌈</span><span>💫</span><span>🎪</span><span>🎠</span><span>🦋</span><span>🌸</span><span>🍭</span>
+      </div>
+      <div class="floating-icons animate-float-bg" style="top: 50%; animation-delay: -5s;">
+        <span>🎨</span><span>🎁</span><span>🎈</span><span>🌺</span><span>⭐</span><span>🎵</span><span>🍬</span><span>🌻</span><span>💝</span><span>🎊</span>
+        <span>🎨</span><span>🎁</span><span>🎈</span><span>🌺</span><span>⭐</span><span>🎵</span><span>🍬</span><span>🌻</span><span>💝</span><span>🎊</span>
+      </div>
+      <div class="floating-icons animate-float-bg" style="top: 85%; animation-delay: -10s;">
+        <span>🐱</span><span>🐰</span><span>🐻</span><span>🦄</span><span>🐨</span><span>🐼</span><span>🦊</span><span>🐶</span><span>🐥</span><span>🦋</span>
+        <span>🐱</span><span>🐰</span><span>🐻</span><span>🦄</span><span>🐨</span><span>🐼</span><span>🦊</span><span>🐶</span><span>🐥</span><span>🦋</span>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="relative z-10 h-full flex flex-col items-center justify-center p-4">
+      <!-- Welcome Screen -->
+      <div id="welcome-screen" class="w-full max-w-lg">
+        <div class="card-3d bg-white/90 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border-4 border-white/50">
+          <div class="text-center mb-6">
+            <div class="text-6xl mb-4 animate-bounce-slow">🎮</div>
+            <h1 id="game-title" class="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent mb-2">
+              Toán Học Vui
+            </h1>
+            <p id="welcome-msg" class="text-lg text-purple-600 font-medium">Cộng Trừ Phân Số - Lớp 6 🎯</p>
+          </div>
+          <div class="space-y-4">
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl">👤</span>
+              <input
+                type="text"
+                id="player-name"
+                placeholder="Nhập tên của bạn..."
+                class="w-full pl-14 pr-4 py-4 text-lg rounded-2xl border-3 border-purple-200 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none transition-all font-medium bg-white/80"
+                maxlength="20"
+              >
+            </div>
+            <button
+              id="start-btn"
+              onclick="startGame()"
+              class="btn-3d w-full py-4 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 text-white text-xl font-bold rounded-2xl hover:from-pink-500 hover:via-purple-500 hover:to-blue-500 transition-all flex items-center justify-center gap-2"
+            >
+              <span>Bắt Đầu Chơi</span>
+              <span class="text-2xl animate-wiggle">🚀</span>
+            </button>
+            <button
+              onclick="showLeaderboard()"
+              class="btn-3d w-full py-3 bg-gradient-to-r from-amber-300 to-orange-400 text-white text-lg font-bold rounded-2xl hover:from-amber-400 hover:to-orange-500 transition-all flex items-center justify-center gap-2"
+            >
+              <span>🏆</span>
+              <span>Bảng Xếp Hạng</span>
+            </button>
+          </div>
+          <div class="mt-6 flex justify-center gap-4 text-3xl">
+            <span class="animate-float" style="animation-delay: 0s;">🌟</span>
+            <span class="animate-float" style="animation-delay: 0.2s;">📚</span>
+            <span class="animate-float" style="animation-delay: 0.4s;">✏️</span>
+            <span class="animate-float" style="animation-delay: 0.6s;">🎯</span>
+            <span class="animate-float" style="animation-delay: 0.8s;">🌈</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Screen -->
+      <div id="game-screen" class="hidden w-full max-w-2xl">
+        <div class="card-3d bg-white/90 backdrop-blur-lg rounded-3xl p-6 shadow-2xl border-4 border-white/50">
+          <!-- Header -->
+          <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+            <div class="flex items-center gap-2 bg-gradient-to-r from-pink-100 to-purple-100 px-4 py-2 rounded-full">
+              <span class="text-xl">👤</span>
+              <span id="display-name" class="font-bold text-purple-700">Học sinh</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-2 bg-gradient-to-r from-amber-100 to-orange-100 px-4 py-2 rounded-full">
+                <span class="text-xl animate-sparkle">⭐</span>
+                <span id="score" class="font-bold text-orange-600">0</span>
+              </div>
+              <div class="flex items-center gap-2 bg-gradient-to-r from-blue-100 to-cyan-100 px-4 py-2 rounded-full">
+                <span class="text-xl">⏱️</span>
+                <span id="timer" class="font-bold text-blue-600">00:00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress -->
+          <div class="mb-4">
+            <div class="flex justify-between text-sm font-medium text-purple-600 mb-1">
+              <span>Câu hỏi</span>
+              <!-- ✅ sửa lại: dùng current-q & total-q -->
+              <span>
+                <span id="current-q">1</span>/
+                <span id="total-q">10</span>
+              </span>
+            </div>
+            <div class="h-3 bg-purple-100 rounded-full overflow-hidden">
+              <div
+                id="progress-bar"
+                class="h-full bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 rounded-full transition-all duration-500"
+                style="width: 10%"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Question -->
+          <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 mb-6 border-2 border-purple-100">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-2xl animate-bounce-slow">📝</span>
+              <span class="text-lg font-bold text-purple-700">Câu hỏi:</span>
+            </div>
+            <div
+              id="question"
+              class="text-2xl md:text-3xl font-bold text-center text-gray-800 py-4"
+            >
+              <!-- Question here -->
+            </div>
+          </div>
+
+          <!-- Drop Zone -->
+          <div
+            id="drop-zone"
+            class="drop-zone bg-gradient-to-br from-amber-50 to-yellow-50 rounded-2xl p-6 mb-6 border-3 border-dashed border-amber-300 min-h-[80px] flex items-center justify-center"
+          >
+            <span class="text-gray-400 text-lg font-medium">🎯 Kéo đáp án vào đây</span>
+          </div>
+
+          <!-- Answer Options -->
+          <div id="answers" class="grid grid-cols-2 gap-4">
+            <!-- Answers here -->
+          </div>
+
+          <!-- Feedback -->
+          <div
+            id="feedback"
+            class="hidden mt-4 text-center py-3 rounded-2xl font-bold text-lg"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Result Screen -->
+      <div id="result-screen" class="hidden w-full max-w-lg">
+        <div class="card-3d bg-white/90 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border-4 border-white/50 text-center">
+          <div class="text-6xl mb-4 animate-bounce-slow">🎉</div>
+          <h2 class="text-3xl font-extrabold bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent mb-4">
+            Hoàn Thành!
+          </h2>
+          <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 mb-6">
+            <p class="text-lg text-gray-600 mb-2">
+              Xin chúc mừng,
+              <span id="result-name" class="font-bold text-purple-600">Học sinh</span>!
+            </p>
+            <div class="flex justify-center gap-8 my-4">
+              <div class="text-center">
+                <div class="text-4xl font-extrabold text-amber-500" id="final-score">0</div>
+                <div class="text-sm text-gray-500">Điểm số ⭐</div>
+              </div>
+              <div class="text-center">
+                <div class="text-4xl font-extrabold text-blue-500" id="final-time">00:00</div>
+                <div class="text-sm text-gray-500">Thời gian ⏱️</div>
+              </div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-green-500" id="correct-count">0/10</div>
+              <div class="text-sm text-gray-500">Câu đúng ✅</div>
+            </div>
+          </div>
+          <div class="space-y-3">
+            <button
+              onclick="restartGame()"
+              class="btn-3d w-full py-4 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 text-white text-xl font-bold rounded-2xl hover:from-pink-500 hover:via-purple-500 hover:to-blue-500 transition-all flex items-center justify-center gap-2"
+            >
+              <span>🔄</span>
+              <span>Chơi Lại</span>
+            </button>
+            <button
+              onclick="showLeaderboard()"
+              class="btn-3d w-full py-3 bg-gradient-to-r from-amber-300 to-orange-400 text-white text-lg font-bold rounded-2xl hover:from-amber-400 hover:to-orange-500 transition-all flex items-center justify-center gap-2"
+            >
+              <span>🏆</span>
+              <span>Xem Bảng Xếp Hạng</span>
+            </button>
+            <button
+              onclick="goHome()"
+              class="btn-3d w-full py-3 bg-gradient-to-r from-gray-300 to-gray-400 text-white text-lg font-bold rounded-2xl hover:from-gray-400 hover:to-gray-500 transition-all flex items-center justify-center gap-2"
+            >
+              <span>🏠</span>
+              <span>Về Trang Chủ</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard Screen -->
+      <div id="leaderboard-screen" class="hidden w-full max-w-lg">
+        <div class="card-3d bg-white/90 backdrop-blur-lg rounded-3xl p-6 shadow-2xl border-4 border-white/50">
+          <div class="text-center mb-6">
+            <div class="text-5xl mb-2 animate-bounce-slow">🏆</div>
+            <h2 class="text-2xl font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
+              Bảng Xếp Hạng
+            </h2>
+          </div>
+
+          <!-- Tabs -->
+          <div class="flex gap-2 mb-4">
+            <button
+              id="tab-score"
+              onclick="switchTab('score')"
+              class="flex-1 py-2 px-4 rounded-xl font-bold transition-all bg-gradient-to-r from-amber-400 to-orange-400 text-white"
+            >
+              ⭐ Theo Điểm
+            </button>
+            <button
+              id="tab-time"
+              onclick="switchTab('time')"
+              class="flex-1 py-2 px-4 rounded-xl font-bold transition-all bg-gray-200 text-gray-600"
+            >
+              ⏱️ Theo Thời Gian
+            </button>
+          </div>
+
+          <!-- Leaderboard List -->
+          <div id="leaderboard-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+            <div class="text-center py-8 text-gray-400">
+              <div class="text-4xl mb-2">📊</div>
+              <p>Chưa có dữ liệu</p>
+            </div>
+          </div>
+
+          <button
+            onclick="goHome()"
+            class="btn-3d w-full py-3 mt-6 bg-gradient-to-r from-purple-400 to-pink-400 text-white text-lg font-bold rounded-2xl hover:from-purple-500 hover:to-pink-500 transition-all flex items-center justify-center gap-2"
+          >
+            <span>🏠</span>
+            <span>Về Trang Chủ</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Game State
+    let currentQuestion = 0;
+    let score = 0;
+    let correctAnswers = 0;
+    let startTime = null;
+    let timerInterval = null;
+    let playerName = '';
+    let allRecords = [];
+    let currentTab = 'score';
+    let draggedElement = null;
+    
+    // ✅ Questions about fractions (đã sửa: mỗi câu chỉ 1 đáp án đúng, không có phân số tương đương)
+    const questions = [
+      { q: '1/2 + 1/4 = ?', options: ['3/4', '2/6', '1/6', '2/4'], answer: '3/4' },
+      { q: '2/3 + 1/6 = ?', options: ['1/2', '5/6', '2/3', '1/3'], answer: '5/6' },
+      { q: '3/4 - 1/2 = ?', options: ['1/2', '3/4', '1/4', '2/3'], answer: '1/4' },
+      { q: '5/6 - 1/3 = ?', options: ['2/3', '1/3', '3/4', '1/2'], answer: '1/2' },
+      { q: '1/3 + 2/3 = ?', options: ['1', '2/3', '3/4', '5/6'], answer: '1' },
+      { q: '7/8 - 3/8 = ?', options: ['3/8', '1/2', '5/8', '7/8'], answer: '1/2' },
+      { q: '2/5 + 1/5 = ?', options: ['2/5', '1/5', '3/5', '4/5'], answer: '3/5' },
+      { q: '3/4 + 1/4 = ?', options: ['1/2', '2/3', '3/4', '1'], answer: '1' },
+      { q: '5/6 - 1/2 = ?', options: ['1/3', '2/3', '1/6', '5/6'], answer: '1/3' },
+      { q: '1/4 + 1/2 = ?', options: ['1/2', '3/4', '2/3', '5/6'], answer: '3/4' }
+    ];
+    
+    let shuffledQuestions = [];
+    
+    // Default config
+    const defaultConfig = {
+      game_title: 'Toán Học Vui',
+      welcome_message: 'Cộng Trừ Phân Số - Lớp 6 🎯',
+      background_color: '#fce7f3',
+      surface_color: '#ffffff',
+      text_color: '#581c87',
+      primary_action_color: '#a855f7',
+      secondary_action_color: '#f59e0b'
+    };
+    
+    // Data Handler
+    const dataHandler = {
+      onDataChanged(data) {
+        allRecords = data;
+        if (document.getElementById('leaderboard-screen').classList.contains('hidden') === false) {
+          renderLeaderboard();
+        }
+      }
+    };
+    
+    // Initialize
+    async function init() {
+      // Init Element SDK
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (config) => {
+            document.getElementById('game-title').textContent = config.game_title || defaultConfig.game_title;
+            document.getElementById('welcome-msg').textContent = config.welcome_message || defaultConfig.welcome_message;
+            
+            const bgColor = config.background_color || defaultConfig.background_color;
+            const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+            
+            document.body.style.setProperty('--bg-color', bgColor);
+            document.body.style.setProperty('--primary-color', primaryColor);
+          },
+          mapToCapabilities: (config) => ({
+            recolorables: [
+              {
+                get: () => config.background_color || defaultConfig.background_color,
+                set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); }
+              },
+              {
+                get: () => config.surface_color || defaultConfig.surface_color,
+                set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); }
+              },
+              {
+                get: () => config.text_color || defaultConfig.text_color,
+                set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); }
+              },
+              {
+                get: () => config.primary_action_color || defaultConfig.primary_action_color,
+                set: (v) => { config.primary_action_color = v; window.elementSdk.setConfig({ primary_action_color: v }); }
+              },
+              {
+                get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+                set: (v) => { config.secondary_action_color = v; window.elementSdk.setConfig({ secondary_action_color: v }); }
+              }
+            ],
+            borderables: [],
+            fontEditable: undefined,
+            fontSizeable: undefined
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ['game_title', config.game_title || defaultConfig.game_title],
+            ['welcome_message', config.welcome_message || defaultConfig.welcome_message]
+          ])
+        });
+      }
+      
+      // Init Data SDK
+      if (window.dataSdk) {
+        const result = await window.dataSdk.init(dataHandler);
+        if (!result.isOk) {
+          console.error('Failed to init data SDK');
+        }
+      }
+    }
+    
+    init();
+    
+    // Shuffle array
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+    
+    // Start Game
+    function startGame() {
+      const nameInput = document.getElementById('player-name');
+      playerName = nameInput.value.trim() || 'Học sinh';
+      
+      currentQuestion = 0;
+      score = 0;
+      correctAnswers = 0;
+      shuffledQuestions = shuffleArray(questions);
+
+      // ✅ cập nhật tổng số câu hỏi
+      document.getElementById('total-q').textContent = shuffledQuestions.length;
+      
+      document.getElementById('display-name').textContent = playerName;
+      document.getElementById('score').textContent = '0';
+      
+      document.getElementById('welcome-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.remove('hidden');
+      document.getElementById('result-screen').classList.add('hidden');
+      document.getElementById('leaderboard-screen').classList.add('hidden');
+      
+      startTime = Date.now();
+      timerInterval = setInterval(updateTimer, 1000);
+      
+      showQuestion();
+    }
+    
+    // Update Timer
+    function updateTimer() {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+      const secs = (elapsed % 60).toString().padStart(2, '0');
+      document.getElementById('timer').textContent = `${mins}:${secs}`;
+    }
+    
+    // Show Question
+    function showQuestion() {
+      const q = shuffledQuestions[currentQuestion];
+      const totalQuestions = shuffledQuestions.length;
+
+      document.getElementById('question').innerHTML = formatFraction(q.q);
+      document.getElementById('current-q').textContent = currentQuestion + 1;
+      document.getElementById('progress-bar').style.width =
+        `${((currentQuestion + 1) / totalQuestions) * 100}%`;
+      
+      const answersDiv = document.getElementById('answers');
+      const shuffledOptions = shuffleArray(q.options);
+      
+      answersDiv.innerHTML = shuffledOptions.map((opt) => `
+        <div class="draggable answer-option btn-3d bg-gradient-to-br from-purple-100 to-pink-100 p-4 rounded-2xl text-center cursor-grab border-3 border-purple-200 hover:border-purple-400 transition-all"
+          data-answer="${opt}"
+          draggable="true"
+          ondragstart="handleDragStart(event)"
+          ondragend="handleDragEnd(event)"
+          ontouchstart="handleTouchStart(event)"
+          ontouchmove="handleTouchMove(event)"
+          ontouchend="handleTouchEnd(event)">
+          <span class="text-xl md:text-2xl font-bold text-purple-700">${formatFraction(opt)}</span>
+        </div>
+      `).join('');
+      
+      // Reset drop zone
+      const dropZone = document.getElementById('drop-zone');
+      dropZone.innerHTML = '<span class="text-gray-400 text-lg font-medium">🎯 Kéo đáp án vào đây</span>';
+      dropZone.classList.remove('correct-answer', 'wrong-answer');
+      
+      // Setup drop zone events
+      dropZone.ondragover = handleDragOver;
+      dropZone.ondragleave = handleDragLeave;
+      dropZone.ondrop = handleDrop;
+      
+      document.getElementById('feedback').classList.add('hidden');
+    }
+    
+    // Format fraction display
+    function formatFraction(text) {
+      return text.replace(/(\d+)\/(\d+)/g, '<span class="fraction"><span>$1</span><span class="fraction-line"></span><span>$2</span></span>');
+    }
+    
+    // Drag and Drop handlers
+    function handleDragStart(e) {
+      draggedElement = e.target.closest('.answer-option');
+      draggedElement.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', draggedElement.dataset.answer);
+      e.dataTransfer.effectAllowed = 'move';
+    }
+    
+    function handleDragEnd(e) {
+      if (draggedElement) {
+        draggedElement.classList.remove('dragging');
+        draggedElement = null;
+      }
+      document.getElementById('drop-zone').classList.remove('drag-over');
+    }
+    
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      e.currentTarget.classList.add('drag-over');
+    }
+    
+    function handleDragLeave(e) {
+      e.currentTarget.classList.remove('drag-over');
+    }
+    
+    function handleDrop(e) {
+      e.preventDefault();
+      const dropZone = e.currentTarget;
+      dropZone.classList.remove('drag-over');
+      
+      const answer = e.dataTransfer.getData('text/plain');
+      checkAnswer(answer, dropZone);
+    }
+    
+    // Touch handlers for mobile
+    let touchStartX, touchStartY, touchClone;
+    
+    function handleTouchStart(e) {
+      draggedElement = e.target.closest('.answer-option');
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      
+      // Create visual clone
+      touchClone = draggedElement.cloneNode(true);
+      touchClone.style.position = 'fixed';
+      touchClone.style.zIndex = '9999';
+      touchClone.style.pointerEvents = 'none';
+      touchClone.style.opacity = '0.9';
+      touchClone.style.transform = 'scale(1.1) rotate(5deg)';
+      document.body.appendChild(touchClone);
+      
+      updateClonePosition(touch.clientX, touch.clientY);
+      draggedElement.style.opacity = '0.5';
+    }
+    
+    function handleTouchMove(e) {
+      e.preventDefault();
+      if (!touchClone) return;
+      
+      const touch = e.touches[0];
+      updateClonePosition(touch.clientX, touch.clientY);
+      
+      // Check if over drop zone
+      const dropZone = document.getElementById('drop-zone');
+      const rect = dropZone.getBoundingClientRect();
+      
+      if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+          touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+        dropZone.classList.add('drag-over');
+      } else {
+        dropZone.classList.remove('drag-over');
+      }
+    }
+    
+    function handleTouchEnd(e) {
+      if (!draggedElement || !touchClone) return;
+      
+      const touch = e.changedTouches[0];
+      const dropZone = document.getElementById('drop-zone');
+      const rect = dropZone.getBoundingClientRect();
+      
+      touchClone.remove();
+      touchClone = null;
+      draggedElement.style.opacity = '1';
+      dropZone.classList.remove('drag-over');
+      
+      if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+          touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+        const answer = draggedElement.dataset.answer;
+        checkAnswer(answer, dropZone);
+      }
+      
+      draggedElement = null;
+    }
+    
+    function updateClonePosition(x, y) {
+      if (touchClone) {
+        touchClone.style.left = (x - 60) + 'px';
+        touchClone.style.top = (y - 30) + 'px';
+      }
+    }
+    
+    // Check Answer
+    function checkAnswer(answer, dropZone) {
+      const q = shuffledQuestions[currentQuestion];
+      const isCorrect = answer === q.answer;
+      const feedback = document.getElementById('feedback');
+      
+      // Show answer in drop zone
+      dropZone.innerHTML = `<span class="text-2xl font-bold text-white">${formatFraction(answer)}</span>`;
+      
+      if (isCorrect) {
+        score += 10;
+        correctAnswers++;
+        document.getElementById('score').textContent = score;
+        dropZone.classList.add('correct-answer');
+        feedback.textContent = '🎉 Chính xác! Tuyệt vời!';
+        feedback.className = 'mt-4 text-center py-3 rounded-2xl font-bold text-lg bg-green-100 text-green-700';
+      } else {
+        dropZone.classList.add('wrong-answer');
+        feedback.innerHTML = `😢 Sai rồi! Đáp án đúng là: ${formatFraction(q.answer)}`;
+        feedback.className = 'mt-4 text-center py-3 rounded-2xl font-bold text-lg bg-red-100 text-red-700';
+      }
+      
+      feedback.classList.remove('hidden');
+      
+      // Disable all answer options
+      document.querySelectorAll('.answer-option').forEach(opt => {
+        opt.style.pointerEvents = 'none';
+        opt.style.opacity = '0.5';
+      });
+      
+      // Next question after delay
+      setTimeout(() => {
+        currentQuestion++;
+        const totalQuestions = shuffledQuestions.length;
+        if (currentQuestion < totalQuestions) {
+          showQuestion();
+        } else {
+          endGame();
+        }
+      }, 1500);
+    }
+    
+    // End Game
+    async function endGame() {
+      clearInterval(timerInterval);
+      const totalTime = Math.floor((Date.now() - startTime) / 1000);
+      const mins = Math.floor(totalTime / 60).toString().padStart(2, '0');
+      const secs = (totalTime % 60).toString().padStart(2, '0');
+      
+      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.remove('hidden');
+      
+      document.getElementById('result-name').textContent = playerName;
+      document.getElementById('final-score').textContent = score;
+      document.getElementById('final-time').textContent = `${mins}:${secs}`;
+      document.getElementById('correct-count').textContent =
+        `${correctAnswers}/${shuffledQuestions.length}`;
+      
+      // Save to Canva Sheet
+      if (window.dataSdk && allRecords.length < 999) {
+        const saveBtn = document.querySelector('#result-screen button');
+        if (saveBtn) {
+          saveBtn.disabled = true;
+          saveBtn.innerHTML = '<span class="animate-spin">⏳</span> Đang lưu...';
+        }
+        
+        const result = await window.dataSdk.create({
+          player_name: playerName,
+          score: score,
+          time_seconds: totalTime,
+          played_at: new Date().toISOString()
+        });
+        
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '<span>🔄</span><span>Chơi Lại</span>';
+        }
+        
+        if (!result.isOk) {
+          console.error('Failed to save score');
+        }
+      } else if (allRecords.length >= 999) {
+        // Show limit warning inline
+        const resultScreen = document.getElementById('result-screen');
+        const warning = document.createElement('div');
+        warning.className = 'bg-amber-100 text-amber-700 p-3 rounded-xl mt-4 text-sm font-medium';
+        warning.innerHTML = '⚠️ Bảng xếp hạng đã đầy (999 lượt chơi). Điểm của bạn không được lưu.';
+        resultScreen.querySelector('.card-3d').appendChild(warning);
+      }
+    }
+    
+    // Show Leaderboard
+    function showLeaderboard() {
+      document.getElementById('welcome-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.add('hidden');
+      document.getElementById('leaderboard-screen').classList.remove('hidden');
+      
+      renderLeaderboard();
+    }
+    
+    // Switch Tab
+    function switchTab(tab) {
+      currentTab = tab;
+      
+      const scoreTab = document.getElementById('tab-score');
+      const timeTab = document.getElementById('tab-time');
+      
+      if (tab === 'score') {
+        scoreTab.className = 'flex-1 py-2 px-4 rounded-xl font-bold transition-all bg-gradient-to-r from-amber-400 to-orange-400 text-white';
+        timeTab.className = 'flex-1 py-2 px-4 rounded-xl font-bold transition-all bg-gray-200 text-gray-600';
+      } else {
+        scoreTab.className = 'flex-1 py-2 px-4 rounded-xl font-bold transition-all bg-gray-200 text-gray-600';
+        timeTab.className = 'flex-1 py-2 px-4 rounded-xl font-bold transition-all bg-gradient-to-r from-blue-400 to-cyan-400 text-white';
+      }
+      
+      renderLeaderboard();
+    }
+    
+    // Render Leaderboard
+    function renderLeaderboard() {
+      const list = document.getElementById('leaderboard-list');
+      
+      if (allRecords.length === 0) {
+        list.innerHTML = `
+          <div class="text-center py-8 text-gray-400">
+            <div class="text-4xl mb-2">📊</div>
+            <p>Chưa có dữ liệu</p>
+            <p class="text-sm">Hãy chơi để ghi điểm đầu tiên!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      let sorted = [...allRecords];
+      
+      if (currentTab === 'score') {
+        sorted.sort((a, b) => b.score - a.score);
+      } else {
+        // Filter only completed games and sort by time (ascending)
+        sorted = sorted.filter(r => r.score > 0);
+        sorted.sort((a, b) => a.time_seconds - b.time_seconds);
+      }
+      
+      const top10 = sorted.slice(0, 10);
+      
+      list.innerHTML = top10.map((record, i) => {
+        const mins = Math.floor(record.time_seconds / 60).toString().padStart(2, '0');
+        const secs = (record.time_seconds % 60).toString().padStart(2, '0');
+        const medalClass = i === 0 ? 'medal-1' : i === 1 ? 'medal-2' : i === 2 ? 'medal-3' : '';
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+        
+        return `
+          <div class="leaderboard-row flex items-center gap-3 bg-gradient-to-r from-purple-50 to-pink-50 p-3 rounded-xl border-2 border-purple-100">
+            <div class="w-10 h-10 flex items-center justify-center text-2xl font-bold ${medalClass}">
+              ${medal}
+            </div>
+            <div class="flex-1">
+              <div class="font-bold text-purple-700">${escapeHtml(record.player_name)}</div>
+              <div class="text-xs text-gray-500">${formatDate(record.played_at)}</div>
+            </div>
+            <div class="text-right">
+              <div class="font-bold ${currentTab === 'score' ? 'text-amber-500' : 'text-blue-500'}">
+                ${currentTab === 'score' ? `⭐ ${record.score}` : `⏱️ ${mins}:${secs}`}
+              </div>
+              <div class="text-xs text-gray-500">
+                ${currentTab === 'score' ? `${mins}:${secs}` : `${record.score} điểm`}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // Format Date
+    function formatDate(isoString) {
+      const date = new Date(isoString);
+      return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+    
+    // Escape HTML
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Restart Game
+    function restartGame() {
+      document.getElementById('result-screen').classList.add('hidden');
+      startGame();
+    }
+    
+    // Go Home
+    function goHome() {
+      clearInterval(timerInterval);
+      document.getElementById('welcome-screen').classList.remove('hidden');
+      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.add('hidden');
+      document.getElementById('leaderboard-screen').classList.add('hidden');
+    }
+  </script>
+
+  <!-- Đoạn script Cloudflare tự chèn, nếu cô đang dùng host mặc định thì có thể giữ nguyên như cũ -->
+  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b181bb966549c35',t:'MTc2NjMyNzc1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>
