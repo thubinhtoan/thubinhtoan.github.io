@@ -56,13 +56,13 @@
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
     </style>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1D2gp14vsvs67ZgQaJJk_q2iqqLTzJfXSm0YZRYnexucwZpNUe2bn2Ag9vyn5whGF/exec";
+     <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    // --- GEMINI API CONFIGURATION ---
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1D2gp14vsvs67ZgQaJJk_q2iqqLTzJfXSm0YZRYnexucwZpNUe2bn2Ag9vyn5whGF/exec";
+ 
             }
         }
     </script>
@@ -391,8 +391,7 @@
                 analyzeIcon.innerText = "🎓";
             }
         }
-
-        async function callGeminiAPI(prompt) {
+async function callGeminiAPI(prompt) {
     const res = await fetch(APPS_SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -406,8 +405,7 @@
     }
 
     return data.text;
-
-        }
+}
 
         function createLabel(text, x, y, z, colorStr) {
             const canvas = document.createElement('canvas');
