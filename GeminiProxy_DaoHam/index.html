@@ -480,19 +480,28 @@ Hãy giải thích cho học sinh (trả lời ngắn gọn, dùng Markdown):
       }
     }
 
-    async function callGeminiAPI(prompt) {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-      });
+   async function callGeminiAPI(prompt) {
+    const res = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        // ❌ KHÔNG đặt Content-Type application/json
+        // headers: { "Content-Type": "application/json" },
 
-      const data = await res.json();
-      if (data.error) {
-        throw new Error(data.error);
-      }
-      return data.text;
+        // Gửi chuỗi JSON, Apps Script vẫn đọc được qua e.postData.contents
+        body: JSON.stringify({ prompt })
+    });
+
+    if (!res.ok) {
+        throw new Error("Network error: " + res.status);
     }
+
+    const data = await res.json();
+
+    if (data.error) {
+        throw new Error(data.error);
+    }
+
+    return data.text;
+}
 
     function createLabel(text, x, y, z, colorStr) {
       const canvas = document.createElement('canvas');
