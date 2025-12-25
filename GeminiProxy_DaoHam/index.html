@@ -56,15 +56,14 @@
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
     </style>
-     <script type="module">
-    import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-    // --- GEMINI API CONFIGURATION ---
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1D2gp14vsvs67ZgQaJJk_q2iqqLTzJfXSm0YZRYnexucwZpNUe2bn2Ag9vyn5whGF/exec";
- 
-            }
+       <!-- Import map cho three.js -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
         }
+            }
     </script>
 </head>
 <body>
@@ -159,9 +158,7 @@
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
         // --- GEMINI API CONFIGURATION ---
-        const apiKey = ""; 
-        const modelId = "gemini-2.5-flash-preview-09-2025";
-
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1D2gp14vsvs67ZgQaJJk_q2iqqLTzJfXSm0YZRYnexucwZpNUe2bn2Ag9vyn5whGF/exec";
         // --- GLOBAL VARIABLES ---
         let scene, camera, renderer, controls;
         let curveLine, tangentMesh, pointMesh;
