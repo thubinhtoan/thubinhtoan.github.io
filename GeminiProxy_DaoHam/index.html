@@ -469,22 +469,25 @@ Hãy giải thích cho học sinh (trả lời ngắn gọn, dùng Markdown):
             console.log('MathJax error:', err)
           );
         }
-      } catch (e) {
-        console.error(e);
-        aiContent.innerHTML =
-          "<p class='text-red-400'>Mất kết nối với gia sư AI. Vui lòng thử lại sau.</p>";
-      } finally {
+     } catch (e) {
+    console.error("AI error:", e);
+    aiContent.innerHTML =
+      "<p class='text-red-400 font-semibold mb-2'>Lỗi khi gọi Gemini:</p>" +
+      "<pre class='text-xs whitespace-pre-wrap bg-gray-900/70 text-gray-200 p-2 rounded'>" +
+      (e && e.message ? e.message : e) +
+      "</pre>";
+   } finally {
         btnAnalyze.disabled = false;
         btnAnalyze.classList.remove('opacity-75', 'cursor-wait');
         analyzeIcon.textContent = '🎓';
       }
     }
 
-   async function callGeminiAPI(prompt) {
+  async function callGeminiAPI(prompt) {
   const res = await fetch(APPS_SCRIPT_URL, {
     method: "POST",
     // KHÔNG cần headers Content-Type
-    body: JSON.stringify({ prompt }),
+    body: JSON.stringify({ prompt })
   });
 
   if (!res.ok) {
@@ -493,7 +496,6 @@ Hãy giải thích cho học sinh (trả lời ngắn gọn, dùng Markdown):
 
   const data = await res.json();
 
-  // Nếu Apps Script trả field error → ném lỗi để hiện ra Console + UI
   if (data.error) {
     console.error("GeminiProxy error:", data);
     throw new Error(
@@ -503,13 +505,11 @@ Hãy giải thích cho học sinh (trả lời ngắn gọn, dùng Markdown):
     );
   }
 
-  // Bình thường sẽ có data.text
   if (!data.text) {
     console.warn("No data.text from GeminiProxy. Full data:", data);
-    return "Gemini không trả lời. Thông tin debug:\n" +
-           "```json\n" +
-           JSON.stringify(data, null, 2) +
-           "\n```";
+    return "Gemini không trả lời. Thông tin debug:\n```json\n"
+           + JSON.stringify(data, null, 2)
+           + "\n```";
   }
 
   return data.text;
