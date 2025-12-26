@@ -153,10 +153,7 @@
     renderer.setPixelRatio(window.devicePixelRatio);
     const container = document.getElementById("canvas-container");
     container.appendChild(renderer.domElement);
-    document
-      .getElementById("canvas-container")
-      .appendChild(renderer.domElement);
-
+    
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
 
