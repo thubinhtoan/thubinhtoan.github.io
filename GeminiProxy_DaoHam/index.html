@@ -481,26 +481,38 @@ Hãy giải thích cho học sinh (trả lời ngắn gọn, dùng Markdown):
     }
 
    async function callGeminiAPI(prompt) {
-    const res = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        // ❌ KHÔNG đặt Content-Type application/json
-        // headers: { "Content-Type": "application/json" },
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    // KHÔNG cần headers Content-Type
+    body: JSON.stringify({ prompt }),
+  });
 
-        // Gửi chuỗi JSON, Apps Script vẫn đọc được qua e.postData.contents
-        body: JSON.stringify({ prompt })
-    });
+  if (!res.ok) {
+    throw new Error("Network error: " + res.status + " " + res.statusText);
+  }
 
-    if (!res.ok) {
-        throw new Error("Network error: " + res.status);
-    }
+  const data = await res.json();
 
-    const data = await res.json();
+  // Nếu Apps Script trả field error → ném lỗi để hiện ra Console + UI
+  if (data.error) {
+    console.error("GeminiProxy error:", data);
+    throw new Error(
+      typeof data.error === "string"
+        ? data.error
+        : (data.error.message || "GeminiProxy returned error")
+    );
+  }
 
-    if (data.error) {
-        throw new Error(data.error);
-    }
+  // Bình thường sẽ có data.text
+  if (!data.text) {
+    console.warn("No data.text from GeminiProxy. Full data:", data);
+    return "Gemini không trả lời. Thông tin debug:\n" +
+           "```json\n" +
+           JSON.stringify(data, null, 2) +
+           "\n```";
+  }
 
-    return data.text;
+  return data.text;
 }
 
     function createLabel(text, x, y, z, colorStr) {
