@@ -137,8 +137,8 @@
 
   function init() {
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x111827);
-    scene.fog = new THREE.Fog(0x111827, 20, 60);
+    scene.background = new THREE.Color(0x0b1120);
+    scene.fog = new THREE.Fog(0x0b1120, 20, 60);
 
     camera = new THREE.PerspectiveCamera(
       45,
@@ -151,6 +151,8 @@
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
+    const container = document.getElementById("canvas-container");
+    container.appendChild(renderer.domElement);
     document
       .getElementById("canvas-container")
       .appendChild(renderer.domElement);
