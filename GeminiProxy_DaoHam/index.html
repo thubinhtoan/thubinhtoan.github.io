@@ -2,437 +2,109 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mô phỏng Đạo hàm & Tiếp tuyến</title>
+  <title>Bài giảng AI – Gemini</title>
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- MathJax (hiển thị công thức) -->
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-  <!-- Marked (render Markdown từ AI) -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-  <!-- Import map cho THREE -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-    }
-  }
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
   </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <!-- Marked (Markdown) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <style>
     body {
       margin: 0;
-      overflow: hidden;
-      background-color: #111;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    #canvas-container {
-      width: 100vw;
-      height: 100vh;
-      display: block;
-    }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #1f2937; }
-    ::-webkit-scrollbar-thumb {
-      background: #4b5563;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
-
-    .slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100%;
-      height: 6px;
-      background: #4b5563;
-      outline: none;
-      opacity: 0.7;
-      transition: opacity .2s;
-      border-radius: 3px;
-    }
-    .slider-thumb:hover { opacity: 1; }
-    .slider-thumb::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      background: #eab308;
-      cursor: pointer;
-      border-radius: 50%;
-    }
-
-    /* Markdown styles cho panel AI */
-    .prose h3 {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #facc15;
-      margin-top: 0.5rem;
-    }
-    .prose p {
-      margin-bottom: 0.5rem;
+      font-family: "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0f172a, #020617);
       color: #e5e7eb;
-      font-size: 0.95rem;
     }
-    .prose ul {
-      list-style-type: disc;
-      padding-left: 1.2rem;
-      margin-bottom: 0.5rem;
-    }
-    .prose strong { color: #fde047; }
 
-    /* Bảng hiển thị công thức */
-    .math-container {
-      background: linear-gradient(180deg, rgba(31,41,55,0.9) 0%, rgba(17,24,39,0.95) 100%);
-      border: 1px solid rgba(75,85,99,0.5);
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    .panel {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 420px;
+      background: linear-gradient(180deg, #020617, #020617ee);
+      border: 1px solid #facc15;
+      border-radius: 14px;
+      padding: 16px 18px;
+      box-shadow: 0 0 25px rgba(250,204,21,0.25);
+    }
+
+    .title {
+      color: #facc15;
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      border-radius: 8px;
+      border: none;
+      padding: 10px;
+      font-size: 14px;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: #facc15;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .output {
+      margin-top: 12px;
+      max-height: 360px;
+      overflow-y: auto;
+      background: #020617;
+      border-radius: 8px;
+      padding: 12px;
+      border: 1px solid #334155;
+    }
+
+    .error {
+      color: #f87171;
+      white-space: pre-wrap;
     }
   </style>
 </head>
+
 <body>
 
-  <!-- Panel điều khiển bên trái -->
-  <div class="absolute top-4 left-4 w-80 bg-gray-900/90 text-white p-6 rounded-xl shadow-2xl backdrop-blur-sm border border-gray-700 z-10 max-h-[90vh] overflow-y-auto">
-    <h1 class="text-xl font-bold mb-4 text-yellow-400 tracking-tight">Đạo hàm & Tiếp tuyến</h1>
+  <div class="panel">
+    <div class="title">📘 Bài giảng AI (Gemini)</div>
 
-    <div class="math-container rounded-lg p-4 mb-6">
-      <div class="text-gray-400 text-[10px] uppercase tracking-widest font-semibold mb-1">
-        Hàm số gốc (Parabol)
-      </div>
-      <div id="func-display" class="text-lg text-center text-blue-300 mb-4 min-h-[2rem] flex items-center justify-center">
-        \[ f(x) = 0.5x^2 \]
-      </div>
+    <textarea id="promptInput" placeholder="Nhập nội dung toán cần giảng..."></textarea>
 
-      <div class="border-t border-gray-700 pt-3">
-        <div class="flex justify-between items-baseline mb-1">
-          <span class="text-gray-400 text-[10px] uppercase tracking-widest font-semibold">
-            Đạo hàm tại \(x_0\)
-          </span>
-          <span class="text-xs text-yellow-500 italic">Hệ số góc</span>
-        </div>
-        <div id="deriv-display" class="text-xl text-center text-yellow-300 font-bold mb-4 min-h-[2rem] flex items-center justify-center">
-          \[ f'(2.0) = 2.00 \]
-        </div>
-      </div>
-
-      <div class="border-t border-gray-700 pt-3">
-        <div class="text-gray-400 text-[10px] uppercase tracking-widest font-semibold mb-1">
-          Phương trình tiếp tuyến
-        </div>
-        <div id="tangent-eqn-display" class="text-base text-center text-white min-h-[2rem] flex items-center justify-center">
-          \[ y = 2x - 2 \]
-        </div>
-      </div>
-    </div>
-
-    <!-- Hệ số a -->
-    <div class="mb-5">
-      <div class="flex justify-between mb-1">
-        <label class="text-sm font-medium text-gray-300">Độ cong (a)</label>
-        <span id="val-a" class="text-sm font-bold text-blue-400">0.5</span>
-      </div>
-      <input type="range" min="-2" max="2" step="0.1" value="0.5" class="slider-thumb" id="slider-a" style="background: #1e3a8a;">
-    </div>
-
-    <!-- Điểm x0 -->
-    <div class="mb-6">
-      <div class="flex justify-between mb-1">
-        <label class="text-sm font-medium text-gray-300">Điểm xét \( x_0 \)</label>
-        <span id="val-x0" class="text-sm font-bold text-yellow-400">2.0</span>
-      </div>
-      <input type="range" min="-5" max="5" step="0.1" value="2" class="slider-thumb" id="slider-x0">
-    </div>
-
-    <!-- Nút gọi AI -->
-    <div class="mb-6 pt-6 border-t border-gray-700">
-      <h2 class="text-lg font-bold text-yellow-400 mb-2 flex items-center gap-2">
-        <span class="text-xl">✨</span> Giải thích Đạo hàm
-      </h2>
-      <p class="text-xs text-gray-400 mb-3">
-        Hỏi AI về ý nghĩa của độ dốc tại điểm này.
-      </p>
-      <button id="btn-analyze"
-              class="w-full py-2 px-4 bg-yellow-600 hover:bg-yellow-500 text-white rounded transition duration-200 shadow-lg flex items-center justify-center gap-2 font-medium">
-        <span id="analyze-icon">🎓</span> Giảng bài cho tôi
-      </button>
-    </div>
-
-    <button id="btn-reset"
-            class="w-full py-2 px-4 bg-gray-700 hover:bg-gray-600 text-white rounded transition duration-200 flex items-center justify-center gap-2 border border-gray-600 text-sm">
-      Đặt lại
+    <button id="btnAnalyze" onclick="handleAnalyzeClick()">
+      Giảng bài cho tôi
     </button>
+
+    <div id="output" class="output"></div>
   </div>
 
-  <!-- Panel AI bên phải -->
-  <div id="ai-panel"
-       class="absolute top-4 right-4 w-80 bg-gray-900/95 text-white p-6 rounded-xl shadow-2xl backdrop-blur-md border border-yellow-500/50 z-10 hidden transform transition-all duration-300 translate-x-10 opacity-0">
-    <div class="flex justify-between items-start mb-4">
-      <h2 class="text-lg font-bold text-yellow-300">Bài giảng AI</h2>
-      <button id="btn-close-ai" class="text-gray-400 hover:text-white">✕</button>
-    </div>
-    <div id="ai-content" class="prose text-sm max-h-[70vh] overflow-y-auto">
-      <!-- Nội dung AI -->
-    </div>
-  </div>
-
-  <!-- Canvas 3D -->
-  <div id="canvas-container"></div>
-
-  <!-- TOÀN BỘ JS: để cuối body, trong 1 script type="module" -->
-  <script type="module">
-    import * as THREE from "three";
-    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-     let scene, camera, renderer, controls;
-    let curveLine, tangentMesh, pointMesh;
-    let gridHelper;
-
-    let params = {
-      a: 0.5, // y = ax^2
-      x0: 2.0 // điểm tiếp xúc
-    };
-
-    // DOM
-    const sliderA = document.getElementById("slider-a");
-    const sliderX0 = document.getElementById("slider-x0");
-    const displayA = document.getElementById("val-a");
-    const displayX0 = document.getElementById("val-x0");
-
-    const funcDisplay = document.getElementById("func-display");
-    const derivDisplay = document.getElementById("deriv-display");
-    const tangentEqnDisplay = document.getElementById("tangent-eqn-display");
-
-    const btnReset = document.getElementById("btn-reset");
-
-    const btnAnalyze = document.getElementById("btn-analyze");
-    const aiPanel = document.getElementById("ai-panel");
-    const aiContent = document.getElementById("ai-content");
-    const btnCloseAi = document.getElementById("btn-close-ai");
-    const analyzeIcon = document.getElementById("analyze-icon");
-
-    function init() {
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x0b1120);
-      scene.fog = new THREE.Fog(0x0b1120, 20, 60);
-
-      camera = new THREE.PerspectiveCamera(
-        45,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        1000
-      );
-      camera.position.set(15, 15, 25);
-
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
-
-      const container = document.getElementById("canvas-container");
-      container.appendChild(renderer.domElement);
-
-      controls = new OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-      scene.add(ambientLight);
-      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-      dirLight.position.set(10, 20, 10);
-      scene.add(dirLight);
-
-      gridHelper = new THREE.GridHelper(40, 40, 0x444444, 0x222222);
-      scene.add(gridHelper);
-
-      addAxes();
-      createCurve();
-      createTangentObjects();
-
-      window.addEventListener("resize", onWindowResize);
-      sliderA.addEventListener("input", updateGraph);
-      sliderX0.addEventListener("input", updateGraph);
-      btnReset.addEventListener("click", resetGraph);
-      btnAnalyze.addEventListener("click", handleAnalyzeClick);
-      btnCloseAi.addEventListener("click", closeAiPanel);
-
-      animate();
-    }
-
-    function addAxes() {
-      const axesGroup = new THREE.Group();
-
-      const xAxisGeo = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(-20, 0, 0),
-        new THREE.Vector3(20, 0, 0)
-      ]);
-      const xAxisMat = new THREE.LineBasicMaterial({
-        color: 0xff4444,
-        linewidth: 2
-      });
-      axesGroup.add(new THREE.Line(xAxisGeo, xAxisMat));
-
-      const yAxisGeo = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, -20, 0),
-        new THREE.Vector3(0, 20, 0)
-      ]);
-      const yAxisMat = new THREE.LineBasicMaterial({
-        color: 0x44ff44,
-        linewidth: 2
-      });
-      axesGroup.add(new THREE.Line(yAxisGeo, yAxisMat));
-
-      scene.add(axesGroup);
-      createLabel("x", 21, 0, 0, "red");
-      createLabel("y", 0, 21, 0, "green");
-    }
-
-    function createCurve() {
-      const points = [];
-      const divisions = 200;
-      for (let i = 0; i <= divisions; i++) {
-        points.push(new THREE.Vector3(0, 0, 0));
-      }
-      const geometry = new THREE.BufferGeometry().setFromPoints(points);
-      const material = new THREE.LineBasicMaterial({
-        color: 0x3b82f6,
-        linewidth: 3
-      });
-      curveLine = new THREE.Line(geometry, material);
-      scene.add(curveLine);
-    }
-
-    function createTangentObjects() {
-      const geometry = new THREE.CylinderGeometry(0.08, 0.08, 1, 8);
-      const material = new THREE.MeshPhongMaterial({
-        color: 0xfacc15,
-        shininess: 100
-      });
-      tangentMesh = new THREE.Mesh(geometry, material);
-      scene.add(tangentMesh);
-
-      const pointGeo = new THREE.SphereGeometry(0.4, 32, 32);
-      const pointMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-      pointMesh = new THREE.Mesh(pointGeo, pointMat);
-      scene.add(pointMesh);
-
-      updateGraph();
-    }
-
-    function updateGraph() {
-      params.a = parseFloat(sliderA.value);
-      params.x0 = parseFloat(sliderX0.value);
-
-      displayA.innerText = params.a.toFixed(1);
-      displayX0.innerText = params.x0.toFixed(1);
-
-      const f = x => params.a * x * x;
-      const slope = 2 * params.a * params.x0;
-      const y0 = f(params.x0);
-      const intercept = y0 - slope * params.x0;
-
-      const slopeStr = slope.toFixed(2);
-      const sign = intercept >= 0 ? "+" : "-";
-      const interceptStr = Math.abs(intercept).toFixed(2);
-
-      funcDisplay.innerHTML = `\\[ f(x) = ${params.a}x^2 \\]`;
-      derivDisplay.innerHTML = `\\[ f'(${params.x0}) = ${slopeStr} \\]`;
-      tangentEqnDisplay.innerHTML = `\\[ y = ${slopeStr}x ${sign} ${interceptStr} \\]`;
-
-      if (window.MathJax) {
-        MathJax.typesetPromise([
-          funcDisplay,
-          derivDisplay,
-          tangentEqnDisplay
-        ]).catch(() => {});
-      }
-
-      const positions = curveLine.geometry.attributes.position;
-      const range = 15;
-      const count = positions.count;
-      for (let i = 0; i < count; i++) {
-        const x = -range + (i / (count - 1)) * (2 * range);
-        const y = f(x);
-        positions.setXYZ(i, x, y, 0);
-      }
-      positions.needsUpdate = true;
-
-      const xA = params.x0 - 5;
-      const yA = slope * (xA - params.x0) + y0;
-      const xB = params.x0 + 5;
-      const yB = slope * (xB - params.x0) + y0;
-
-      const startVec = new THREE.Vector3(xA, yA, 0);
-      const endVec = new THREE.Vector3(xB, yB, 0);
-
-      const mid = new THREE.Vector3()
-        .addVectors(startVec, endVec)
-        .multiplyScalar(0.5);
-      tangentMesh.position.copy(mid);
-      tangentMesh.lookAt(endVec);
-      tangentMesh.rotateX(Math.PI / 2);
-
-      const len = startVec.distanceTo(endVec);
-      tangentMesh.scale.set(1, len, 1);
-
-      pointMesh.position.set(params.x0, y0, 0);
-    }
-
-    async function handleAnalyzeClick() {
-      btnAnalyze.disabled = true;
-      btnAnalyze.classList.add("opacity-75", "cursor-wait");
-      analyzeIcon.innerText = "⏳";
-
-      aiPanel.classList.remove("hidden");
-      setTimeout(
-        () => aiPanel.classList.remove("translate-x-10", "opacity-0"),
-        10
-      );
-      aiContent.innerHTML =
-        '<div class="text-center py-4 text-gray-400 animate-pulse">Đang suy nghĩ...</div>';
-
-      const f_prime = (2 * params.a * params.x0).toFixed(2);
-      const aVal = params.a;
-      const xVal = params.x0;
-
-      const prompt = `
-Bạn là một giáo viên toán học vui tính và sâu sắc. 
-Học sinh đang xem đồ thị hàm số $y = ${aVal}x^2$ và tiếp tuyến tại $x = ${xVal}$.
-Đạo hàm (hệ số góc tiếp tuyến) tính được là $f'(${xVal}) = ${f_prime}$.
-
-Hãy giải thích cho học sinh (trả lời ngắn gọn, dùng Markdown):
-1. **Ý nghĩa hình học:** Giải thích tại sao tiếp tuyến lại có độ dốc là $${f_prime}$? (Đang lên dốc hay xuống dốc? Dốc đứng hay thoai thoải?).
-2. **Liên hệ thực tế:** Ví dụ như đây là sườn núi, thì độ dốc này có ý nghĩa gì về độ nguy hiểm? Hoặc nếu là vận tốc xe, thì nó đang tăng tốc hay giảm tốc?
-
-**QUAN TRỌNG:** Hãy viết tất cả các biểu thức toán học, con số và biến số (x, y, a...) trong dấu LaTex inline (ví dụ: $y = x^2$) để hiển thị đẹp mắt.
-      `;
-
-      try {
-        const response = await callGeminiAPI(prompt);
-        aiContent.innerHTML = marked.parse(response);
-        if (window.MathJax) {
-          MathJax.typesetPromise([aiContent]).catch(err =>
-            console.log("MathJax error:", err)
-          );
-        }
-      } catch (e) {
-        console.error("AI error:", e);
-        aiContent.innerHTML =
-          "<p class='text-red-400 font-semibold mb-2'>Lỗi khi gọi Gemini:</p>" +
-          "<pre class='text-xs whitespace-pre-wrap bg-gray-900/70 text-gray-200 p-2 rounded'>" +
-          (e && e.message ? e.message : String(e)) +
-          "</pre>";
-      } finally {
-        btnAnalyze.disabled = false;
-        btnAnalyze.classList.remove("opacity-75", "cursor-wait");
-        analyzeIcon.innerText = "🎓";
-      }
-    }
-
-  function callGeminiAPI(prompt) {
+<script>
+/* ===============================
+   GỌI GEMINI QUA APPS SCRIPT
+================================ */
+function callGeminiAPI(prompt) {
   return new Promise((resolve, reject) => {
     google.script.run
       .withSuccessHandler((data) => {
@@ -470,66 +142,40 @@ Hãy giải thích cho học sinh (trả lời ngắn gọn, dùng Markdown):
           )
         );
       })
-      .exec(prompt); // GỌI Apps Script
+      .exec(prompt);
   });
 }
-      if (!data.text) {
-        console.warn("No data.text from GeminiProxy. Full data:", data);
-        return (
-          "Gemini không trả lời. Thông tin debug:\n```json\n" +
-          JSON.stringify(data, null, 2) +
-          "\n```"
-        );
-      }
 
-      return data.text;
-    }
+/* ===============================
+   CLICK XỬ LÝ
+================================ */
+async function handleAnalyzeClick() {
+  const btn = document.getElementById("btnAnalyze");
+  const output = document.getElementById("output");
+  const prompt = document.getElementById("promptInput").value.trim();
 
-    function createLabel(text, x, y, z, colorStr) {
-      const canvas = document.createElement("canvas");
-      const context = canvas.getContext("2d");
-      canvas.width = 64;
-      canvas.height = 64;
-      context.font = "bold 48px Arial";
-      context.fillStyle = colorStr;
-      context.textAlign = "center";
-      context.textBaseline = "middle";
-      context.fillText(text, 32, 32);
-      const sprite = new THREE.Sprite(
-        new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas) })
-      );
-      sprite.position.set(x, y, z);
-      sprite.scale.set(2, 2, 1);
-      scene.add(sprite);
-    }
+  if (!prompt) {
+    output.innerHTML = "<span class='error'>⚠️ Cô chưa nhập nội dung.</span>";
+    return;
+  }
 
-    function resetGraph() {
-      sliderA.value = 0.5;
-      sliderX0.value = 2.0;
-      updateGraph();
-      controls.reset();
-      closeAiPanel();
-    }
+  btn.disabled = true;
+  output.innerHTML = "⏳ AI đang giảng bài...";
 
-    function closeAiPanel() {
-      aiPanel.classList.add("translate-x-10", "opacity-0");
-      setTimeout(() => aiPanel.classList.add("hidden"), 300);
-    }
+  try {
+    const response = await callGeminiAPI(prompt);
+    output.innerHTML = marked.parse(response);
+    MathJax.typesetPromise();
+  } catch (err) {
+    output.innerHTML =
+      "<div class='error'>❌ Lỗi khi gọi Gemini:\n\n" +
+      err.message +
+      "</div>";
+  } finally {
+    btn.disabled = false;
+  }
+}
+</script>
 
-    function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    // GỌI init 1 lần sau khi DOM đã có đầy đủ vì script nằm cuối body
-    init();
-  </script>
 </body>
 </html>
