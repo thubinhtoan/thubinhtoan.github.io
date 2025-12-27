@@ -189,11 +189,7 @@
   <script type="module">
     import * as THREE from "three";
     import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-
-    const APPS_SCRIPT_URL =
-      "https://script.google.com/macros/s/AKfycby1D2gp14vsvs67ZgQaJJk_q2iqqLTzJfXSm0YZRYnexucwZpNUe2bn2Ag9vyn5whGF/exec";
-       // --- GLOBAL VARIABLES ---
-    let scene, camera, renderer, controls;
+     let scene, camera, renderer, controls;
     let curveLine, tangentMesh, pointMesh;
     let gridHelper;
 
@@ -436,29 +432,47 @@ Hãy giải thích cho học sinh (trả lời ngắn gọn, dùng Markdown):
       }
     }
 
-    async function callGeminiAPI(prompt) {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({ prompt })
-      });
+  function callGeminiAPI(prompt) {
+  return new Promise((resolve, reject) => {
+    google.script.run
+      .withSuccessHandler((data) => {
+        if (!data) {
+          reject(new Error("Gemini không trả dữ liệu"));
+          return;
+        }
 
-      if (!res.ok) {
-        throw new Error(
-          "Network error: " + res.status + " " + res.statusText
+        if (data.error) {
+          reject(
+            new Error(
+              typeof data.error === "string"
+                ? data.error
+                : data.error.message || JSON.stringify(data.error)
+            )
+          );
+          return;
+        }
+
+        if (!data.text) {
+          reject(
+            new Error(
+              "Gemini trả về rỗng:\n" + JSON.stringify(data, null, 2)
+            )
+          );
+          return;
+        }
+
+        resolve(data.text);
+      })
+      .withFailureHandler((err) => {
+        reject(
+          new Error(
+            err && err.message ? err.message : JSON.stringify(err)
+          )
         );
-      }
-
-      const data = await res.json();
-
-      if (data.error) {
-        console.error("GeminiProxy error:", data);
-        throw new Error(
-          typeof data.error === "string"
-            ? data.error
-            : data.error.message || JSON.stringify(data.error)
-        );
-      }
-
+      })
+      .exec(prompt); // GỌI Apps Script
+  });
+}
       if (!data.text) {
         console.warn("No data.text from GeminiProxy. Full data:", data);
         return (
