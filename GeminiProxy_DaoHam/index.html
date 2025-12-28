@@ -1,179 +1,211 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>Bài giảng AI – Gemini</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Parabol và Đường thẳng</title>
 
-  <!-- MathJax -->
-  <script>
-    window.MathJax = {
-      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-      svg: { fontCache: 'global' }
-    };
-  </script>
-  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Marked (Markdown) -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #0f172a, #020617);
-      color: #e5e7eb;
-    }
+<style>
+body { margin:0; overflow:hidden; background:#111; font-family:Segoe UI }
+#canvas-container { width:100vw; height:100vh }
 
-    .panel {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      width: 420px;
-      background: linear-gradient(180deg, #020617, #020617ee);
-      border: 1px solid #facc15;
-      border-radius: 14px;
-      padding: 16px 18px;
-      box-shadow: 0 0 25px rgba(250,204,21,0.25);
-    }
+.slider-thumb {
+  appearance:none; width:100%; height:6px;
+  background:#4b5563; border-radius:3px;
+}
+.slider-thumb::-webkit-slider-thumb{
+  appearance:none; width:18px; height:18px;
+  background:#3b82f6; border-radius:50%; cursor:pointer;
+}
+</style>
 
-    .title {
-      color: #facc15;
-      font-weight: 700;
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 100px;
-      border-radius: 8px;
-      border: none;
-      padding: 10px;
-      font-size: 14px;
-      resize: vertical;
-    }
-
-    button {
-      margin-top: 10px;
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      background: #facc15;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      background: #9ca3af;
-      cursor: not-allowed;
-    }
-
-    .output {
-      margin-top: 12px;
-      max-height: 360px;
-      overflow-y: auto;
-      background: #020617;
-      border-radius: 8px;
-      padding: 12px;
-      border: 1px solid #334155;
-    }
-
-    .error {
-      color: #f87171;
-      white-space: pre-wrap;
-    }
-  </style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 </head>
 
 <body>
 
-  <div class="panel">
-    <div class="title">📘 Bài giảng AI (Gemini)</div>
+<!-- CONTROL PANEL -->
+<div class="absolute top-4 left-4 w-80 bg-gray-900/90 text-white p-6 rounded-xl border border-gray-700 z-10">
 
-    <textarea id="promptInput" placeholder="Nhập nội dung toán cần giảng..."></textarea>
+<h1 class="text-xl font-bold text-blue-400 mb-4">Parabol & Đường thẳng</h1>
 
-    <button id="btnAnalyze" onclick="handleAnalyzeClick()">
-      Giảng bài cho tôi
-    </button>
+<div class="mb-3 text-center text-blue-300" id="func-parabola">
+\[
+y = 0.5x^2
+\]
+</div>
 
-    <div id="output" class="output"></div>
-  </div>
+<div class="mb-3 text-center text-yellow-300" id="func-line">
+\[
+y = 1.0x + 0.0
+\]
+</div>
 
-<script>
-/* ===============================
-   GỌI GEMINI QUA APPS SCRIPT
-================================ */
-function callGeminiAPI(prompt) {
-  return new Promise((resolve, reject) => {
-    google.script.run
-      .withSuccessHandler((data) => {
-        if (!data) {
-          reject(new Error("Gemini không trả dữ liệu"));
-          return;
-        }
+<!-- a -->
+<label class="text-sm">Hệ số a (parabol)</label>
+<div class="flex justify-between mb-1">
+<span></span><span id="val-a">0.5</span>
+</div>
+<input type="range" min="-4" max="4" step="0.1" value="0.5"
+class="slider-thumb mb-4" id="slider-a">
 
-        if (data.error) {
-          reject(
-            new Error(
-              typeof data.error === "string"
-                ? data.error
-                : data.error.message || JSON.stringify(data.error)
-            )
-          );
-          return;
-        }
+<!-- m -->
+<label class="text-sm">Hệ số m (đường thẳng)</label>
+<div class="flex justify-between mb-1">
+<span></span><span id="val-m">1.0</span>
+</div>
+<input type="range" min="-5" max="5" step="0.1" value="1"
+class="slider-thumb mb-4" id="slider-m">
 
-        if (!data.text) {
-          reject(
-            new Error(
-              "Gemini trả về rỗng:\n" + JSON.stringify(data, null, 2)
-            )
-          );
-          return;
-        }
+<!-- b -->
+<label class="text-sm">Hệ số b (đường thẳng)</label>
+<div class="flex justify-between mb-1">
+<span></span><span id="val-b">0.0</span>
+</div>
+<input type="range" min="-5" max="5" step="0.1" value="0"
+class="slider-thumb mb-4" id="slider-b">
 
-        resolve(data.text);
-      })
-      .withFailureHandler((err) => {
-        reject(
-          new Error(
-            err && err.message ? err.message : JSON.stringify(err)
-          )
-        );
-      })
-      .exec(prompt);
-  });
+<button id="btn-reset"
+class="w-full bg-gray-700 hover:bg-gray-600 py-2 rounded">
+Đặt lại
+</button>
+
+</div>
+
+<div id="canvas-container"></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+let scene, camera, renderer, controls;
+let parabolaLine, lineStraight;
+
+const params = { a:0.5, m:1, b:0 };
+
+const sliderA = document.getElementById('slider-a');
+const sliderM = document.getElementById('slider-m');
+const sliderB = document.getElementById('slider-b');
+
+const valA = document.getElementById('val-a');
+const valM = document.getElementById('val-m');
+const valB = document.getElementById('val-b');
+
+const dispPara = document.getElementById('func-parabola');
+const dispLine = document.getElementById('func-line');
+
+init();
+
+function init(){
+scene = new THREE.Scene();
+scene.background = new THREE.Color(0x111827);
+
+camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight,0.1,1000);
+camera.position.set(15,15,25);
+
+renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth, innerHeight);
+document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+scene.add(new THREE.GridHelper(40,40));
+scene.add(new THREE.AmbientLight(0xffffff,0.7));
+
+createAxes();
+createParabola();
+createLine();
+
+sliderA.oninput = sliderM.oninput = sliderB.oninput = update;
+document.getElementById('btn-reset').onclick = reset;
+
+update();
+animate();
 }
 
-/* ===============================
-   CLICK XỬ LÝ
-================================ */
-async function handleAnalyzeClick() {
-  const btn = document.getElementById("btnAnalyze");
-  const output = document.getElementById("output");
-  const prompt = document.getElementById("promptInput").value.trim();
+function createAxes(){
+scene.add(new THREE.Line(
+new THREE.BufferGeometry().setFromPoints([
+new THREE.Vector3(-20,0,0),
+new THREE.Vector3(20,0,0)
+]),
+new THREE.LineBasicMaterial({color:0xff4444})
+));
+scene.add(new THREE.Line(
+new THREE.BufferGeometry().setFromPoints([
+new THREE.Vector3(0,-20,0),
+new THREE.Vector3(0,20,0)
+]),
+new THREE.LineBasicMaterial({color:0x44ff44})
+));
+}
 
-  if (!prompt) {
-    output.innerHTML = "<span class='error'>⚠️ Cô chưa nhập nội dung.</span>";
-    return;
-  }
+function createParabola(){
+const geo = new THREE.BufferGeometry();
+geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(600),3));
+parabolaLine = new THREE.Line(geo,new THREE.LineBasicMaterial({color:0x3b82f6}));
+scene.add(parabolaLine);
+}
 
-  btn.disabled = true;
-  output.innerHTML = "⏳ AI đang giảng bài...";
+function createLine(){
+const geo = new THREE.BufferGeometry();
+geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6),3));
+lineStraight = new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xfacc15}));
+scene.add(lineStraight);
+}
 
-  try {
-    const response = await callGeminiAPI(prompt);
-    output.innerHTML = marked.parse(response);
-    MathJax.typesetPromise();
-  } catch (err) {
-    output.innerHTML =
-      "<div class='error'>❌ Lỗi khi gọi Gemini:\n\n" +
-      err.message +
-      "</div>";
-  } finally {
-    btn.disabled = false;
-  }
+function update(){
+params.a = +sliderA.value;
+params.m = +sliderM.value;
+params.b = +sliderB.value;
+
+valA.innerText = params.a.toFixed(1);
+valM.innerText = params.m.toFixed(1);
+valB.innerText = params.b.toFixed(1);
+
+dispPara.innerHTML = `\\[ y = ${params.a.toFixed(1)}x^2 \\]`;
+dispLine.innerHTML = `\\[ y = ${params.m.toFixed(1)}x + ${params.b.toFixed(1)} \\]`;
+MathJax.typesetPromise([dispPara, dispLine]).catch(()=>{});
+
+const p = parabolaLine.geometry.attributes.position;
+let i=0;
+for(let x=-15;x<=15;x+=0.2){
+p.setXYZ(i++,x,params.a*x*x,0);
+}
+p.needsUpdate=true;
+
+const l = lineStraight.geometry.attributes.position;
+l.setXYZ(0,-15,params.m*(-15)+params.b,0);
+l.setXYZ(1,15,params.m*15+params.b,0);
+l.needsUpdate=true;
+}
+
+function reset(){
+sliderA.value=0.5;
+sliderM.value=1;
+sliderB.value=0;
+update();
+controls.reset();
+}
+
+function animate(){
+requestAnimationFrame(animate);
+controls.update();
+renderer.render(scene,camera);
 }
 </script>
 
