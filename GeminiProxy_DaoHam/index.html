@@ -1,213 +1,305 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Parabol và Đường thẳng</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parabol & Đường thẳng (nét đậm)</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script id="MathJax-script" async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!-- MathJax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-<style>
-body { margin:0; overflow:hidden; background:#111; font-family:Segoe UI }
-#canvas-container { width:100vw; height:100vh }
+  <style>
+    body { margin: 0; overflow: hidden; background:#111; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    #canvas-container { width: 100vw; height: 100vh; display: block; }
 
-.slider-thumb {
-  appearance:none; width:100%; height:6px;
-  background:#4b5563; border-radius:3px;
-}
-.slider-thumb::-webkit-slider-thumb{
-  appearance:none; width:18px; height:18px;
-  background:#3b82f6; border-radius:50%; cursor:pointer;
-}
-</style>
+    .slider-thumb{
+      -webkit-appearance:none; appearance:none;
+      width:100%; height:6px; background:#4b5563;
+      outline:none; border-radius:3px; opacity:0.9;
+    }
+    .slider-thumb::-webkit-slider-thumb{
+      -webkit-appearance:none; appearance:none;
+      width:18px; height:18px; background:#3b82f6;
+      cursor:pointer; border-radius:50%;
+    }
 
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
+    .math-container{
+      background: linear-gradient(180deg, rgba(31,41,55,0.9) 0%, rgba(17,24,39,0.95) 100%);
+      border: 1px solid rgba(75,85,99,0.5);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+  </style>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 
 <body>
+  <!-- Control Panel -->
+  <div class="absolute top-4 left-4 w-80 bg-gray-900/90 text-white p-6 rounded-xl shadow-2xl backdrop-blur-sm border border-gray-700 z-10 max-h-[90vh] overflow-y-auto">
+    <h1 class="text-xl font-bold mb-4 text-blue-400 tracking-tight">Parabol & Đường thẳng</h1>
 
-<!-- CONTROL PANEL -->
-<div class="absolute top-4 left-4 w-80 bg-gray-900/90 text-white p-6 rounded-xl border border-gray-700 z-10">
+    <div class="math-container rounded-lg p-4 mb-6">
+      <div class="text-gray-400 text-[10px] uppercase tracking-widest font-semibold mb-1">Parabol</div>
+      <div id="func-parabola" class="text-lg text-center text-blue-300 min-h-[2rem] flex items-center justify-center">
+        \[ y = 0.5x^2 \]
+      </div>
 
-<h1 class="text-xl font-bold text-blue-400 mb-4">Parabol & Đường thẳng</h1>
+      <div class="border-t border-gray-700 my-3"></div>
 
-<div class="mb-3 text-center text-blue-300" id="func-parabola">
-\[
-y = 0.5x^2
-\]
-</div>
+      <div class="text-gray-400 text-[10px] uppercase tracking-widest font-semibold mb-1">Đường thẳng</div>
+      <div id="func-line" class="text-lg text-center text-yellow-300 min-h-[2rem] flex items-center justify-center">
+        \[ y = 1.0x + 0.0 \]
+      </div>
+    </div>
 
-<div class="mb-3 text-center text-yellow-300" id="func-line">
-\[
-y = 1.0x + 0.0
-\]
-</div>
+    <!-- a parabola -->
+    <div class="mb-4">
+      <div class="flex justify-between mb-1">
+        <label class="text-sm font-medium text-gray-300">Hệ số \(a\) (parabol)</label>
+        <span id="val-a" class="text-sm font-bold text-blue-400">0.5</span>
+      </div>
+      <input type="range" min="-4" max="4" step="0.1" value="0.5"
+        class="slider-thumb" id="slider-a" style="background:#1e3a8a;">
+    </div>
 
-<!-- a -->
-<label class="text-sm">Hệ số a (parabol)</label>
-<div class="flex justify-between mb-1">
-<span></span><span id="val-a">0.5</span>
-</div>
-<input type="range" min="-4" max="4" step="0.1" value="0.5"
-class="slider-thumb mb-4" id="slider-a">
+    <!-- m line -->
+    <div class="mb-4">
+      <div class="flex justify-between mb-1">
+        <label class="text-sm font-medium text-gray-300">Hệ số \(m\) (đường thẳng)</label>
+        <span id="val-m" class="text-sm font-bold text-yellow-300">1.0</span>
+      </div>
+      <input type="range" min="-5" max="5" step="0.1" value="1.0"
+        class="slider-thumb" id="slider-m" style="background:#7c2d12;">
+    </div>
 
-<!-- m -->
-<label class="text-sm">Hệ số m (đường thẳng)</label>
-<div class="flex justify-between mb-1">
-<span></span><span id="val-m">1.0</span>
-</div>
-<input type="range" min="-5" max="5" step="0.1" value="1"
-class="slider-thumb mb-4" id="slider-m">
+    <!-- b line -->
+    <div class="mb-6">
+      <div class="flex justify-between mb-1">
+        <label class="text-sm font-medium text-gray-300">Hệ số \(b\) (đường thẳng)</label>
+        <span id="val-b" class="text-sm font-bold text-yellow-300">0.0</span>
+      </div>
+      <input type="range" min="-5" max="5" step="0.1" value="0.0"
+        class="slider-thumb" id="slider-b" style="background:#7c2d12;">
+    </div>
 
-<!-- b -->
-<label class="text-sm">Hệ số b (đường thẳng)</label>
-<div class="flex justify-between mb-1">
-<span></span><span id="val-b">0.0</span>
-</div>
-<input type="range" min="-5" max="5" step="0.1" value="0"
-class="slider-thumb mb-4" id="slider-b">
+    <button id="btn-reset"
+      class="w-full py-2 px-4 bg-gray-700 hover:bg-gray-600 text-white rounded transition duration-200 flex items-center justify-center gap-2 border border-gray-600 text-sm">
+      Đặt lại
+    </button>
+  </div>
 
-<button id="btn-reset"
-class="w-full bg-gray-700 hover:bg-gray-600 py-2 rounded">
-Đặt lại
-</button>
+  <!-- Canvas -->
+  <div id="canvas-container"></div>
 
-</div>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-<div id="canvas-container"></div>
+    // Fat lines (nét đậm thật)
+    import { Line2 } from 'three/addons/lines/Line2.js';
+    import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+    import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 
-<script type="module">
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    let scene, camera, renderer, controls;
+    let parabolaLine, lineStraight;
 
-let scene, camera, renderer, controls;
-let parabolaLine, lineStraight;
+    const params = { a: 0.5, m: 1.0, b: 0.0 };
 
-const params = { a:0.5, m:1, b:0 };
+    // DOM
+    const sliderA = document.getElementById('slider-a');
+    const sliderM = document.getElementById('slider-m');
+    const sliderB = document.getElementById('slider-b');
 
-const sliderA = document.getElementById('slider-a');
-const sliderM = document.getElementById('slider-m');
-const sliderB = document.getElementById('slider-b');
+    const valA = document.getElementById('val-a');
+    const valM = document.getElementById('val-m');
+    const valB = document.getElementById('val-b');
 
-const valA = document.getElementById('val-a');
-const valM = document.getElementById('val-m');
-const valB = document.getElementById('val-b');
+    const dispPara = document.getElementById('func-parabola');
+    const dispLine = document.getElementById('func-line');
 
-const dispPara = document.getElementById('func-parabola');
-const dispLine = document.getElementById('func-line');
+    const btnReset = document.getElementById('btn-reset');
 
-init();
+    init();
 
-function init(){
-scene = new THREE.Scene();
-scene.background = new THREE.Color(0x111827);
+    function init() {
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x111827);
+      scene.fog = new THREE.Fog(0x111827, 20, 60);
 
-camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight,0.1,1000);
-camera.position.set(15,15,25);
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(15, 15, 25);
 
-renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(innerWidth, innerHeight);
-document.getElementById('canvas-container').appendChild(renderer.domElement);
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
 
-scene.add(new THREE.GridHelper(40,40));
-scene.add(new THREE.AmbientLight(0xffffff,0.7));
+      // Lights
+      scene.add(new THREE.AmbientLight(0xffffff, 0.65));
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+      dirLight.position.set(10, 20, 10);
+      scene.add(dirLight);
 
-createAxes();
-createParabola();
-createLine();
+      // Grid
+      scene.add(new THREE.GridHelper(40, 40, 0x444444, 0x222222));
 
-sliderA.oninput = sliderM.oninput = sliderB.oninput = update;
-document.getElementById('btn-reset').onclick = reset;
+      // Axes + labels
+      createAxes();
 
-update();
-animate();
-}
+      // Curves
+      createParabola();
+      createLine();
 
-function createAxes(){
-scene.add(new THREE.Line(
-new THREE.BufferGeometry().setFromPoints([
-new THREE.Vector3(-20,0,0),
-new THREE.Vector3(20,0,0)
-]),
-new THREE.LineBasicMaterial({color:0xff4444})
-));
-scene.add(new THREE.Line(
-new THREE.BufferGeometry().setFromPoints([
-new THREE.Vector3(0,-20,0),
-new THREE.Vector3(0,20,0)
-]),
-new THREE.LineBasicMaterial({color:0x44ff44})
-));
-}
+      // Events
+      window.addEventListener('resize', onWindowResize);
+      sliderA.addEventListener('input', update);
+      sliderM.addEventListener('input', update);
+      sliderB.addEventListener('input', update);
+      btnReset.addEventListener('click', reset);
 
-function createParabola(){
-const geo = new THREE.BufferGeometry();
-geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(600),3));
-parabolaLine = new THREE.Line(geo,new THREE.LineBasicMaterial({color:0x3b82f6}));
-scene.add(parabolaLine);
-}
+      update();
+      animate();
+    }
 
-function createLine(){
-const geo = new THREE.BufferGeometry();
-geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6),3));
-lineStraight = new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xfacc15}));
-scene.add(lineStraight);
-}
+    function createAxes() {
+      // Ox
+      scene.add(new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-20, 0, 0), new THREE.Vector3(20, 0, 0)]),
+        new THREE.LineBasicMaterial({ color: 0xff4444 })
+      ));
+      // Oy
+      scene.add(new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -20, 0), new THREE.Vector3(0, 20, 0)]),
+        new THREE.LineBasicMaterial({ color: 0x44ff44 })
+      ));
 
-function update(){
-params.a = +sliderA.value;
-params.m = +sliderM.value;
-params.b = +sliderB.value;
+      // Labels in positive direction
+      createLabel("x", 21, 0, 0, "#ff4444");
+      createLabel("y", 0, 21, 0, "#44ff44");
+    }
 
-valA.innerText = params.a.toFixed(1);
-valM.innerText = params.m.toFixed(1);
-valB.innerText = params.b.toFixed(1);
+    function createParabola() {
+      const geometry = new LineGeometry();
+      const material = new LineMaterial({
+        color: 0x3b82f6,
+        linewidth: 6, // px
+        transparent: true,
+        opacity: 1.0
+      });
+      material.resolution.set(window.innerWidth, window.innerHeight);
 
-dispPara.innerHTML = `\\[ y = ${params.a.toFixed(1)}x^2 \\]`;
-dispLine.innerHTML = `\\[ y = ${params.m.toFixed(1)}x + ${params.b.toFixed(1)} \\]`;
-MathJax.typesetPromise([dispPara, dispLine]).catch(()=>{});
+      parabolaLine = new Line2(geometry, material);
+      parabolaLine.computeLineDistances();
+      scene.add(parabolaLine);
+    }
 
-const p = parabolaLine.geometry.attributes.position;
-let i=0;
-for(let x=-15;x<=15;x+=0.2){
-p.setXYZ(i++,x,params.a*x*x,0);
-}
-p.needsUpdate=true;
+    function createLine() {
+      const geometry = new LineGeometry();
+      const material = new LineMaterial({
+        color: 0xfacc15,
+        linewidth: 6, // px
+        transparent: true,
+        opacity: 1.0
+      });
+      material.resolution.set(window.innerWidth, window.innerHeight);
 
-const l = lineStraight.geometry.attributes.position;
-l.setXYZ(0,-15,params.m*(-15)+params.b,0);
-l.setXYZ(1,15,params.m*15+params.b,0);
-l.needsUpdate=true;
-}
+      lineStraight = new Line2(geometry, material);
+      lineStraight.computeLineDistances();
+      scene.add(lineStraight);
+    }
 
-function reset(){
-sliderA.value=0.5;
-sliderM.value=1;
-sliderB.value=0;
-update();
-controls.reset();
-}
+    function update() {
+      params.a = parseFloat(sliderA.value);
+      params.m = parseFloat(sliderM.value);
+      params.b = parseFloat(sliderB.value);
 
-function animate(){
-requestAnimationFrame(animate);
-controls.update();
-renderer.render(scene,camera);
-}
-</script>
+      valA.innerText = params.a.toFixed(1);
+      valM.innerText = params.m.toFixed(1);
+      valB.innerText = params.b.toFixed(1);
 
+      dispPara.innerHTML = `\\[ y = ${params.a.toFixed(1)}x^2 \\]`;
+      // b hiển thị có dấu +/-
+      const sign = params.b >= 0 ? "+" : "-";
+      dispLine.innerHTML = `\\[ y = ${params.m.toFixed(1)}x ${sign} ${Math.abs(params.b).toFixed(1)} \\]`;
+
+      if (window.MathJax) MathJax.typesetPromise([dispPara, dispLine]).catch(() => { });
+
+      // Parabola positions
+      const parabolaPositions = [];
+      for (let x = -15; x <= 15; x += 0.2) {
+        parabolaPositions.push(x, params.a * x * x, 0);
+      }
+      parabolaLine.geometry.setPositions(parabolaPositions);
+      parabolaLine.computeLineDistances();
+
+      // Straight line positions
+      const x1 = -15, y1 = params.m * x1 + params.b;
+      const x2 = 15, y2 = params.m * x2 + params.b;
+      lineStraight.geometry.setPositions([x1, y1, 0, x2, y2, 0]);
+      lineStraight.computeLineDistances();
+    }
+
+    function reset() {
+      sliderA.value = 0.5;
+      sliderM.value = 1.0;
+      sliderB.value = 0.0;
+      update();
+      controls.reset();
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      // Important for Line2 thickness
+      parabolaLine.material.resolution.set(window.innerWidth, window.innerHeight);
+      lineStraight.material.resolution.set(window.innerWidth, window.innerHeight);
+    }
+
+    function createLabel(text, x, y, z, colorStr) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = 128;
+      canvas.height = 128;
+
+      ctx.clearRect(0, 0, 128, 128);
+      ctx.font = 'bold 80px Arial';
+      ctx.fillStyle = colorStr;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 64, 64);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.needsUpdate = true;
+
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
+      sprite.position.set(x, y, z);
+      sprite.scale.set(3, 3, 1);
+      scene.add(sprite);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+  </script>
 </body>
 </html>
