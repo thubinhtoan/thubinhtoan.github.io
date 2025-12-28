@@ -5,17 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Parabol & Đường thẳng (nét đậm)</title>
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- MathJax -->
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <style>
-    body { margin: 0; overflow: hidden; background:#111; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    #canvas-container { width: 100vw; height: 100vh; display: block; }
+    body { margin:0; overflow:hidden; background:#111; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    #canvas-container { width:100vw; height:100vh; display:block; }
 
     .slider-thumb{
       -webkit-appearance:none; appearance:none;
@@ -95,7 +93,7 @@
     </div>
 
     <button id="btn-reset"
-      class="w-full py-2 px-4 bg-gray-700 hover:bg-gray-600 text-white rounded transition duration-200 flex items-center justify-center gap-2 border border-gray-600 text-sm">
+      class="w-full py-2 px-4 bg-gray-700 hover:bg-gray-600 text-white rounded transition duration-200 border border-gray-600 text-sm">
       Đặt lại
     </button>
   </div>
@@ -107,13 +105,11 @@
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-    // Fat lines (nét đậm thật)
-    import { Line2 } from 'three/addons/lines/Line2.js';
-    import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
-    import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
-
     let scene, camera, renderer, controls;
-    let parabolaLine, lineStraight;
+
+    // “Nét đậm thật” bằng Mesh
+    let parabolaMesh = null;     // TubeGeometry theo đường cong
+    let lineMesh = null;         // Cylinder (đường thẳng)
 
     const params = { a: 0.5, m: 1.0, b: 0.0 };
 
@@ -130,6 +126,14 @@
     const dispLine = document.getElementById('func-line');
 
     const btnReset = document.getElementById('btn-reset');
+
+    // Cấu hình vẽ
+    const X_MIN = -15, X_MAX = 15;
+    const PARABOLA_STEP = 0.2;
+    const TUBE_RADIUS = 0.10;      // độ “dày” parabol
+    const LINE_RADIUS = 0.10;      // độ “dày” đường thẳng
+    const TUBE_SEGMENTS = 250;     // độ mịn ống
+    const TUBE_RADIAL = 14;        // độ tròn ống
 
     init();
 
@@ -161,9 +165,8 @@
       // Axes + labels
       createAxes();
 
-      // Curves
-      createParabola();
-      createLine();
+      // Line mesh (cylinder) tạo một lần
+      createLineMesh();
 
       // Events
       window.addEventListener('resize', onWindowResize);
@@ -188,39 +191,45 @@
         new THREE.LineBasicMaterial({ color: 0x44ff44 })
       ));
 
-      // Labels in positive direction
-      createLabel("x", 21, 0, 0, "#ff4444");
-      createLabel("y", 0, 21, 0, "#44ff44");
+      // Chữ x/y ở chiều dương (đặt hơi nhô lên Z để không “dính” mặt phẳng)
+      createLabel("x", 21, 0, 0.6, "#ff4444");
+      createLabel("y", 0, 21, 0.6, "#44ff44");
     }
 
-    function createParabola() {
-      const geometry = new LineGeometry();
-      const material = new LineMaterial({
-        color: 0x3b82f6,
-        linewidth: 6, // px
-        transparent: true,
-        opacity: 1.0
-      });
-      material.resolution.set(window.innerWidth, window.innerHeight);
+    function createLabel(text, x, y, z, colorStr) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
 
-      parabolaLine = new Line2(geometry, material);
-      parabolaLine.computeLineDistances();
-      scene.add(parabolaLine);
+      canvas.width = 256;
+      canvas.height = 256;
+
+      ctx.clearRect(0, 0, 256, 256);
+      ctx.font = 'bold 160px Arial';
+      ctx.fillStyle = colorStr;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 128, 140);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.needsUpdate = true;
+
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+      // Quan trọng: luôn nổi lên, không bị che bởi grid/mesh
+      mat.depthTest = false;
+      mat.depthWrite = false;
+
+      const sprite = new THREE.Sprite(mat);
+      sprite.position.set(x, y, z);
+      sprite.scale.set(4.0, 4.0, 1);
+      sprite.renderOrder = 999;
+      scene.add(sprite);
     }
 
-    function createLine() {
-      const geometry = new LineGeometry();
-      const material = new LineMaterial({
-        color: 0xfacc15,
-        linewidth: 6, // px
-        transparent: true,
-        opacity: 1.0
-      });
-      material.resolution.set(window.innerWidth, window.innerHeight);
-
-      lineStraight = new Line2(geometry, material);
-      lineStraight.computeLineDistances();
-      scene.add(lineStraight);
+    function createLineMesh() {
+      const geometry = new THREE.CylinderGeometry(LINE_RADIUS, LINE_RADIUS, 1, 18, 1, false);
+      const material = new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.2, roughness: 0.35 });
+      lineMesh = new THREE.Mesh(geometry, material);
+      scene.add(lineMesh);
     }
 
     function update() {
@@ -233,25 +242,52 @@
       valB.innerText = params.b.toFixed(1);
 
       dispPara.innerHTML = `\\[ y = ${params.a.toFixed(1)}x^2 \\]`;
-      // b hiển thị có dấu +/-
       const sign = params.b >= 0 ? "+" : "-";
       dispLine.innerHTML = `\\[ y = ${params.m.toFixed(1)}x ${sign} ${Math.abs(params.b).toFixed(1)} \\]`;
-
       if (window.MathJax) MathJax.typesetPromise([dispPara, dispLine]).catch(() => { });
 
-      // Parabola positions
-      const parabolaPositions = [];
-      for (let x = -15; x <= 15; x += 0.2) {
-        parabolaPositions.push(x, params.a * x * x, 0);
-      }
-      parabolaLine.geometry.setPositions(parabolaPositions);
-      parabolaLine.computeLineDistances();
+      updateParabolaTube();
+      updateStraightLineCylinder();
+    }
 
-      // Straight line positions
-      const x1 = -15, y1 = params.m * x1 + params.b;
-      const x2 = 15, y2 = params.m * x2 + params.b;
-      lineStraight.geometry.setPositions([x1, y1, 0, x2, y2, 0]);
-      lineStraight.computeLineDistances();
+    function updateParabolaTube() {
+      // Tạo danh sách điểm của parabol
+      const pts = [];
+      for (let x = X_MIN; x <= X_MAX; x += PARABOLA_STEP) {
+        pts.push(new THREE.Vector3(x, params.a * x * x, 0));
+      }
+
+      const curve = new THREE.CatmullRomCurve3(pts);
+
+      // Tạo Tube mới, bỏ cái cũ để không bị “chồng”
+      const newGeo = new THREE.TubeGeometry(curve, TUBE_SEGMENTS, TUBE_RADIUS, TUBE_RADIAL, false);
+
+      if (!parabolaMesh) {
+        const mat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, metalness: 0.15, roughness: 0.4 });
+        parabolaMesh = new THREE.Mesh(newGeo, mat);
+        scene.add(parabolaMesh);
+      } else {
+        parabolaMesh.geometry.dispose();
+        parabolaMesh.geometry = newGeo;
+      }
+    }
+
+    function updateStraightLineCylinder() {
+      const x1 = X_MIN, y1 = params.m * x1 + params.b;
+      const x2 = X_MAX, y2 = params.m * x2 + params.b;
+
+      const start = new THREE.Vector3(x1, y1, 0);
+      const end   = new THREE.Vector3(x2, y2, 0);
+
+      const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+      lineMesh.position.copy(mid);
+
+      // hướng cylinder theo đoạn thẳng
+      lineMesh.lookAt(end);
+      lineMesh.rotateX(Math.PI / 2);
+
+      const len = start.distanceTo(end);
+      lineMesh.scale.set(1, len, 1);
     }
 
     function reset() {
@@ -266,33 +302,6 @@
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
-
-      // Important for Line2 thickness
-      parabolaLine.material.resolution.set(window.innerWidth, window.innerHeight);
-      lineStraight.material.resolution.set(window.innerWidth, window.innerHeight);
-    }
-
-    function createLabel(text, x, y, z, colorStr) {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      canvas.width = 128;
-      canvas.height = 128;
-
-      ctx.clearRect(0, 0, 128, 128);
-      ctx.font = 'bold 80px Arial';
-      ctx.fillStyle = colorStr;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(text, 64, 64);
-
-      const tex = new THREE.CanvasTexture(canvas);
-      tex.needsUpdate = true;
-
-      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
-      sprite.position.set(x, y, z);
-      sprite.scale.set(3, 3, 1);
-      scene.add(sprite);
     }
 
     function animate() {
