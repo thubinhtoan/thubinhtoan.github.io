@@ -121,11 +121,10 @@ h1 {
 <audio id="correctSound">
     <source src="data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=">
 </audio>
+<script>
 let startTime = Date.now();
-<script>
+
 // ================= DATA CÂU HỎI =================
-let questions = [
-<script>
 let questions = [
 {
 q: "Bậc của đa thức x² + 3x³ − 5 là:",
@@ -283,98 +282,77 @@ rationale: "Dữ liệu số đo."
 ];
 
 // ================= RANDOM =================
-questions = questions.sort(() => Math.random() - 0.5);
+questions.sort(() => Math.random() - 0.5);
 
 let index = 0;
 let score = 0;
 
 // ================= LOAD =================
 function loadQuestion() {
-    let q = questions[index];
-    document.getElementById("question").innerHTML = "Câu " + (index+1) + ": " + q.q;
+  let q = questions[index];
+  document.getElementById("question").innerHTML = "Câu " + (index + 1) + ": " + q.q;
 
-    let optionsEl = document.getElementById("options");
-    optionsEl.innerHTML = "";
+  let optionsEl = document.getElementById("options");
+  optionsEl.innerHTML = "";
 
-    let shuffled = [...q.options].sort(() => Math.random() - 0.5);
-    shuffled.forEach(opt => {
-        let btn = document.createElement("button");
-        btn.innerText = opt;
-        btn.onclick = () => checkAnswer(btn, opt);
-        optionsEl.appendChild(btn);
-    });
+  let shuffled = [...q.options].sort(() => Math.random() - 0.5);
+  shuffled.forEach(opt => {
+    let btn = document.createElement("button");
+    btn.innerText = opt;
+    btn.onclick = () => checkAnswer(btn, opt);
+    optionsEl.appendChild(btn);
+  });
 
-    document.getElementById("feedback").innerHTML = "";
-    document.getElementById("rationale").innerHTML = "";
+  document.getElementById("feedback").innerHTML = "";
+  document.getElementById("rationale").innerHTML = "";
 }
 
+// ================= CHECK =================
 function checkAnswer(btn, choice) {
-    let q = questions[index];
-    let buttons = document.querySelectorAll(".options button");
-    buttons.forEach(b => b.disabled = true);
+  let q = questions[index];
+  document.querySelectorAll(".options button").forEach(b => b.disabled = true);
 
-    if (choice === q.answer) {
-        btn.classList.add("correct");
-        document.getElementById("feedback").innerHTML =
-            "<div class='confetti'>🎉🎊😊🌸</div><strong>Chính xác!</strong>";
-        document.getElementById("correctSound").play();
-        score++;
-    } else {
-        btn.classList.add("wrong");
-        document.getElementById("feedback").innerHTML =
-            "❌ Chưa đúng! Đáp án đúng là: <strong>" + q.answer + "</strong>";
-    }
+  if (choice === q.answer) {
+    btn.classList.add("correct");
+    document.getElementById("feedback").innerHTML =
+      "<div class='confetti'>🎉🎊😊🌸</div><strong>Chính xác!</strong>";
+    document.getElementById("correctSound").play();
+    score++;
+  } else {
+    btn.classList.add("wrong");
+    document.getElementById("feedback").innerHTML =
+      "❌ Chưa đúng! Đáp án đúng là: <strong>" + q.answer + "</strong>";
+  }
 
-    document.getElementById("rationale").innerText = "Giải thích: " + q.rationale;
-    document.getElementById("score").innerText =
-        "Điểm hiện tại: " + score + " / " + questions.length;
+  document.getElementById("rationale").innerText = "Giải thích: " + q.rationale;
+  document.getElementById("score").innerText =
+    "Điểm: " + score + " / " + questions.length;
 }
 
+// ================= NEXT =================
 function nextQuestion() {
-    index++;
-    if (index < questions.length) {
-        loadQuestion();
-    else {
+  index++;
+  if (index < questions.length) {
+    loadQuestion();
+  } else {
     let endTime = Math.floor((Date.now() - startTime) / 1000);
     let name = document.getElementById("playerName").value || "Không tên";
 
     let leaderboard = JSON.parse(localStorage.getItem("toan8_ck1_rank")) || [];
+    leaderboard.push({ name, score, time: endTime, date: new Date().toLocaleDateString() });
 
-    leaderboard.push({
-        name: name,
-        score: score,
-        time: endTime,
-        date: new Date().toLocaleDateString()
-    });
-
-    leaderboard.sort((a, b) => {
-        if (b.score !== a.score) return b.score - a.score;
-        return a.time - b.time;
-    });
-
+    leaderboard.sort((a, b) => b.score - a.score || a.time - b.time);
     leaderboard = leaderboard.slice(0, 10);
     localStorage.setItem("toan8_ck1_rank", JSON.stringify(leaderboard));
 
-    let html = "<h2>🏆 BẢNG XẾP HẠNG</h2>";
-    html += "<table style='width:100%;color:white;border-collapse:collapse;'>";
-
-    html += "<tr style='background:#ffd166;color:black;'>" +
-            "<th>Hạng</th><th>Tên</th><th>Điểm</th><th>Thời gian (s)</th><th>Ngày</th></tr>";
-
+    let html = "<h2>🏆 BẢNG XẾP HẠNG</h2><table style='width:100%;color:white'>";
     leaderboard.forEach((p, i) => {
-        html += `<tr style="border-bottom:1px solid #fff">
-            <td>${i+1}</td>
-            <td>${p.name}</td>
-            <td>${p.score}/${questions.length}</td>
-            <td>${p.time}</td>
-            <td>${p.date}</td>
-        </tr>`;
+      html += `<tr><td>${i + 1}</td><td>${p.name}</td><td>${p.score}</td><td>${p.time}s</td></tr>`;
     });
-
     html += "</table>";
-    html += "<p style='margin-top:15px;'>🎉 Chúc mừng! Em đã hoàn thành thử thách cuối kì 🎉</p>";
 
     document.querySelector(".quiz-box").innerHTML = html;
+  }
 }
 
 loadQuestion();
