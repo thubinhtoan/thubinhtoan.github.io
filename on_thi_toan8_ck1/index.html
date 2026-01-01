@@ -6,147 +6,183 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top, #2c4f87, #0f2347);
-  color: #2b2b2b;
+body{
+  margin:0;
+  font-family:"Segoe UI",sans-serif;
+  background:radial-gradient(circle at top,#2c4f87,#0f2347);
+  color:#2b2b2b;
 }
 
-.container {
-  max-width: 1000px;
-  margin: auto;
-  padding: 30px 15px;
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:30px 15px;
 }
 
-.game-card {
-  background: #fff8e8;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
-  overflow: hidden;
+.game-card{
+  background:#fff8e8;
+  border-radius:20px;
+  box-shadow:0 20px 40px rgba(0,0,0,.35);
+  overflow:hidden;
 }
 
-.game-header {
-  background: linear-gradient(135deg, #a55b16, #7a3e0e);
-  color: #ffd36a;
-  padding: 16px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: bold;
+.game-header{
+  background:linear-gradient(135deg,#a55b16,#7a3e0e);
+  color:#ffd36a;
+  padding:16px 20px;
+  display:flex;
+  justify-content:space-between;
+  font-weight:bold;
 }
 
-.progress {
-  height: 8px;
-  background: #e0e0e0;
+.progress{
+  height:8px;
+  background:#e0e0e0;
 }
 
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #f4b41a, #ffdd8d);
-  width: 0%;
+.progress-bar{
+  height:100%;
+  background:linear-gradient(90deg,#f4b41a,#ffdd8d);
+  width:0%;
 }
 
-.game-body {
-  padding: 30px 25px 35px;
+.game-body{
+  padding:30px 25px 35px;
 }
 
-.level {
-  display: inline-block;
-  background: #5b7c8b;
-  color: #fff;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.85em;
-  margin-bottom: 15px;
+.level{
+  display:inline-block;
+  background:#5b7c8b;
+  color:#fff;
+  padding:6px 14px;
+  border-radius:20px;
+  font-size:.85em;
+  margin-bottom:15px;
 }
 
-.question {
-  font-size: 1.35em;
-  font-weight: 600;
-  margin-bottom: 25px;
+.question{
+  font-size:1.35em;
+  font-weight:600;
+  margin-bottom:25px;
 }
 
-.options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+.options{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
 }
 
-.options button {
-  background: #ffffff;
-  border: 2px solid #d6c7a1;
-  border-radius: 14px;
-  padding: 14px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: 0.25s;
+.options button{
+  background:#fff;
+  border:2px solid #d6c7a1;
+  border-radius:14px;
+  padding:14px;
+  font-size:1em;
+  cursor:pointer;
+  transition:.25s;
 }
 
-.options button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+.options button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 15px rgba(0,0,0,.15);
 }
 
-.correct {
-  background: #c8f2d0 !important;
-  border-color: #2e8b57 !important;
+.correct{
+  background:#c8f2d0!important;
+  border-color:#2e8b57!important;
 }
 
-.wrong {
-  background: #ffd0d0 !important;
-  border-color: #c0392b !important;
+.wrong{
+  background:#ffd0d0!important;
+  border-color:#c0392b!important;
 }
 
-.feedback {
-  margin-top: 18px;
-  font-weight: bold;
+.feedback{
+  margin-top:18px;
+  font-weight:bold;
 }
 
-.rationale {
-  margin-top: 10px;
-  font-style: italic;
-  color: #7a5a2e;
+.rationale{
+  margin-top:10px;
+  font-style:italic;
+  color:#7a5a2e;
 }
 
-.next-btn {
-  margin-top: 25px;
-  padding: 12px 28px;
-  border-radius: 25px;
-  border: none;
-  background: linear-gradient(135deg, #f4b41a, #ffdd8d);
-  font-size: 1em;
-  font-weight: bold;
-  cursor: pointer;
+.next-btn{
+  margin-top:25px;
+  padding:12px 28px;
+  border-radius:25px;
+  border:none;
+  background:linear-gradient(135deg,#f4b41a,#ffdd8d);
+  font-size:1em;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* ===== KẾT QUẢ ===== */
+.result-box{
+  text-align:center;
+  padding:30px;
+}
+
+.medal{
+  font-size:4.5em;
+  margin:15px 0;
+}
+
+.rank-note{
+  font-style:italic;
+  margin-top:10px;
+}
+table{
+  margin-top:10px;
+}
+table th,table td{
+  padding:8px;
+  border:1px solid #ccc;
 }
 </style>
 </head>
 
 <body>
 <div class="container">
-    <h1>🎯 HÀNH TRÌNH CHINH PHỤC HỌC KÌ I – TOÁN 8</h1>
-    <p>Immersive Quiz – Thử thách tổng hợp cuối kì</p>
+<h1 style="color:#fff">🎯 HÀNH TRÌNH CHINH PHỤC HỌC KÌ I – TOÁN 8</h1>
+<p style="color:#dbe7ff">Immersive Quiz – Thử thách tổng hợp cuối kì</p>
 
-    <div class="quiz-box">
-        <div id="question" class="question"></div>
-        <div class="options" id="options"></div>
-        <div id="feedback"></div>
-        <div id="rationale" class="rationale"></div>
-        <button class="next-btn" onclick="nextQuestion()">Câu tiếp theo ▶</button>
-        <div id="score"></div>
+<div class="game-card">
+  <div class="game-header">
+    <span>🔑 Thợ Săn Tri Thức</span>
+    <span id="progressText">Câu 1</span>
+  </div>
+  <div class="progress">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="game-body quiz-box">
+    <div class="level">NHẬN BIẾT</div>
+    <div id="question" class="question"></div>
+    <div class="options" id="options"></div>
+    <div id="feedback" class="feedback"></div>
+    <div id="rationale" class="rationale"></div>
+
+    <button class="next-btn" onclick="nextQuestion()">Câu tiếp theo ▶</button>
+
+    <div id="score" style="margin-top:10px;font-weight:bold"></div>
+
+    <div style="margin-top:15px">
+      <input id="playerName" placeholder="Nhập tên người chơi"
+      style="padding:10px;border-radius:8px;border:none;width:70%;font-size:1em;">
     </div>
-<div style="margin-bottom:15px;">
-    <input id="playerName" placeholder="Nhập tên người chơi"
-           style="padding:10px;border-radius:8px;border:none;width:70%;font-size:1em;">
+  </div>
 </div>
 </div>
 
-<!-- ÂM THANH -->
 <audio id="correctSound">
-    <source src="data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=">
+<source src="data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=">
 </audio>
+
 <script>
-let startTime = Date.now();
+let startTime=Date.now();
 
 // ================= DATA CÂU HỎI =================
 let questions = [
@@ -305,131 +341,97 @@ rationale: "Dữ liệu số đo."
 }
 ];
 
-// ================= RANDOM =================
-questions.sort(() => Math.random() - 0.5);
+/* RANDOM */
+questions.sort(()=>Math.random()-0.5);
 
-let index = 0;
-let score = 0;
+let index=0,score=0;
 
-// ================= LOAD =================
-function loadQuestion() {
-  let q = questions[index];
-  document.getElementById("question").innerHTML = "Câu " + (index + 1) + ": " + q.q;
+/* LOAD */
+function loadQuestion(){
+  let q=questions[index];
+  document.getElementById("question").innerHTML="Câu "+(index+1)+": "+q.q;
 
-  let optionsEl = document.getElementById("options");
-  optionsEl.innerHTML = "";
+  let opts=[...q.options].sort(()=>Math.random()-0.5);
+  let el=document.getElementById("options");
+  el.innerHTML="";
 
-  let shuffled = [...q.options].sort(() => Math.random() - 0.5);
-  shuffled.forEach(opt => {
-    let btn = document.createElement("button");
-    btn.innerText = opt;
-    btn.onclick = () => checkAnswer(btn, opt);
-    optionsEl.appendChild(btn);
+  opts.forEach(o=>{
+    let b=document.createElement("button");
+    b.innerText=o;
+    b.onclick=()=>checkAnswer(b,o);
+    el.appendChild(b);
   });
 
-  document.getElementById("feedback").innerHTML = "";
-  document.getElementById("rationale").innerHTML = "";
+  document.getElementById("feedback").innerHTML="";
+  document.getElementById("rationale").innerHTML="";
+  document.getElementById("progressText").innerText=`Câu ${index+1}/${questions.length}`;
+  document.getElementById("progressBar").style.width=((index)/questions.length*100)+"%";
 }
 
-// ================= CHECK =================
-function checkAnswer(btn, choice) {
-  let q = questions[index];
-  document.querySelectorAll(".options button").forEach(b => b.disabled = true);
+/* CHECK */
+function checkAnswer(btn,choice){
+  let q=questions[index];
+  document.querySelectorAll(".options button").forEach(b=>b.disabled=true);
 
-  if (choice === q.answer) {
+  if(choice===q.answer){
     btn.classList.add("correct");
-    document.getElementById("feedback").innerHTML =
-      "<div class='confetti'>🎉🎊😊🌸</div><strong>Chính xác!</strong>";
-    document.getElementById("correctSound").play();
     score++;
-  } else {
+    document.getElementById("correctSound").play();
+    document.getElementById("feedback").innerHTML="🎉 Chính xác!";
+  }else{
     btn.classList.add("wrong");
-    document.getElementById("feedback").innerHTML =
-      "❌ Chưa đúng! Đáp án đúng là: <strong>" + q.answer + "</strong>";
+    document.getElementById("feedback").innerHTML="❌ Đáp án đúng: <b>"+q.answer+"</b>";
   }
-
-  document.getElementById("rationale").innerText = "Giải thích: " + q.rationale;
-  document.getElementById("score").innerText =
-    "Điểm: " + score + " / " + questions.length;
+  document.getElementById("rationale").innerText="Giải thích: "+q.rationale;
+  document.getElementById("score").innerText="Điểm: "+score+"/"+questions.length;
 }
 
-// ================= NEXT =================
-function nextQuestion() {
+/* NEXT */
+function nextQuestion(){
   index++;
-  if (index < questions.length) {
+  if(index<questions.length){
     loadQuestion();
-  } else {
-  let endTime = Math.floor((Date.now() - startTime) / 1000);
-  let name = document.getElementById("playerName")?.value || "Không tên";
-
-  let total = questions.length;
-  let percent = Math.round(score / total * 100);
-
-  let medal = "🎯";
-  let title = "CỐ GẮNG THÊM";
-  let message = "Em hãy ôn tập thêm để chinh phục thử thách nhé!";
-
-  if (percent >= 80) {
-    medal = "🥇";
-    title = "CHIẾN BINH TOÁN HỌC";
-    message = "Xuất sắc! Em đã chinh phục kho báu Toán học!";
-  } else if (percent >= 60) {
-    medal = "🥈";
-    title = "NHÀ THÁM HIỂM TÀI NĂNG";
-    message = "Rất tốt! Chỉ cần cố gắng thêm một chút nữa!";
-  } else if (percent >= 40) {
-    medal = "🥉";
-    title = "NGƯỜI KHỞI HÀNH";
-    message = "Khởi đầu tốt! Tiếp tục luyện tập nhé!";
+  }else{
+    showResult();
   }
-
-  // ===== LƯU BẢNG XẾP HẠNG =====
-  let leaderboard = JSON.parse(localStorage.getItem("toan8_ck1_rank")) || [];
-  leaderboard.push({ name, score, percent, time: endTime, date: new Date().toLocaleDateString() });
-
-  leaderboard.sort((a, b) => b.percent - a.percent || a.time - b.time);
-  leaderboard = leaderboard.slice(0, 10);
-  localStorage.setItem("toan8_ck1_rank", JSON.stringify(leaderboard));
-
-  // ===== GIAO DIỆN TỔNG KẾT =====
-  let html = `
-    <div class="result-box">
-      <h2>🏁 HOÀN THÀNH HÀNH TRÌNH</h2>
-
-      <div class="medal">${medal}</div>
-
-      <h3>${title}</h3>
-
-      <p><strong>Người chơi:</strong> ${name}</p>
-      <p><strong>Điểm:</strong> ${score} / ${total} (${percent}%)</p>
-      <p><strong>Thời gian:</strong> ${endTime} giây</p>
-
-      <p class="rank-note">${message}</p>
-
-      <hr style="margin:20px 0">
-
-      <h3>🏆 BẢNG XẾP HẠNG</h3>
-      <table style="width:100%;border-collapse:collapse">
-        <tr style="background:#f4b41a">
-          <th>Hạng</th><th>Tên</th><th>Điểm</th><th>%</th><th>Thời gian</th>
-        </tr>
-        ${leaderboard.map((p, i) => `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${p.name}</td>
-            <td>${p.score}/${total}</td>
-            <td>${p.percent}%</td>
-            <td>${p.time}s</td>
-          </tr>
-        `).join("")}
-      </table>
-
-      <p style="margin-top:20px;">🎉 Chúc mừng em đã hoàn thành thử thách! 🎉</p>
-    </div>
-  `;
-
-  document.querySelector(".game-card").innerHTML = html;
 }
+
+/* RESULT */
+function showResult(){
+  let time=Math.floor((Date.now()-startTime)/1000);
+  let name=document.getElementById("playerName").value||"Không tên";
+  let percent=Math.round(score/questions.length*100);
+
+  let medal="🎯",title="CỐ GẮNG THÊM";
+  if(percent>=80){medal="🥇";title="CHIẾN BINH TOÁN HỌC";}
+  else if(percent>=60){medal="🥈";title="NHÀ THÁM HIỂM";}
+  else if(percent>=40){medal="🥉";title="NGƯỜI KHỞI HÀNH";}
+
+  let rank=JSON.parse(localStorage.getItem("toan8_ck1_rank")||"[]");
+  rank.push({name,score,percent,time});
+  rank.sort((a,b)=>b.percent-a.percent||a.time-b.time);
+  rank=rank.slice(0,10);
+  localStorage.setItem("toan8_ck1_rank",JSON.stringify(rank));
+
+  document.querySelector(".quiz-box").innerHTML=`
+  <div class="result-box">
+    <h2>🏁 HOÀN THÀNH</h2>
+    <div class="medal">${medal}</div>
+    <h3>${title}</h3>
+    <p><b>${name}</b></p>
+    <p>Điểm: ${score}/${questions.length} (${percent}%)</p>
+    <p>Thời gian: ${time}s</p>
+
+    <h3>🏆 BẢNG XẾP HẠNG</h3>
+    <table width="100%">
+      <tr><th>Hạng</th><th>Tên</th><th>%</th><th>Thời gian</th></tr>
+      ${rank.map((r,i)=>`<tr>
+        <td>${i+1}</td><td>${r.name}</td><td>${r.percent}%</td><td>${r.time}s</td>
+      </tr>`).join("")}
+    </table>
+  </div>`;
+}
+
 loadQuestion();
 </script>
 </body>
