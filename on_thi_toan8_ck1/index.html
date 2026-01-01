@@ -7,93 +7,142 @@
 
 <style>
 body {
-    font-family: "Segoe UI", sans-serif;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    color: #fff;
-    margin: 0;
-    padding: 0;
-    text-align: center;
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #2c4f87, #0f2347);
+  color: #2b2b2b;
 }
 
 .container {
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
+  max-width: 1000px;
+  margin: auto;
+  padding: 30px 15px;
 }
 
-h1 {
-    margin-bottom: 10px;
+.game-card {
+  background: #fff8e8;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+  overflow: hidden;
 }
 
-.quiz-box {
-    background: rgba(0,0,0,0.35);
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+.game-header {
+  background: linear-gradient(135deg, #a55b16, #7a3e0e);
+  color: #ffd36a;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+
+.progress {
+  height: 8px;
+  background: #e0e0e0;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #f4b41a, #ffdd8d);
+  width: 0%;
+}
+
+.game-body {
+  padding: 30px 25px 35px;
+}
+
+.level {
+  display: inline-block;
+  background: #5b7c8b;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  margin-bottom: 15px;
 }
 
 .question {
-    font-size: 1.2em;
-    margin-bottom: 15px;
+  font-size: 1.35em;
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
 }
 
 .options button {
-    display: block;
-    width: 100%;
-    margin: 8px 0;
-    padding: 12px;
-    font-size: 1em;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    background: #ffffff;
-    color: #000;
-    transition: 0.3s;
+  background: #ffffff;
+  border: 2px solid #d6c7a1;
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: 0.25s;
 }
 
 .options button:hover {
-    background: #ffd166;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
 }
 
 .correct {
-    background: #06d6a0 !important;
-    color: #000;
+  background: #c8f2d0 !important;
+  border-color: #2e8b57 !important;
 }
 
 .wrong {
-    background: #ef476f !important;
+  background: #ffd0d0 !important;
+  border-color: #c0392b !important;
+}
+
+.feedback {
+  margin-top: 18px;
+  font-weight: bold;
 }
 
 .rationale {
-    margin-top: 15px;
-    font-style: italic;
-    color: #ffd166;
-}
-
-#score {
-    margin-top: 15px;
-    font-weight: bold;
-}
-
-.confetti {
-    font-size: 2em;
-    animation: float 1s ease-in-out infinite alternate;
-}
-
-@keyframes float {
-    from { transform: translateY(0); }
-    to { transform: translateY(-10px); }
+  margin-top: 10px;
+  font-style: italic;
+  color: #7a5a2e;
 }
 
 .next-btn {
-    margin-top: 15px;
-    padding: 10px 20px;
-    font-size: 1em;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    background: #ffd166;
-    color: #000;
+  margin-top: 25px;
+  padding: 12px 28px;
+  border-radius: 25px;
+  border: none;
+  background: linear-gradient(135deg, #f4b41a, #ffdd8d);
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+}
+    .medal {
+  font-size: 4.5em;
+  margin: 20px 0;
+}
+
+.result-box {
+  text-align: center;
+  padding: 30px;
+}
+
+.result-box h2 {
+  color: #7a3e0e;
+  margin-bottom: 10px;
+}
+
+.result-box p {
+  font-size: 1.1em;
+  margin: 6px 0;
+}
+
+.rank-note {
+  margin-top: 15px;
+  font-style: italic;
+  color: #5b4a2d;
 }
 </style>
 </head>
@@ -335,26 +384,77 @@ function nextQuestion() {
   if (index < questions.length) {
     loadQuestion();
   } else {
-    let endTime = Math.floor((Date.now() - startTime) / 1000);
-    let name = document.getElementById("playerName").value || "Không tên";
+  let endTime = Math.floor((Date.now() - startTime) / 1000);
+  let name = document.getElementById("playerName")?.value || "Không tên";
 
-    let leaderboard = JSON.parse(localStorage.getItem("toan8_ck1_rank")) || [];
-    leaderboard.push({ name, score, time: endTime, date: new Date().toLocaleDateString() });
+  let total = questions.length;
+  let percent = Math.round(score / total * 100);
 
-    leaderboard.sort((a, b) => b.score - a.score || a.time - b.time);
-    leaderboard = leaderboard.slice(0, 10);
-    localStorage.setItem("toan8_ck1_rank", JSON.stringify(leaderboard));
+  let medal = "🎯";
+  let title = "CỐ GẮNG THÊM";
+  let message = "Em hãy ôn tập thêm để chinh phục thử thách nhé!";
 
-    let html = "<h2>🏆 BẢNG XẾP HẠNG</h2><table style='width:100%;color:white'>";
-    leaderboard.forEach((p, i) => {
-      html += `<tr><td>${i + 1}</td><td>${p.name}</td><td>${p.score}</td><td>${p.time}s</td></tr>`;
-    });
-    html += "</table>";
-
-    document.querySelector(".quiz-box").innerHTML = html;
+  if (percent >= 80) {
+    medal = "🥇";
+    title = "CHIẾN BINH TOÁN HỌC";
+    message = "Xuất sắc! Em đã chinh phục kho báu Toán học!";
+  } else if (percent >= 60) {
+    medal = "🥈";
+    title = "NHÀ THÁM HIỂM TÀI NĂNG";
+    message = "Rất tốt! Chỉ cần cố gắng thêm một chút nữa!";
+  } else if (percent >= 40) {
+    medal = "🥉";
+    title = "NGƯỜI KHỞI HÀNH";
+    message = "Khởi đầu tốt! Tiếp tục luyện tập nhé!";
   }
-}
 
+  // ===== LƯU BẢNG XẾP HẠNG =====
+  let leaderboard = JSON.parse(localStorage.getItem("toan8_ck1_rank")) || [];
+  leaderboard.push({ name, score, percent, time: endTime, date: new Date().toLocaleDateString() });
+
+  leaderboard.sort((a, b) => b.percent - a.percent || a.time - b.time);
+  leaderboard = leaderboard.slice(0, 10);
+  localStorage.setItem("toan8_ck1_rank", JSON.stringify(leaderboard));
+
+  // ===== GIAO DIỆN TỔNG KẾT =====
+  let html = `
+    <div class="result-box">
+      <h2>🏁 HOÀN THÀNH HÀNH TRÌNH</h2>
+
+      <div class="medal">${medal}</div>
+
+      <h3>${title}</h3>
+
+      <p><strong>Người chơi:</strong> ${name}</p>
+      <p><strong>Điểm:</strong> ${score} / ${total} (${percent}%)</p>
+      <p><strong>Thời gian:</strong> ${endTime} giây</p>
+
+      <p class="rank-note">${message}</p>
+
+      <hr style="margin:20px 0">
+
+      <h3>🏆 BẢNG XẾP HẠNG</h3>
+      <table style="width:100%;border-collapse:collapse">
+        <tr style="background:#f4b41a">
+          <th>Hạng</th><th>Tên</th><th>Điểm</th><th>%</th><th>Thời gian</th>
+        </tr>
+        ${leaderboard.map((p, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${p.name}</td>
+            <td>${p.score}/${total}</td>
+            <td>${p.percent}%</td>
+            <td>${p.time}s</td>
+          </tr>
+        `).join("")}
+      </table>
+
+      <p style="margin-top:20px;">🎉 Chúc mừng em đã hoàn thành thử thách! 🎉</p>
+    </div>
+  `;
+
+  document.querySelector(".game-card").innerHTML = html;
+}
 loadQuestion();
 </script>
 </body>
