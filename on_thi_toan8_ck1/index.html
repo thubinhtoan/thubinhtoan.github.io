@@ -82,88 +82,105 @@ th,td{padding:6px}
 let startTime=Date.now();
 let index=0,score=0;
 
-let questions=[
+let questions = [
 {
-q:"Bậc của đa thức $x^2+3x^3-5$ là:",
-options:["$2$","$3$","$1$","$5$"],
-answer:"$3$",
-rationale:"Số mũ lớn nhất của biến là $3$."
+q: "Bậc của đa thức \\(x^2 + 3x^3 - 5\\) là:",
+options: ["2", "3", "1", "5"],
+answer: "3",
+rationale: "Bậc của đa thức là số mũ lớn nhất của biến, ở đây là \\(3\\)."
 },
 {
-q:"Điều kiện xác định của phân thức $\\dfrac{1}{x-2}$ là:",
-options:["$x\\ne2$","$x=2$","$x\\ge2$","$x\\le2$"],
-answer:"$x\\ne2$",
-rationale:"Mẫu khác $0$ nên $x-2\\ne0$."
+q: "Điều kiện xác định của phân thức \\(\\frac{1}{x-2}\\) là:",
+options: ["x ≠ 2", "x = 2", "x ≥ 2", "x ≤ 2"],
+answer: "x ≠ 2",
+rationale: "Mẫu khác \\(0\\) nên \\(x-2 \\ne 0\\), hay \\(x \\ne 2\\)."
 },
 {
-q:"Phân tích $x^2-4$ thành nhân tử:",
-options:[
-"$(x-2)(x+2)$",
-"$(x-4)(x+1)$",
-"$x(x-4)$",
-"$(x-2)^2$"
-],
-answer:"$(x-2)(x+2)$",
-rationale:"Hằng đẳng thức hiệu hai bình phương."
+q: "Đa thức \\(x^2 - 4\\) viết dưới dạng tích là:",
+options: ["(x−2)(x+2)", "(x−4)(x+1)", "x(x−4)", "(x−2)²"],
+answer: "(x−2)(x+2)",
+rationale: "Áp dụng hằng đẳng thức \\(a^2-b^2=(a-b)(a+b)\\)."
 },
 {
-q:"Rút gọn $\\dfrac{2x}{4x}$ ($x\\ne0$):",
-options:["$\\dfrac12$","$2$","$x$","$4$"],
-answer:"$\\dfrac12$",
-rationale:"Chia cả tử và mẫu cho $2x$."
+q: "Phân thức \\(\\frac{2x}{4x}\\) rút gọn được là:",
+options: ["1/2", "2", "x", "4"],
+answer: "1/2",
+rationale: "Chia cả tử và mẫu cho \\(2x\\) với điều kiện \\(x \\ne 0\\)."
 },
 {
-q:"Tích của $3x^2$ và $-2x$ là:",
-options:["$-6x^3$","$-6x^2$","$6x^3$","$-5x^3$"],
-answer:"$-6x^3$",
-rationale:"Nhân hệ số, cộng số mũ."
+q: "Tích của hai đơn thức \\(3x^2\\) và \\(-2x\\) là:",
+options: ["−6x³", "−6x²", "6x³", "−5x³"],
+answer: "−6x³",
+rationale: "Nhân hệ số và cộng số mũ của \\(x\\): \\(3\\cdot(-2)=-6\\), \\(2+1=3\\)."
 },
 {
-q:"Phân thức đối của $\\dfrac{5}{x+2}$ là:",
-options:[
-"$-\\dfrac{5}{x+2}$",
-"$\\dfrac{5}{x-2}$",
-"$-\\dfrac{5}{x-2}$",
-"$\\dfrac1{x+2}$"
-],
-answer:"$-\\dfrac{5}{x+2}$",
-rationale:"Hai phân thức đối nhau có tổng bằng $0$."
+q: "Phân thức đối của \\(\\frac{5}{x+2}\\) là:",
+options: ["−5/(x+2)", "5/(x−2)", "−5/(x−2)", "1/(x+2)"],
+answer: "−5/(x+2)",
+rationale: "Hai phân thức đối nhau khi tổng của chúng bằng \\(0\\)."
 },
 {
-q:"Bậc của đa thức $2x^4-x^2+1$ là:",
-options:["$4$","$2$","$6$","$1$"],
-answer:"$4$",
-rationale:"Số mũ lớn nhất là $4$."
+q: "Bậc của đa thức \\(2x^4 - x^2 + 1\\) là:",
+options: ["4", "2", "6", "1"],
+answer: "4",
+rationale: "Số mũ lớn nhất của biến là \\(4\\)."
 },
 {
-q:"Kết quả $(4x+y)(4x-y)$ bằng:",
-options:[
-"$16x^2-y^2$",
-"$4x^2-y^2$",
-"$16x^2+y^2$",
-"$4x^2+y^2$"
-],
-answer:"$16x^2-y^2$",
-rationale:"$(a+b)(a-b)=a^2-b^2$."
+q: "Kết quả của \\((4x + y)(4x - y)\\) là:",
+options: ["16x² − y²", "4x² − y²", "16x² + y²", "4x² + y²"],
+answer: "16x² − y²",
+rationale: "Áp dụng \\((a+b)(a-b)=a^2-b^2\\) với \\(a=4x, b=y\\)."
 },
 {
-q:"Tứ giác vừa là hình chữ nhật vừa là hình thoi là:",
-options:["Hình vuông","Hình bình hành","Hình thang cân","Hình chữ nhật"],
-answer:"Hình vuông",
-rationale:"Hình vuông thỏa cả hai tính chất."
+q: "Giá trị không hợp lí trong dãy \\(33; 54; a; 48\\) là:",
+options: ["33", "54", "a", "48"],
+answer: "a",
+rationale: "Dữ liệu thống kê phải là các giá trị số cụ thể."
 },
 {
-q:"Chiều cao của hình chóp tam giác đều là:",
-options:[
-"Đoạn nối từ đỉnh tới trọng tâm đáy",
-"Đường cao mặt bên",
-"Đường trung tuyến đáy",
-"Đoạn nối tới trung điểm cạnh đáy"
-],
-answer:"Đoạn nối từ đỉnh tới trọng tâm đáy",
-rationale:"Định nghĩa hình chóp đều."
+q: "Tháng có lượng mưa ít nhất trong bảng là:",
+options: ["Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11"],
+answer: "Tháng 11",
+rationale: "Quan sát bảng số liệu cho thấy tháng 11 có lượng mưa nhỏ nhất."
+},
+{
+q: "Biểu đồ thích hợp để biểu diễn tỉ lệ phần trăm là:",
+options: ["Biểu đồ quạt tròn", "Biểu đồ cột", "Biểu đồ đoạn thẳng", "Biểu đồ tranh"],
+answer: "Biểu đồ quạt tròn",
+rationale: "Biểu đồ quạt tròn dùng để thể hiện cơ cấu và tỉ lệ phần trăm."
+},
+{
+q: "Quan sát học sinh đi xe điện là phương pháp thu thập dữ liệu nào?",
+options: ["Quan sát", "Phỏng vấn", "Lập bảng hỏi", "Nguồn có sẵn"],
+answer: "Quan sát",
+rationale: "Thu thập dữ liệu bằng cách theo dõi trực tiếp đối tượng."
+},
+{
+q: "Hình bình hành có một góc vuông là:",
+options: ["Hình chữ nhật", "Hình thoi", "Hình vuông", "Hình thang"],
+answer: "Hình chữ nhật",
+rationale: "Hình bình hành có một góc vuông thì bốn góc đều vuông."
+},
+{
+q: "Hình thang cân là hình thang có:",
+options: ["Hai góc kề một đáy bằng nhau", "Hai cạnh bên song song", "Hai đáy bằng nhau", "Hai góc kề một cạnh bên"],
+answer: "Hai góc kề một đáy bằng nhau",
+rationale: "Đây là dấu hiệu nhận biết hình thang cân."
+},
+{
+q: "Tứ giác vừa là hình chữ nhật vừa là hình thoi là:",
+options: ["Hình vuông", "Hình bình hành", "Hình thang cân", "Hình chữ nhật"],
+answer: "Hình vuông",
+rationale: "Hình vuông có đủ tính chất của hình chữ nhật và hình thoi."
+},
+{
+q: "Điều kiện để hình bình hành trở thành hình thoi là:",
+options: ["Hai cạnh kề bằng nhau", "Hai cạnh đối song song", "Hai đường chéo bằng nhau", "Có một góc vuông"],
+answer: "Hai cạnh kề bằng nhau",
+rationale: "Khi hai cạnh kề bằng nhau thì hình bình hành là hình thoi."
 }
 ];
+
 
 questions.sort(()=>Math.random()-0.5);
 
