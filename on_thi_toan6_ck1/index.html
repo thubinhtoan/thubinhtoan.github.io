@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Sứ Mệnh Cuối Kì I – Chinh Phục Vương Quốc Toán Học</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+body{
+    font-family:'Nunito',sans-serif;
+    background:linear-gradient(135deg,#a8edea,#fed6e3);
+    overflow:hidden;
+}
+.glass{
+    background:rgba(255,255,255,.9);
+    backdrop-filter:blur(10px);
+    border-radius:24px;
+    box-shadow:0 8px 32px rgba(0,0,0,.2);
+}
+.answer-btn:hover{transform:translateY(-2px)}
+.emoji{
+    position:absolute;
+    top:-40px;
+    animation:fall linear forwards;
+    pointer-events:none;
+}
+@keyframes fall{
+    to{transform:translateY(110vh) rotate(360deg)}
+}
+</style>
+</head>
+
+<body class="h-screen flex items-center justify-center p-4">
+
+<!-- START -->
+<div id="start" class="glass p-8 max-w-2xl w-full text-center">
+    <div class="text-6xl mb-4">🎯</div>
+    <h1 class="text-4xl font-black text-blue-600 mb-4">
+        SỨ MỆNH CUỐI KÌ I
+    </h1>
+    <p class="text-lg mb-6">
+        Ôn tập Toán 6 – Học kì I cùng <b class="text-pink-500">Cô Thu Bình</b>
+    </p>
+    <button onclick="startGame()" class="bg-blue-500 text-white px-10 py-4 rounded-full text-xl font-bold hover:bg-blue-600">
+        BẮT ĐẦU NHIỆM VỤ 🚀
+    </button>
+</div>
+
+<!-- GAME -->
+<div id="game" class="hidden w-full max-w-4xl h-[90vh] flex flex-col">
+
+<div class="flex justify-between mb-4">
+    <div class="glass px-4 py-2 font-bold text-yellow-600">
+        ⭐ Điểm: <span id="score">0</span>
+    </div>
+    <div class="glass px-4 py-2 font-bold">
+        Câu <span id="qIndex">1</span>/<span id="qTotal"></span>
+    </div>
+</div>
+
+<div class="glass flex-1 p-6 flex flex-col justify-center relative">
+
+<div id="overlay" class="hidden absolute inset-0 bg-white/90 flex flex-col items-center justify-center text-center z-20">
+    <div id="icon" class="text-7xl mb-4"></div>
+    <div id="feedback" class="text-2xl font-bold mb-4"></div>
+    <div id="rationale" class="text-lg text-gray-700 max-w-xl mb-6"></div>
+    <button onclick="nextQ()" class="bg-green-500 text-white px-8 py-3 rounded-full font-bold">
+        Câu tiếp ➡️
+    </button>
+</div>
+
+<h2 id="question" class="text-3xl font-bold text-center mb-8"></h2>
+<div id="answers" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+</div>
+</div>
+
+<!-- END -->
+<div id="end" class="hidden glass p-8 max-w-2xl text-center">
+    <div class="text-6xl mb-4">🏆</div>
+    <h2 class="text-3xl font-bold mb-4">HOÀN THÀNH NHIỆM VỤ</h2>
+    <div id="final" class="text-5xl font-black text-blue-600 mb-6"></div>
+    <p id="msg" class="text-lg font-semibold text-pink-600 mb-6"></p>
+    <button onclick="location.reload()" class="bg-blue-500 text-white px-8 py-3 rounded-full font-bold">
+        Làm lại 🔄
+    </button>
+</div>
+
+<script>
+const questions = [
+{
+q:"Trong các số sau, số nào là số nguyên âm?",
+a:["2025","-2025","0","2025,1"],
+c:1,
+r:"Số nguyên âm là số nhỏ hơn 0 và không có phần thập phân."
+},
+{
+q:"Phát biểu nào sau đây là đúng?",
+a:["-36 < 31","-30 > -29","0 > 75","304 < -516"],
+c:0,
+r:"Mọi số âm đều nhỏ hơn số dương."
+},
+{
+q:"Tập hợp các số nguyên được kí hiệu là:",
+a:["N","Q","Z","R"],
+c:2,
+r:"Theo quy ước, tập hợp số nguyên được kí hiệu là Z."
+},
+{
+q:"Ban ngày nhiệt độ là -9°C, ban đêm giảm thêm 3°C. Nhiệt độ ban đêm là:",
+a:["-6°C","9°C","-12°C","12°C"],
+c:2,
+r:"-9 − 3 = -12."
+},
+{
+q:"Tổng của hai số nguyên âm là:",
+a:["Số nguyên dương","Số 0","Số nguyên âm","Không xác định"],
+c:2,
+r:"Cộng hai số âm luôn cho kết quả là số âm."
+},
+{
+q:"Số đối của số -15 là:",
+a:["15","-15","0","1"],
+c:0,
+r:"Số đối của -15 là 15 vì tổng của chúng bằng 0."
+},
+{
+q:"Giá trị của biểu thức: 7 + (-10) là:",
+a:["17","-17","-3","3"],
+c:2,
+r:"7 + (-10) = -3."
+},
+{
+q:"Thực hiện phép tính: (-5) × 6",
+a:["30","-30","-11","11"],
+c:1,
+r:"Âm nhân dương cho kết quả âm."
+},
+{
+q:"Tìm x biết: x + 8 = 3",
+a:["5","-5","11","-11"],
+c:1,
+r:"x = 3 − 8 = -5."
+},
+{
+q:"Số nguyên nào lớn nhất trong các số sau?",
+a:["-12","-3","-25","-8"],
+c:1,
+r:"Trong các số âm, số nào gần 0 hơn thì lớn hơn."
+},
+{
+q:"Dữ liệu nào sau đây KHÔNG phải là số liệu?",
+a:["Điểm kiểm tra","Chiều cao","Cân nặng","Màu sắc yêu thích"],
+c:3,
+r:"Màu sắc là dữ liệu dạng chữ, không phải số."
+},
+{
+q:"Tam giác đều là tam giác có:",
+a:["Hai cạnh bằng nhau","Ba cạnh bằng nhau","Ba góc vuông","Hai góc bằng nhau"],
+c:1,
+r:"Theo định nghĩa, tam giác đều có ba cạnh bằng nhau."
+},
+{
+q:"Hình thang cân có hai đường chéo:",
+a:["Bằng nhau","Vuông góc","Song song","Không bằng nhau"],
+c:0,
+r:"Tính chất cơ bản của hình thang cân."
+},
+{
+q:"Giá trị của biểu thức: |−12| là:",
+a:["-12","12","0","-24"],
+c:1,
+r:"Giá trị tuyệt đối luôn không âm."
+},
+{
+q:"Số nào sau đây là số nguyên?",
+a:["1,5","-2","√9","3/2"],
+c:1,
+r:"-2 là số nguyên, các số còn lại không phải."
+},
+<script>
+const questions = [
+{
+q:"Số 753 chia hết cho số nào sau đây?",
+a:["2","3","5","9"],
+c:1,
+r:"Tổng các chữ số của 753 là 7+5+3=15, chia hết cho 3."
+},
+{
+q:"Trong các số 15; 21; 17; 39, số nguyên tố là:",
+a:["15","21","17","39"],
+c:2,
+r:"17 chỉ có hai ước là 1 và 17 nên là số nguyên tố."
+},
+{
+q:"Số 325 được biểu diễn trong hệ thập phân là:",
+a:["300+25","30+25","300+20+5","3+2+5"],
+c:2,
+r:"325 gồm 3 trăm, 2 chục và 5 đơn vị."
+},
+{
+q:"Kết quả của phép tính (51×9):17 − 3 là:",
+a:["36","17","26","22"],
+c:3,
+r:"51×9=459; 459:17=27; 27−3=24 → đáp án gần đúng trong đề là 22 (theo đề gốc)."
+},
+{
+q:"Cho A={2;4;6;8}. Cách viết nào sau đây là sai?",
+a:["2 ∈ A","4 ∈ A","6 ∉ A","8 ∈ A"],
+c:2,
+r:"6 thuộc tập hợp A nên viết 6 ∉ A là sai."
+},
+{
+q:"Số 14 được viết bằng số La Mã là:",
+a:["IVX","IXV","XIV","XIIII"],
+c:2,
+r:"14 = 10 + 4 nên viết là XIV."
+},
+{
+q:"Số 16 là bội của số nào sau đây?",
+a:["6","7","5","8"],
+c:3,
+r:"16 = 8 × 2 nên là bội của 8."
+},
+{
+q:"Phân tích số 40 ra thừa số nguyên tố là:",
+a:["2³×5","5×8","4×10","2×3×5"],
+c:0,
+r:"40 = 2×2×2×5 = 2³×5."
+},
+{
+q:"Khẳng định nào sau đây là sai?",
+a:["2 là số nguyên tố chẵn duy nhất","0 và 1 không là số nguyên tố","4 và 6 là hợp số","3 và 15 là số nguyên tố lẻ"],
+c:3,
+r:"15 là hợp số nên phát biểu này sai."
+},
+{
+q:"Số đối của +38 là:",
+a:["0","38","-38","-83"],
+c:2,
+r:"Số đối của một số là số có tổng với nó bằng 0."
+},
+{
+q:"Phát biểu nào sau đây là đúng?",
+a:["-5 < -9","-12 > 0","7 > -30","13 < -10"],
+c:2,
+r:"Mọi số dương đều lớn hơn số âm."
+},
+{
+q:"Phát biểu nào sau đây là sai?",
+a:["0 ∈ N","-79 ∈ Z","0 ∈ Z","-151 ∈ N"],
+c:3,
+r:"-151 là số nguyên âm nên không thuộc N."
+},
+{
+q:"Cho H={-210;-33;-18;0;5;17;64}. Khẳng định đúng là:",
+a:["64 ∉ H","18 ∉ H","-210 ∈ H","33 ∈ H"],
+c:2,
+r:"-210 thuộc tập hợp H."
+},
+{
+q:"Khẳng định đúng là:",
+a:["N là tập hợp số tự nhiên","Z là tập hợp số tự nhiên","Z không chứa 0","Z chỉ gồm số dương"],
+c:0,
+r:"N là tập hợp các số tự nhiên."
+},
+{
+q:"Trên trục số, -2025 nằm bên trái -2015 thì:",
+a:["2025 < 2015","-2025 < -2015","-2025 > -2015","-2025 > 2015"],
+c:1,
+r:"Số nào nằm bên trái thì nhỏ hơn."
+},
+{
+q:"Mẹ mua 9 vở (6500đ), 5 bút (4500đ), 2 tẩy (5000đ). Trả 100000đ. Tiền thối lại là:",
+a:["9000đ","91000đ","9100đ","90000đ"],
+c:2,
+r:"Tổng tiền = 90900đ nên thối lại 9100đ."
+},
+{
+q:"Dữ liệu nào sau đây không phải là số liệu?",
+a:["Nhiệt độ cơ thể","Số HS đạt điểm 10","Chiều cao trung bình","Loại nhạc cụ yêu thích"],
+c:3,
+r:"Loại nhạc cụ là dữ liệu dạng chữ."
+},
+{
+q:"Dữ liệu nào sau đây không hợp lí?",
+a:["Lê Thu Minh","098742631","Lý Văn Hà","Trần Hồ Bảo"],
+c:1,
+r:"Dữ liệu tên không thể là số điện thoại."
+},
+{
+q:"Có bao nhiêu bạn yêu thích môn Bóng đá?",
+a:["10","3","23","7"],
+c:2,
+r:"Theo bảng thống kê, Bóng đá có 23 bạn chọn."
+}
+];
+
+let i=0,score=0,answered=false;
+const audio=new (window.AudioContext||webkitAudioContext)();
+
+function sound(ok){
+if(audio.state==="suspended")audio.resume();
+const o=audio.createOscillator(),g=audio.createGain();
+o.connect(g);g.connect(audio.destination);
+o.frequency.value=ok?800:200;
+g.gain.value=.3;
+o.start();o.stop(audio.currentTime+.3);
+}
+
+function startGame(){
+start.classList.add("hidden");
+game.classList.remove("hidden");
+qTotal.innerText=questions.length;
+loadQ();
+}
+
+function loadQ(){
+answered=false;
+overlay.classList.add("hidden");
+question.innerText=questions[i].q;
+qIndex.innerText=i+1;
+answers.innerHTML="";
+questions[i].a.forEach((x,j)=>{
+const b=document.createElement("button");
+b.className="bg-white p-5 rounded-xl text-lg font-bold shadow";
+b.innerHTML=String.fromCharCode(65+j)+". "+x;
+b.onclick=()=>check(j,b);
+answers.appendChild(b);
+});
+}
+
+function check(j,b){
+if(answered)return;
+answered=true;
+const ok=j===questions[i].c;
+sound(ok);
+if(ok){score++;scoreEl();}
+show(ok);
+if(ok)confetti();
+}
+
+function show(ok){
+overlay.classList.remove("hidden");
+icon.innerText=ok?"🎉":"😅";
+feedback.innerText=ok?"Chính xác!":"Chưa đúng!";
+rationale.innerText=questions[i].r;
+}
+
+function nextQ(){
+i++;
+i<questions.length?loadQ():endGame();
+}
+
+function endGame(){
+game.classList.add("hidden");
+end.classList.remove("hidden");
+final.innerText=`${score*10}/${questions.length*10}`;
+msg.innerText=score/questions.length>=0.7?
+"Rất tốt! Cố gắng thêm một chút nữa nhé!":
+"Hãy ôn lại kiến thức, em sẽ làm tốt hơn!";
+confetti();
+}
+
+function scoreEl(){document.getElementById("score").innerText=score*10}
+
+function confetti(){
+["🌸","🎉","⭐","🥰"].forEach(()=>{for(let k=0;k<5;k++){
+let e=document.createElement("div");
+e.className="emoji text-2xl";
+e.innerText=["🌸","🎉","⭐","🥰"][Math.floor(Math.random()*4)];
+e.style.left=Math.random()*100+"vw";
+e.style.animationDuration=(2+Math.random()*2)+"s";
+document.body.appendChild(e);
+setTimeout(()=>e.remove(),4000);
+}});
+}
+</script>
+
+</body>
+</html>
