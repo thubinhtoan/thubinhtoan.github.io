@@ -37,12 +37,8 @@ body{
 <!-- START -->
 <div id="start" class="glass p-8 max-w-2xl w-full text-center">
     <div class="text-6xl mb-4">🎯</div>
-    <h1 class="text-4xl font-black text-blue-600 mb-4">
-        SỨ MỆNH CUỐI KÌ I
-    </h1>
-    <p class="text-lg mb-6">
-        Ôn tập Toán 6 – Học kì I cùng <b class="text-pink-500">Cô Thu Bình</b>
-    </p>
+    <h1 class="text-4xl font-black text-blue-600 mb-4">SỨ MỆNH CUỐI KÌ I</h1>
+    <p class="text-lg mb-6">Ôn tập Toán 6 – Học kì I cùng <b class="text-pink-500">Cô Thu Bình</b></p>
     <button onclick="startGame()" class="bg-blue-500 text-white px-10 py-4 rounded-full text-xl font-bold hover:bg-blue-600">
         BẮT ĐẦU NHIỆM VỤ 🚀
     </button>
@@ -89,6 +85,8 @@ body{
 </div>
 
 <script>
+/* ===== DỮ LIỆU CÂU HỎI – ĐÃ GỘP HOÀN CHỈNH ===== */
+const questions = [
 const questions = [
 {
 q:"Trong các số sau, số nào là số nguyên âm?",
@@ -180,8 +178,6 @@ a:["1,5","-2","√9","3/2"],
 c:1,
 r:"-2 là số nguyên, các số còn lại không phải."
 },
-<script>
-const questions = [
 {
 q:"Số 753 chia hết cho số nào sau đây?",
 a:["2","3","5","9"],
@@ -298,6 +294,7 @@ r:"Theo bảng thống kê, Bóng đá có 23 bạn chọn."
 }
 ];
 
+/* ===== LOGIC GAME ===== */
 let i=0,score=0,answered=false;
 const audio=new (window.AudioContext||webkitAudioContext)();
 
@@ -327,17 +324,17 @@ questions[i].a.forEach((x,j)=>{
 const b=document.createElement("button");
 b.className="bg-white p-5 rounded-xl text-lg font-bold shadow";
 b.innerHTML=String.fromCharCode(65+j)+". "+x;
-b.onclick=()=>check(j,b);
+b.onclick=()=>check(j);
 answers.appendChild(b);
 });
 }
 
-function check(j,b){
+function check(j){
 if(answered)return;
 answered=true;
 const ok=j===questions[i].c;
 sound(ok);
-if(ok){score++;scoreEl();}
+if(ok)score+=10;
 show(ok);
 if(ok)confetti();
 }
@@ -347,24 +344,20 @@ overlay.classList.remove("hidden");
 icon.innerText=ok?"🎉":"😅";
 feedback.innerText=ok?"Chính xác!":"Chưa đúng!";
 rationale.innerText=questions[i].r;
+document.getElementById("score").innerText=score;
 }
 
-function nextQ(){
-i++;
-i<questions.length?loadQ():endGame();
-}
+function nextQ(){i++;i<questions.length?loadQ():endGame();}
 
 function endGame(){
 game.classList.add("hidden");
 end.classList.remove("hidden");
-final.innerText=`${score*10}/${questions.length*10}`;
-msg.innerText=score/questions.length>=0.7?
+final.innerText=`${score}/${questions.length*10}`;
+msg.innerText=score>=questions.length*7?
 "Rất tốt! Cố gắng thêm một chút nữa nhé!":
 "Hãy ôn lại kiến thức, em sẽ làm tốt hơn!";
 confetti();
 }
-
-function scoreEl(){document.getElementById("score").innerText=score*10}
 
 function confetti(){
 ["🌸","🎉","⭐","🥰"].forEach(()=>{for(let k=0;k<5;k++){
@@ -375,8 +368,7 @@ e.style.left=Math.random()*100+"vw";
 e.style.animationDuration=(2+Math.random()*2)+"s";
 document.body.appendChild(e);
 setTimeout(()=>e.remove(),4000);
-}});
-}
+}});}
 </script>
 
 </body>
