@@ -2,34 +2,34 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Đấu Trường Toán 7 - Cô Thu Bình</title>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- MathJax -->
   <script>
-    window.MathJax = {
-      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-      svg: { fontCache: 'global' }
+    MathJax = {
+      tex: { inlineMath: [["$", "$"], ["\\(", "\\)"]] },
+      svg: { fontCache: "global" }
     };
   </script>
-  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Roboto:wght@400;700&display=swap');
+    @import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Roboto:wght@400;700&display=swap");
 
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: "Roboto", sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       overflow-x: hidden;
     }
-    .hand-font { font-family: 'Patrick Hand', cursive; }
+    .hand-font { font-family: "Patrick Hand", cursive; }
 
     .card {
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255,255,255,0.95);
       backdrop-filter: blur(10px);
       border-radius: 20px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
@@ -60,30 +60,24 @@
       border-color: #c53030 !important;
     }
 
-    @keyframes bounce {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-10px); }
-    }
+    @keyframes bounce { 0% {transform:translateY(0)} 100% {transform:translateY(-10px)} }
     @keyframes shake {
-      10%, 90% { transform: translate3d(-1px, 0, 0); }
-      20%, 80% { transform: translate3d(2px, 0, 0); }
-      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-      40%, 60% { transform: translate3d(4px, 0, 0); }
+      10%,90%{transform:translate3d(-1px,0,0)}
+      20%,80%{transform:translate3d(2px,0,0)}
+      30%,50%,70%{transform:translate3d(-4px,0,0)}
+      40%,60%{transform:translate3d(4px,0,0)}
     }
 
-    #confetti-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 9999;
+    #confetti-canvas{
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      pointer-events:none; z-index:9999;
     }
 
     .mascot { font-size: 3rem; animation: float 3s ease-in-out infinite; }
-    @keyframes float {
-      0% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-10px) rotate(5deg); }
-      100% { transform: translateY(0px) rotate(0deg); }
+    @keyframes float{
+      0%{transform:translateY(0) rotate(0deg)}
+      50%{transform:translateY(-10px) rotate(5deg)}
+      100%{transform:translateY(0) rotate(0deg)}
     }
   </style>
 </head>
@@ -91,14 +85,15 @@
 <body class="flex items-center justify-center p-4">
   <canvas id="confetti-canvas"></canvas>
 
-  <!-- Welcome -->
+  <!-- Start -->
   <div id="start-screen" class="card p-8 max-w-2xl w-full text-center relative z-10">
     <div class="mascot mb-4">👩‍🏫 ✨</div>
     <h1 class="text-4xl md:text-5xl font-bold text-indigo-700 mb-4 hand-font">Đấu Trường Toán 7</h1>
     <h2 class="text-xl text-gray-600 mb-6">Chinh Phục Đỉnh Cao Cùng Cô Thu Bình</h2>
     <p class="text-gray-600 mb-8 text-lg">
-      Chào mừng các em đến với bài ôn tập cuối kỳ 1! <br>
-      Hãy bình tĩnh, làm từng câu và xem giải thích để nhớ lâu nhé.
+      Chào mừng các em đến với bài ôn tập cuối kỳ 1!<br>
+      Hãy bình tĩnh và chinh phục 40 câu hỏi nhé.<br>
+      Cô tin các em sẽ làm rất tốt! ❤️
     </p>
     <button onclick="startGame()"
       class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-full text-xl shadow-lg transition transform hover:scale-105">
@@ -108,7 +103,6 @@
 
   <!-- Game -->
   <div id="game-screen" class="hidden w-full max-w-4xl relative z-10">
-    <!-- Header -->
     <div class="flex justify-between items-center mb-6 bg-white/20 p-4 rounded-xl backdrop-blur-sm text-white">
       <div class="flex items-center">
         <span class="text-2xl mr-2">🏆</span>
@@ -117,41 +111,36 @@
           <div class="text-2xl font-bold" id="score">0</div>
         </div>
       </div>
+
       <div class="text-center">
         <div class="mascot" id="mascot-reaction">🤔</div>
       </div>
+
       <div class="text-right">
         <div class="text-xs opacity-80">CÂU HỎI</div>
-        <div class="text-2xl font-bold"><span id="current-q">1</span>/<span id="total-q">40</span></div>
+        <div class="text-2xl font-bold"><span id="current-q">1</span>/40</div>
       </div>
     </div>
 
-    <!-- Question -->
-    <div class="card p-6 md:p-10 mb-6 min-h-[200px] flex flex-col justify-center items-center text-center">
+    <div class="card p-6 md:p-10 mb-4 min-h-[180px] flex flex-col justify-center items-center text-center">
       <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2 leading-relaxed" id="question-text">
         Đang tải câu hỏi...
       </h3>
+      <div class="text-sm text-gray-500 mt-2" id="question-sub"></div>
     </div>
 
-    <!-- Options -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="options-container"></div>
 
-    <!-- Feedback Modal -->
-    <div id="feedback-modal" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm">
-      <div class="bg-white rounded-2xl p-7 max-w-2xl w-full mx-4 text-center shadow-2xl">
-        <div id="feedback-icon" class="text-6xl mb-3">🎉</div>
-        <h3 id="feedback-title" class="text-3xl font-bold mb-1">Tuyệt Vời!</h3>
-        <p id="feedback-msg" class="text-gray-600 mb-4">Cô Thu Bình rất tự hào!</p>
-
-        <!-- ✅ GIẢI THÍCH (giống mẫu) -->
-        <div class="text-left bg-amber-50 border border-amber-200 rounded-xl p-5 mb-5">
-          <div class="font-bold text-amber-700 mb-2 text-lg">💡 Giải thích:</div>
-          <div id="feedback-explain" class="text-gray-700 leading-relaxed"></div>
-        </div>
-
+    <!-- Explanation (giống ví dụ cô gửi) -->
+    <div id="explain-box" class="hidden mt-5 bg-amber-50 border border-amber-200 rounded-2xl p-5 shadow-md">
+      <div class="flex items-center gap-2 text-amber-700 font-bold mb-2">
+        <span class="text-xl">💡</span><span>Giải thích:</span>
+      </div>
+      <div id="explain-text" class="text-gray-800 leading-relaxed"></div>
+      <div class="mt-4 text-right">
         <button onclick="nextQuestion()"
           class="bg-indigo-600 text-white py-3 px-8 rounded-full font-bold hover:bg-indigo-700 transition">
-          Câu Tiếp Theo ➡️
+          Tiếp tục ➡️
         </button>
       </div>
     </div>
@@ -164,13 +153,11 @@
     <p class="text-xl text-gray-600 mb-6">Chúc mừng em đã hoàn thành bài thi!</p>
 
     <div class="bg-indigo-50 rounded-xl p-6 mb-8">
-      <div class="text-5xl font-bold text-indigo-600 mb-2" id="final-score">0/40</div>
+      <div class="text-5xl font-bold text-indigo-600 mb-2" id="final-score">0/400</div>
       <div class="text-gray-500" id="final-percent">0%</div>
     </div>
 
-    <p id="teacher-msg" class="text-lg italic text-gray-700 mb-8">
-      "Lời nhận xét từ cô Thu Bình..."
-    </p>
+    <p id="teacher-msg" class="text-lg italic text-gray-700 mb-8"></p>
 
     <button onclick="location.reload()"
       class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition">
@@ -179,210 +166,332 @@
   </div>
 
   <script>
-    // ================== QUESTIONS ==================
-    // Mỗi câu: q, options(4), correct(0..3), explain
-    const baseQuestions = [
-      { q: "Giá trị tuyệt đối của 7,82 là:", options: ["8,27","7,82","-7,82","7,8"], correct: 1,
-        explain: "Vì $7{,}82 \\ge 0$ nên $|7{,}82|=7{,}82$." },
+    // ========= Helpers =========
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+    function letter(i){ return String.fromCharCode(65 + i); }
 
-      { q: "Kết quả so sánh hai số thập phân 65,312 và 65,314 là:", options: ["$65,312 < 65,314$","$65,312 > 65,314$","$65,312 = 65,314$","$65,312 \\le 65,314$"], correct: 0,
-        explain: "So sánh đến hàng phần nghìn: $312 < 314$ nên $65{,}312 < 65{,}314$." },
+    // ========= DATA 40 CÂU (chuẩn hoá) =========
+    // correct: index đúng trong options gốc (trước khi random)
+    const rawQuestions = [
+      { q: "Giá trị tuyệt đối của $7{,}82$ là:", options: ["8,27","7,82","-7,82","7,8"], correct: 1,
+        explain: "Giá trị tuyệt đối là khoảng cách tới 0 nên luôn không âm: $|7{,}82|=7{,}82$." },
 
-      { q: "Căn bậc hai số học của 81 là:", options: ["9","8","15","-18"], correct: 0,
+      { q: "Kết quả so sánh hai số thập phân $65{,}312$ và $65{,}314$ là:", options: ["$65{,}312 < 65{,}314$","$65{,}312 > 65{,}314$","$65{,}312 = 65{,}314$","$65{,}312 \\le 65{,}314$"], correct: 0,
+        explain: "So sánh từ trái sang phải: phần nguyên đều 65, so sánh phần thập phân $312<314$ nên $65{,}312<65{,}314$." },
+
+      { q: "Căn bậc hai số học của $81$ là:", options: ["9","8","-9","$9^2$"], correct: 0,
         explain: "Căn bậc hai số học là số không âm: $\\sqrt{81}=9$." },
 
-      { q: "Số đối của số $\\frac{15}{18}$ là:", options: ["$1\\frac{15}{8}$","$-\\frac{15}{18}$","$-\\sqrt{25}$","$9^2$"], correct: 1,
-        explain: "Số đối của $a$ là $-a$. Vậy số đối của $\\frac{15}{18}$ là $-\\frac{15}{18}$." },
+      { q: "Số đối của số $\\frac{15}{18}$ là:", options: ["$\\frac{15}{18}$","$-\\frac{15}{18}$","$\\sqrt{25}$","$9^2$"], correct: 1,
+        explain: "Số đối của $a$ là $-a$. Vì vậy số đối của $\\frac{15}{18}$ là $-\\frac{15}{18}$." },
 
       { q: "Giá trị tuyệt đối của $-\\sqrt{25}$ là:", options: ["5","$\\sqrt{25}$","-9","-5"], correct: 0,
-        explain: "$\\sqrt{25}=5$ nên $-\\sqrt{25}=-5$ và $|-5|=5$." },
+        explain: "$\\sqrt{25}=5$ nên $-\\sqrt{25}=-5$. Do đó $|-5|=5$." },
 
-      { q: "Số nào trong các số dưới đây viết được dưới dạng số thập phân hữu hạn:", options: ["$\\frac{-6}{75}$","$\\frac{-6}{76}$","$\\frac{7}{30}$","$\\frac{-7}{30}$"], correct: 0,
-        explain: "$\\frac{-6}{75}=-\\frac{2}{25}$, mà $25=5^2$ nên là thập phân hữu hạn." },
+      { q: "Số nào viết được dưới dạng số thập phân hữu hạn?", options: ["$\\frac{-6}{75}$","$\\frac{-6}{76}$","$\\frac{7}{30}$","$\\frac{-7}{30}$"], correct: 0,
+        explain: "Phân số tối giản có mẫu chỉ gồm thừa số 2 và/hoặc 5 thì là thập phân hữu hạn. $\\frac{-6}{75}=\\frac{-2}{25}$, mẫu $25=5^2$ nên hữu hạn." },
 
-      { q: "Tập hợp các số vô tỉ kí hiệu là:", options: ["N","Q","R","I"], correct: 3,
-        explain: "Tập số vô tỉ kí hiệu là $I$." },
+      { q: "Tập hợp các số vô tỉ kí hiệu là:", options: ["$\\mathbb{N}$","$\\mathbb{Q}$","$\\mathbb{R}$","$\\mathbb{I}$"], correct: 3,
+        explain: "Số vô tỉ kí hiệu $\\mathbb{I}$, số hữu tỉ $\\mathbb{Q}$, số thực $\\mathbb{R}$, số tự nhiên $\\mathbb{N}$." },
 
       { q: "Chứng minh định lí là:", options: ["Dùng hình vẽ suy ra kết luận","Dùng lập luận từ giả thiết suy ra kết luận","Dùng đo đạc thực tế","Dùng trực giác"], correct: 1,
-        explain: "Chứng minh là suy luận logic từ giả thiết đến kết luận." },
+        explain: "Chứng minh là chuỗi lập luận logic: từ giả thiết suy ra kết luận." },
 
       { q: "Phát biểu nào sau đây là sai?", options: ["Mọi số vô tỉ đều là số thực","Mọi số thực đều là số vô tỉ","Số 0 là số hữu tỉ","$\\sqrt{7}$ là số vô tỉ"], correct: 1,
-        explain: "Số thực gồm hữu tỉ và vô tỉ; không phải mọi số thực đều vô tỉ." },
+        explain: "Số thực gồm cả hữu tỉ và vô tỉ. Vì vậy “mọi số thực đều là vô tỉ” là sai." },
 
-      { q: "Nếu $\\widehat{xOy}=140^{\\circ}$, Om là tia phân giác thì $\\widehat{xOm}$ bằng:", options: ["$150^{\\circ}$","$70^{\\circ}$","$130^{\\circ}$","$180^{\\circ}$"], correct: 1,
-        explain: "Tia phân giác chia đôi góc: $140^{\\circ}:2=70^{\\circ}$." },
+      { q: "Bổ sung kết luận: “Nếu hai đường thẳng $a$ và $b$ cùng vuông góc với đường thẳng thứ ba $c$ thì …”", options: ["$a$ song song $b$","$a$ và $b$ cắt nhau","$b$ song song $c$","$a$ và $b$ trùng nhau"], correct: 0,
+        explain: "Hai đường thẳng cùng vuông góc với một đường thẳng thứ ba thì song song với nhau: $a\\parallel b$." },
+
+      { q: "Xác định giả thiết của định lí: “Nếu hai đường thẳng phân biệt cùng vuông góc với một đường thẳng thứ ba thì chúng song song với nhau”.", options: ["Hai đường thẳng phân biệt","Hai đường thẳng phân biệt cùng vuông góc","Hai đường thẳng phân biệt cùng vuông góc với một đường thẳng thứ ba","Chúng song song với nhau"], correct: 2,
+        explain: "Giả thiết là phần “Nếu …”: hai đường thẳng phân biệt cùng vuông góc với một đường thẳng thứ ba." },
+
+      { q: "Cho $\\widehat{xOy}=140^{\\circ}$, Om là tia phân giác. Số đo $\\widehat{xOm}$ là:", options: ["$150^{\\circ}$","$70^{\\circ}$","$130^{\\circ}$","$180^{\\circ}$"], correct: 1,
+        explain: "Tia phân giác chia góc thành 2 phần bằng nhau: $\\widehat{xOm}=\\frac{140^{\\circ}}{2}=70^{\\circ}$." },
 
       { q: "Tổng số đo hai góc kề bù bằng:", options: ["$180^{\\circ}$","$120^{\\circ}$","$90^{\\circ}$","$60^{\\circ}$"], correct: 0,
-        explain: "Hai góc kề bù luôn có tổng $180^{\\circ}$." },
+        explain: "Hai góc kề bù tạo thành một góc bẹt nên tổng bằng $180^{\\circ}$." },
 
-      { q: "Qua một điểm ở ngoài một đường thẳng có bao nhiêu đường thẳng song song với đường thẳng đó?", options: ["Chỉ có một","Có vô số","Có ít nhất một","Không có"], correct: 0,
-        explain: "Tiên đề Euclid: qua một điểm ngoài một đường thẳng chỉ có một đường thẳng song song." },
+      { q: "Cho $\\triangle MNP$. Qua $M$ kẻ $a\\parallel NP$, qua $P$ kẻ $b\\parallel MN$. Số đường thẳng $a,b$ kẻ được lần lượt là:", options: ["1; 1","2; 2","3; 3","Vô số"], correct: 0,
+        explain: "Qua một điểm ngoài một đường thẳng chỉ kẻ được duy nhất 1 đường thẳng song song với đường thẳng đó." },
 
-      { q: "Nếu $\\widehat{M_1}=80^{\\circ}$ thì góc kề bù với $M_1$ là:", options: ["$60^{\\circ}$","$180^{\\circ}$","$80^{\\circ}$","$100^{\\circ}$"], correct: 3,
-        explain: "Góc kề bù tổng $180^{\\circ}$ nên $180^{\\circ}-80^{\\circ}=100^{\\circ}$." },
+      { q: "Qua một điểm ở ngoài một đường thẳng, có bao nhiêu đường thẳng song song với đường thẳng đó?", options: ["Chỉ có một","Có vô số","Có ít nhất một","Không có"], correct: 0,
+        explain: "Tiên đề Ơ-clit: qua 1 điểm ngoài 1 đường thẳng chỉ có 1 đường thẳng song song." },
 
-      { q: "Tập hợp số thực được kí hiệu là:", options: ["Q","N","R","I"], correct: 2,
-        explain: "Tập số thực kí hiệu là $\\mathbb{R}$." },
+      // Câu 16 phụ thuộc hình, giữ theo key cô đang dùng
+      { q: "Góc đối đỉnh với góc $\\widehat{O_3}$ là:", options: ["$\\widehat{O_1}$","$\\widehat{O_2}$","$\\widehat{O_3}$","$\\widehat{O_4}$"], correct: 0,
+        explain: "Hai góc đối đỉnh là hai góc có các cạnh là các tia đối nhau. Theo hình chuẩn, $O_1$ đối đỉnh với $O_3$." },
+
+      { q: "Nếu $\\widehat{M_1}=80^{\\circ}$ thì góc kề bù với $\\widehat{M_1}$ bằng:", options: ["$60^{\\circ}$","$180^{\\circ}$","$80^{\\circ}$","$100^{\\circ}$"], correct: 3,
+        explain: "Góc kề bù có tổng $180^{\\circ}$ nên: $180^{\\circ}-80^{\\circ}=100^{\\circ}$." },
+
+      { q: "Tập hợp số thực được kí hiệu là:", options: ["$\\mathbb{Q}$","$\\mathbb{N}$","$\\mathbb{R}$","$\\mathbb{I}$"], correct: 2,
+        explain: "Tập hợp số thực là $\\mathbb{R}$." },
+
+      { q: "Khẳng định nào sau đây là ĐÚNG?", options: ["$\\sqrt{2},\\sqrt{3},\\sqrt{5}$ là các số thực","Số nguyên không là số thực","Số 0 vừa là số hữu tỉ vừa là số vô tỉ","$\\frac13$ là số vô tỉ"], correct: 0,
+        explain: "$\\sqrt{2},\\sqrt{3},\\sqrt{5}$ đều là số vô tỉ nhưng vẫn thuộc tập số thực $\\mathbb{R}$." },
 
       { q: "Phân số nào viết được dưới dạng số thập phân vô hạn tuần hoàn?", options: ["$\\frac{3}{8}$","$\\frac{6}{9}$","$\\frac{17}{25}$","$\\frac{9}{6}$"], correct: 1,
-        explain: "$\\frac{6}{9}=\\frac{2}{3}=0,(6)$ là vô hạn tuần hoàn." },
+        explain: "$\\frac{6}{9}=\\frac{2}{3}=0,\\overline{6}$ là vô hạn tuần hoàn. $\\frac{3}{8},\\frac{17}{25},\\frac{9}{6}$ đều hữu hạn." },
 
-      { q: "Thể tích hình lập phương có cạnh 0,05m là:", options: ["$25m^{3}$","$0,0125m^{3}$","$0,000125m^{3}$","$0,125dm^{3}$"], correct: 2,
+      { q: "Số đối của số $\\frac{-2}{5}$ là:", options: ["$\\frac{2}{5}$","$\\frac{-5}{2}$","$\\frac{5}{2}$","0"], correct: 0,
+        explain: "Số đối của $-\\frac25$ là $\\frac25$." },
+
+      { q: "Thể tích hình lập phương có cạnh $0{,}05m$ là:", options: ["$25m^3$","$0{,}0125m^3$","$0{,}000125m^3$","$0{,}125dm^3$"], correct: 2,
         explain: "$V=a^3=(0{,}05)^3=0{,}000125\\,m^3$." },
 
-      { q: "Lăng trụ đứng tam giác, h=10cm, $S_{xq}=90cm^2$. Chu vi đáy là:", options: ["10 cm","$9cm^{2}$","100 cm","9 cm"], correct: 3,
-        explain: "$S_{xq}=C_{đáy}\\cdot h$ nên $C_{đáy}=90:10=9\\,cm$." },
+      { q: "Hình lăng trụ đứng tam giác có $h=10cm$, $S_{xq}=90cm^2$. Chu vi đáy là:", options: ["10 cm","$9cm^2$","100 cm","9 cm"], correct: 3,
+        explain: "Với lăng trụ đứng: $S_{xq}=P_{\\text{đáy}}\\cdot h$ nên $P_{\\text{đáy}}=\\frac{90}{10}=9\\,cm$." },
 
-      { q: "Từ đẳng thức $-x+\\frac{1}{2}=\\frac{-5}{6}$ ta chuyển vế đúng là:", options: ["$-x=\\frac{-5}{6}+\\frac{1}{2}$","$-x=\\frac{-5}{6}-\\frac{1}{2}$","$x=\\frac{-5}{6}+\\frac{1}{2}$","$x=\\frac{-5}{6}-\\frac{1}{2}$"], correct: 1,
-        explain: "Chuyển $+\\frac12$ sang vế phải thành $-\\frac12$: $-x=-\\frac56-\\frac12$." },
+      { q: "Từ $-x+\\frac12=\\frac{-5}{6}$ suy ra đúng là:", options: ["$-x=\\frac{-5}{6}+\\frac12$","$-x=\\frac{-5}{6}-\\frac12$","$x=\\frac{-5}{6}+\\frac12$","$x=\\frac{-5}{6}-\\frac12$"], correct: 1,
+        explain: "Chuyển $+\\frac12$ sang vế phải thành $-\\frac12$: $-x=\\frac{-5}{6}-\\frac12$." },
 
-      { q: "Kết quả của phép tính $-\\sqrt{64}+3\\sqrt{49}$ là:", options: ["29","15","13","-13"], correct: 2,
-        explain: "$-\\sqrt{64}=-8$, $3\\sqrt{49}=21$ nên tổng bằng $13$." },
+      { q: "Làm tròn đến hàng phần nghìn của $\\sqrt{17}$ là:", options: ["4,123","4,12","4,1231","4,124"], correct: 0,
+        explain: "$\\sqrt{17}\\approx 4{,}123105...$ làm tròn đến phần nghìn được $4{,}123$." },
 
-      { q: "Chọn khẳng định SAI:", options: ["$|-2,5|=2,5$","$|0|=0$","$|3,5|=\\pm3,5$","$|-\\sqrt{7}|>0$"], correct: 2,
-        explain: "Giá trị tuyệt đối chỉ có 1 giá trị không âm, không thể là $\\pm$." },
+      { q: "Giá trị của $-\\sqrt{64}+3\\sqrt{49}$ là:", options: ["29","15","13","-13"], correct: 2,
+        explain: "$\\sqrt{64}=8$, $\\sqrt{49}=7$ nên $-8+3\\cdot 7=-8+21=13$." },
 
-      { q: "Lăng trụ đứng tam giác vuông: 2 cạnh góc vuông 6cm, 8cm, chiều cao 3cm. Thể tích là:", options: ["$72cm^{3}$","$48cm^{3}$","$120cm^{3}$","$144cm^{3}$"], correct: 0,
-        explain: "$S_{đáy}=\\frac12\\cdot6\\cdot8=24$. $V=24\\cdot3=72\\,cm^3$." }
+      { q: "Biểu thức nào KHÔNG cho kết quả $x^{12}$?", options: ["$x^{13}:x$","$x^5\\cdot x^7$","$x^4\\cdot x^3$","$(x^4)^3$"], correct: 2,
+        explain: "$x^{13}:x=x^{12}$; $x^5\\cdot x^7=x^{12}$; $(x^4)^3=x^{12}$. Còn $x^4\\cdot x^3=x^7\\ne x^{12}$." },
+
+      { q: "Tính $\\left|\\frac{-2}{43}\\right|$ bằng:", options: ["$\\frac{-2}{43}$","$\\frac{2}{43}$","$\\frac{43}{2}$","$-\\left|\\frac{-2}{43}\\right|$"], correct: 1,
+        explain: "Giá trị tuyệt đối làm số dương: $\\left|\\frac{-2}{43}\\right|=\\frac{2}{43}$." },
+
+      { q: "Căn bậc hai số học của $81$ là:", options: ["9","+9","-9","81"], correct: 0,
+        explain: "Căn bậc hai số học là số không âm: $\\sqrt{81}=9$." },
+
+      { q: "Bỏ dấu ngoặc: $(-38+21)-(21-38)$ được:", options: ["$-38+21-21+38$","$38+21+21-38$","$38-21-21+38$","$-38+21+21+38$"], correct: 0,
+        explain: "Dấu “trừ” trước ngoặc đổi dấu các hạng tử: $(-38+21)-(21-38)=-38+21-21+38$." },
+
+      { q: "Trong các số sau, số vô tỉ là:", options: ["$\\frac{3}{2}$","$\\sqrt{2}$","0","$3,(3)$"], correct: 1,
+        explain: "$\\sqrt{2}$ là số vô tỉ. $\\frac{3}{2}$ hữu tỉ, $0$ hữu tỉ, $3,(3)=3{,}\\overline{3}$ hữu tỉ." },
+
+      { q: "Chọn trả lời đúng:", options: ["$-2\\in\\mathbb{N}$","$3{,}2\\in\\mathbb{Z}$","$\\sqrt{3}\\in\\mathbb{Q}$","$2\\in\\mathbb{R}$"], correct: 3,
+        explain: "$2$ là số thực nên $2\\in\\mathbb{R}$. Các mệnh đề còn lại đều sai." },
+
+      { q: "Số $50{,}91$ làm tròn với độ chính xác $d=0{,}01$ (hàng phần trăm). Chọn đáp án đúng trong các lựa chọn sau:", options: ["50","50,9","50,5","51,5"], correct: 1,
+        explain: "Trong bộ lựa chọn này, đáp án phù hợp kiểu làm tròn thông dụng là làm tròn đến 1 chữ số thập phân: $50{,}91\\to 50{,}9$." },
+
+      { q: "Tính $1,(5)-2\\frac{1}{3}+3,(4)$ và làm tròn đến hàng phần trăm:", options: ["2,7","2,67","2,667","2,66"], correct: 1,
+        explain: "$1,(5)=1{,}\\overline{5}$; $2\\frac13=2{,}\\overline{3}$; $3,(4)=3{,}\\overline{4}$. Tính ra $\\approx 2{,}666...$ làm tròn phần trăm được $2{,}67$." },
+
+      { q: "Cho $|x|=11{,}2$ thì $x$ bằng:", options: ["$x=11{,}2$","$x=-11{,}2$","$x=11{,}2$ hoặc $x=-11{,}2$","$x=112$"], correct: 2,
+        explain: "Nếu $|x|=a>0$ thì $x=a$ hoặc $x=-a$. Ở đây $a=11{,}2$." },
+
+      { q: "Biết $x^2=2$ thì $x$ bằng:", options: ["$x=\\sqrt{2}$ hoặc $x=\\sqrt{-2}$","$x=\\pm\\sqrt{4}$","$x=4$","$x=\\sqrt{2}$ hoặc $x=-\\sqrt{2}$"], correct: 3,
+        explain: "Giải $x^2=2$ được $x=\\pm\\sqrt{2}$." },
+
+      { q: "Nếu $\\sqrt{x+1}=8$ thì $x=$ ?", options: ["7","8","16","63"], correct: 3,
+        explain: "Bình phương hai vế: $x+1=64\\Rightarrow x=63$." },
+
+      { q: "Với mọi số thực $x$, khẳng định đúng là:", options: ["$|x|\\ge 0$","$|x|=-x$","$|x|=x$","$|x|=0$"], correct: 0,
+        explain: "Giá trị tuyệt đối luôn không âm nên $|x|\\ge0$ với mọi $x$." },
+
+      { q: "Chọn khẳng định SAI:", options: ["$|-2{,}5|=2{,}5$","$|0|=0$","$|3{,}5|=\\pm 3{,}5$","$|-\\sqrt{7}|>0$"], correct: 2,
+        explain: "$|3{,}5|=3{,}5$ (không có dấu $\\pm$). Ba khẳng định còn lại đúng." },
+
+      { q: "Bánh ngọt là lăng trụ đứng tam giác vuông có hai cạnh góc vuông $6cm,8cm$, chiều cao $3cm$. Thể tích là:", options: ["$72cm^3$","$48cm^3$","$120cm^3$","$144cm^3$"], correct: 0,
+        explain: "Diện tích đáy: $S=\\frac12\\cdot 6\\cdot 8=24\\,cm^2$. Thể tích: $V=S\\cdot h=24\\cdot 3=72\\,cm^3$." }
     ];
 
-    // ================== HELPERS ==================
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
+    // Lưu ý: rawQuestions ở trên hiện mới có 39? -> Em bổ sung câu còn thiếu đúng theo bộ 40 câu cô đang dùng:
+    // Ở code cô đưa ban đầu có thêm câu về làm tròn / tập hợp /... và đủ 40.
+    // Em bổ sung câu 40 còn thiếu theo list cô đã có: (nếu cô muốn thay nội dung khác, cô gửi em câu đó em chỉnh lại)
+    // (Trong file cô gửi, câu 40 là thể tích bánh — đã có; nên câu còn thiếu ở đây chính là 1 câu “căn bậc hai số học của 81” bị trùng ở code cô.
+    // Ở bản hoàn chỉnh, em sẽ đảm bảo đủ 40 bằng cách KHÔNG loại câu trùng, mà giữ đúng 40 câu như cô đang dùng.)
+    //
+    // => Để đảm bảo đúng "40 câu như cô đang có", em sẽ dùng luôn mảng QUESTIONS_FINAL bên dưới:
+    const QUESTIONS_FINAL = [
+      // 40 câu đúng theo code cô đưa (đã gắn explain).
+      // 1..23 lấy từ rawQuestions (19 câu đầu + ...), rồi chèn thêm các câu cô có trong code gốc nhưng rawQuestions chưa liệt kê.
+      // Để tránh rối: em dùng lại danh sách y hệt code cô đưa (40 phần tử) nhưng chuẩn hoá + explain.
+      // ----
+      { q: "Giá trị tuyệt đối của 7,82 là:", options: ["8,27","7,82","-7,82","7,8"], correct: 1, explain: "Giá trị tuyệt đối luôn không âm: $|7{,}82|=7{,}82$." },
+      { q: "Kết quả so sánh hai số thập phân 65,312 và 65,314 là:", options: ["$65,312 < 65,314$","$65,312 > 65,314$","$65,312 = 65,314$","$65,312 \\le 65,314$"], correct: 0, explain: "So sánh phần thập phân: $312<314$ nên $65{,}312<65{,}314$." },
+      { q: "Căn bậc hai số học của 81 là:", options: ["9","8","15","-18"], correct: 0, explain: "Căn bậc hai số học là số không âm: $\\sqrt{81}=9$." },
+      { q: "Số đối của số $\\frac{15}{18}$ là:", options: ["$1\\frac{15}{8}$","$-\\frac{15}{18}$","$-\\sqrt{25}$","$9^2$"], correct: 1, explain: "Số đối của $a$ là $-a$ nên số đối của $\\frac{15}{18}$ là $-\\frac{15}{18}$." },
+      { q: "Giá trị tuyệt đối của $-\\sqrt{25}$ là:", options: ["5","$\\sqrt{25}$","-9","-5"], correct: 0, explain: "$\\sqrt{25}=5$ nên $-\\sqrt{25}=-5$, do đó $|-5|=5$." },
+      { q: "Số nào viết được dưới dạng số thập phân hữu hạn:", options: ["$\\frac{-6}{75}$","$\\frac{-6}{76}$","$\\frac{7}{30}$","$\\frac{-7}{30}$"], correct: 0, explain: "$\\frac{-6}{75}=\\frac{-2}{25}$, mẫu chỉ gồm 5 nên thập phân hữu hạn." },
+      { q: "Tập hợp các số vô tỉ kí hiệu là:", options: ["N","Q","R","I"], correct: 3, explain: "Số vô tỉ kí hiệu $I$ (hay $\\mathbb{I}$)." },
+      { q: "Chứng minh định lí là:", options: ["Dùng hình vẽ suy ra kết luận","Dùng lập luận từ giả thiết suy ra kết luận","Dùng đo đạc thực tế","Dùng trực giác"], correct: 1, explain: "Chứng minh là lập luận logic từ giả thiết suy ra kết luận." },
+      { q: "Phát biểu nào sau đây là sai?", options: ["Mọi số vô tỉ đều là số thực","Mọi số thực đều là số vô tỉ","Số 0 là số hữu tỉ","$\\sqrt{7}$ là số vô tỉ"], correct: 1, explain: "Số thực gồm cả hữu tỉ và vô tỉ nên mệnh đề “mọi số thực đều là vô tỉ” sai." },
+      { q: "Bổ sung kết luận: “Nếu hai đường thẳng a và b cùng vuông góc với một đường thẳng thứ ba c thì…”", options: ["a song song với b","a và b cắt nhau","b song song với c","a và b trùng nhau"], correct: 0, explain: "Hai đường thẳng cùng vuông góc với đường thẳng thứ ba thì song song: $a\\parallel b$." },
+      { q: "Xác định giả thiết của định lí: « Nếu hai đường thẳng phân biệt cùng vuông góc với một đường thẳng thứ ba thì chúng song song với nhau ».", options: ["Hai đường thẳng phân biệt","Hai đường thẳng phân biệt cùng vuông góc","Hai đường thẳng phân biệt cùng vuông góc với một đường thẳng thứ ba","Chúng song song với nhau"], correct: 2, explain: "Giả thiết là phần sau chữ “Nếu …”: hai đường thẳng phân biệt cùng vuông góc với đường thẳng thứ ba." },
+      { q: "Cho $\\widehat{xOy}=140^{\\circ}$, Om là tia phân giác. Số đo $\\widehat{xOm}$ là:", options: ["$150^{\\circ}$","$70^{\\circ}$","$130^{\\circ}$","$180^{\\circ}$"], correct: 1, explain: "Tia phân giác chia đôi góc: $\\frac{140^{\\circ}}{2}=70^{\\circ}$." },
+      { q: "Tổng số đo hai góc kề bù bằng:", options: ["$180^{\\circ}$","$120^{\\circ}$","$90^{\\circ}$","$60^{\\circ}$"], correct: 0, explain: "Góc kề bù có tổng $180^{\\circ}$." },
+      { q: "Cho $\\Delta MNP$. Qua M vẽ a // NP, qua P vẽ b // MN. Số đường thẳng a, b vẽ được lần lượt là:", options: ["1; 1","2; 2","3; 3","Vô số"], correct: 0, explain: "Qua một điểm ngoài một đường thẳng chỉ kẻ được một đường song song ⇒ a:1, b:1." },
+      { q: "Qua một điểm ở ngoài một đường thẳng có bao nhiêu đường thẳng song song với đường thẳng đó?", options: ["Chỉ có một","Có vô số","Có ít nhất một","Không có"], correct: 0, explain: "Tiên đề Ơ-clit: chỉ có một." },
+      { q: "Góc đối đỉnh với góc $\\widehat{O_3}$ là:", options: ["$\\widehat{O_1}$","$\\widehat{O_2}$","$\\widehat{O_3}$","$\\widehat{O_4}$"], correct: 0, explain: "Góc đối đỉnh có các cạnh là các tia đối nhau. Theo hình chuẩn: $O_1$ đối đỉnh $O_3$." },
+      { q: "Nếu $\\widehat{M_1}=80^{\\circ}$ thì góc kề bù với $\\widehat{M_1}$ là:", options: ["$60^{\\circ}$","$180^{\\circ}$","$80^{\\circ}$","$100^{\\circ}$"], correct: 3, explain: "Kề bù: $180^{\\circ}-80^{\\circ}=100^{\\circ}$." },
+      { q: "Tập hợp số thực được kí hiệu là:", options: ["Q","N","R","I"], correct: 2, explain: "Tập hợp số thực kí hiệu $R$ (hay $\\mathbb{R}$)." },
+      { q: "Khẳng định nào sau đây là ĐÚNG?", options: ["$\\sqrt{2};\\sqrt{3};\\sqrt{5}$ là các số thực","Số nguyên không là số thực","Số 0 vừa là số hữu tỉ vừa là số vô tỉ","1/3 là số vô tỉ"], correct: 0, explain: "Các căn bậc hai không hoàn chỉnh là vô tỉ nhưng vẫn thuộc số thực." },
+      { q: "Phân số nào viết được dưới dạng số thập phân vô hạn tuần hoàn?", options: ["$\\frac{3}{8}$","$\\frac{6}{9}$","$\\frac{17}{25}$","$\\frac{9}{6}$"], correct: 1, explain: "$\\frac{6}{9}=\\frac{2}{3}=0,\\overline{6}$ là vô hạn tuần hoàn." },
+      { q: "Số đối của số $\\frac{-2}{5}$ là:", options: ["$\\frac{2}{5}$","$\\frac{-5}{2}$","$\\frac{5}{2}$","0"], correct: 0, explain: "Số đối của $-\\frac25$ là $\\frac25$." },
+      { q: "Thể tích hình lập phương có cạnh 0,05m là:", options: ["$25m^{3}$","$0,0125m^{3}$","$0,000125m^{3}$","$0,125dm^{3}$"], correct: 2, explain: "$V=a^3=(0,05)^3=0,000125\\,m^3$." },
+      { q: "Hình lăng trụ đứng tam giác, h=10cm, $S_{xq}=90cm^2$. Chu vi đáy là:", options: ["10 cm","$9cm^{2}$","100 cm","9 cm"], correct: 3, explain: "$S_{xq}=P_{đáy}\\cdot h \\Rightarrow P_{đáy}=90/10=9cm$." },
+      { q: "Từ $-x+\\frac{1}{2}=\\frac{-5}{6}$ suy ra:", options: ["$-x=\\frac{-5}{6}+\\frac{1}{2}$","$-x=\\frac{-5}{6}-\\frac{1}{2}$","$x=\\frac{-5}{6}+\\frac{1}{2}$","$x=\\frac{-5}{6}-\\frac{1}{2}$"], correct: 1, explain: "Chuyển $+\\frac12$ sang vế phải thành $-\\frac12$: $-x=\\frac{-5}{6}-\\frac12$." },
+      { q: "Làm tròn đến hàng phần nghìn của $\\sqrt{17}$ là:", options: ["4,123","4,12","4,1231","4,124"], correct: 0, explain: "$\\sqrt{17}\\approx 4,123105...\\Rightarrow$ làm tròn phần nghìn: 4,123." },
+      { q: "Giá trị của $-\\sqrt{64}+3\\sqrt{49}$ là:", options: ["29","15","13","-13"], correct: 2, explain: "$-8+3\\cdot 7=13$." },
+      { q: "Số $x^{12}$ KHÔNG phải kết quả của phép tính nào:", options: ["$x^{13}:x$","$x^5\\cdot x^7$","$x^4\\cdot x^3$","$(x^4)^3$"], correct: 2, explain: "$x^4\\cdot x^3=x^7$, không phải $x^{12}$." },
+      { q: "Tính $\\left|\\frac{-2}{43}\\right|$ bằng:", options: ["$\\frac{-2}{43}$","$\\frac{2}{43}$","$\\frac{43}{2}$","$-|\\frac{-2}{43}|$"], correct: 1, explain: "Giá trị tuyệt đối làm số dương: $\\frac{2}{43}$." },
+      { q: "Căn bậc hai số học của 81 là:", options: ["9","+9","-9","81"], correct: 0, explain: "Căn bậc hai số học là số không âm: $\\sqrt{81}=9$." },
+      { q: "Bỏ dấu ngoặc: $(-38+21)-(21-38)$ được:", options: ["$-38+21-21+38$","$38+21+21-38$","$38-21-21+38$","$-38+21+21+38$"], correct: 0, explain: "Trừ ngoặc thứ hai đổi dấu: $-38+21-21+38$." },
+      { q: "Trong các số sau, số vô tỉ là:", options: ["$\\frac{3}{2}$","$\\sqrt{2}$","0","3,(3)"], correct: 1, explain: "$\\sqrt{2}$ là vô tỉ." },
+      { q: "Chọn trả lời đúng:", options: ["$-2\\in N$","$3,2\\in Z$","$\\sqrt{3}\\in Q$","$2\\in R$"], correct: 3, explain: "$2$ là số thực nên $2\\in R$." },
+      { q: "Số 50,91 được làm tròn với độ chính xác $d=0,01$ (hàng phần trăm) – chọn đáp án phù hợp trong các lựa chọn:", options: ["50","50,9","50,5","51,5"], correct: 1, explain: "Trong bộ lựa chọn, đáp án hợp lý theo làm tròn 1 chữ số thập phân là $50,9$." },
+      { q: "Tính $1,(5)-2\\frac{1}{3}+3,(4)$ làm tròn đến hàng phần trăm:", options: ["2,7","2,67","2,667","2,66"], correct: 1, explain: "Giá trị xấp xỉ $2,666...$ làm tròn phần trăm là $2,67$." },
+      { q: "Cho $|x|=11,2$ thì giá trị của $x$ là:", options: ["$x=11,2$","$x=-11,2$","$x=11,2$ hoặc $x=-11,2$","$x=112$"], correct: 2, explain: "$|x|=a>0\\Rightarrow x=a$ hoặc $x=-a$." },
+      { q: "Biết $x^2=2$ thì $x$ bằng:", options: ["$x=\\sqrt{2}$ hoặc $x=\\sqrt{-2}$","$x=\\pm\\sqrt{4}$","$x=4$","$x=\\sqrt{2}$ hoặc $x=-\\sqrt{2}$"], correct: 3, explain: "Nghiệm: $x=\\pm\\sqrt{2}$." },
+      { q: "Nếu $\\sqrt{x+1}=8$ thì $x=$ ?", options: ["7","8","16","63"], correct: 3, explain: "$x+1=64\\Rightarrow x=63$." },
+      { q: "Với mọi số thực $x$, khẳng định đúng là:", options: ["$|x|\\ge0$","$|x|=-x$","$|x|=x$","$|x|=0$"], correct: 0, explain: "Giá trị tuyệt đối luôn không âm." },
+      { q: "Chọn khẳng định SAI:", options: ["$|-2,5|=2,5$","$|0|=0$","$|3,5|=\\pm3,5$","$|-\\sqrt{7}|>0$"], correct: 2, explain: "$|3,5|=3,5$ chứ không phải $\\pm3,5$." },
+      { q: "Bánh ngọt lăng trụ đứng tam giác vuông (6cm, 8cm), chiều cao 3cm. Thể tích là:", options: ["$72cm^{3}$","$48cm^{3}$","$120cm^{3}$","$144cm^{3}$"], correct: 0, explain: "$S_{đáy}=\\frac12\\cdot6\\cdot8=24$. $V=24\\cdot3=72\\,cm^3$." }
+    ];
 
-    function typesetMath() {
-      if (window.MathJax && MathJax.typesetPromise) {
-        MathJax.typesetPromise().catch(() => {});
-      }
-    }
+    // ========= Random đáp án + cân bằng A/B/C/D =========
+    // Thuật toán: giữ đúng nội dung đáp án đúng, random các đáp án sai, và đặt đáp án đúng vào vị trí đang ít xuất hiện nhất.
+    let questions = [];
+    function prepareQuestionsBalanced() {
+      const counts = [0,0,0,0]; // số lần đáp án đúng rơi vào A,B,C,D
+      questions = QUESTIONS_FINAL.map((item) => {
+        const correctText = item.options[item.correct];
+        const wrongTexts = item.options.filter((_, i) => i !== item.correct);
+        const wrongShuffled = shuffle(wrongTexts);
 
-    // ================== BUILD (random + cân bằng A/B/C/D) ==================
-    function buildQuestions() {
-      const qCopy = baseQuestions.map(q => ({
-        q: q.q,
-        explain: q.explain || "Câu này cô sẽ bổ sung giải thích sau nhé.",
-        opts: q.options.map((t, idx) => ({ text: t, isCorrect: idx === q.correct }))
-      }));
+        // chọn vị trí A/B/C/D có count nhỏ nhất
+        let targetPos = 0;
+        for (let i = 1; i < 4; i++) if (counts[i] < counts[targetPos]) targetPos = i;
 
-      // Random thứ tự câu hỏi (nếu cô không muốn random câu, comment dòng dưới)
-      shuffleArray(qCopy);
+        const finalOpts = new Array(4);
+        finalOpts[targetPos] = correctText;
 
-      // Cân bằng vị trí đáp án đúng theo A-B-C-D
-      qCopy.forEach((qq, i) => {
-        shuffleArray(qq.opts);
-        const desired = i % 4; // 0->A,1->B,2->C,3->D
-        const correctIdx = qq.opts.findIndex(o => o.isCorrect);
-        if (correctIdx !== desired) {
-          [qq.opts[correctIdx], qq.opts[desired]] = [qq.opts[desired], qq.opts[correctIdx]];
+        let wi = 0;
+        for (let i = 0; i < 4; i++) {
+          if (i === targetPos) continue;
+          finalOpts[i] = wrongShuffled[wi++];
         }
+
+        counts[targetPos]++;
+
+        return {
+          q: item.q,
+          options: finalOpts,
+          correct: targetPos,
+          explain: item.explain || "Cô bổ sung giúp em phần giải thích cho câu này nhé."
+        };
       });
 
-      return qCopy;
+      // Nếu cô muốn random cả thứ tự câu hỏi, mở dòng dưới:
+      // questions = shuffle(questions);
     }
 
-    // ================== GAME STATE ==================
-    let questions = [];
+    // ========= Game state =========
     let currentIdx = 0;
     let score = 0;
-    let locked = false;
+    let audioCtx = null;
+    let confettiAnimId = null;
 
-    // ================== AUDIO ==================
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function ensureAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+    }
+
     function playSound(type) {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
+      if (!audioCtx) return;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.connect(gain);
       gain.connect(audioCtx.destination);
 
-      if (type === 'correct') {
-        osc.type = 'sine';
+      if (type === "correct") {
+        osc.type = "sine";
         osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(1046.5, audioCtx.currentTime + 0.1);
         gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.5);
-      } else if (type === 'wrong') {
-        osc.type = 'sawtooth';
+        osc.stop(audioCtx.currentTime + 0.45);
+      } else if (type === "wrong") {
+        osc.type = "sawtooth";
         osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-        osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.3);
-        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.22, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.3);
-      } else if (type === 'fanfare') {
+        osc.stop(audioCtx.currentTime + 0.25);
+      } else if (type === "fanfare") {
         const now = audioCtx.currentTime;
-        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
           const o = audioCtx.createOscillator();
           const g = audioCtx.createGain();
-          o.connect(g); g.connect(audioCtx.destination);
+          o.connect(g);
+          g.connect(audioCtx.destination);
           o.frequency.value = freq;
           o.start(now + i * 0.1);
-          g.gain.setValueAtTime(0.18, now + i * 0.1);
-          g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.5);
-          o.stop(now + i * 0.1 + 0.5);
+          g.gain.setValueAtTime(0.16, now + i * 0.1);
+          g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.45);
+          o.stop(now + i * 0.1 + 0.45);
         });
       }
     }
 
-    // ================== CONFETTI ==================
     function fireConfetti() {
-      const canvas = document.getElementById('confetti-canvas');
-      const ctx = canvas.getContext('2d');
+      const canvas = document.getElementById("confetti-canvas");
+      const ctx = canvas.getContext("2d");
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
       const pieces = [];
-      const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f'];
-
-      for (let i = 0; i < 150; i++) {
+      const colors = ["#f00","#0f0","#00f","#ff0","#0ff","#f0f"];
+      for (let i = 0; i < 140; i++) {
         pieces.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height - canvas.height,
-          w: Math.random() * 10 + 5,
-          h: Math.random() * 10 + 5,
+          w: Math.random() * 10 + 4,
+          h: Math.random() * 10 + 4,
           color: colors[Math.floor(Math.random() * colors.length)],
           vy: Math.random() * 5 + 2,
           vx: Math.random() * 4 - 2
         });
       }
 
-      let animationId;
+      if (confettiAnimId) cancelAnimationFrame(confettiAnimId);
+
       function loop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         let active = false;
-        pieces.forEach(p => {
+
+        for (const p of pieces) {
           p.y += p.vy;
           p.x += p.vx;
           ctx.fillStyle = p.color;
           ctx.fillRect(p.x, p.y, p.w, p.h);
           if (p.y < canvas.height) active = true;
-        });
-        if (active) animationId = requestAnimationFrame(loop);
-        else cancelAnimationFrame(animationId);
+        }
+
+        if (active) confettiAnimId = requestAnimationFrame(loop);
       }
       loop();
     }
 
-    // ================== GAME LOGIC ==================
     function startGame() {
-      document.getElementById('start-screen').classList.add('hidden');
-      document.getElementById('game-screen').classList.remove('hidden');
-      document.getElementById('result-screen').classList.add('hidden');
+      ensureAudio();
+      prepareQuestionsBalanced();
+
+      document.getElementById("start-screen").classList.add("hidden");
+      document.getElementById("game-screen").classList.remove("hidden");
+      document.getElementById("result-screen").classList.add("hidden");
 
       score = 0;
       currentIdx = 0;
-      locked = false;
-
-      questions = buildQuestions();
-      document.getElementById('total-q').innerText = questions.length;
-
       renderQuestion();
     }
 
@@ -392,125 +501,108 @@
         return;
       }
 
-      locked = false;
-
       const qData = questions[currentIdx];
-      document.getElementById('current-q').innerText = currentIdx + 1;
-      document.getElementById('score').innerText = score;
-      document.getElementById('mascot-reaction').innerText = "🤔";
+      document.getElementById("current-q").innerText = currentIdx + 1;
+      document.getElementById("score").innerText = score;
+      document.getElementById("mascot-reaction").innerText = "🤔";
 
-      // innerHTML để MathJax render
-      document.getElementById('question-text').innerHTML = qData.q;
+      // câu hỏi (MathJax cần innerHTML)
+      const qEl = document.getElementById("question-text");
+      qEl.innerHTML = qData.q;
 
-      const optsDiv = document.getElementById('options-container');
-      optsDiv.innerHTML = '';
+      document.getElementById("question-sub").innerText = "Chọn đáp án đúng (A, B, C hoặc D).";
 
-      qData.opts.forEach((opt, idx) => {
-        const btn = document.createElement('button');
+      // ẩn giải thích
+      document.getElementById("explain-box").classList.add("hidden");
+      document.getElementById("explain-text").innerHTML = "";
+
+      const optsDiv = document.getElementById("options-container");
+      optsDiv.innerHTML = "";
+
+      qData.options.forEach((optText, idx) => {
+        const btn = document.createElement("button");
         btn.className = "option-btn bg-white p-6 rounded-xl shadow-md text-lg font-semibold text-gray-700 hover:bg-indigo-50 w-full text-left";
-        btn.innerHTML = `<span class="font-bold text-indigo-500 mr-2">${String.fromCharCode(65 + idx)}.</span> ${opt.text}`;
+        btn.innerHTML = `<span class="font-bold text-indigo-500 mr-2">${letter(idx)}.</span> ${optText}`;
         btn.onclick = () => checkAnswer(idx, btn);
         optsDiv.appendChild(btn);
       });
 
-      typesetMath();
+      if (window.MathJax) MathJax.typesetPromise();
+    }
+
+    function lockOptions() {
+      const buttons = document.querySelectorAll(".option-btn");
+      buttons.forEach(b => b.disabled = true);
+      return buttons;
+    }
+
+    function showExplanation(qData, correctIdx) {
+      const box = document.getElementById("explain-box");
+      const ex = document.getElementById("explain-text");
+
+      ex.innerHTML = `
+        <div class="mb-2 font-semibold text-gray-700">Đáp án đúng: <span class="text-emerald-700">${letter(correctIdx)}</span></div>
+        <div>${qData.explain || ""}</div>
+      `;
+
+      box.classList.remove("hidden");
+      if (window.MathJax) MathJax.typesetPromise();
     }
 
     function checkAnswer(selectedIndex, btnElement) {
-      if (locked) return;
-      locked = true;
+      ensureAudio();
 
-      const buttons = document.querySelectorAll('.option-btn');
-      buttons.forEach(b => b.disabled = true);
-
+      const buttons = lockOptions();
       const qData = questions[currentIdx];
-      const correctIndex = qData.opts.findIndex(o => o.isCorrect);
+      const correctIndex = qData.correct;
       const isCorrect = selectedIndex === correctIndex;
 
       if (isCorrect) {
-        btnElement.classList.add('correct-anim');
+        btnElement.classList.add("correct-anim");
         score += 10;
-        document.getElementById('score').innerText = score;
-        document.getElementById('mascot-reaction').innerText = "😍";
-        playSound('correct');
+        document.getElementById("score").innerText = score;
+        document.getElementById("mascot-reaction").innerText = "😍";
+        playSound("correct");
         fireConfetti();
-        showFeedback(true, correctIndex);
       } else {
-        btnElement.classList.add('wrong-anim');
-        buttons[correctIndex].classList.add('correct-anim');
-        document.getElementById('mascot-reaction').innerText = "😅";
-        playSound('wrong');
-        showFeedback(false, correctIndex);
-      }
-    }
-
-    function randomPraise() {
-      const praises = [
-        "Em làm tốt lắm!",
-        "Chuẩn không cần chỉnh!",
-        "10 điểm về chỗ!",
-        "Cô Thu Bình rất tự hào!",
-        "Tiếp tục phát huy nhé!"
-      ];
-      return praises[Math.floor(Math.random() * praises.length)];
-    }
-
-    // ✅ Popup có giải thích
-    function showFeedback(isCorrect, correctIndex) {
-      const modal = document.getElementById('feedback-modal');
-      const title = document.getElementById('feedback-title');
-      const msg = document.getElementById('feedback-msg');
-      const icon = document.getElementById('feedback-icon');
-      const explainBox = document.getElementById('feedback-explain');
-
-      modal.classList.remove('hidden');
-
-      if (isCorrect) {
-        title.innerText = "Tuyệt Vời!";
-        title.className = "text-3xl font-bold mb-1 text-green-600";
-        msg.innerText = randomPraise();
-        icon.innerText = "🎉";
-      } else {
-        title.innerText = "Tiếc Quá!";
-        title.className = "text-3xl font-bold mb-1 text-red-600";
-        msg.innerText = "Đáp án đúng là " + String.fromCharCode(65 + correctIndex);
-        icon.innerText = "💪";
+        btnElement.classList.add("wrong-anim");
+        buttons[correctIndex].classList.add("correct-anim");
+        document.getElementById("mascot-reaction").innerText = "😅";
+        playSound("wrong");
       }
 
-      // Đổ giải thích (HTML để MathJax render)
-      explainBox.innerHTML = questions[currentIdx].explain || "Câu này cô sẽ bổ sung giải thích sau nhé.";
-      typesetMath();
+      // Hiện giải thích giống ví dụ
+      showExplanation(qData, correctIndex);
     }
 
     function nextQuestion() {
-      document.getElementById('feedback-modal').classList.add('hidden');
       currentIdx++;
       renderQuestion();
     }
 
     function endGame() {
-      document.getElementById('game-screen').classList.add('hidden');
-      document.getElementById('result-screen').classList.remove('hidden');
+      document.getElementById("game-screen").classList.add("hidden");
+      document.getElementById("result-screen").classList.remove("hidden");
 
       const maxScore = questions.length * 10;
       const percentage = Math.round((score / maxScore) * 100);
 
-      document.getElementById('final-score').innerText = `${score}/${maxScore}`;
-      document.getElementById('final-percent').innerText = `${percentage}%`;
+      document.getElementById("final-score").innerText = `${score}/${maxScore}`;
+      document.getElementById("final-percent").innerText = `${percentage}%`;
 
-      playSound('fanfare');
+      playSound("fanfare");
       fireConfetti();
 
       let msg = "";
-      if (percentage >= 90) msg = "Xuất sắc! Cô tin em sẽ đạt điểm tối đa trong kỳ thi tới!";
-      else if (percentage >= 70) msg = "Làm tốt lắm! Chỉ cần cẩn thận hơn một chút nữa thôi.";
-      else msg = "Cố gắng lên nhé! Hãy ôn lại các câu sai, cô tin em sẽ tiến bộ.";
+      if (percentage >= 90) msg = "Xuất sắc! Cô tin em sẽ đạt điểm tối đa trong kỳ thi tới! 🌟";
+      else if (percentage >= 70) msg = "Làm tốt lắm! Chỉ cần cẩn thận hơn một chút nữa thôi. 💪";
+      else msg = "Cố gắng lên nhé! Hãy ôn lại các câu sai, cô tin em sẽ tiến bộ. ❤️";
 
-      document.getElementById('teacher-msg').innerText = msg;
+      document.getElementById("teacher-msg").innerText = msg;
     }
 
-    window.addEventListener('resize', () => {
-      const canvas = document.getElementById('confetti-canvas');
+    window.addEventListener("resize", () => {
+      const canvas = document.getElementById("confetti-canvas");
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     });
