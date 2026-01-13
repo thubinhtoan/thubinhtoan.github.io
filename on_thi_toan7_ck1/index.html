@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đấu Trường Toán 7 - Cô Thu Bình</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- MathJax để hiển thị công thức toán -->
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Roboto:wght@400;700&display=swap');
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .hand-font { font-family: 'Patrick Hand', cursive; }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .option-btn {
+      transition: all 0.2s;
+      border: 3px solid transparent;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      border-color: #764ba2;
+    }
+
+    .option-btn:active:not(:disabled) { transform: translateY(1px); }
+
+    .correct-anim {
+      animation: bounce 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) infinite alternate;
+      background-color: #48bb78 !important;
+      color: white !important;
+      border-color: #2f855a !important;
+    }
+
+    .wrong-anim {
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+      background-color: #f56565 !important;
+      color: white !important;
+      border-color: #c53030 !important;
+    }
+
+    @keyframes bounce { 0% { transform: translateY(0);} 100% { transform: translateY(-10px);} }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .mascot { font-size: 3rem; animation: float 3s ease-in-out infinite; }
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(5deg); }
+      100% { transform: translateY(0px) rotate(0deg); }
+    }
+  </style>
+</head>
+
+<body class="flex items-center justify-center p-4">
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Welcome Screen -->
+  <div id="start-screen" class="card p-8 max-w-2xl w-full text-center relative z-10">
+    <div class="mascot mb-4">👩‍🏫 ✨</div>
+    <h1 class="text-4xl md:text-5xl font-bold text-indigo-700 mb-4 hand-font">Đấu Trường Toán 7</h1>
+    <h2 class="text-xl text-gray-600 mb-6">Chinh Phục Đỉnh Cao Cùng Cô Thu Bình</h2>
+    <p class="text-gray-600 mb-8 text-lg">
+      Chào mừng các em đến với bài ôn tập cuối kỳ 1! <br>
+      Hãy hít thở sâu, thật bình tĩnh và chinh phục câu hỏi nhé. <br>
+      Cô tin các em sẽ làm rất tốt! ❤️
+    </p>
+    <button onclick="startGame()"
+      class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-full text-xl shadow-lg transition transform hover:scale-105">
+      BẮT ĐẦU NGAY 🚀
+    </button>
+  </div>
+
+  <!-- Game Screen -->
+  <div id="game-screen" class="hidden w-full max-w-4xl relative z-10">
+    <!-- Header Info -->
+    <div class="flex justify-between items-center mb-6 bg-white/20 p-4 rounded-xl backdrop-blur-sm text-white">
+      <div class="flex items-center">
+        <span class="text-2xl mr-2">🏆</span>
+        <div>
+          <div class="text-xs opacity-80">ĐIỂM SỐ</div>
+          <div class="text-2xl font-bold" id="score">0</div>
+        </div>
+      </div>
+      <div class="text-center">
+        <div class="mascot" id="mascot-reaction">🤔</div>
+      </div>
+      <div class="text-right">
+        <div class="text-xs opacity-80">CÂU HỎI</div>
+        <div class="text-2xl font-bold"><span id="current-q">1</span>/<span id="total-q">0</span></div>
+      </div>
+    </div>
+
+    <!-- Question Card -->
+    <div class="card p-6 md:p-10 mb-6 min-h-[200px] flex flex-col justify-center items-center text-center">
+      <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 leading-relaxed" id="question-text">
+        Đang tải câu hỏi...
+      </h3>
+    </div>
+
+    <!-- Options Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="options-container"></div>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal"
+      class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm">
+      <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 text-center shadow-2xl animate-[bounce_0.5s]">
+        <div id="feedback-icon" class="text-6xl mb-4">🎉</div>
+        <h3 id="feedback-title" class="text-3xl font-bold mb-2">Chính Xác!</h3>
+        <p id="feedback-msg" class="text-gray-600 mb-6">Bạn quá xuất sắc!</p>
+        <button onclick="nextQuestion()"
+          class="bg-indigo-600 text-white py-3 px-8 rounded-full font-bold hover:bg-indigo-700 transition">
+          Câu Tiếp Theo ➡️
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result Screen -->
+  <div id="result-screen" class="hidden card p-8 max-w-2xl w-full text-center relative z-10">
+    <div class="text-6xl mb-4">🎓</div>
+    <h2 class="text-4xl font-bold text-indigo-800 mb-4">Tổng Kết</h2>
+    <p class="text-xl text-gray-600 mb-6">Chúc mừng em đã hoàn thành bài thi!</p>
+
+    <div class="bg-indigo-50 rounded-xl p-6 mb-8">
+      <div class="text-5xl font-bold text-indigo-600 mb-2" id="final-score">0/0</div>
+      <div class="text-gray-500" id="final-percent">0%</div>
+    </div>
+
+    <p id="teacher-msg" class="text-lg italic text-gray-700 mb-8">
+      "Lời nhận xét từ cô Thu Bình..."
+    </p>
+
+    <div class="text-xs text-gray-500 mb-4" id="answer-balance"></div>
+
+    <button onclick="location.reload()"
+      class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition">
+      Làm Lại Bài 🔄
+    </button>
+  </div>
+
+  <script>
+    // =========================
+    // 1) DỮ LIỆU CÂU HỎI (RAW)
+    // =========================
+    const questionsRaw = [
+      { q: "Giá trị tuyệt đối của 7,82 là:", a: ["8,27", "7,82", "-7,82", "7,8"], correct: 1 },
+      { q: "Kết quả so sánh hai số thập phân 65,312 và 65,314 là:", a: ["$65,312 < 65,314$", "$65,312 > 65,314$", "$65,312 = 65,314$", "$65,312 \\le 65,314$"], correct: 0 },
+      { q: "Căn bậc hai số học của 81 là:", a: ["9", "8", "15", "-18"], correct: 0 },
+      { q: "Số đối của số $\\frac{15}{18}$ là:", a: ["$1\\frac{15}{8}$", "$-\\frac{15}{18}$", "$-\\sqrt{25}$", "$9^2$"], correct: 1 },
+      { q: "Giá trị tuyệt đối của $-\\sqrt{25}$ là:", a: ["5", "$\\sqrt{25}$", "-9", "-5"], correct: 0 },
+      { q: "Số nào trong các số dưới đây viết được dưới dạng số thập phân hữu hạn:", a: ["$\\frac{-6}{75}$", "$\\frac{-6}{76}$", "$\\frac{7}{30}$", "$\\frac{-7}{30}$"], correct: 0 },
+      { q: "Tập hợp các số vô tỉ kí hiệu là:", a: ["N", "Q", "R", "I"], correct: 3 },
+      { q: "Chứng minh định lí là:", a: ["Dùng hình vẽ suy ra kết luận", "Dùng lập luận từ giả thiết suy ra kết luận", "Dùng đo đạc thực tế", "Dùng trực giác"], correct: 1 },
+      { q: "Phát biểu nào sau đây là sai?", a: ["Mọi số vô tỉ đều là số thực", "Mọi số thực đều là số vô tỉ", "Số 0 là số hữu tỉ", "$\\sqrt{7}$ là số vô tỉ"], correct: 1 },
+      { q: "Hãy bổ sung Kết Luận cho định lí: “Nếu hai đường thẳng a và b cùng vuông góc với một đường thẳng thứ ba c thì...”", a: ["a song song với b", "a và b cắt nhau", "b song song với c", "a và b trùng nhau"], correct: 0 },
+      { q: "Xác định giả thiết của định lí: « Nếu hai đường thẳng phân biệt cùng vuông góc với một đường thẳng thứ ba thì chúng song song với nhau ».", a: ["Hai đường thẳng phân biệt", "Hai đường thẳng phân biệt cùng vuông góc", "Hai đường thẳng phân biệt cùng vuông góc với một đường thẳng thứ ba", "Chúng song song với nhau"], correct: 2 },
+      { q: "Cho $\\widehat{xOy}=140^{0}$, gọi Om là tia phân giác của $\\widehat{xOy}$. Số đo của $\\widehat{xOm}$ là:", a: ["$150^{\\circ}$", "$70^{0}$", "$130^{0}$", "$180^{0}$"], correct: 1 },
+      { q: "Tổng số đo hai góc kề bù bằng:", a: ["$180^{\\circ}$", "$120^{0}$", "$90^{0}$", "$60^{\\circ}$"], correct: 0 },
+      { q: "Cho $\\Delta MNP$. Qua M vẽ đường thẳng a // NP, qua P vẽ đường thẳng b // MN. Số đường thẳng a, b vẽ được lần lượt là:", a: ["1; 1", "2; 2", "3; 3", "Vô số"], correct: 0 },
+      { q: "Qua một điểm ở ngoài một đường thẳng có bao nhiêu đường thẳng song song với đường thẳng đó?", a: ["Chỉ có một", "Có vô số", "Có ít nhất một", "Không có"], correct: 0 },
+      { q: "Góc đối đỉnh với góc $\\widehat{O_3}$ là:", a: ["$\\widehat{O_1}$", "$\\widehat{O_2}$", "$\\widehat{O_3}$", "$\\widehat{O_4}$"], correct: 0 },
+      { q: "Nếu $\\widehat{M_1}=80^{\\circ}$ thì số đo của góc kề bù với góc $M_1$ là bao nhiêu độ?", a: ["$60^{0}$", "$180^{0}$", "$80^{0}$", "$100^{0}$"], correct: 3 },
+      { q: "Tập hợp số thực được kí hiệu là:", a: ["Q", "N", "R", "I"], correct: 2 },
+      { q: "Khẳng định nào sau đây là ĐÚNG?", a: ["$\\sqrt{2}; \\sqrt{3}; \\sqrt{5}$ là các số thực", "Số nguyên không là số thực", "Số 0 vừa là số hữu tỉ vừa là số vô tỉ", "1/3 là số vô tỉ"], correct: 0 },
+      { q: "Phân số nào viết được dưới dạng số thập phân vô hạn tuần hoàn?", a: ["$\\frac{3}{8}$", "$\\frac{6}{9}$", "$\\frac{17}{25}$", "$\\frac{9}{6}$"], correct: 1 },
+      { q: "Số đối của số $\\frac{-2}{5}$ là:", a: ["$\\frac{2}{5}$", "$\\frac{-5}{2}$", "$\\frac{5}{2}$", "0"], correct: 0 },
+      { q: "Thể tích hình lập phương có cạnh 0,05m là:", a: ["$25m^{3}$", "$0,0125m^{3}$", "$0,000125m^{3}$", "$0,125dm^{3}$"], correct: 2 },
+      { q: "Hình lăng trụ đứng tam giác, h=10cm, $S_{xq}=90cm^2$. Chu vi đáy là:", a: ["10 cm", "$9cm^{2}$", "100 cm", "9 cm"], correct: 3 },
+      {
+        q: "Mô tả quy tắc chuyển vế qua đẳng thức $-x+\\frac{1}{2}=\\frac{-5}{6}$ ta được:",
+        options: ["$-x=\\frac{-5}{6}+\\frac{1}{2}$", "$-x=\\frac{-5}{6}-\\frac{1}{2}$", "$x=\\frac{-5}{6}+\\frac{1}{2}$", "$x=\\frac{-5}{6}-\\frac{1}{2}$"],
+        correct: 1
+      },
+      { q: "Giá trị gần đúng khi làm tròn đến hàng phần nghìn của $\\sqrt{17}$ là:", a: ["4,123", "4,12", "4,1231", "4,124"], correct: 0 },
+      { q: "Kết quả của phép tính $-\\sqrt{64}+3\\sqrt{49}$ là:", a: ["29", "15", "13", "-13"], correct: 2 },
+      {
+        q: "Số $x^{12}$ KHÔNG phải kết quả của phép tính nào sau đây:",
+        options: ["$x^{13}:x (x\\ne0)$", "$x^5 \\cdot x^7$", "$x^4 \\cdot x^3$", "$(x^4)^3$"],
+        correct: 2
+      },
+      { q: "Tính $|\\frac{-2}{43}|$ bằng:", a: ["$\\frac{-2}{43}$", "$\\frac{2}{43}$", "$\\frac{43}{2}$", "$-|\\frac{-2}{43}|$"], correct: 1 },
+      { q: "Căn bậc hai số học của 81 là:", a: ["9", "+9", "-9", "81"], correct: 0 },
+      { q: "Cho phép tính $(-38+21)-(21-38)$. Khi bỏ dấu ngoặc, ta được:", a: ["$-38+21-21+38$", "$38+21+21-38$", "$38-21-21+38$", "$-38+21+21+38$"], correct: 0 },
+      { q: "Trong các số sau, số vô tỉ là:", a: ["$\\frac{3}{2}$", "$\\sqrt{2}$", "0", "3,(3)"], correct: 1 },
+      { q: "Hãy chọn trả lời đúng:", a: ["$-2\\in N$", "$3,2\\in Z$", "$\\sqrt{3}\\in Q$", "$2\\in R$"], correct: 3 },
+      { q: "Số 50,91 được làm tròn với độ chính xác là $d=0,01$ (hàng phần trăm) => làm tròn đến hàng phần chục:", a: ["50", "50,9", "50,5", "51,5"], correct: 1 },
+      { q: "Tính $1,(5) -2\\frac{1}{3}+3,(4)$ với độ chính xác $d=0,005$ (làm tròn đến hàng phần trăm) là:", a: ["2,7", "2,67", "2,667", "2,66"], correct: 1 },
+      { q: "Cho $|x|=11,2$ thì giá trị của x là:", a: ["$x=11,2$", "$x=-11,2$", "$x=11,2$ hoặc $x=-11,2$", "$x=112$"], correct: 2 },
+      { q: "Biết $x^2=2$ thì x bằng:", a: ["$x=\\sqrt{2}$ hoặc $x=\\sqrt{-2}$", "$x=\\pm\\sqrt{4}$", "$x=4$", "$x=\\sqrt{2}$ hoặc $x=-\\sqrt{2}$"], correct: 3 },
+      { q: "Nếu $\\sqrt{x+1}=8$ thì $x=$ ?", a: ["7", "8", "16", "63"], correct: 3 },
+      { q: "Với mọi số thực x. Khẳng định nào sau đây là đúng?", a: ["$|x|\\ge0$", "$|x|=-x$", "$|x|=x$", "$|x|=0$"], correct: 0 },
+      { q: "Chọn khẳng định SAI:", a: ["$|-2,5|=2,5$", "$|0|=0$", "$|3,5|=\\pm3,5$", "$|-\\sqrt{7}|>0$"], correct: 2 },
+      { q: "Bánh ngọt lăng trụ đứng tam giác vuông, 2 cạnh góc vuông 6cm, 8cm, chiều cao 3cm. Thể tích là:", a: ["$72cm^{3}$", "$48cm^{3}$", "$120cm^{3}$", "$144cm^{3}$"], correct: 0 }
+    ];
+
+    // =========================
+    // 2) TIỆN ÍCH: SHUFFLE & HOÁN VỊ
+    // =========================
+    function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+    function shuffleInPlace(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Trả về 24 hoán vị của [0,1,2,3] (cố định, nhẹ)
+    function allPermutations4() {
+      const base = [0,1,2,3];
+      const res = [];
+      function permute(a, l) {
+        if (l === a.length - 1) { res.push(a.slice()); return; }
+        for (let i = l; i < a.length; i++) {
+          [a[l], a[i]] = [a[i], a[l]];
+          permute(a, l + 1);
+          [a[l], a[i]] = [a[i], a[l]];
+        }
+      }
+      permute(base, 0);
+      return res;
+    }
+    const PERMS4 = allPermutations4();
+
+    // =========================
+    // 3) CHUẨN HOÁ + RANDOM CÂU + RANDOM ĐÁP ÁN + CÂN BẰNG ABCD
+    // =========================
+    function normalizeQuestions(raw) {
+      const normalized = raw.map((qq, idx) => {
+        const opts = Array.isArray(qq.options) ? qq.options
+                  : Array.isArray(qq.a) ? qq.a
+                  : null;
+
+        if (!opts || opts.length !== 4) {
+          console.warn("Câu bị lỗi dữ liệu (không đủ 4 đáp án):", idx + 1, qq);
+        }
+
+        return {
+          q: qq.q,
+          options: opts || ["(Thiếu đáp án A)", "(Thiếu đáp án B)", "(Thiếu đáp án C)", "(Thiếu đáp án D)"],
+          correct: typeof qq.correct === "number" ? qq.correct : 0
+        };
+      });
+
+      return normalized;
+    }
+
+    // Cân bằng chữ cái đáp án đúng: ưu tiên đặt đáp án đúng vào letter ít xuất hiện nhất
+    function prepareQuiz(rawQuestions) {
+      const base = normalizeQuestions(rawQuestions);
+
+      // 1) random thứ tự câu hỏi
+      shuffleInPlace(base);
+
+      // 2) random đáp án nhưng có cân bằng ABCD
+      const correctCounts = [0,0,0,0]; // A,B,C,D
+      const prepared = base.map((q) => {
+        const correctOld = q.correct;
+        const opts = q.options.slice();
+
+        // Chọn chữ cái mục tiêu (ít xuất hiện nhất)
+        const minCount = Math.min(...correctCounts);
+        const targetLetters = [0,1,2,3].filter(i => correctCounts[i] === minCount);
+        const target = targetLetters[Math.floor(Math.random() * targetLetters.length)];
+
+        // Duyệt các hoán vị: chọn hoán vị sao cho đáp án đúng rơi vào target nếu có thể
+        // đồng thời vẫn có ngẫu nhiên (lọc nhóm phù hợp rồi pick random)
+        const goodPerms = PERMS4.filter(p => p.indexOf(correctOld) === target);
+        const candidatePerms = goodPerms.length ? goodPerms : PERMS4;
+
+        const chosenPerm = candidatePerms[Math.floor(Math.random() * candidatePerms.length)];
+
+        const newOptions = chosenPerm.map(i => opts[i]);
+        const newCorrect = chosenPerm.indexOf(correctOld);
+
+        correctCounts[newCorrect]++;
+
+        return {
+          q: q.q,
+          options: newOptions,
+          correct: newCorrect
+        };
+      });
+
+      return { prepared, correctCounts };
+    }
+
+    // =========================
+    // 4) GAME STATE
+    // =========================
+    let quiz = [];
+    let correctCountsFinal = [0,0,0,0];
+    let currentIdx = 0;
+    let score = 0;
+
+    let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // --- ÂM THANH (Synth) ---
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'correct') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1046.5, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'fanfare') {
+        const now = audioCtx.currentTime;
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.frequency.value = freq;
+          o.start(now + i * 0.1);
+          g.gain.setValueAtTime(0.2, now + i * 0.1);
+          g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.5);
+          o.stop(now + i * 0.1 + 0.5);
+        });
+      }
+    }
+
+    // --- HIỆU ỨNG CONFETTI ---
+    function fireConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const pieces = [];
+      const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f'];
+
+      for (let i = 0; i < 150; i++) {
+        pieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          w: Math.random() * 10 + 5,
+          h: Math.random() * 10 + 5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vy: Math.random() * 5 + 2,
+          vx: Math.random() * 4 - 2
+        });
+      }
+
+      let animationId;
+      function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let active = false;
+        pieces.forEach(p => {
+          p.y += p.vy;
+          p.x += p.vx;
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x, p.y, p.w, p.h);
+          if (p.y < canvas.height) active = true;
+        });
+
+        if (active) animationId = requestAnimationFrame(loop);
+        else cancelAnimationFrame(animationId);
+      }
+      loop();
+    }
+
+    // --- LOGIC GAME ---
+    function startGame() {
+      // Prepare quiz each run (random câu + random đáp án + cân bằng ABCD)
+      const preparedPack = prepareQuiz(questionsRaw);
+      quiz = preparedPack.prepared;
+      correctCountsFinal = preparedPack.correctCounts;
+
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.remove('hidden');
+      document.getElementById('result-screen').classList.add('hidden');
+
+      score = 0;
+      currentIdx = 0;
+
+      document.getElementById('total-q').innerText = quiz.length;
+
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      if (currentIdx >= quiz.length) {
+        endGame();
+        return;
+      }
+
+      const qData = quiz[currentIdx];
+
+      document.getElementById('current-q').innerText = currentIdx + 1;
+      document.getElementById('score').innerText = score;
+
+      // IMPORTANT: innerHTML để MathJax render tốt cho cả $...$
+      document.getElementById('question-text').innerHTML = qData.q;
+      document.getElementById('mascot-reaction').innerText = "🤔";
+
+      const optsDiv = document.getElementById('options-container');
+      optsDiv.innerHTML = '';
+
+      qData.options.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "option-btn bg-white p-6 rounded-xl shadow-md text-lg font-semibold text-gray-700 hover:bg-indigo-50 w-full";
+        btn.innerHTML = `<span class="font-bold text-indigo-500 mr-2">${String.fromCharCode(65 + idx)}.</span> ${optText}`;
+        btn.onclick = () => checkAnswer(idx, btn);
+        optsDiv.appendChild(btn);
+      });
+
+      if (window.MathJax) {
+        MathJax.typesetPromise();
+      }
+    }
+
+    function checkAnswer(selectedIndex, btnElement) {
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach(b => b.disabled = true);
+
+      const correctIndex = quiz[currentIdx].correct;
+      const isCorrect = selectedIndex === correctIndex;
+
+      if (isCorrect) {
+        btnElement.classList.add('correct-anim');
+        score += 10;
+        document.getElementById('score').innerText = score;
+        document.getElementById('mascot-reaction').innerText = "😍";
+        playSound('correct');
+        fireConfetti();
+        showFeedback(true);
+      } else {
+        btnElement.classList.add('wrong-anim');
+        buttons[correctIndex].classList.add('correct-anim');
+        document.getElementById('mascot-reaction').innerText = "😅";
+        playSound('wrong');
+        showFeedback(false);
+      }
+    }
+
+    function showFeedback(isCorrect) {
+      const modal = document.getElementById('feedback-modal');
+      const title = document.getElementById('feedback-title');
+      const msg = document.getElementById('feedback-msg');
+      const icon = document.getElementById('feedback-icon');
+
+      modal.classList.remove('hidden');
+
+      if (isCorrect) {
+        title.innerText = "Tuyệt Vời!";
+        title.className = "text-3xl font-bold mb-2 text-green-600";
+        msg.innerText = randomPraise();
+        icon.innerText = "🎉";
+      } else {
+        title.innerText = "Tiếc Quá!";
+        title.className = "text-3xl font-bold mb-2 text-red-600";
+        msg.innerText = "Đáp án đúng là " + String.fromCharCode(65 + quiz[currentIdx].correct);
+        icon.innerText = "💪";
+      }
+    }
+
+    function randomPraise() {
+      const praises = ["Em làm tốt lắm!", "Chuẩn không cần chỉnh!", "10 điểm về chỗ!", "Cô Thu Bình rất tự hào!", "Tiếp tục phát huy nhé!"];
+      return praises[Math.floor(Math.random() * praises.length)];
+    }
+
+    function nextQuestion() {
+      document.getElementById('feedback-modal').classList.add('hidden');
+      currentIdx++;
+      renderQuestion();
+    }
+
+    function endGame() {
+      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.remove('hidden');
+
+      const maxScore = quiz.length * 10;
+      const percentage = Math.round((score / maxScore) * 100);
+
+      document.getElementById('final-score').innerText = `${score}/${maxScore}`;
+      document.getElementById('final-percent').innerText = `${percentage}%`;
+
+      playSound('fanfare');
+      fireConfetti();
+
+      let msg = "";
+      if (percentage >= 90) msg = "Xuất sắc! Cô tin em sẽ đạt điểm tối đa trong kỳ thi tới! 🌟";
+      else if (percentage >= 70) msg = "Làm tốt lắm! Chỉ cần cẩn thận hơn một chút nữa thôi. 💪";
+      else msg = "Cố gắng lên nhé! Hãy ôn lại các câu sai, cô tin em sẽ tiến bộ. ❤️";
+
+      document.getElementById('teacher-msg').innerText = msg;
+
+      // Hiển thị phân bố đáp án đúng ABCD để cô kiểm tra nhanh
+      const [a,b,c,d] = correctCountsFinal;
+      document.getElementById('answer-balance').innerText =
+        `Phân bố đáp án đúng (tự cân bằng): A=${a}, B=${b}, C=${c}, D=${d}`;
+    }
+
+    // Resize confetti canvas
+    window.addEventListener('resize', () => {
+      const canvas = document.getElementById('confetti-canvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
