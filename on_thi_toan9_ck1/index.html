@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đấu Trường Toán 9 - Cô Thu Bình</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- MathJax -->
+  <script>
+    MathJax = {
+      tex: { inlineMath: [["$", "$"], ["\\(", "\\)"]] },
+      svg: { fontCache: "global" }
+    };
+  </script>
+  <script async id="MathJax-script"
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet" />
+
+  <style>
+    body{
+      font-family:'Montserrat',sans-serif;
+      background:linear-gradient(135deg,#1a2980 0%,#26d0ce 100%);
+      min-height:100vh;color:#333;
+    }
+    .title-font{font-family:'Pacifico',cursive;}
+    .glass-panel{
+      background:rgba(255,255,255,.95);
+      backdrop-filter:blur(12px);
+      border-radius:1.5rem;
+      box-shadow:0 8px 32px rgba(31,38,135,.37);
+    }
+    .option-btn{transition:all .25s ease;position:relative;overflow:hidden;}
+    .option-btn:hover:not(:disabled){
+      transform:translateY(-4px);
+      box-shadow:0 10px 20px rgba(0,0,0,.1);
+      background-color:#f0f9ff;border-color:#3b82f6;
+    }
+    .correct-anim{
+      background-color:#10b981!important;color:#fff!important;
+      border-color:#059669!important;animation:pulse .5s;
+    }
+    .wrong-anim{
+      background-color:#ef4444!important;color:#fff!important;
+      border-color:#b91c1c!important;animation:shake .5s;
+    }
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+    #confetti-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50;}
+    mjx-container{font-size:110%!important;}
+
+    /* Giải thích gọn 1–2 dòng */
+    .clamp-2{
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+  </style>
+</head>
+
+<body class="flex items-center justify-center p-4">
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- START -->
+  <div id="start-screen" class="glass-panel p-10 max-w-3xl w-full text-center relative z-10">
+    <div class="text-6xl mb-4">🔥🚀</div>
+    <h1 class="text-4xl md:text-6xl font-bold text-blue-900 mb-2 title-font">Đấu Trường Toán 9</h1>
+    <h2 class="text-xl md:text-2xl text-blue-600 mb-8 font-bold uppercase tracking-wider">Bứt Phá Vào Lớp 10</h2>
+
+    <div class="bg-blue-50 p-6 rounded-xl mb-8 text-left border-l-4 border-blue-500">
+      <p class="text-gray-700 text-lg mb-2"><b>Lời nhắn từ cô Thu Bình:</b></p>
+      <p class="text-gray-600 italic">"Các chiến binh 2k11 thân mến! Đây là thời điểm vàng để ôn tập kiến thức học kỳ 1. Hãy thật bình tĩnh, tự tin và chinh phục trọn vẹn bộ câu hỏi này nhé. Cô tin các em sẽ làm được!"</p>
+    </div>
+
+    <button onclick="startGame()"
+      class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-blue-600 rounded-full hover:bg-blue-700 hover:scale-105 shadow-lg">
+      SẴN SÀNG CHIẾN ĐẤU ⚔️
+    </button>
+  </div>
+
+  <!-- GAME -->
+  <div id="game-screen" class="hidden w-full max-w-5xl z-10 flex flex-col h-[90vh]">
+    <div class="flex justify-between items-center mb-4 bg-white/90 p-4 rounded-xl shadow-lg backdrop-blur text-blue-900">
+      <div class="flex items-center gap-4">
+        <div class="text-center">
+          <span class="block text-xs font-bold opacity-60">ĐIỂM SỐ</span>
+          <span id="score" class="text-2xl font-bold text-green-600">0</span>
+        </div>
+        <div class="h-8 w-px bg-gray-300"></div>
+        <div class="text-center">
+          <span class="block text-xs font-bold opacity-60">TIẾN ĐỘ</span>
+          <span class="text-xl font-bold"><span id="current-q">1</span>/<span id="total-q">40</span></span>
+        </div>
+      </div>
+      <div class="text-4xl animate-bounce" id="mascot">🧐</div>
+    </div>
+
+    <div class="glass-panel p-6 md:p-10 mb-4 flex-grow flex flex-col justify-center relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-2 bg-gray-200">
+        <div id="progress-bar" class="h-full bg-green-500 transition-all duration-500" style="width:0%"></div>
+      </div>
+
+      <div id="question-content" class="text-center">
+        <h3 class="text-xl md:text-3xl font-bold text-gray-800 mb-8 leading-relaxed" id="question-text">Loading...</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full" id="options-grid"></div>
+      </div>
+
+      <!-- RATIONALE MODAL -->
+      <div id="rationale-modal" class="hidden absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center p-6 text-center">
+        <div id="feedback-icon" class="text-6xl mb-3">✨</div>
+        <h2 id="feedback-title" class="text-2xl font-bold mb-3"></h2>
+
+        <div class="w-full max-w-2xl bg-amber-50 border border-amber-200 rounded-xl p-4 text-left">
+          <div class="font-bold text-amber-800 mb-1">💡 Giải thích:</div>
+          <div id="feedback-rationale" class="text-gray-700 leading-relaxed clamp-2"></div>
+        </div>
+
+        <button onclick="nextQuestion()" class="mt-6 bg-indigo-600 text-white px-8 py-3 rounded-full font-bold hover:bg-indigo-700 transition shadow-lg">
+          Câu Tiếp Theo ➡️
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="hidden glass-panel p-10 max-w-2xl w-full text-center relative z-10">
+    <div class="mb-6">
+      <div class="inline-block p-4 rounded-full bg-yellow-100 text-6xl shadow-inner">🏆</div>
+    </div>
+    <h2 class="text-3xl font-bold text-gray-800 mb-2">Tổng Kết Đấu Trường</h2>
+    <p class="text-gray-500 mb-6">Kết quả bài làm của em</p>
+
+    <div class="grid grid-cols-2 gap-4 mb-8">
+      <div class="bg-green-50 p-4 rounded-xl border border-green-200">
+        <div class="text-green-800 text-sm font-bold uppercase">Điểm số</div>
+        <div class="text-3xl font-bold text-green-600" id="final-score">0</div>
+      </div>
+      <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
+        <div class="text-blue-800 text-sm font-bold uppercase">Độ chính xác</div>
+        <div class="text-3xl font-bold text-blue-600" id="final-percent">0%</div>
+      </div>
+    </div>
+
+    <p id="teacher-comment" class="text-lg text-indigo-800 font-medium italic mb-8">"..."</p>
+
+    <button onclick="location.reload()" class="bg-gray-800 text-white px-8 py-3 rounded-full font-bold hover:bg-gray-900 transition">
+      Làm Lại Bài Thi 🔄
+    </button>
+  </div>
+
+  <script>
+    // =======================
+    // 1) DATA (cô giữ nguyên)
+    // =======================
+    const questions = [
+      // ĐẠI SỐ
+      { q: "Trong các phương trình sau, phương trình nào là phương trình bậc nhất hai ẩn?", a: ["$x^2 + y = 5$", "$x + y = 3$", "$0x + 0y = 2$", "$3x^3 + y = 1$"], correct: 1, rational: "Dạng $ax+by=c$ với $a,b$ không đồng thời bằng 0." },
+      { q: "Cặp số $(1; -1)$ là nghiệm của hệ phương trình nào?", a: ["$\\begin{cases} x+y=0 \\\\ 2x+y=1 \\end{cases}$", "$\\begin{cases} x-y=0 \\\\ x+y=2 \\end{cases}$", "$\\begin{cases} 2x+y=3 \\\\ x-y=1 \\end{cases}$", "$\\begin{cases} x+y=2 \\\\ x-y=0 \\end{cases}$"], correct: 0, rational: "Thay $x=1, y=-1$: $1+(-1)=0$ và $2(1)+(-1)=1$." },
+      { q: "Điều kiện xác định của phương trình $\\frac{1}{x-1} + \\frac{1}{x} = 2$ là:", a: "$x \\ne 1$", b: "$x \\ne 0$", c: "$x \\ne 0$ và $x \\ne 1$", d: "$x \\ne 0$ hoặc $x \\ne 1$", correct: 2, rational: "Mẫu khác 0: $x-1\\ne0$ và $x\\ne0$." },
+      { q: "Bất phương trình nào sau đây là bất phương trình bậc nhất một ẩn?", a: "$x^2 + 1 > 0$", b: "$2x - 5 \\ge 0$", c: "$\\frac{1}{x} < 1$", d: "$0x + 3 > 0$", correct: 1, rational: "Dạng $ax+b\\, (>,<,\\le,\\ge)\\, 0$ với $a\\ne0$." },
+      { q: "Số nào sau đây có căn bậc hai số học bằng 18?", a: "9", b: "36", c: "324", d: "81", correct: 2, rational: "$\\sqrt{324}=18$." },
+      { q: "Kết quả của phép tính $\\sqrt[3]{(-15)^3} + \\sqrt[3]{19^3}$ là:", a: "4", b: "-4", c: "34", d: "-34", correct: 0, rational: "$-15+19=4$." },
+      { q: "Điều kiện xác định của biểu thức $\\sqrt{6-2x}$ là:", a: "$x < 3$", b: "$x > 3$", c: "$x \\le 3$", d: "$x \\ge 3$", correct: 2, rational: "$6-2x\\ge0\\Rightarrow x\\le3$." },
+      { q: "Căn bậc hai (không phải số học) của 100 là:", a: "10 và -10", b: "10", c: "-10", d: "100", correct: 0, rational: "100 có hai căn bậc hai: 10 và -10." },
+      { q: "Rút gọn $M = \\sqrt{(\\sqrt{3}-1)^2} + 1$ ta được:", a: "$2-\\sqrt{3}$", b: "$\\sqrt{3}$", c: "$2+\\sqrt{3}$", d: "$\\sqrt{3}-2$", correct: 1, rational: "$|\\sqrt3-1|+1=\\sqrt3$." },
+      { q: "Nghiệm của phương trình $\\sqrt{x-1}=3$ là:", a: "x=4", b: "x=10", c: "x=8", d: "x=7", correct: 1, rational: "$x-1=9\\Rightarrow x=10$." },
+      { q: "Rút gọn $\\sqrt{18y} + \\sqrt{8y} - 3\\sqrt{8y}$ (với $y \\ge 0$):", a: "$\\sqrt{2y}$", b: "$-\\sqrt{2y}$", c: "$2\\sqrt{y}$", d: "0", correct: 1, rational: "$3\\sqrt{2y}+2\\sqrt{2y}-6\\sqrt{2y}=-\\sqrt{2y}$." },
+      { q: "Giá trị của x thỏa mãn $\\sqrt[3]{x-1} + 1 = 3$ là:", a: "27", b: "9", c: "7", d: "-9", correct: 1, rational: "$\\sqrt[3]{x-1}=2\\Rightarrow x-1=8\\Rightarrow x=9$." },
+      { q: "Với 3 số $a, b, c$. Khẳng định nào đúng?", a: "Nếu $a > b$ thì $a+c > b+c$", b: "Nếu $a > b$ thì $ac > bc$", c: "Nếu $a > b$ thì $ac < bc$", d: "Nếu $a > b$ thì $a^2 > b^2$", correct: 0, rational: "Cộng cùng 1 số vào hai vế thì chiều BĐT không đổi." },
+
+      // HÌNH HỌC
+      { q: "Cho $\\Delta ABC$ vuông tại A, $AC=4, BC=5$. Tính $\\sin B$?", a: "$\\frac{3}{5}$", b: "$\\frac{4}{5}$", c: "$\\frac{3}{4}$", d: "$\\frac{4}{3}$", correct: 1, rational: "$\\sin B=\\frac{AC}{BC}=\\frac45$." },
+      { q: "Cho $\\Delta ABC$ vuông tại A. Hệ thức nào đúng?", a: "$AB = AC.\\sin C$", b: "$AB = AC.\\tan C$", c: "$AB = BC.\\sin B$", d: "$AB = BC.\\tan C$", correct: 1, rational: "$\\tan C=\\frac{AB}{AC}\\Rightarrow AB=AC\\tan C$." },
+      { q: "Nếu $\\alpha$ và $\\beta$ là hai góc phụ nhau thì:", a: "$\\sin \\alpha = \\cos \\beta$", b: "$\\sin \\alpha = \\sin \\beta$", c: "$\\tan \\alpha = \\tan \\beta$", d: "$\\cot \\alpha = \\cot \\beta$", correct: 0, rational: "Góc phụ nhau: $\\sin\\alpha=\\cos\\beta$." },
+      { q: "Cho $\\Delta ABC$ vuông tại A, đường cao AH. Hệ thức lượng nào đúng?", a: "$AH^2 = HB.HC$", b: "$AB^2 = HB.BC$", c: "$AC^2 = HC.HB$", d: "Cả A và B", correct: 3, rational: "Hệ thức lượng: $AH^2=BH\\cdot CH$ và $AB^2=BH\\cdot BC$." },
+      { q: "Tâm đối xứng của đường tròn là:", a: "Điểm bất kỳ trong đường tròn", b: "Tâm của đường tròn", c: "Điểm trên đường tròn", d: "Không có", correct: 1, rational: "Tâm O là tâm đối xứng." },
+      { q: "Trục đối xứng của đường tròn là:", a: "Chỉ đường kính đi qua điểm A", b: "Mọi đường thẳng đi qua tâm", c: "Mọi dây cung", d: "Các tiếp tuyến", correct: 1, rational: "Vô số trục đối xứng: mọi đường thẳng qua tâm." },
+      { q: "Vị trí tương đối của hai đường tròn $(O; 3cm)$ và $(O'; 4cm)$ với $OO' = 5cm$?", a: "Tiếp xúc ngoài", b: "Tiếp xúc trong", c: "Cắt nhau", d: "Không giao nhau", correct: 2, rational: "$|4-3|<5<4+3$ nên cắt nhau." },
+      { q: "Góc nội tiếp chắn nửa đường tròn có số đo bằng:", a: "$60^o$", b: "$90^o$", c: "$180^o$", d: "$45^o$", correct: 1, rational: "Chắn nửa đường tròn thì là góc vuông." },
+      { q: "Số đo góc ở tâm chắn cung $60^o$ là:", a: "$30^o$", b: "$60^o$", c: "$120^o$", d: "$90^o$", correct: 1, rational: "Góc ở tâm = số đo cung bị chắn." },
+      { q: "Chu vi đường tròn bán kính $R=9$ cm là:", a: "$18\\pi$ cm", b: "$9\\pi$ cm", c: "$81\\pi$ cm", d: "$3\\pi$ cm", correct: 0, rational: "$C=2\\pi R=18\\pi$." },
+      { q: "Diện tích hình tròn bán kính $R=10$ cm là:", a: "$20\\pi$ cm$^2$", b: "$100\\pi$ cm$^2$", c: "$10\\pi$ cm$^2$", d: "$50\\pi$ cm$^2$", correct: 1, rational: "$S=\\pi R^2=100\\pi$." },
+      { q: "Cho tứ giác ABCD nội tiếp, biết $\\widehat{A} = 80^o$. Tính $\\widehat{C}$?", a: "$80^o$", b: "$100^o$", c: "$90^o$", d: "$120^o$", correct: 1, rational: "$A+C=180^o\\Rightarrow C=100^o$." },
+
+      // HỖN HỢP
+      { q: "Biết $x=-3$ là nghiệm của bất phương trình nào?", a: "$2x+1 > 5$", b: "$x > 0$", c: "$2x+10 > 0$", d: "$x+5 < 0$", correct: 2, rational: "$2(-3)+10=4>0$." },
+      { q: "Tiếp tuyến của đường tròn thì:", a: "Vuông góc với bán kính tại tiếp điểm", b: "Song song với bán kính", c: "Cắt đường tròn tại 2 điểm", d: "Đi qua tâm", correct: 0, rational: "Tiếp tuyến ⟂ bán kính tại tiếp điểm." },
+      { q: "Độ dài cung $30^o$ của đường tròn bán kính 4dm là:", a: "$\\frac{2\\pi}{3}$ dm", b: "$\\frac{\\pi}{3}$ dm", c: "$\\frac{4\\pi}{3}$ dm", d: "$2\\pi$ dm", correct: 0, rational: "$l=\\frac{\\pi R n}{180}=\\frac{\\pi\\cdot4\\cdot30}{180}=\\frac{2\\pi}{3}$." },
+      { q: "Hình vành khuyên giới hạn bởi (O; R) và (O; r) có diện tích là:", a: "$\\pi(R^2 - r^2)$", b: "$\\pi(R-r)^2$", c: "$\\pi(R^2 + r^2)$", d: "$2\\pi(R-r)$", correct: 0, rational: "Diện tích = S(tròn lớn) − S(tròn nhỏ)." },
+      { q: "Cho $\\sin \\alpha = 0.6$. Tính $\\cos \\alpha$ (biết $\\alpha$ nhọn)?", a: "0.4", b: "0.8", c: "0.5", d: "0.75", correct: 1, rational: "$\\cos\\alpha=\\sqrt{1-0.6^2}=0.8$." }
+    ];
+
+    // =======================
+    // 2) UTILS: shuffle + rotate
+    // =======================
+    function shuffleArray(arr){
+      for(let i=arr.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]]=[arr[j],arr[i]];
+      }
+      return arr;
+    }
+
+    // Rotate options so correct index becomes targetIndex
+    function rotateToIndex(opts, correctIdx, targetIdx){
+      const n = opts.length;
+      const shift = (targetIdx - correctIdx + n) % n;
+      if(shift === 0) return {opts, correctIdx};
+      const rotated = opts.slice(-shift).concat(opts.slice(0, -shift));
+      const newCorrect = (correctIdx + shift) % n;
+      return {opts: rotated, correctIdx: newCorrect};
+    }
+
+    // =======================
+    // 3) PREP: random options + balance A/B/C/D
+    // =======================
+    function normalizeQuestions(raw){
+      // Convert each question to standard form:
+      // { q, options:[{text, isCorrect}], rationale }
+      return raw.map(item => {
+        let options;
+        if(Array.isArray(item.a)){
+          options = item.a.map((t, i) => ({ text: t, isCorrect: i === item.correct }));
+        } else {
+          // a,b,c,d string style
+          const arr = [item.a, item.b, item.c, item.d];
+          options = arr.map((t, i) => ({ text: t, isCorrect: i === item.correct }));
+        }
+        const rationale = item.rational || item.explain || item.explanation || "";
+        return { q: item.q, options, rationale };
+      });
+    }
+
+    function randomizeAndBalance(qs){
+      // Step 1: shuffle options each question
+      qs.forEach(q=>{
+        q.options = shuffleArray(q.options);
+      });
+
+      // Step 2: balance correct letters across A/B/C/D using greedy assignment
+      const n = qs.length;
+      const base = Math.floor(n/4);
+      const remainder = n % 4;
+      // target counts: distribute remainder to first letters A,B,C...
+      const targets = [base, base, base, base];
+      for(let i=0;i<remainder;i++) targets[i]++;
+
+      const used = [0,0,0,0];
+
+      qs.forEach(q=>{
+        let correctIdx = q.options.findIndex(o=>o.isCorrect);
+        // choose a letter that still has capacity; prefer the one with most remaining
+        const remaining = targets.map((t,i)=>t-used[i]);
+        let targetIdx = remaining.indexOf(Math.max(...remaining));
+        if(remaining[targetIdx] <= 0){
+          // fallback (shouldn't happen): keep current
+          targetIdx = correctIdx;
+        }
+        const rotated = rotateToIndex(q.options, correctIdx, targetIdx);
+        q.options = rotated.opts;
+        correctIdx = rotated.correctIdx;
+        used[correctIdx]++;
+      });
+
+      return qs;
+    }
+
+    let prepared = randomizeAndBalance(normalizeQuestions(questions));
+
+    // =======================
+    // 4) GAME STATE
+    // =======================
+    let currentIdx = 0;
+    let score = 0;
+    let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type){
+      if(audioCtx.state === "suspended") audioCtx.resume();
+      const now = audioCtx.currentTime;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if(type==="correct"){
+        osc.type="triangle";
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.linearRampToValueAtTime(880, now+0.1);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.3, now+0.05);
+        gain.gain.exponentialRampToValueAtTime(0.01, now+0.4);
+        osc.start(now); osc.stop(now+0.4);
+      } else if(type==="wrong"){
+        osc.type="sawtooth";
+        osc.frequency.setValueAtTime(100, now);
+        osc.frequency.linearRampToValueAtTime(80, now+0.3);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now+0.3);
+        osc.start(now); osc.stop(now+0.3);
+      } else if(type==="win"){
+        const notes=[523.25,659.25,783.99,1046.5,783.99,1046.5];
+        let t=now;
+        notes.forEach(freq=>{
+          const o=audioCtx.createOscillator();
+          const g=audioCtx.createGain();
+          o.connect(g); g.connect(audioCtx.destination);
+          o.type="sine"; o.frequency.value=freq;
+          o.start(t);
+          g.gain.setValueAtTime(0.2, t);
+          g.gain.exponentialRampToValueAtTime(0.01, t+0.2);
+          o.stop(t+0.25);
+          t += 0.15;
+        });
+      }
+    }
+
+    function fireConfetti(){
+      const canvas=document.getElementById("confetti-canvas");
+      const ctx=canvas.getContext("2d");
+      canvas.width=window.innerWidth;
+      canvas.height=window.innerHeight;
+
+      const particles=[];
+      const colors=["#FFD700","#FF6347","#00BFFF","#32CD32","#FF69B4"];
+
+      for(let i=0;i<100;i++){
+        particles.push({
+          x:canvas.width/2, y:canvas.height/2,
+          vx:(Math.random()-0.5)*15, vy:(Math.random()-0.5)*15,
+          color:colors[Math.floor(Math.random()*colors.length)],
+          life:1.0
+        });
+      }
+
+      function animate(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        let active=false;
+        particles.forEach(p=>{
+          p.x+=p.vx; p.y+=p.vy; p.vy+=0.2; p.life-=0.02;
+          if(p.life>0){
+            ctx.globalAlpha=p.life;
+            ctx.fillStyle=p.color;
+            ctx.fillRect(p.x,p.y,8,8);
+            active=true;
+          }
+        });
+        if(active) requestAnimationFrame(animate);
+        else ctx.clearRect(0,0,canvas.width,canvas.height);
+      }
+      animate();
+    }
+
+    function startGame(){
+      document.getElementById("start-screen").classList.add("hidden");
+      document.getElementById("game-screen").classList.remove("hidden");
+      document.getElementById("result-screen").classList.add("hidden");
+
+      score = 0;
+      currentIdx = 0;
+      document.getElementById("score").innerText = score;
+      document.getElementById("total-q").innerText = prepared.length;
+
+      renderQuestion();
+    }
+
+    function renderQuestion(){
+      if(currentIdx >= prepared.length){
+        endGame(); return;
+      }
+      const q = prepared[currentIdx];
+      document.getElementById("current-q").innerText = currentIdx + 1;
+
+      // progress: show true progress including current question
+      const percent = ((currentIdx + 1) / prepared.length) * 100;
+      document.getElementById("progress-bar").style.width = `${percent}%`;
+
+      document.getElementById("mascot").innerText = "🤔";
+
+      // IMPORTANT: use innerHTML so MathJax works for question text
+      const qt = document.getElementById("question-text");
+      qt.innerHTML = q.q;
+
+      const grid = document.getElementById("options-grid");
+      grid.innerHTML = "";
+
+      q.options.forEach((opt, idx)=>{
+        const btn = document.createElement("button");
+        btn.className = "option-btn bg-white border-2 border-transparent p-4 rounded-xl text-left shadow-sm text-gray-700 font-medium text-lg";
+        btn.innerHTML = `<span class="font-bold text-blue-500 mr-2">${String.fromCharCode(65+idx)}.</span> ${opt.text}`;
+        btn.onclick = ()=>checkAnswer(idx, btn);
+        grid.appendChild(btn);
+      });
+
+      if(window.MathJax) MathJax.typesetPromise();
+    }
+
+    function checkAnswer(selectedIdx, btn){
+      const buttons = document.querySelectorAll(".option-btn");
+      buttons.forEach(b=>b.disabled=true);
+
+      const q = prepared[currentIdx];
+      const correctIdx = q.options.findIndex(o=>o.isCorrect);
+      const isCorrect = selectedIdx === correctIdx;
+
+      const modal = document.getElementById("rationale-modal");
+      const feedbackTitle = document.getElementById("feedback-title");
+      const feedbackIcon = document.getElementById("feedback-icon");
+      const feedbackRationale = document.getElementById("feedback-rationale");
+
+      if(isCorrect){
+        btn.classList.add("correct-anim");
+        score += 10;
+        document.getElementById("score").innerText = score;
+        document.getElementById("mascot").innerText = "😎";
+        playSound("correct");
+        fireConfetti();
+
+        feedbackTitle.innerText = "Tuyệt Vời!";
+        feedbackTitle.className = "text-2xl font-bold mb-3 text-green-600";
+        feedbackIcon.innerText = "🎉";
+      }else{
+        btn.classList.add("wrong-anim");
+        buttons[correctIdx].classList.add("correct-anim");
+        document.getElementById("mascot").innerText = "😅";
+        playSound("wrong");
+
+        feedbackTitle.innerText = "Tiếc Quá!";
+        feedbackTitle.className = "text-2xl font-bold mb-3 text-red-600";
+        feedbackIcon.innerText = "💡";
+      }
+
+      // Explanation compact 1–2 lines
+      const explain = q.rationale && q.rationale.trim() ? q.rationale : `Đáp án đúng là ${String.fromCharCode(65 + correctIdx)}.`;
+      feedbackRationale.innerHTML = explain;
+
+      if(window.MathJax) MathJax.typesetPromise([feedbackRationale]);
+
+      setTimeout(()=>modal.classList.remove("hidden"), 500);
+    }
+
+    function nextQuestion(){
+      document.getElementById("rationale-modal").classList.add("hidden");
+      currentIdx++;
+      renderQuestion();
+    }
+
+    function endGame(){
+      document.getElementById("game-screen").classList.add("hidden");
+      document.getElementById("result-screen").classList.remove("hidden");
+
+      const maxScore = prepared.length * 10;
+      const percent = Math.round((score / maxScore) * 100);
+
+      document.getElementById("final-score").innerText = `${score}/${maxScore}`;
+      document.getElementById("final-percent").innerText = `${percent}%`;
+
+      let comment = "";
+      if(percent >= 90) comment = "Tuyệt vời! Em đã sẵn sàng bứt phá rồi!";
+      else if(percent >= 70) comment = "Rất tốt! Ôn thêm vài dạng nữa là hoàn hảo.";
+      else comment = "Không sao! Xem lại giải thích từng câu, em sẽ tiến bộ nhanh.";
+
+      document.getElementById("teacher-comment").innerText = comment;
+
+      playSound("win");
+      fireConfetti();
+    }
+
+    window.addEventListener("resize", ()=>{
+      const canvas=document.getElementById("confetti-canvas");
+      canvas.width=window.innerWidth;
+      canvas.height=window.innerHeight;
+    });
+  </script>
+</body>
+</html>
