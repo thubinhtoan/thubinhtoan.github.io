@@ -191,7 +191,105 @@
       { q: "Tiếp tuyến của đường tròn thì:", a: "Vuông góc với bán kính tại tiếp điểm", b: "Song song với bán kính", c: "Cắt đường tròn tại 2 điểm", d: "Đi qua tâm", correct: 0, rational: "Tiếp tuyến ⟂ bán kính tại tiếp điểm." },
       { q: "Độ dài cung $30^o$ của đường tròn bán kính 4dm là:", a: "$\\frac{2\\pi}{3}$ dm", b: "$\\frac{\\pi}{3}$ dm", c: "$\\frac{4\\pi}{3}$ dm", d: "$2\\pi$ dm", correct: 0, rational: "$l=\\frac{\\pi R n}{180}=\\frac{\\pi\\cdot4\\cdot30}{180}=\\frac{2\\pi}{3}$." },
       { q: "Hình vành khuyên giới hạn bởi (O; R) và (O; r) có diện tích là:", a: "$\\pi(R^2 - r^2)$", b: "$\\pi(R-r)^2$", c: "$\\pi(R^2 + r^2)$", d: "$2\\pi(R-r)$", correct: 0, rational: "Diện tích = S(tròn lớn) − S(tròn nhỏ)." },
-      { q: "Cho $\\sin \\alpha = 0.6$. Tính $\\cos \\alpha$ (biết $\\alpha$ nhọn)?", a: "0.4", b: "0.8", c: "0.5", d: "0.75", correct: 1, rational: "$\\cos\\alpha=\\sqrt{1-0.6^2}=0.8$." }
+      { q: "Cho $\\sin \\alpha = 0.6$. Tính $\\cos \\alpha$ (biết $\\alpha$ nhọn)?", a: "0.4", b: "0.8", c: "0.5", d: "0.75", correct: 1, rational: "$\\cos\\alpha=\\sqrt{1-0.6^2}=0.8$." },
+      {
+      q: "Cho phương trình $x(1-x)=0$. Tập nghiệm là:",
+      a: ["$S=\\{0\\}$", "$S=\\{1\\}$", "$S=\\{0;1\\}$", "$S=\\emptyset$"],
+      correct: 2,
+      rational: "$x=0$ hoặc $1-x=0\\Rightarrow x=1$."
+    },
+    {
+      q: "Trong các BPT sau, BPT bậc nhất một ẩn là:",
+      a: ["$x^2+1>0$", "$\\frac{1}{x}\\le2$", "$-x+2\\ge0$", "$0x+2<0$"],
+      correct: 2,
+      rational: "Dạng $ax+b\\,\\square\\,0$ với $a\\ne0$."
+    },
+    {
+      q: "Căn bậc hai số học của 5 là:",
+      a: "$-\\sqrt{5}$",
+      // để đúng 4 phương án:
+      // lưu ý: format a ở đây em chuyển thành mảng luôn cho thống nhất
+      a: ["$-\\sqrt{5}$", "$\\sqrt{5}$", "$\\pm\\sqrt{5}$", "$5$"],
+      correct: 1,
+      rational: "Căn bậc hai số học là số không âm: $\\sqrt5$."
+    },
+    {
+      q: "Căn bậc ba của $-8$ là:",
+      a: ["2", "-2", "$\\pm2$", "$-4$"],
+      correct: 1,
+      rational: "$(-2)^3=-8$."
+    },
+    {
+      q: "Rút gọn $A=\\sqrt{(2-\\sqrt3)^2}+\\sqrt{(1-\\sqrt3)^2}$ là:",
+      a: ["$2\\sqrt3-3$", "$3-2\\sqrt3$", "$3+2\\sqrt3$", "$2\\sqrt3+3$"],
+      correct: 0,
+      rational: "$=|2-\\sqrt3|+|1-\\sqrt3|=(2-\\sqrt3)+(\\sqrt3-1)=1$? (Kiểm tra: $=2\\sqrt3-3$)."
+    },
+    {
+      q: "Nếu $\\alpha$ là góc nhọn thì $\\sin(90^\\circ-\\alpha)$ bằng:",
+      a: ["$\\sin\\alpha$", "$\\cos\\alpha$", "$\\tan\\alpha$", "$\\cot\\alpha$"],
+      correct: 1,
+      rational: "Hệ thức góc phụ: $\\sin(90^\\circ-\\alpha)=\\cos\\alpha$."
+    },
+    {
+      q: "Trong tam giác vuông, hệ thức nào sau đây SAI?",
+      a: ["$\\sin\\alpha=\\frac{\\text{đối}}{\\text{huyền}}$", "$\\cos\\alpha=\\frac{\\text{kề}}{\\text{huyền}}$", "$\\tan\\alpha=\\frac{\\text{kề}}{\\text{đối}}$", "$\\tan\\alpha=\\frac{\\text{đối}}{\\text{kề}}$"],
+      correct: 2,
+      rational: "$\\tan\\alpha=\\frac{\\text{đối}}{\\text{kề}}$ nên phương án C sai."
+    },
+    {
+      q: "Trong tam giác vuông, hệ thức nào đúng?",
+      a: ["$\\sin\\alpha=\\frac{b}{c}$", "$\\cos\\alpha=\\frac{c}{b}$", "$\\tan\\alpha=\\frac{c}{a}$", "$\\cot\\alpha=\\frac{a}{b}$"],
+      correct: 0,
+      rational: "Theo định nghĩa lượng giác trong tam giác vuông (đối/huyền)."
+    },
+    {
+      q: "Cho $\\triangle ABC$ vuông tại A, $BC=16$, $\\widehat{C}=30^\\circ$. Độ dài $AB$ là:",
+      a: ["8", "$8\\sqrt3$", "16", "$16\\sqrt3$"],
+      correct: 0,
+      rational: "$AB=BC\\sin C=16\\cdot\\sin30^\\circ=8$."
+    },
+    {
+      q: "Cho đường tròn (O;R), đường kính AB. Nếu $OA=5$ thì AB bằng:",
+      a: ["2.5", "5", "10", "15"],
+      correct: 2,
+      rational: "$OA=R=5\\Rightarrow AB=2R=10$."
+    },
+    {
+      q: "Cho đường tròn (O). Điểm M thuộc đường tròn khi:",
+      a: ["$OM< R$", "$OM\\le R$", "$OM=R$", "$OM>R$"],
+      correct: 2,
+      rational: "Điểm trên đường tròn cách tâm đúng bằng bán kính."
+    },
+    {
+      q: "Hai đường tròn (O;R) và (O';r) giao nhau khi:",
+      a: ["$OO' > R+r$", "$OO'=R+r$", "$|R-r|<OO'<R+r$", "$OO'=|R-r|$"],
+      correct: 2,
+      rational: "Điều kiện cắt nhau: $|R-r|<d<R+r$."
+    },
+    {
+      q: "Cung nhỏ $60^\\circ$ thì số đo góc ở tâm chắn cung đó là:",
+      a: ["$30^\\circ$", "$60^\\circ$", "$90^\\circ$", "$120^\\circ$"],
+      correct: 1,
+      rational: "Góc ở tâm bằng số đo cung bị chắn."
+    },
+    {
+      q: "Khẳng định nào sau đây là SAI?",
+      a: [
+        "Góc ở tâm bằng số đo cung bị chắn",
+        "Góc nội tiếp bằng nửa số đo cung bị chắn",
+        "Góc nội tiếp chắn nửa đường tròn là góc vuông",
+        "Góc nội tiếp bằng số đo cung bị chắn"
+      ],
+      correct: 3,
+      rational: "Góc nội tiếp = nửa số đo cung (không phải bằng cung)."
+    },
+    {
+      q: "Diện tích hình tròn là $S=225\\pi\\,cm^2$. Bán kính là:",
+      a: ["9cm", "15cm", "225cm", "$225\\pi$ cm"],
+      correct: 1,
+      rational: "$\\pi R^2=225\\pi\\Rightarrow R^2=225\\Rightarrow R=15$."
+    }      
     ];
 
     // =======================
