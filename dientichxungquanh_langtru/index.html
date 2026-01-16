@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="vi" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thí Nghiệm Lăng Trụ Tứ Giác</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body { box-sizing: border-box; }
+    * { font-family: 'Baloo 2', cursive; }
+
+    .layer { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    .pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 200, 50, 0.6)); }
+      50% { filter: drop-shadow(0 0 20px rgba(255, 200, 50, 1)); }
+    }
+    .float { animation: float 3s ease-in-out infinite; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .sparkle { animation: sparkle 1.5s ease-in-out infinite; }
+    @keyframes sparkle {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 12px;
+      border-radius: 6px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+  </style>
+
+  <style>@view-transition { navigation: auto; }</style>
+</head>
+
+<body class="h-full overflow-auto">
+  <div id="app-container" class="min-h-full w-full p-4 md:p-8">
+
+    <!-- Header -->
+    <div class="text-center mb-6">
+      <h1 id="main-title" class="text-2xl md:text-4xl font-bold mb-2">🔬 Khám Phá Diện Tích Xung Quanh</h1>
+      <p id="subtitle" class="text-lg md:text-xl opacity-90">Hình Lăng Trụ Đứng Tứ Giác (đáy vuông)</p>
+    </div>
+
+    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- Left Panel - 3D Visualization -->
+      <div id="viz-panel" class="rounded-3xl p-6 shadow-2xl">
+        <h2 class="text-xl font-bold mb-4 text-center">📐 Mô Hình Trực Quan</h2>
+
+        <!-- SVG Visualization -->
+        <div class="relative flex justify-center items-center" style="height: 400px;">
+          <svg id="prism-svg" viewBox="0 0 500 450" class="w-full" style="max-width: 500px;">
+
+            <!-- Definitions -->
+            <defs>
+              <linearGradient id="topGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#FFD700;stop-opacity:0.95" />
+                <stop offset="100%" style="stop-color:#FFA500;stop-opacity:0.95" />
+              </linearGradient>
+
+              <linearGradient id="frontGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#4ECDC4;stop-opacity:0.9" />
+                <stop offset="100%" style="stop-color:#2CB5AC;stop-opacity:0.9" />
+              </linearGradient>
+
+              <linearGradient id="rightGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#45B7AF;stop-opacity:0.85" />
+                <stop offset="100%" style="stop-color:#3A9990;stop-opacity:0.85" />
+              </linearGradient>
+
+              <linearGradient id="leftGrad" x1="100%" y1="0%" x2="0%" y2="0%">
+                <stop offset="0%" style="stop-color:#5DD5CC;stop-opacity:0.85" />
+                <stop offset="100%" style="stop-color:#4ECDC4;stop-opacity:0.85" />
+              </linearGradient>
+
+              <linearGradient id="backGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" style="stop-color:#3A9990;stop-opacity:0.8" />
+                <stop offset="100%" style="stop-color:#45B7AF;stop-opacity:0.8" />
+              </linearGradient>
+            </defs>
+
+            <!-- 3D Prism will be drawn here -->
+            <g id="prism-group"></g>
+
+            <!-- Labels -->
+            <text id="height-label" x="420" y="225" fill="currentColor" font-size="16" font-weight="bold" text-anchor="middle">
+              h =
+              <tspan id="h-value">5</tspan>
+            </text>
+
+            <text id="perimeter-label" x="250" y="420" fill="currentColor" font-size="16" font-weight="bold" text-anchor="middle">
+              Chu vi P =
+              <tspan id="p-value">24</tspan>
+            </text>
+          </svg>
+
+          <!-- Floating hint -->
+          <div id="hint-bubble" class="absolute top-2 right-2 px-3 py-2 rounded-xl text-sm font-medium float"
+               style="background: rgba(255,255,255,0.9); color: #333;">
+            🎮 Kéo thanh xoay để nhìn góc khác
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="mt-6 space-y-4">
+          <div>
+            <label class="block text-sm font-semibold mb-2">
+              📏 Chiều cao h: <span id="layer-count" class="font-bold">5</span>
+            </label>
+            <input type="range" id="layer-slider" min="1" max="15" value="5" class="w-full">
+            <p class="text-xs opacity-75 mt-1">
+              Ghi chú: hệ số vẽ phóng to chỉ để nhìn rõ; giá trị toán học dùng đúng h ở trên.
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold mb-2">
+              ⬛ Cạnh đáy a (đáy vuông): <span id="base-size" class="font-bold">6</span>
+            </label>
+            <input type="range" id="base-slider" min="3" max="10" value="6" class="w-full">
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm font-semibold mb-2">
+                🔄 Xoay ngang: <span id="rotate-x-value" class="font-bold">-20°</span>
+              </label>
+              <input type="range" id="rotate-x-slider" min="-60" max="60" value="-20" class="w-full">
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">
+                ↩️ Xoay dọc: <span id="rotate-y-value" class="font-bold">25°</span>
+              </label>
+              <input type="range" id="rotate-y-slider" min="-60" max="60" value="25" class="w-full">
+            </div>
+
+            <div class="flex gap-3">
+              <button id="spread-btn" class="flex-1 px-4 py-3 rounded-xl font-bold transition-all duration-300 hover:scale-105 active:scale-95">
+                🎯 Tách Lớp
+              </button>
+              <button id="stack-btn" class="flex-1 px-4 py-3 rounded-xl font-bold transition-all duration-300 hover:scale-105 active:scale-95">
+                📚 Xếp Chồng
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel - Discovery -->
+      <div class="space-y-4">
+
+        <!-- Concept Explanation -->
+        <div id="concept-panel" class="rounded-3xl p-6 shadow-2xl">
+          <h2 class="text-xl font-bold mb-4">💭 Ý Tưởng Chính</h2>
+          <div class="space-y-3 text-base">
+            <p id="discovery-text" class="leading-relaxed">
+              Hãy tưởng tượng diện tích xung quanh của lăng trụ như <strong>các “dải” xung quanh đáy</strong> xếp chồng theo chiều cao!
+            </p>
+
+            <div class="flex items-center gap-3 p-3 rounded-xl" style="background: rgba(255,255,255,0.15);">
+              <span class="text-3xl">📦</span>
+              <span>Một vòng quanh đáy có độ dài bằng chu vi P</span>
+            </div>
+
+            <div class="flex items-center gap-3 p-3 rounded-xl" style="background: rgba(255,255,255,0.15);">
+              <span class="text-3xl">📊</span>
+              <span>Chiều cao h càng lớn thì diện tích xung quanh càng tăng</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formula Discovery -->
+        <div id="formula-panel" class="rounded-3xl p-6 shadow-2xl">
+          <h2 class="text-xl font-bold mb-4">🧮 Khám Phá Công Thức</h2>
+
+          <div class="space-y-4">
+            <div class="p-4 rounded-2xl" style="background: rgba(255,255,255,0.1);">
+              <p class="font-semibold mb-2">Bước 1: Tính chu vi đáy (đáy vuông)</p>
+              <div class="text-center text-lg">
+                <span>P = 4a = </span>
+                <span id="calc-perimeter" class="font-bold">24</span>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl" style="background: rgba(255,255,255,0.1);">
+              <p class="font-semibold mb-2">Bước 2: Nhân với chiều cao</p>
+              <div class="text-center text-lg">
+                <span>S<sub>xq</sub> = P × h = </span>
+                <span id="calc-area" class="font-bold">120</span>
+              </div>
+            </div>
+
+            <div id="formula-box" class="p-5 rounded-2xl text-center pulse-glow">
+              <p class="text-sm mb-2 opacity-80">CÔNG THỨC</p>
+              <p class="text-2xl md:text-3xl font-bold">S<sub>xq</sub> = P × h</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Calculation -->
+        <div id="calc-panel" class="rounded-3xl p-6 shadow-2xl">
+          <h2 class="text-xl font-bold mb-4">✨ Kết Quả Trực Tiếp</h2>
+
+          <div class="grid grid-cols-3 gap-3 text-center">
+            <div class="p-3 rounded-xl" style="background: rgba(255,255,255,0.15);">
+              <p class="text-sm opacity-80">Chu vi P</p>
+              <p id="result-p" class="text-2xl font-bold">24</p>
+            </div>
+
+            <div class="p-3 rounded-xl" style="background: rgba(255,255,255,0.15);">
+              <p class="text-sm opacity-80">Chiều cao h</p>
+              <p id="result-h" class="text-2xl font-bold">5</p>
+            </div>
+
+            <div class="p-3 rounded-xl" style="background: rgba(255,255,255,0.15);">
+              <p id="result-area" class="text-2xl font-bold">120</p>
+              <p class="text-sm opacity-80">S<sub>xq</sub></p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="text-center mt-6 opacity-75">
+      <p class="text-sm">🎮 Thử thay đổi a và h để thấy công thức S<sub>xq</sub> = P × h hoạt động!</p>
+    </div>
+
+  </div>
+
+  <script>
+    // Default configuration
+    const defaultConfig = {
+      background_color: '#1a1a2e',
+      surface_color: '#16213e',
+      text_color: '#ffffff',
+      primary_color: '#FFD700',
+      secondary_color: '#4ECDC4',
+      font_family: 'Baloo 2',
+      font_size: 16,
+      main_title: '🔬 Khám Phá Diện Tích Xung Quanh',
+      discovery_text: 'Hãy tưởng tượng diện tích xung quanh của lăng trụ như các “dải” xung quanh đáy xếp chồng theo chiều cao!'
+    };
+
+    // State
+    let isSpread = false;
+    let hValue = 5;      // dùng đúng nghĩa: chiều cao h
+    let baseSize = 6;    // cạnh đáy a (đáy vuông)
+    let rotateX = -20;
+    let rotateY = 25;
+
+    // DOM Elements
+    const layerSlider = document.getElementById('layer-slider');
+    const baseSlider = document.getElementById('base-slider');
+    const rotateXSlider = document.getElementById('rotate-x-slider');
+    const rotateYSlider = document.getElementById('rotate-y-slider');
+    const spreadBtn = document.getElementById('spread-btn');
+    const stackBtn = document.getElementById('stack-btn');
+    const prismGroup = document.getElementById('prism-group');
+
+    // 3D Projection functions
+    function project3D(x, y, z, rotX, rotY) {
+      const angleX = (rotX * Math.PI) / 180;
+      const angleY = (rotY * Math.PI) / 180;
+
+      // Rotate around X axis
+      let y1 = y * Math.cos(angleX) - z * Math.sin(angleX);
+      let z1 = y * Math.sin(angleX) + z * Math.cos(angleX);
+
+      // Rotate around Y axis
+      let x2 = x * Math.cos(angleY) + z1 * Math.sin(angleY);
+      let z2 = -x * Math.sin(angleY) + z1 * Math.cos(angleY);
+
+      // Perspective projection
+      const perspective = 800;
+      const scale = perspective / (perspective + z2);
+
+      return {
+        x: 250 + x2 * scale,
+        y: 225 + y1 * scale,
+        z: z2
+      };
+    }
+
+    // Draw 3D Prism
+    function drawPrism(config) {
+      prismGroup.innerHTML = '';
+
+      // Define prism dimensions (vẽ phóng to để dễ nhìn)
+      const width = baseSize * 12;
+      const depth = baseSize * 12;
+      const height = hValue * 15;
+
+      const spreadOffset = isSpread ? 80 : 0;
+
+      if (isSpread) {
+        // Draw separate layers when spread (mỗi "lớp" minh hoạ 1 đơn vị chiều cao)
+        for (let i = 0; i < hValue; i++) {
+          const yOffset = i * (height / hValue + spreadOffset / hValue);
+          drawLayer(i, yOffset, width, depth, height / hValue, config);
+        }
+      } else {
+        drawCompletePrism(width, depth, height, config);
+      }
+
+      drawDimensionLines(width, depth, height, config);
+    }
+
+    function drawLayer(index, yOffset, width, depth, layerHeight, config) {
+      const primaryColor = config.primary_color || defaultConfig.primary_color;
+      const secondaryColor = config.secondary_color || defaultConfig.secondary_color;
+
+      // 8 vertices
+      const vertices = [
+        [-width/2, -yOffset, -depth/2],
+        [ width/2, -yOffset, -depth/2],
+        [ width/2, -yOffset,  depth/2],
+        [-width/2, -yOffset,  depth/2],
+        [-width/2, -yOffset - layerHeight, -depth/2],
+        [ width/2, -yOffset - layerHeight, -depth/2],
+        [ width/2, -yOffset - layerHeight,  depth/2],
+        [-width/2, -yOffset - layerHeight,  depth/2]
+      ];
+
+      const projected = vertices.map(v => project3D(v[0], v[1], v[2], rotateX, rotateY));
+
+      const faces = [
+        { points: [4, 5, 6, 7], color: primaryColor, name: 'top' },
+        { points: [0, 1, 2, 3], color: primaryColor + '80', name: 'bottom' },
+        { points: [1, 2, 6, 5], color: secondaryColor, name: 'front' },
+        { points: [0, 3, 7, 4], color: secondaryColor + 'CC', name: 'back' },
+        { points: [2, 3, 7, 6], color: secondaryColor + 'E6', name: 'right' },
+        { points: [0, 1, 5, 4], color: secondaryColor + 'E6', name: 'left' }
+      ];
+
+      faces.forEach(face => {
+        face.avgZ = face.points.reduce((sum, i) => sum + projected[i].z, 0) / face.points.length;
+      });
+      faces.sort((a, b) => a.avgZ - b.avgZ);
+
+      faces.forEach(face => {
+        const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        polygon.setAttribute('points', face.points.map(i => `${projected[i].x},${projected[i].y}`).join(' '));
+        polygon.setAttribute('fill', face.color);
+        polygon.setAttribute('stroke', '#000000');
+        polygon.setAttribute('stroke-width', '1.5');
+        polygon.setAttribute('opacity', '0.9');
+        polygon.classList.add('layer');
+        prismGroup.appendChild(polygon);
+      });
+
+      if (hValue <= 10) {
+        const centerX = (projected[4].x + projected[5].x + projected[6].x + projected[7].x) / 4;
+        const centerY = (projected[4].y + projected[5].y + projected[6].y + projected[7].y) / 4;
+
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', centerX);
+        text.setAttribute('y', centerY);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('dominant-baseline', 'middle');
+        text.setAttribute('font-size', '12');
+        text.setAttribute('font-weight', 'bold');
+        text.setAttribute('fill', '#1a1a2e');
+        text.textContent = `h${index + 1}`;
+        prismGroup.appendChild(text);
+      }
+    }
+
+    function drawCompletePrism(width, depth, height, config) {
+      const primaryColor = config.primary_color || defaultConfig.primary_color;
+
+      const vertices = [
+        [-width/2,  height/2, -depth/2], // 0
+        [ width/2,  height/2, -depth/2], // 1
+        [ width/2,  height/2,  depth/2], // 2
+        [-width/2,  height/2,  depth/2], // 3
+        [-width/2, -height/2, -depth/2], // 4
+        [ width/2, -height/2, -depth/2], // 5
+        [ width/2, -height/2,  depth/2], // 6
+        [-width/2, -height/2,  depth/2]  // 7
+      ];
+
+      const projected = vertices.map(v => project3D(v[0], v[1], v[2], rotateX, rotateY));
+
+      const faces = [
+        { points: [0, 1, 2, 3], color: 'url(#topGrad)' },
+        { points: [4, 5, 6, 7], color: primaryColor + '60' },
+        { points: [2, 3, 7, 6], color: 'url(#frontGrad)' },
+        { points: [0, 1, 5, 4], color: 'url(#backGrad)' },
+        { points: [1, 2, 6, 5], color: 'url(#rightGrad)' },
+        { points: [0, 3, 7, 4], color: 'url(#leftGrad)' }
+      ];
+
+      faces.forEach(face => {
+        face.avgZ = face.points.reduce((sum, i) => sum + projected[i].z, 0) / face.points.length;
+      });
+      faces.sort((a, b) => a.avgZ - b.avgZ);
+
+      faces.forEach(face => {
+        const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        polygon.setAttribute('points', face.points.map(i => `${projected[i].x},${projected[i].y}`).join(' '));
+        polygon.setAttribute('fill', face.color);
+        polygon.setAttribute('stroke', '#000000');
+        polygon.setAttribute('stroke-width', '2');
+        polygon.setAttribute('stroke-linejoin', 'round');
+        prismGroup.appendChild(polygon);
+      });
+    }
+
+    function drawDimensionLines(width, depth, height, config) {
+      const secondaryColor = config.secondary_color || defaultConfig.secondary_color;
+
+      if (!isSpread) {
+        const p1 = project3D(width/2 + 40, height/2, 0, rotateX, rotateY);
+        const p2 = project3D(width/2 + 40, -height/2, 0, rotateX, rotateY);
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', p1.x);
+        line.setAttribute('y1', p1.y);
+        line.setAttribute('x2', p2.x);
+        line.setAttribute('y2', p2.y);
+        line.setAttribute('stroke', secondaryColor);
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('stroke-dasharray', '5,5');
+        prismGroup.appendChild(line);
+
+        const dot1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot1.setAttribute('cx', p1.x);
+        dot1.setAttribute('cy', p1.y);
+        dot1.setAttribute('r', '4');
+        dot1.setAttribute('fill', secondaryColor);
+        prismGroup.appendChild(dot1);
+
+        const dot2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot2.setAttribute('cx', p2.x);
+        dot2.setAttribute('cy', p2.y);
+        dot2.setAttribute('r', '4');
+        dot2.setAttribute('fill', secondaryColor);
+        prismGroup.appendChild(dot2);
+      }
+    }
+
+    // Update calculations (đáy vuông: P = 4a; Sxq = P*h)
+    function updateCalculations() {
+      const perimeter = baseSize * 4;
+      const area = perimeter * hValue;
+
+      document.getElementById('layer-count').textContent = hValue;
+      document.getElementById('base-size').textContent = baseSize;
+
+      document.getElementById('h-value').textContent = hValue;
+      document.getElementById('p-value').textContent = perimeter;
+
+      document.getElementById('calc-perimeter').textContent = perimeter;
+      document.getElementById('calc-area').textContent = area;
+
+      document.getElementById('result-p').textContent = perimeter;
+      document.getElementById('result-h').textContent = hValue;
+      document.getElementById('result-area').textContent = area;
+    }
+
+    function updateModeButtons() {
+      // active state rõ ràng
+      if (isSpread) {
+        spreadBtn.style.opacity = '1';
+        spreadBtn.style.transform = 'scale(1.02)';
+        stackBtn.style.opacity = '0.65';
+        stackBtn.style.transform = 'scale(1)';
+      } else {
+        spreadBtn.style.opacity = '0.65';
+        spreadBtn.style.transform = 'scale(1)';
+        stackBtn.style.opacity = '1';
+        stackBtn.style.transform = 'scale(1.02)';
+      }
+    }
+
+    // Apply config to UI
+    function applyConfig(config) {
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_color || defaultConfig.primary_color;
+      const secondaryColor = config.secondary_color || defaultConfig.secondary_color;
+      const fontFamily = config.font_family || defaultConfig.font_family;
+      const fontSize = config.font_size || defaultConfig.font_size;
+
+      document.getElementById('app-container').style.background =
+        `linear-gradient(135deg, ${bgColor} 0%, ${surfaceColor} 100%)`;
+
+      document.body.style.color = textColor;
+
+      document.getElementById('viz-panel').style.background = surfaceColor;
+      document.getElementById('concept-panel').style.background = surfaceColor;
+      document.getElementById('formula-panel').style.background = surfaceColor;
+      document.getElementById('calc-panel').style.background = surfaceColor;
+
+      document.getElementById('formula-box').style.background =
+        `linear-gradient(135deg, ${primaryColor}33, ${secondaryColor}33)`;
+      document.getElementById('formula-box').style.border = `3px solid ${primaryColor}`;
+
+      spreadBtn.style.background = primaryColor;
+      spreadBtn.style.color = bgColor;
+      stackBtn.style.background = secondaryColor;
+      stackBtn.style.color = bgColor;
+
+      const sliders = document.querySelectorAll('input[type="range"]');
+      sliders.forEach(slider => {
+        slider.style.background = `linear-gradient(to right, ${primaryColor}, ${secondaryColor})`;
+      });
+
+      document.body.style.fontFamily = `${fontFamily}, cursive`;
+      const baseFont = fontSize;
+      document.getElementById('main-title').style.fontSize = `${baseFont * 2}px`;
+      document.getElementById('subtitle').style.fontSize = `${baseFont * 1.25}px`;
+
+      document.getElementById('main-title').textContent = config.main_title || defaultConfig.main_title;
+      document.getElementById('discovery-text').innerHTML =
+        (config.discovery_text || defaultConfig.discovery_text)
+          .replace('các “dải” xung quanh đáy', '<strong>các “dải” xung quanh đáy</strong>');
+
+      drawPrism(config);
+      updateModeButtons();
+    }
+
+    // Event listeners
+    layerSlider.addEventListener('input', (e) => {
+      hValue = parseInt(e.target.value, 10);
+      updateCalculations();
+      drawPrism(window.elementSdk?.config || defaultConfig);
+    });
+
+    baseSlider.addEventListener('input', (e) => {
+      baseSize = parseInt(e.target.value, 10);
+      updateCalculations();
+      drawPrism(window.elementSdk?.config || defaultConfig);
+    });
+
+    rotateXSlider.addEventListener('input', (e) => {
+      rotateX = parseInt(e.target.value, 10);
+      document.getElementById('rotate-x-value').textContent = rotateX + '°';
+      drawPrism(window.elementSdk?.config || defaultConfig);
+    });
+
+    rotateYSlider.addEventListener('input', (e) => {
+      rotateY = parseInt(e.target.value, 10);
+      document.getElementById('rotate-y-value').textContent = rotateY + '°';
+      drawPrism(window.elementSdk?.config || defaultConfig);
+    });
+
+    spreadBtn.addEventListener('click', () => {
+      isSpread = true;
+      drawPrism(window.elementSdk?.config || defaultConfig);
+      updateModeButtons();
+    });
+
+    stackBtn.addEventListener('click', () => {
+      isSpread = false;
+      drawPrism(window.elementSdk?.config || defaultConfig);
+      updateModeButtons();
+    });
+
+    // Initialize SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig: defaultConfig,
+        onConfigChange: async (config) => {
+          applyConfig(config);
+        },
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => { config.background_color = value; window.elementSdk.setConfig({ background_color: value }); }
+            },
+            {
+              get: () => config.surface_color || defaultConfig.surface_color,
+              set: (value) => { config.surface_color = value; window.elementSdk.setConfig({ surface_color: value }); }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => { config.text_color = value; window.elementSdk.setConfig({ text_color: value }); }
+            },
+            {
+              get: () => config.primary_color || defaultConfig.primary_color,
+              set: (value) => { config.primary_color = value; window.elementSdk.setConfig({ primary_color: value }); }
+            },
+            {
+              get: () => config.secondary_color || defaultConfig.secondary_color,
+              set: (value) => { config.secondary_color = value; window.elementSdk.setConfig({ secondary_color: value }); }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => { config.font_family = value; window.elementSdk.setConfig({ font_family: value }); }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => { config.font_size = value; window.elementSdk.setConfig({ font_size: value }); }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ['main_title', config.main_title || defaultConfig.main_title],
+          ['discovery_text', config.discovery_text || defaultConfig.discovery_text]
+        ])
+      });
+    } else {
+      // Fallback initialization
+      applyConfig(defaultConfig);
+    }
+
+    // Initial render
+    updateCalculations();
+    updateModeButtons();
+  </script>
+</body>
+</html>
