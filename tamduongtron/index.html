@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bí Mật Tâm Đường Tròn - Cô Thu Bình Toán</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- MathJax for rendering math formulas -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Roboto:wght@400;500;700&display=swap');
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f0f9ff;
+      background-image: radial-gradient(#bae6fd 1px, transparent 1px);
+      background-size: 20px 20px;
+      min-height: 100vh;
+      color: #334155;
+      overflow-x: hidden;
+    }
+
+    .hand-font { font-family: 'Patrick Hand', cursive; }
+
+    .notebook-card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      border-left: 6px solid #0ea5e9;
+      position: relative;
+    }
+
+    .notebook-card::before {
+      content: '';
+      position: absolute;
+      left: 20px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: #e2e8f0;
+    }
+
+    .btn-geom {
+      background-color: #ffffff;
+      border: 2px solid #e2e8f0;
+      color: #475569;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-geom:hover:not(:disabled) {
+      border-color: #0ea5e9;
+      background-color: #f0f9ff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.1);
+    }
+
+    .btn-geom.correct {
+      background-color: #dcfce7 !important;
+      border-color: #22c55e !important;
+      color: #166534 !important;
+    }
+
+    .btn-geom.incorrect {
+      background-color: #fee2e2 !important;
+      border-color: #ef4444 !important;
+      color: #991b1b !important;
+    }
+
+    .progress-ring {
+      transition: stroke-dashoffset 0.35s;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+
+    .compass-icon { animation: spin-slow 10s linear infinite; }
+    @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body class="flex items-center justify-center p-4">
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="notebook-card max-w-2xl w-full p-10 text-center fade-in">
+    <div class="mb-6 flex justify-center">
+      <div class="relative w-24 h-24 bg-sky-100 rounded-full flex items-center justify-center">
+        <i class="fa-solid fa-compass-drafting text-5xl text-sky-600 compass-icon"></i>
+      </div>
+    </div>
+
+    <h1 class="text-4xl md:text-5xl font-bold mb-2 text-sky-700 hand-font">
+      Bí Mật Tâm Đường Tròn
+    </h1>
+    <p class="text-slate-500 mb-6 font-medium">Toán 9 - Chương 9: Đường tròn ngoại tiếp & Nội tiếp</p>
+
+    <div class="bg-sky-50 p-6 rounded-xl border border-sky-100 text-left mb-6">
+      <h3 class="font-bold text-sky-800 mb-3 flex items-center">
+        <i class="fa-solid fa-graduation-cap mr-2"></i> Nội dung thử thách:
+      </h3>
+      <ul class="space-y-2 text-sm text-slate-700">
+        <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Phân biệt tâm đường tròn ngoại tiếp & nội tiếp.</li>
+        <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Tính bán kính R, r trong các tam giác đặc biệt.</li>
+        <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Ứng dụng thực tế: Đặt trạm phát sóng, thiết kế vườn.</li>
+      </ul>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="bg-white p-5 rounded-xl border border-slate-100 text-left mb-8">
+      <div class="font-bold text-slate-700 mb-3 flex items-center">
+        <i class="fa-solid fa-sliders mr-2 text-slate-400"></i> Tuỳ chọn
+      </div>
+
+      <label class="flex items-center gap-3 cursor-pointer select-none mb-3">
+        <input id="toggle-shuffle-options" type="checkbox" class="w-5 h-5" checked>
+        <span class="text-slate-700">Random thứ tự đáp án (A/B/C/D)</span>
+      </label>
+
+      <label class="flex items-center gap-3 cursor-pointer select-none">
+        <input id="toggle-shuffle-questions" type="checkbox" class="w-5 h-5">
+        <span class="text-slate-700">Random thứ tự câu hỏi</span>
+      </label>
+
+      <p class="text-xs text-slate-400 mt-3">
+        (Nếu <b>tắt</b> random đáp án, bộ đề được chia đều đúng 5–5–5–5 cho A/B/C/D.)
+      </p>
+    </div>
+
+    <button onclick="game.start()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-4 px-10 rounded-full shadow-lg transform transition hover:scale-105 flex items-center mx-auto text-lg">
+      <i class="fa-solid fa-play mr-2"></i> Bắt Đầu Ngay
+    </button>
+    <div class="mt-6 text-xs text-slate-400">Biên soạn bởi Cô Thu Bình Toán</div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="hidden w-full max-w-4xl notebook-card p-6 md:p-10 fade-in">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6 pl-6">
+      <div class="flex items-center gap-3">
+        <div class="relative w-12 h-12">
+          <svg class="w-full h-full" viewBox="0 0 100 100">
+            <circle class="text-slate-200 stroke-current" stroke-width="8" cx="50" cy="50" r="40" fill="transparent"></circle>
+            <circle id="progress-ring-circle" class="text-sky-500 progress-ring stroke-current" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="40" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+          </svg>
+          <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold text-sky-700">
+            <span id="q-curr">1</span>/20
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 uppercase font-bold">Câu hỏi</div>
+          <div id="level-badge" class="text-xs px-2 py-0.5 rounded bg-green-100 text-green-700 font-bold">NHẬN BIẾT</div>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 px-4 py-2 rounded-lg border border-slate-100">
+        <div class="text-xs text-slate-400 uppercase font-bold text-right">Điểm số</div>
+        <div id="score" class="text-2xl font-bold text-sky-600 font-mono">0</div>
+      </div>
+    </div>
+
+    <!-- Question -->
+    <div class="pl-6 mb-8">
+      <h2 id="q-text" class="text-xl md:text-2xl font-medium text-slate-800 leading-relaxed"></h2>
+    </div>
+
+    <!-- Options -->
+    <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6 mb-6"></div>
+
+    <!-- Feedback Area -->
+    <div id="feedback-area" class="hidden pl-6 mt-6 bg-yellow-50 p-4 rounded-xl border-l-4 border-yellow-400 fade-in">
+      <div class="flex items-start gap-3">
+        <div id="fb-icon" class="text-2xl mt-0.5"></div>
+        <div>
+          <h4 id="fb-title" class="font-bold text-lg mb-1 hand-font"></h4>
+          <div id="fb-content" class="text-slate-700 text-sm leading-relaxed"></div>
+        </div>
+      </div>
+      <div class="mt-4 text-right">
+        <button onclick="game.next()" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-2 rounded-lg font-bold text-sm transition flex items-center ml-auto">
+          Tiếp theo <i class="fa-solid fa-angle-right ml-2"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- END SCREEN -->
+  <div id="end-screen" class="hidden notebook-card max-w-lg w-full p-8 text-center fade-in">
+    <div class="w-24 h-24 mx-auto bg-yellow-100 rounded-full flex items-center justify-center mb-6">
+      <i class="fa-solid fa-star text-5xl text-yellow-500"></i>
+    </div>
+
+    <h2 class="text-3xl font-bold text-slate-800 mb-2 hand-font">Tổng Kết Bài Học</h2>
+    <p class="text-slate-500 mb-8">Em đã hoàn thành xuất sắc chuyến hành trình!</p>
+
+    <div class="grid grid-cols-2 gap-4 mb-8">
+      <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+        <div class="text-xs text-slate-400 uppercase font-bold">Điểm số</div>
+        <div id="final-score" class="text-3xl font-bold text-sky-600">0</div>
+      </div>
+      <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+        <div class="text-xs text-slate-400 uppercase font-bold">Chính xác</div>
+        <div id="final-acc" class="text-3xl font-bold text-green-600">0%</div>
+      </div>
+    </div>
+
+    <div id="final-msg" class="mb-8 font-medium text-slate-600 bg-sky-50 p-4 rounded-lg italic"></div>
+
+    <button onclick="location.reload()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-xl shadow transition">
+      <i class="fa-solid fa-rotate mr-2"></i> Làm Lại Bài
+    </button>
+  </div>
+
+  <script>
+    // =========================
+    // HELPERS
+    // =========================
+    function shuffleInPlace(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function safeTypeset(targets) {
+      if (!window.MathJax || !MathJax.typesetPromise) return;
+      MathJax.typesetPromise(targets ? targets : undefined).catch(() => {});
+    }
+
+    // Build question for play: shuffle options but keep correct aligned
+    function buildQuestionForPlay(q, shuffleOptions) {
+      if (!shuffleOptions) return { ...q };
+
+      const idxs = [0,1,2,3];
+      shuffleInPlace(idxs);
+
+      const newOptions = idxs.map(i => q.options[i]);
+      const newCorrect = idxs.indexOf(q.correct);
+
+      return { ...q, options: newOptions, correct: newCorrect };
+    }
+
+    // =========================
+    // QUESTIONS
+    // ✅ Chia đều A/B/C/D 5–5–5–5 khi TẮT random đáp án
+    // (Cách làm: vì đáp án đúng vốn nằm ở options[0] của bản gốc, em xoay vị trí theo nhóm)
+    // =========================
+    const questions = [
+      // 1–5: đúng A (giữ nguyên)
+      {
+        text: "Tâm của đường tròn ngoại tiếp tam giác là giao điểm của ba đường nào?",
+        options: ["Ba đường trung trực", "Ba đường phân giác", "Ba đường cao", "Ba đường trung tuyến"],
+        correct: 0,
+        level: "NHẬN BIẾT",
+        rationale: "Tâm đường tròn ngoại tiếp là giao điểm của ba đường trung trực của tam giác."
+      },
+      {
+        text: "Tâm của đường tròn nội tiếp tam giác là giao điểm của ba đường nào?",
+        options: ["Ba đường phân giác", "Ba đường trung trực", "Ba đường cao", "Ba đường trung tuyến"],
+        correct: 0,
+        level: "NHẬN BIẾT",
+        rationale: "Tâm đường tròn nội tiếp là giao điểm của ba đường phân giác trong của tam giác."
+      },
+      {
+        text: "Tâm đường tròn ngoại tiếp tam giác vuông nằm ở đâu?",
+        options: ["Trung điểm cạnh huyền", "Đỉnh góc vuông", "Trong tam giác", "Ngoài tam giác"],
+        correct: 0,
+        level: "NHẬN BIẾT",
+        rationale: "Đối với tam giác vuông, tâm đường tròn ngoại tiếp là trung điểm của cạnh huyền."
+      },
+      {
+        text: "Khẳng định nào sau đây đúng về đường tròn ngoại tiếp tam giác?",
+        options: ["Đi qua ba đỉnh của tam giác", "Tiếp xúc với ba cạnh của tam giác", "Có tâm luôn nằm trong tam giác", "Có bán kính bằng nửa chu vi"],
+        correct: 0,
+        level: "NHẬN BIẾT",
+        rationale: "Đường tròn ngoại tiếp là đường tròn đi qua ba đỉnh của tam giác."
+      },
+      {
+        text: "Trong tam giác đều, tâm đường tròn ngoại tiếp và tâm đường tròn nội tiếp:",
+        options: ["Trùng nhau", "Khác nhau", "Đối xứng qua cạnh", "Nằm trên hai đường thẳng song song"],
+        correct: 0,
+        level: "NHẬN BIẾT",
+        rationale: "Trong tam giác đều, giao điểm 3 đường trung trực, phân giác, trung tuyến, đường cao đều trùng nhau."
+      },
+
+      // 6–10: đúng B (đưa đáp án đúng sang vị trí B)
+      {
+        text: "Tâm đường tròn ngoại tiếp của một tam giác tù nằm ở đâu?",
+        options: ["Nằm trong tam giác", "Nằm ngoài tam giác", "Nằm trên cạnh lớn nhất", "Trùng với một đỉnh"],
+        correct: 1,
+        level: "NHẬN BIẾT",
+        rationale: "Với tam giác tù, giao điểm các đường trung trực nằm ở miền ngoài tam giác."
+      },
+      {
+        text: "Đường tròn tiếp xúc với ba cạnh của tam giác được gọi là:",
+        options: ["Đường tròn ngoại tiếp", "Đường tròn nội tiếp", "Đường tròn bàng tiếp", "Đường tròn Euler"],
+        correct: 1,
+        level: "NHẬN BIẾT",
+        rationale: "Đường tròn tiếp xúc với 3 cạnh của tam giác gọi là đường tròn nội tiếp tam giác."
+      },
+      {
+        text: "Cho tam giác vuông có hai cạnh góc vuông là 6 cm và 8 cm. Bán kính đường tròn ngoại tiếp tam giác đó là:",
+        options: ["10 cm", "5 cm", "4 cm", "2.5 cm"],
+        correct: 1,
+        level: "THÔNG HIỂU",
+        rationale: "Cạnh huyền \\(BC = \\sqrt{6^2+8^2} = 10\\). Bán kính \\(R = BC/2 = 5\\) cm."
+      },
+      {
+        text: "Cho tam giác đều cạnh \\(a\\). Bán kính đường tròn ngoại tiếp \\(R\\) tính theo \\(a\\) là:",
+        options: ["\\(R = \\frac{a\\sqrt{3}}{6}\\)", "\\(R = \\frac{a\\sqrt{3}}{3}\\)", "\\(R = \\frac{a\\sqrt{3}}{2}\\)", "\\(R = a\\)"],
+        correct: 1,
+        level: "THÔNG HIỂU",
+        rationale: "Đường cao \\(h = \\frac{a\\sqrt{3}}{2}\\). \\(R = \\frac{2}{3}h = \\frac{a\\sqrt{3}}{3}\\)."
+      },
+      {
+        text: "Cho tam giác đều cạnh \\(6\\) cm. Bán kính đường tròn nội tiếp \\(r\\) là:",
+        options: ["\\(2\\sqrt{3}\\) cm", "\\(\\sqrt{3}\\) cm", "\\(3\\) cm", "\\(1.5\\) cm"],
+        correct: 1,
+        level: "THÔNG HIỂU",
+        rationale: "Đường cao \\(h=3\\sqrt{3}\\). \\(r=\\frac{1}{3}h=\\sqrt{3}\\) cm."
+      },
+
+      // 11–15: đúng C
+      {
+        text: "Tam giác ABC nội tiếp đường tròn đường kính BC = 10cm. Biết AB = 6cm. Độ dài cạnh AC là:",
+        options: ["4 cm", "10 cm", "8 cm", "\\(\\sqrt{136}\\) cm"],
+        correct: 2,
+        level: "THÔNG HIỂU",
+        rationale: "Tam giác vuông tại A. \\(AC = \\sqrt{10^2 - 6^2} = 8\\) cm."
+      },
+      {
+        text: "Cho tam giác ABC vuông tại A, có AB=3, AC=4. Bán kính đường tròn nội tiếp \\(r\\) của tam giác là:",
+        options: ["2", "2.5", "1", "5"],
+        correct: 2,
+        level: "THÔNG HIỂU",
+        rationale: "BC=5. \\(r=\\frac{AB+AC-BC}{2}=\\frac{3+4-5}{2}=1\\)."
+      },
+      {
+        text: "Hình vuông cạnh \\(4\\) cm nội tiếp đường tròn (O). Bán kính của đường tròn (O) là:",
+        options: ["\\(4\\) cm", "\\(2\\) cm", "\\(2\\sqrt{2}\\) cm", "\\(4\\sqrt{2}\\) cm"],
+        correct: 2,
+        level: "THÔNG HIỂU",
+        rationale: "Đường kính bằng đường chéo: \\(d=4\\sqrt{2}\\) ⇒ \\(R=2\\sqrt{2}\\)."
+      },
+      {
+        text: "Một lục giác đều cạnh \\(a\\) nội tiếp đường tròn bán kính \\(R\\). Mối liên hệ giữa \\(a\\) và \\(R\\) là:",
+        options: ["\\(a = R\\sqrt{3}\\)", "\\(a = R/2\\)", "\\(a = R\\)", "\\(a = R\\sqrt{2}\\)"],
+        correct: 2,
+        level: "THÔNG HIỂU",
+        rationale: "Lục giác đều nội tiếp: cạnh lục giác bằng bán kính đường tròn ngoại tiếp ⇒ \\(a=R\\)."
+      },
+      {
+        text: "Khoảng cách từ tâm đường tròn ngoại tiếp đến các đỉnh của tam giác là:",
+        options: ["Khác nhau", "Bằng đường cao", "Bằng nhau và bằng bán kính R", "Bằng một nửa cạnh đáy"],
+        correct: 2,
+        level: "THÔNG HIỂU",
+        rationale: "Tâm O cách đều 3 đỉnh nên đều bằng bán kính R."
+      },
+
+      // 16–20: đúng D
+      {
+        text: "Một người thợ muốn cắt một nắp cống hình tròn vừa khít để đậy lên một miệng cống hình tam giác đều có cạnh 1m. Hỏi đường kính tối thiểu của nắp cống hình tròn là bao nhiêu? (Làm tròn đến chữ số thập phân thứ 2)",
+        options: ["0.58 m", "1.00 m", "0.87 m", "1.15 m"],
+        correct: 3,
+        level: "VẬN DỤNG",
+        rationale: "Nắp cống là đường tròn ngoại tiếp tam giác đều. \\(R=\\frac{\\sqrt{3}}{3}\\approx0.577\\). \\(d=2R\\approx1.15\\) m."
+      },
+      {
+        text: "Ba ngôi nhà A, B, C xây dựng không thẳng hàng. Người ta muốn khoan một giếng nước cách đều cả ba ngôi nhà. Vị trí giếng nước là:",
+        options: ["Tâm đường tròn nội tiếp tam giác ABC", "Trọng tâm tam giác ABC", "Trực tâm tam giác ABC", "Tâm đường tròn ngoại tiếp tam giác ABC"],
+        correct: 3,
+        level: "VẬN DỤNG",
+        rationale: "Điểm cách đều 3 đỉnh A,B,C là tâm đường tròn ngoại tiếp tam giác ABC."
+      },
+      {
+        text: "Một khu vườn hình tam giác có ba cạnh là 13m, 14m, 15m. Người ta muốn trồng một bồn hoa hình tròn lớn nhất có thể nằm trọn trong khu vườn. Bán kính của bồn hoa đó là:",
+        options: ["8.125 m", "6 m", "3.5 m", "4 m"],
+        correct: 3,
+        level: "VẬN DỤNG",
+        rationale: "Bồn hoa là đường tròn nội tiếp. Heron: \\(S=84\\), \\(p=21\\). \\(r=S/p=84/21=4\\) m."
+      },
+      {
+        text: "Cho tam giác ABC đều cạnh \\(a\\) ngoại tiếp đường tròn (I; r). Tỉ số diện tích giữa hình tròn (I) và tam giác ABC là:",
+        options: ["\\(\\frac{\\pi\\sqrt{3}}{9}\\)", "\\(\\frac{\\pi}{4}\\)", "\\(\\frac{\\pi}{2\\sqrt{3}}\\)", "\\(\\frac{\\pi}{3\\sqrt{3}}\\)"],
+        correct: 3,
+        level: "VẬN DỤNG CAO",
+        rationale: "\\(r=\\frac{a\\sqrt{3}}{6}\\). \\(S_{tròn}=\\pi r^2=\\frac{\\pi a^2}{12}\\). \\(S_{tg}=\\frac{a^2\\sqrt{3}}{4}\\). Tỉ số = \\(\\frac{\\pi}{3\\sqrt{3}}\\)."
+      },
+      {
+        text: "Cho tam giác ABC nội tiếp đường tròn (O; R). Biết \\(\\angle A = 60^\\circ\\). Độ dài cạnh BC tính theo R là:",
+        options: ["\\(R\\)", "\\(R\\sqrt{2}\\)", "\\(2R\\)", "\\(R\\sqrt{3}\\)"],
+        correct: 3,
+        level: "VẬN DỤNG CAO",
+        rationale: "Định lý sin: \\(\\frac{BC}{\\sin A}=2R\\Rightarrow BC=2R\\sin60^\\circ=R\\sqrt{3}\\)."
+      }
+    ];
+
+    // =========================
+    // GAME ENGINE
+    // =========================
+    const game = {
+      index: 0,
+      score: 0,
+      audioCtx: null,
+      order: [],
+      settings: { shuffleOptions: true, shuffleQuestions: false },
+      currentQ: null,
+
+      initAudio: function() {
+        if (!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      },
+
+      playSound: function(type) {
+        if (!this.audioCtx) return;
+        const osc = this.audioCtx.createOscillator();
+        const gain = this.audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(this.audioCtx.destination);
+
+        const now = this.audioCtx.currentTime;
+        if (type === 'correct') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(500, now);
+          osc.frequency.exponentialRampToValueAtTime(1000, now + 0.1);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+          osc.start(now);
+          osc.stop(now + 0.5);
+        } else {
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(200, now);
+          osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        }
+      },
+
+      start: function() {
+        this.initAudio();
+
+        this.settings.shuffleOptions = document.getElementById('toggle-shuffle-options').checked;
+        this.settings.shuffleQuestions = document.getElementById('toggle-shuffle-questions').checked;
+
+        this.index = 0;
+        this.score = 0;
+
+        this.order = Array.from({ length: questions.length }, (_, i) => i);
+        if (this.settings.shuffleQuestions) shuffleInPlace(this.order);
+
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+
+        this.loadQuestion();
+      },
+
+      loadQuestion: function() {
+        const qIndex = this.order[this.index];
+        const baseQ = questions[qIndex];
+        const q = buildQuestionForPlay(baseQ, this.settings.shuffleOptions);
+        this.currentQ = q;
+
+        document.getElementById('q-curr').innerText = this.index + 1;
+        document.getElementById('score').innerText = this.score;
+        document.getElementById('q-text').innerHTML = q.text;
+        document.getElementById('level-badge').innerText = q.level;
+
+        // Badge color
+        const badge = document.getElementById('level-badge');
+        if (q.level.includes("NHẬN")) badge.className = "text-xs px-2 py-0.5 rounded bg-green-100 text-green-700 font-bold";
+        else if (q.level.includes("THÔNG")) badge.className = "text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-bold";
+        else if (q.level.includes("VẬN DỤNG") && !q.level.includes("CAO")) badge.className = "text-xs px-2 py-0.5 rounded bg-orange-100 text-orange-700 font-bold";
+        else badge.className = "text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-bold";
+
+        // Progress Ring (✅ FIX lên đúng 100%)
+        const circle = document.getElementById('progress-ring-circle');
+        const radius = circle.r.baseVal.value;
+        const circumference = radius * 2 * Math.PI;
+        const percent = ((this.index + 1) / questions.length) * 100;
+        const offset = circumference - (percent / 100) * circumference;
+        circle.style.strokeDasharray = `${circumference}`;
+        circle.style.strokeDashoffset = `${offset}`;
+
+        // Options render
+        const grid = document.getElementById('options-grid');
+        grid.innerHTML = '';
+        document.getElementById('feedback-area').classList.add('hidden');
+
+        q.options.forEach((opt, i) => {
+          const btn = document.createElement('button');
+          btn.className = "btn-geom w-full p-4 rounded-xl text-left font-medium text-lg flex items-start gap-3";
+          btn.innerHTML = `
+            <span class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-sm font-bold border border-slate-200 shrink-0">
+              ${String.fromCharCode(65 + i)}
+            </span>
+            <span class="leading-snug break-words">${opt}</span>
+          `;
+          btn.onclick = () => this.check(i, btn);
+          grid.appendChild(btn);
+        });
+
+        safeTypeset();
+      },
+
+      check: function(choice, btn) {
+        const q = this.currentQ;
+        const btns = document.querySelectorAll('.btn-geom');
+        btns.forEach(b => b.disabled = true);
+
+        if (choice === q.correct) {
+          btn.classList.add('correct');
+          this.score += 10;
+          document.getElementById('score').innerText = this.score;
+          this.playSound('correct');
+          this.showFeedback(true, q.rationale);
+          fireConfetti();
+        } else {
+          btn.classList.add('incorrect');
+          btns[q.correct].classList.add('correct');
+          this.playSound('incorrect');
+          this.showFeedback(false, q.rationale);
+        }
+      },
+
+      showFeedback: function(isCorrect, text) {
+        const area = document.getElementById('feedback-area');
+        const icon = document.getElementById('fb-icon');
+        const title = document.getElementById('fb-title');
+
+        area.classList.remove('hidden', 'bg-yellow-50', 'border-yellow-400', 'bg-green-50', 'border-green-500', 'bg-red-50', 'border-red-400');
+
+        if (isCorrect) {
+          area.classList.add('bg-green-50', 'border-green-500');
+          icon.innerHTML = '<i class="fa-solid fa-face-smile-wink text-green-500"></i>';
+          title.innerHTML = '<span class="text-green-700">Chính xác! Giỏi lắm!</span>';
+        } else {
+          area.classList.add('bg-red-50', 'border-red-400');
+          icon.innerHTML = '<i class="fa-solid fa-lightbulb text-red-500"></i>';
+          title.innerHTML = '<span class="text-red-700">Chưa đúng rồi. Xem giải thích nhé:</span>';
+        }
+
+        document.getElementById('fb-content').innerHTML = text;
+        safeTypeset([area]);
+      },
+
+      next: function() {
+        if (this.index < questions.length - 1) {
+          this.index++;
+          this.loadQuestion();
+        } else {
+          this.end();
+        }
+      },
+
+      end: function() {
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+
+        const score = this.score;
+        const acc = Math.round((score / (questions.length * 10)) * 100);
+
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('final-acc').innerText = acc + '%';
+
+        let msg = "";
+        if (acc >= 90) msg = "Tuyệt vời! Em đã nắm vững kiến thức về đường tròn.";
+        else if (acc >= 70) msg = "Rất tốt! Em hiểu bài khá kỹ.";
+        else msg = "Cần ôn tập thêm về cách tính bán kính nhé!";
+
+        document.getElementById('final-msg').innerText = msg;
+        if (acc >= 50) fireConfetti();
+      }
+    };
+
+    // =========================
+    // CONFETTI
+    // =========================
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animating = false;
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function fireConfetti() {
+      for (let i = 0; i < 80; i++) {
+        particles.push({
+          x: canvas.width / 2, y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 15,
+          vy: (Math.random() - 0.5) * 15,
+          life: 100,
+          color: `hsl(${Math.random() * 360}, 100%, 70%)`,
+          size: Math.random() * 5 + 3
+        });
+      }
+      if (!animating) updateConfetti();
+    }
+
+    function updateConfetti() {
+      if (particles.length === 0) {
+        animating = false;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+      animating = true;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < particles.length; i++) {
+        let p = particles[i];
+        p.x += p.vx; p.y += p.vy; p.vy += 0.5; p.life--;
+
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        if (i % 2 === 0) { ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); }
+        else { ctx.fillRect(p.x, p.y, p.size, p.size); }
+
+        if (p.life <= 0) { particles.splice(i, 1); i--; }
+      }
+      requestAnimationFrame(updateConfetti);
+    }
+
+    // INIT
+    // (không gọi tự động start, cô bấm nút bắt đầu)
+  </script>
+</body>
+</html>
