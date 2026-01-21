@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chinh Phục Hình Trụ - Cô Thu Bình Toán</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- MathJax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #E0F2FE 0%, #F0F9FF 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .btn-option { transition: all 0.2s; border: 2px solid #E5E7EB; }
+    .btn-option:hover:not(:disabled) { transform: translateY(-2px); border-color: #3B82F6; background-color: #EFF6FF; }
+    .btn-option.correct { border-color: #22C55E; background-color: #F0FDF4; color: #15803D; }
+    .btn-option.incorrect { border-color: #EF4444; background-color: #FEF2F2; color: #B91C1C; }
+
+    .fade-in { animation: fadeIn 0.5s ease-in; }
+    .slide-up { animation: slideUp 0.5s ease-out; }
+    .bounce { animation: bounce 0.5s cubic-bezier(0.36, 0, 0.66, -0.56); }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+    #confetti-canvas {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 50;
+    }
+    .progress-bar { transition: width 0.5s ease-in-out; }
+  </style>
+</head>
+
+<body class="flex items-center justify-center p-4">
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Start Screen -->
+  <div id="start-screen" class="card max-w-2xl w-full p-8 text-center slide-up">
+    <div class="mb-6">
+      <i class="fa-solid fa-shapes text-6xl text-blue-500 mb-4 bounce"></i>
+      <h1 class="text-4xl font-extrabold text-slate-800 mb-2">Chinh Phục Hình Trụ</h1>
+      <p class="text-slate-500 text-lg">Môn Toán Lớp 9 - Chương 10</p>
+    </div>
+
+    <div class="bg-blue-50 rounded-xl p-6 mb-6 text-left">
+      <h3 class="font-bold text-blue-800 mb-3 flex items-center">
+        <i class="fa-solid fa-circle-info mr-2"></i> Thông tin bài thi:
+      </h3>
+      <ul class="space-y-2 text-slate-700">
+        <li><i class="fa-solid fa-check text-green-500 mr-2"></i> <b>20 Câu hỏi</b> trắc nghiệm</li>
+        <li><i class="fa-solid fa-layer-group text-purple-500 mr-2"></i> 4 Mức độ: Nhận biết, Thông hiểu, Vận dụng</li>
+        <li><i class="fa-solid fa-brain text-orange-500 mr-2"></i> Có giải thích chi tiết sau mỗi câu</li>
+      </ul>
+    </div>
+
+    <!-- Settings -->
+    <div class="bg-white rounded-xl p-5 mb-6 text-left shadow-sm border border-slate-100">
+      <div class="font-bold text-slate-800 mb-3 flex items-center">
+        <i class="fa-solid fa-sliders mr-2 text-slate-500"></i> Tuỳ chọn khi làm bài
+      </div>
+      <label class="flex items-center gap-3 mb-3 cursor-pointer select-none">
+        <input id="toggle-shuffle-options" type="checkbox" class="w-5 h-5" checked />
+        <span class="text-slate-700">Random thứ tự đáp án (A/B/C/D)</span>
+      </label>
+      <label class="flex items-center gap-3 cursor-pointer select-none">
+        <input id="toggle-shuffle-questions" type="checkbox" class="w-5 h-5" />
+        <span class="text-slate-700">Random thứ tự câu hỏi</span>
+      </label>
+      <p class="text-xs text-slate-400 mt-2">
+        (Em đã chỉnh bộ dữ liệu để đáp án A/B/C/D chia đều 5-5-5-5 khi <b>tắt</b> random đáp án.)
+      </p>
+    </div>
+
+    <button onclick="game.start()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transform transition hover:scale-105 w-full md:w-auto text-xl">
+      <i class="fa-solid fa-play mr-2"></i> Bắt Đầu Ngay
+    </button>
+    <p class="mt-4 text-sm text-slate-400">Thiết kế bởi Cô Thu Bình Toán</p>
+  </div>
+
+  <!-- Game Screen -->
+  <div id="game-screen" class="hidden w-full max-w-3xl">
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center bg-white px-4 py-2 rounded-lg shadow-sm">
+        <span class="text-slate-500 mr-2">Câu:</span>
+        <span id="q-current" class="font-bold text-blue-600 text-xl">1</span>
+        <span class="text-slate-400 mx-1">/</span>
+        <span id="q-total" class="text-slate-500">20</span>
+      </div>
+      <div class="flex items-center bg-white px-4 py-2 rounded-lg shadow-sm">
+        <span class="text-slate-500 mr-2">Điểm:</span>
+        <span id="score" class="font-bold text-green-600 text-xl">0</span>
+      </div>
+    </div>
+
+    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+      <div id="progress" class="bg-blue-600 h-2.5 rounded-full progress-bar" style="width: 0%"></div>
+    </div>
+
+    <div class="card p-6 md:p-8 relative overflow-hidden">
+      <div class="mb-2">
+        <span id="q-level" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-600 mb-2">NHẬN BIẾT</span>
+      </div>
+      <h2 id="q-text" class="text-xl md:text-2xl font-bold text-slate-800 mb-6 leading-relaxed"></h2>
+
+      <div id="options-container" class="grid grid-cols-1 gap-4"></div>
+
+      <div id="feedback-area" class="hidden mt-6 p-4 rounded-xl border-l-4">
+        <div class="flex items-start">
+          <div id="feedback-icon" class="text-2xl mr-3 mt-1"></div>
+          <div>
+            <h4 id="feedback-title" class="font-bold text-lg mb-1"></h4>
+            <p id="feedback-text" class="text-slate-700"></p>
+          </div>
+        </div>
+        <button onclick="game.nextQuestion()" id="btn-next" class="mt-4 bg-slate-800 text-white px-6 py-2 rounded-lg hover:bg-slate-700 transition float-right">
+          Câu tiếp theo <i class="fa-solid fa-arrow-right ml-2"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Screen -->
+  <div id="end-screen" class="hidden card max-w-xl w-full p-8 text-center slide-up">
+    <div class="mb-6">
+      <div id="final-emoji" class="text-6xl mb-4">🏆</div>
+      <h2 class="text-3xl font-bold text-slate-800 mb-2">Hoàn Thành!</h2>
+      <p class="text-slate-500">Chúc mừng bạn đã hoàn thành bài kiểm tra.</p>
+    </div>
+
+    <div class="bg-gradient-to-r from-blue-500 to-cyan-400 rounded-2xl p-8 mb-8 text-white shadow-lg">
+      <div class="text-sm opacity-90 uppercase tracking-wider mb-1">Tổng điểm của bạn</div>
+      <div class="text-6xl font-black mb-2"><span id="final-score">0</span><span class="text-2xl font-normal opacity-70">/200</span></div>
+      <div id="final-message" class="font-semibold text-lg bg-white/20 inline-block px-4 py-1 rounded-full">Xuất sắc!</div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 mb-8">
+      <div class="bg-gray-50 p-4 rounded-xl">
+        <div class="text-gray-400 text-xs uppercase">Chính xác</div>
+        <div id="final-correct" class="text-2xl font-bold text-green-500">0</div>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-xl">
+        <div class="text-gray-400 text-xs uppercase">Tỉ lệ</div>
+        <div id="final-percent" class="text-2xl font-bold text-blue-500">0%</div>
+      </div>
+    </div>
+
+    <button onclick="location.reload()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl w-full transition">
+      <i class="fa-solid fa-rotate-right mr-2"></i> Làm lại bài
+    </button>
+  </div>
+
+  <script>
+    // =========================
+    // 1) QUESTIONS (ĐÃ CHIA ĐỀU A/B/C/D 5-5-5-5 khi KHÔNG random đáp án)
+    // =========================
+    const questions = [
+      // NHẬN BIẾT (7)
+      {
+        text: "Hình trụ được tạo thành khi quay hình nào sau đây một vòng quanh một cạnh cố định?",
+        options: ["Hình chữ nhật", "Hình tam giác vuông", "Hình bán nguyệt", "Hình thang cân"],
+        correct: 0, // A
+        level: "NHẬN BIẾT",
+        rationale: "Khi quay một hình chữ nhật một vòng quanh một cạnh cố định của nó, ta được một hình trụ."
+      },
+      {
+        text: "Công thức tính diện tích xung quanh \\(S_{xq}\\) của hình trụ có bán kính đáy \\(r\\) và chiều cao \\(h\\) là:",
+        options: ["\\(S_{xq} = \\pi r h\\)", "\\(S_{xq} = 2\\pi r h\\)", "\\(S_{xq} = \\pi r^2 h\\)", "\\(S_{xq} = 4\\pi r h\\)"],
+        correct: 1, // B
+        level: "NHẬN BIẾT",
+        rationale: "Diện tích xung quanh của hình trụ bằng chu vi đáy nhân với chiều cao: \\(S_{xq} = 2\\pi r h\\)."
+      },
+      {
+        text: "Trong hình trụ, khẳng định nào sau đây là đúng về mối quan hệ giữa chiều cao \\(h\\) và đường sinh \\(l\\)?",
+        options: ["\\(h > l\\)", "\\(h < l\\)", "\\(h = l\\)", "\\(h = 2l\\)"],
+        correct: 2, // C
+        level: "NHẬN BIẾT",
+        rationale: "Trong hình trụ, đường sinh vuông góc với đáy nên độ dài đường sinh \\(l\\) bằng chiều cao \\(h\\)."
+      },
+      {
+        text: "Cắt hình trụ bởi một mặt phẳng song song với đáy, thiết diện thu được là hình gì?",
+        options: ["Hình chữ nhật", "Hình elip", "Hình tam giác", "Hình tròn"],
+        correct: 3, // D
+        level: "NHẬN BIẾT",
+        rationale: "Mặt phẳng song song với đáy sẽ cắt các mặt xung quanh tạo thành một hình tròn bằng với hình tròn đáy."
+      },
+      {
+        text: "Công thức tính thể tích \\(V\\) của hình trụ là:",
+        options: ["\\(V = \\pi r^2 h\\)", "\\(V = 2\\pi r h\\)", "\\(V = \\frac{1}{3}\\pi r^2 h\\)", "\\(V = 2\\pi r^2\\)"],
+        correct: 0, // A
+        level: "NHẬN BIẾT",
+        rationale: "Thể tích hình trụ bằng diện tích đáy nhân với chiều cao: \\(V = \\pi r^2 h\\)."
+      },
+      {
+        text: "Hình trụ có bao nhiêu mặt đáy?",
+        options: ["1 mặt", "2 mặt", "3 mặt", "Không có mặt đáy"],
+        correct: 1, // B
+        level: "NHẬN BIẾT",
+        rationale: "Hình trụ có 2 mặt đáy là hai hình tròn bằng nhau và nằm trên hai mặt phẳng song song."
+      },
+      {
+        text: "Nếu cắt mặt xung quanh của hình trụ dọc theo một đường sinh và trải phẳng ra, ta được hình gì?",
+        options: ["Hình tròn", "Hình thang", "Hình chữ nhật", "Hình tam giác"],
+        correct: 2, // C
+        level: "NHẬN BIẾT",
+        rationale: "Khai triển mặt xung quanh của hình trụ ta được hình chữ nhật có một cạnh bằng chu vi đáy, cạnh kia bằng chiều cao."
+      },
+
+      // THÔNG HIỂU (8)
+      {
+        text: "Một hình trụ có bán kính đáy \\(r = 3\\) cm và chiều cao \\(h = 5\\) cm. Diện tích xung quanh của hình trụ là:",
+        options: ["\\(15\\pi\\) cm²", "\\(45\\pi\\) cm²", "\\(90\\pi\\) cm²", "\\(30\\pi\\) cm²"],
+        correct: 3, // D
+        level: "THÔNG HIỂU",
+        rationale: "Áp dụng \\(S_{xq} = 2\\pi r h = 2\\pi\\cdot3\\cdot5 = 30\\pi\\) cm²."
+      },
+      {
+        text: "Tính thể tích hình trụ có đường kính đáy \\(d = 8\\) cm và chiều cao \\(h = 10\\) cm.",
+        options: ["\\(160\\pi\\) cm³", "\\(640\\pi\\) cm³", "\\(80\\pi\\) cm³", "\\(40\\pi\\) cm³"],
+        correct: 0, // A
+        level: "THÔNG HIỂU",
+        rationale: "Bán kính \\(r=4\\). \\(V=\\pi r^2 h=\\pi\\cdot16\\cdot10=160\\pi\\) cm³."
+      },
+      {
+        text: "Một hình trụ có thể tích \\(V = 100\\pi\\) cm³ và chiều cao \\(h = 4\\) cm. Bán kính đáy của hình trụ là:",
+        options: ["25 cm", "5 cm", "10 cm", "2.5 cm"],
+        correct: 1, // B
+        level: "THÔNG HIỂU",
+        rationale: "\\(100\\pi=\\pi r^2\\cdot4\\Rightarrow r^2=25\\Rightarrow r=5\\) cm."
+      },
+      {
+        text: "Thiết diện qua trục của một hình trụ là hình vuông có cạnh bằng \\(6\\) cm. Tính diện tích xung quanh của hình trụ đó.",
+        options: ["\\(18\\pi\\) cm²", "\\(72\\pi\\) cm²", "\\(36\\pi\\) cm²", "\\(9\\pi\\) cm²"],
+        correct: 2, // C
+        level: "THÔNG HIỂU",
+        rationale: "Thiết diện qua trục là hình vuông cạnh 6 \\(\\Rightarrow h=6\\), \\(2r=6\\Rightarrow r=3\\). \\(S_{xq}=2\\pi r h=36\\pi\\)."
+      },
+      {
+        text: "Nếu giữ nguyên bán kính đáy và tăng chiều cao của hình trụ lên 2 lần thì thể tích hình trụ sẽ:",
+        options: ["Tăng 4 lần", "Giữ nguyên", "Giảm 2 lần", "Tăng 2 lần"],
+        correct: 3, // D
+        level: "THÔNG HIỂU",
+        rationale: "\\(V=\\pi r^2 h\\) tỉ lệ thuận với \\(h\\). \\(h\\) tăng 2 lần ⇒ \\(V\\) tăng 2 lần."
+      },
+      {
+        text: "Nếu giữ nguyên chiều cao và tăng bán kính đáy của hình trụ lên 2 lần thì thể tích hình trụ sẽ:",
+        options: ["Tăng 4 lần", "Tăng 2 lần", "Tăng 8 lần", "Không đổi"],
+        correct: 0, // A
+        level: "THÔNG HIỂU",
+        rationale: "\\(V=\\pi r^2 h\\). Nếu \\(r\\) tăng 2 lần ⇒ \\(r^2\\) tăng 4 lần ⇒ \\(V\\) tăng 4 lần."
+      },
+      {
+        text: "Một hình trụ có chu vi đáy là \\(20\\pi\\) cm và diện tích xung quanh là \\(400\\pi\\) cm². Chiều cao của hình trụ là:",
+        options: ["10 cm", "20 cm", "40 cm", "5 cm"],
+        correct: 1, // B
+        level: "THÔNG HIỂU",
+        rationale: "\\(S_{xq}=C\\cdot h\\Rightarrow 400\\pi=20\\pi\\cdot h\\Rightarrow h=20\\) cm."
+      },
+      {
+        text: "Diện tích toàn phần của hình trụ có \\(r = 2\\) cm và \\(h = 5\\) cm là:",
+        options: ["\\(20\\pi\\) cm²", "\\(24\\pi\\) cm²", "\\(28\\pi\\) cm²", "\\(40\\pi\\) cm²"],
+        correct: 2, // C
+        level: "THÔNG HIỂU",
+        rationale: "\\(S_{tp}=2\\pi r h+2\\pi r^2=20\\pi+8\\pi=28\\pi\\)."
+      },
+
+      // VẬN DỤNG (3)
+      {
+        text: "Một thùng nước hình trụ có đường kính đáy 1m, chiều cao 1,5m. Thùng này chứa được tối đa bao nhiêu lít nước? (Lấy \\(\\pi \\approx 3,14\\))",
+        options: ["4710 lít", "1500 lít", "3532,5 lít", "1177,5 lít"],
+        correct: 3, // D
+        level: "VẬN DỤNG",
+        rationale: "\\(r=0,5\\)m. \\(V\\approx 3,14\\cdot(0,5)^2\\cdot1,5=1,1775\\) m³ = 1177,5 lít."
+      },
+      {
+        text: "Một cái trục lăn sơn có dạng hình trụ với đường kính 8cm và chiều dài 25cm. Sau khi lăn trọn vẹn 10 vòng thì diện tích bề mặt được sơn là bao nhiêu? (Lấy \\(\\pi \\approx 3,14\\))",
+        options: ["6280 cm²", "3140 cm²", "12560 cm²", "5024 cm²"],
+        correct: 0, // A
+        level: "VẬN DỤNG",
+        rationale: "Diện tích 1 vòng: \\(S=\\pi d h=3,14\\cdot8\\cdot25=628\\) cm². 10 vòng: \\(6280\\) cm²."
+      },
+      {
+        text: "Người ta cần làm một lon sữa bò hình trụ bằng kim loại có thể tích \\(314\\) ml (cm³) và bán kính đáy \\(5\\) cm. Chiều cao của lon sữa xấp xỉ bằng: (Lấy \\(\\pi \\approx 3,14\\))",
+        options: ["8 cm", "4 cm", "10 cm", "6 cm"],
+        correct: 1, // B
+        level: "VẬN DỤNG",
+        rationale: "\\(314=3,14\\cdot25\\cdot h\\Rightarrow 314=78,5h\\Rightarrow h=4\\) cm."
+      },
+
+      // VẬN DỤNG CAO (2)
+      {
+        text: "Cho hình chữ nhật ABCD có \\(AB = 3\\), \\(AD = 4\\). Quay hình chữ nhật này quanh cạnh AD ta được hình trụ (T1), quay quanh cạnh AB ta được hình trụ (T2). Tỉ số thể tích \\(\\frac{V_{T1}}{V_{T2}}\\) là:",
+        options: ["\\(\\frac{4}{3}\\)", "\\(\\frac{9}{16}\\)", "\\(\\frac{3}{4}\\)", "\\(1\\)"],
+        correct: 2, // C
+        level: "VẬN DỤNG CAO",
+        rationale: "(T1): quay quanh AD ⇒ \\(h=4\\), \\(r_1=3\\) ⇒ \\(V_1=\\pi\\cdot3^2\\cdot4=36\\pi\\).<br>(T2): quay quanh AB ⇒ \\(h=3\\), \\(r_2=4\\) ⇒ \\(V_2=\\pi\\cdot4^2\\cdot3=48\\pi\\).<br>\\(\\frac{V_1}{V_2}=\\frac{36\\pi}{48\\pi}=\\frac{3}{4}\\)."
+      },
+      {
+        text: "Một ống cống hình trụ rỗng có chiều dài 2m, đường kính ngoài 1m, độ dày thành ống là 10cm. Tính thể tích bê tông cần dùng để đúc ống cống đó. (Lấy \\(\\pi \\approx 3,14\\))",
+        options: ["1,5700 m³", "0,2826 m³", "0,4522 m³", "0,5652 m³"],
+        correct: 3, // D
+        level: "VẬN DỤNG CAO",
+        rationale: "Bán kính ngoài \\(R=0,5\\)m. Bán kính trong \\(r=0,4\\)m.<br>\\(V=\\pi h(R^2-r^2)\\approx 3,14\\cdot2\\cdot(0,25-0,16)=6,28\\cdot0,09=0,5652\\) m³."
+      }
+    ];
+
+    // =========================
+    // 2) HELPERS
+    // =========================
+    function shuffleInPlace(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function safeTypeset(targets) {
+      if (!window.MathJax || !MathJax.typesetPromise) return;
+      MathJax.typesetPromise(targets ? targets : undefined).catch(() => {});
+    }
+
+    // Tạo phiên bản câu hỏi có thể shuffle đáp án mà vẫn giữ đúng correct
+    function buildQuestionForPlay(q, shuffleOptions) {
+      if (!shuffleOptions) {
+        return {
+          ...q,
+          _optionMap: q.options.map((_, idx) => idx), // map hiển thị -> gốc
+        };
+      }
+
+      const idxs = [0,1,2,3];
+      shuffleInPlace(idxs);
+
+      const newOptions = idxs.map(i => q.options[i]);
+      const newCorrect = idxs.indexOf(q.correct);
+
+      return {
+        ...q,
+        options: newOptions,
+        correct: newCorrect,
+        _optionMap: idxs
+      };
+    }
+
+    // =========================
+    // 3) GAME LOGIC
+    // =========================
+    const game = {
+      currentQuestionIndex: 0,
+      score: 0,
+      isAnswering: false,
+      audioContext: null,
+      questionOrder: [],
+      settings: {
+        shuffleOptions: true,
+        shuffleQuestions: false
+      },
+      currentQ: null,
+
+      init: function() {
+        document.body.addEventListener('click', () => {
+          if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          }
+        }, { once: true });
+
+        document.getElementById('q-total').innerText = questions.length;
+      },
+
+      start: function() {
+        // Read settings from toggles
+        this.settings.shuffleOptions = document.getElementById('toggle-shuffle-options').checked;
+        this.settings.shuffleQuestions = document.getElementById('toggle-shuffle-questions').checked;
+
+        // Build order
+        this.questionOrder = Array.from({ length: questions.length }, (_, i) => i);
+        if (this.settings.shuffleQuestions) shuffleInPlace(this.questionOrder);
+
+        // Reset state
+        this.currentQuestionIndex = 0;
+        this.score = 0;
+
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        document.getElementById('game-screen').classList.add('slide-up');
+
+        this.showQuestion();
+      },
+
+      playSound: function(type) {
+        if (!this.audioContext) return;
+
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+
+        if (type === 'correct') {
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(1200, this.audioContext.currentTime + 0.1);
+          gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
+          oscillator.start();
+          oscillator.stop(this.audioContext.currentTime + 0.5);
+        } else {
+          oscillator.type = 'sawtooth';
+          oscillator.frequency.setValueAtTime(150, this.audioContext.currentTime);
+          oscillator.frequency.linearRampToValueAtTime(100, this.audioContext.currentTime + 0.3);
+          gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+          gainNode.gain.linearRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+          oscillator.start();
+          oscillator.stop(this.audioContext.currentTime + 0.3);
+        }
+      },
+
+      showQuestion: function() {
+        this.isAnswering = true;
+
+        const qIndex = this.questionOrder[this.currentQuestionIndex];
+        const baseQ = questions[qIndex];
+        const q = buildQuestionForPlay(baseQ, this.settings.shuffleOptions);
+        this.currentQ = q;
+
+        // UI: header + progress (SỬA: lên đúng 100%)
+        document.getElementById('q-current').innerText = this.currentQuestionIndex + 1;
+        document.getElementById('score').innerText = this.score;
+
+        const progressPercent = ((this.currentQuestionIndex + 1) / questions.length) * 100;
+        document.getElementById('progress').style.width = `${progressPercent}%`;
+
+        // Question content
+        document.getElementById('q-level').innerText = q.level;
+        const qText = document.getElementById('q-text');
+        qText.innerHTML = q.text;
+
+        // Reset feedback + options
+        const fbArea = document.getElementById('feedback-area');
+        fbArea.classList.add('hidden');
+
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+
+        // Render options
+        q.options.forEach((opt, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'btn-option w-full text-left p-4 rounded-xl text-lg font-medium text-slate-700 bg-white shadow-sm';
+          btn.innerHTML = `<span class="inline-block w-8 h-8 rounded-full bg-slate-100 text-slate-500 text-center leading-8 mr-3 text-sm font-bold">${String.fromCharCode(65 + index)}</span> ${opt}`;
+          btn.onclick = () => this.checkAnswer(index, btn);
+          optionsContainer.appendChild(btn);
+        });
+
+        safeTypeset();
+      },
+
+      checkAnswer: function(selectedIndex, btnElement) {
+        if (!this.isAnswering) return;
+        this.isAnswering = false;
+
+        const q = this.currentQ;
+        const isCorrect = selectedIndex === q.correct;
+        const options = document.getElementById('options-container').children;
+
+        Array.from(options).forEach(btn => btn.disabled = true);
+
+        if (isCorrect) {
+          btnElement.classList.add('correct');
+          this.score += 10;
+          this.playSound('correct');
+          fireConfetti();
+        } else {
+          btnElement.classList.add('incorrect');
+          options[q.correct].classList.add('correct');
+          this.playSound('wrong');
+        }
+
+        this.showFeedback(isCorrect, q.rationale);
+        document.getElementById('score').innerText = this.score;
+      },
+
+      showFeedback: function(isCorrect, rationale) {
+        const fbArea = document.getElementById('feedback-area');
+        const fbIcon = document.getElementById('feedback-icon');
+        const fbTitle = document.getElementById('feedback-title');
+        const fbText = document.getElementById('feedback-text');
+        const btnNext = document.getElementById('btn-next');
+
+        fbArea.classList.remove('hidden', 'bg-green-50', 'border-green-500', 'bg-red-50', 'border-red-500');
+
+        if (isCorrect) {
+          fbArea.classList.add('bg-green-50', 'border-green-500');
+          fbIcon.innerHTML = '<i class="fa-solid fa-face-laugh-beam text-green-500 bounce"></i>';
+          fbTitle.innerText = "Chính xác! Làm tốt lắm!";
+          fbTitle.className = "font-bold text-lg mb-1 text-green-700";
+        } else {
+          fbArea.classList.add('bg-red-50', 'border-red-500');
+          fbIcon.innerHTML = '<i class="fa-solid fa-face-frown-open text-red-500"></i>';
+          fbTitle.innerText = "Tiếc quá, chưa đúng rồi!";
+          fbTitle.className = "font-bold text-lg mb-1 text-red-700";
+        }
+
+        fbText.innerHTML = rationale;
+        fbArea.classList.add('fade-in');
+
+        // Button label
+        if (this.currentQuestionIndex === questions.length - 1) {
+          btnNext.innerHTML = 'Xem kết quả <i class="fa-solid fa-trophy ml-2"></i>';
+        } else {
+          btnNext.innerHTML = 'Câu tiếp theo <i class="fa-solid fa-arrow-right ml-2"></i>';
+        }
+
+        safeTypeset([fbArea]);
+      },
+
+      nextQuestion: function() {
+        if (this.currentQuestionIndex < questions.length - 1) {
+          this.currentQuestionIndex++;
+          this.showQuestion();
+        } else {
+          this.endGame();
+        }
+      },
+
+      endGame: function() {
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+
+        const finalScore = this.score;
+        const totalScore = questions.length * 10;
+        const percent = (finalScore / totalScore) * 100;
+
+        document.getElementById('final-score').innerText = finalScore;
+        document.getElementById('final-correct').innerText = (finalScore / 10) + "/" + questions.length;
+        document.getElementById('final-percent').innerText = Math.round(percent) + "%";
+
+        let message = "";
+        let emoji = "";
+
+        if (percent >= 90) {
+          message = "Xuất sắc! Cô rất tự hào về em!";
+          emoji = "👑";
+          fireConfetti();
+        } else if (percent >= 70) {
+          message = "Giỏi lắm! Cố gắng thêm chút nữa nhé!";
+          emoji = "🌟";
+        } else if (percent >= 50) {
+          message = "Khá tốt! Em đã nắm được kiến thức cơ bản.";
+          emoji = "👍";
+        } else {
+          message = "Cần ôn tập thêm nhé. Đừng nản chí!";
+          emoji = "📚";
+        }
+
+        document.getElementById('final-message').innerText = message;
+        document.getElementById('final-emoji').innerText = emoji;
+      }
+    };
+
+    // =========================
+    // 4) CONFETTI
+    // =========================
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let confetti = [];
+    let isAnimating = false;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function fireConfetti() {
+      const colors = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6'];
+      for (let i = 0; i < 100; i++) {
+        confetti.push({
+          x: Math.random() * canvas.width,
+          y: -10,
+          w: Math.random() * 10 + 5,
+          h: Math.random() * 5 + 5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vy: Math.random() * 2 + 2,
+          vx: Math.random() * 2 - 1,
+          rot: Math.random() * 360,
+          rotSpeed: Math.random() * 10 - 5
+        });
+      }
+      if (!isAnimating) {
+        isAnimating = true;
+        animateConfetti();
+      }
+    }
+
+    function animateConfetti() {
+      if (confetti.length === 0) {
+        isAnimating = false;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < confetti.length; i++) {
+        const c = confetti[i];
+        c.y += c.vy;
+        c.x += c.vx;
+        c.rot += c.rotSpeed;
+
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        ctx.rotate(c.rot * Math.PI / 180);
+        ctx.fillStyle = c.color;
+        ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+        ctx.restore();
+
+        if (c.y > canvas.height) {
+          confetti.splice(i, 1);
+          i--;
+        }
+      }
+      requestAnimationFrame(animateConfetti);
+    }
+
+    // Initialize
+    game.init();
+  </script>
+</body>
+</html>
