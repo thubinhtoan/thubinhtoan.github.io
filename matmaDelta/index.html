@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giải Mã Mật Mã Delta - Cô Thu Bình Toán</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- MathJax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Roboto:wght@400;500;700&display=swap');
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #000000;
+      color: #00ff41;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    #matrix-bg {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    .mono-font { font-family: 'Share Tech Mono', monospace; }
+
+    .cyber-card {
+      background: rgba(10, 20, 10, 0.85);
+      border: 1px solid #00ff41;
+      box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+      backdrop-filter: blur(5px);
+      position: relative;
+      z-index: 10;
+    }
+
+    .btn-option {
+      background: rgba(0, 50, 0, 0.6);
+      border: 1px solid #005500;
+      color: #e0e0e0;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-option:hover:not(:disabled) {
+      background: rgba(0, 255, 65, 0.1);
+      border-color: #00ff41;
+      box-shadow: 0 0 10px rgba(0, 255, 65, 0.4);
+      transform: translateX(5px);
+    }
+
+    .btn-option.correct {
+      background: rgba(0, 255, 65, 0.2) !important;
+      border-color: #00ff41 !important;
+      color: #fff !important;
+      box-shadow: 0 0 20px rgba(0, 255, 65, 0.6);
+    }
+
+    .btn-option.incorrect {
+      background: rgba(255, 0, 0, 0.2) !important;
+      border-color: #ff0000 !important;
+      color: #ffcccc !important;
+      opacity: 0.7;
+    }
+
+    .glitch-text {
+      position: relative;
+      animation: glitch 3s infinite;
+    }
+    @keyframes glitch {
+      0% { text-shadow: 2px 0 #ff0000, -2px 0 #0000ff; }
+      5% { text-shadow: 2px 0 #ff0000, -2px 0 #0000ff; }
+      10% { text-shadow: none; }
+      100% { text-shadow: none; }
+    }
+
+    .progress-container { height: 4px; background: #111; width: 100%; }
+    .progress-bar {
+      height: 100%;
+      background: #00ff41;
+      box-shadow: 0 0 10px #00ff41;
+      transition: width 0.5s ease;
+    }
+
+    .badge-level {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border: 1px solid currentColor;
+      letter-spacing: 1px;
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .fade-in { animation: fadeIn 0.5s forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body class="flex items-center justify-center p-4">
+  <canvas id="matrix-bg"></canvas>
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="cyber-card max-w-2xl w-full p-8 rounded-xl text-center fade-in">
+    <div class="mb-6 flex justify-center">
+      <div class="w-24 h-24 border-2 border-[#00ff41] rounded-full flex items-center justify-center shadow-[0_0_20px_#00ff41]">
+        <span class="text-5xl font-bold mono-font">Δ</span>
+      </div>
+    </div>
+
+    <h1 class="text-4xl md:text-5xl font-bold mb-2 glitch-text tracking-tighter text-white">
+      GIẢI MÃ MẬT MÃ DELTA
+    </h1>
+    <p class="text-[#00ff41] opacity-80 mb-8 mono-font text-lg">System: Math 9 &gt; Chapter 6 &gt; Quadratic Eq</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-sm">
+      <div class="border border-gray-700 p-3 rounded bg-black/50">
+        <i class="fa-solid fa-database mb-2 block text-2xl"></i>
+        20 DỮ LIỆU
+      </div>
+      <div class="border border-gray-700 p-3 rounded bg-black/50">
+        <i class="fa-solid fa-shield-halved mb-2 block text-2xl"></i>
+        4 CẤP ĐỘ BẢO MẬT
+      </div>
+      <div class="border border-gray-700 p-3 rounded bg-black/50">
+        <i class="fa-solid fa-microchip mb-2 block text-2xl"></i>
+        XỬ LÝ THỜI GIAN THỰC
+      </div>
+    </div>
+
+    <button onclick="game.start()" class="group relative px-8 py-4 bg-[#00ff41] text-black font-bold text-xl rounded hover:bg-white transition-colors w-full md:w-auto uppercase tracking-widest">
+      <i class="fa-solid fa-terminal mr-2"></i> Kích Hoạt Hệ Thống
+    </button>
+    <div class="mt-4 text-xs text-gray-500">Thiết kế bởi Cô Thu Bình Toán</div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="hidden w-full max-w-4xl cyber-card p-6 md:p-10 rounded-xl fade-in">
+    <div class="flex justify-between items-end mb-6 border-b border-gray-800 pb-4">
+      <div>
+        <div class="text-xs text-gray-500 mb-1 mono-font">PROGRESS</div>
+        <div class="text-2xl font-bold text-white"><span id="q-curr">01</span><span class="text-sm text-gray-500">/20</span></div>
+      </div>
+      <div class="text-right">
+        <div class="text-xs text-gray-500 mb-1 mono-font">SCORE DATA</div>
+        <div id="score" class="text-2xl font-bold text-[#00ff41] mono-font">0000</div>
+      </div>
+    </div>
+
+    <div class="progress-container mb-8">
+      <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+    </div>
+
+    <div class="relative mb-8">
+      <span id="level-tag" class="absolute -top-6 right-0 badge-level text-yellow-400 border-yellow-400">NHẬN BIẾT</span>
+      <h2 id="q-text" class="text-xl md:text-2xl font-medium text-gray-100 leading-relaxed mt-2"></h2>
+    </div>
+
+    <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
+
+    <div id="rationale-box" class="hidden mt-6 p-4 border-l-4 border-[#00ff41] bg-[#001100] fade-in">
+      <div class="flex items-start gap-3">
+        <div id="rat-icon" class="text-xl mt-1"></div>
+        <div>
+          <h3 id="rat-title" class="font-bold text-[#00ff41] mb-1 mono-font uppercase"></h3>
+          <div id="rat-content" class="text-gray-300 text-sm leading-relaxed"></div>
+        </div>
+      </div>
+      <div class="mt-4 text-right">
+        <button onclick="game.next()" class="text-[#00ff41] hover:text-white font-bold text-sm uppercase tracking-wider border border-[#00ff41] px-4 py-2 hover:bg-[#00ff41] hover:text-black transition">
+          Tiếp Tục >>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- END SCREEN -->
+  <div id="end-screen" class="hidden cyber-card max-w-lg w-full p-8 rounded-xl text-center fade-in">
+    <div class="mb-6 text-[#00ff41] text-6xl">
+      <i class="fa-solid fa-check-double"></i>
+    </div>
+    <h2 class="text-3xl font-bold text-white mb-2">NHIỆM VỤ HOÀN TẤT</h2>
+    <p class="text-gray-400 mb-6">Dữ liệu kết quả phân tích:</p>
+
+    <div class="flex justify-between items-center bg-black/40 p-4 rounded border border-gray-700 mb-8">
+      <div class="text-left">
+        <div class="text-xs text-gray-500 uppercase">Điểm số</div>
+        <div id="final-score" class="text-3xl font-bold text-[#00ff41] mono-font">0</div>
+      </div>
+      <div class="text-right">
+        <div class="text-xs text-gray-500 uppercase">Chính xác</div>
+        <div id="final-acc" class="text-3xl font-bold text-blue-400 mono-font">0%</div>
+      </div>
+    </div>
+
+    <div id="final-msg" class="text-sm text-gray-300 italic mb-8"></div>
+
+    <button onclick="location.reload()" class="w-full py-4 bg-gray-800 hover:bg-gray-700 text-white font-bold uppercase tracking-wider border border-gray-600 transition">
+      <i class="fa-solid fa-power-off mr-2"></i> Khởi động lại
+    </button>
+  </div>
+
+  <script>
+    // --- MATRIX RAIN EFFECT ---
+    const matrixCanvas = document.getElementById('matrix-bg');
+    const mCtx = matrixCanvas.getContext('2d');
+    let mCols, mDrops;
+
+    function initMatrix() {
+      matrixCanvas.width = window.innerWidth;
+      matrixCanvas.height = window.innerHeight;
+      mCols = Math.floor(matrixCanvas.width / 20);
+      mDrops = Array(mCols).fill(1);
+    }
+
+    function drawMatrix() {
+      mCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+      mCtx.fillStyle = '#0F0';
+      mCtx.font = '15px monospace';
+      for (let i = 0; i < mDrops.length; i++) {
+        const ch = String.fromCharCode(Math.floor(Math.random() * 128));
+        mCtx.fillText(ch, i * 20, mDrops[i] * 20);
+        if (mDrops[i] * 20 > matrixCanvas.height && Math.random() > 0.975) mDrops[i] = 0;
+        mDrops[i]++;
+      }
+    }
+
+    window.addEventListener('resize', initMatrix);
+    initMatrix();
+    setInterval(drawMatrix, 50);
+
+    // --- HELPERS: SHUFFLE + BALANCE CORRECT LETTERS ---
+    function shuffleArray(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    // target correct positions: 0(A),1(B),2(C),3(D) each 5 times for 20 câu
+    function buildBalancedTargets(n) {
+      const base = [];
+      const per = Math.floor(n / 4); // 20 -> 5
+      for (let k = 0; k < 4; k++) for (let i = 0; i < per; i++) base.push(k);
+      // if n not multiple of 4, push extra randomly (not needed here)
+      while (base.length < n) base.push(Math.floor(Math.random() * 4));
+      return shuffleArray(base);
+    }
+
+    // Build a per-session option order for each question:
+    // - correct answer is forced to land on target letter (balanced A/B/C/D)
+    // - wrong answers shuffled into remaining slots
+    function buildSessionOrders(questions) {
+      const targets = buildBalancedTargets(questions.length);
+      return questions.map((q, idx) => {
+        const correctText = q.options[q.correct];
+        const wrongs = q.options.filter((_, i) => i !== q.correct);
+        const wrongsShuffled = shuffleArray(wrongs);
+
+        const targetPos = targets[idx];
+        const finalOptions = new Array(4);
+        finalOptions[targetPos] = correctText;
+
+        let w = 0;
+        for (let i = 0; i < 4; i++) {
+          if (i === targetPos) continue;
+          finalOptions[i] = wrongsShuffled[w++];
+        }
+
+        return {
+          options: finalOptions,
+          correct: targetPos
+        };
+      });
+    }
+
+    // --- QUESTION DATA ---
+    const questions = [
+      // NHẬN BIẾT (7)
+      {
+        text: "Phương trình nào sau đây là phương trình bậc hai một ẩn?",
+        options: ["\\(2x^2 + 5 = 0\\)", "\\(2x - 5 = 0\\)", "\\(\\frac{1}{x^2} + 2x = 0\\)", "\\(0x^2 + 3x - 1 = 0\\)"],
+        correct: 0,
+        level: "NHẬN BIẾT",
+        rationale: "Phương trình bậc hai một ẩn có dạng \\(ax^2 + bx + c = 0\\) với \\(a \\ne 0\\). Đáp án \\(2x^2 + 5 = 0\\) thỏa mãn."
+      },
+      {
+        text: "Xác định hệ số \\(a, b, c\\) của phương trình \\(x^2 - 4x + 1 = 0\\).",
+        options: ["\\(a=1, b=4, c=1\\)", "\\(a=1, b=-4, c=1\\)", "\\(a=0, b=-4, c=1\\)", "\\(a=x^2, b=-4x, c=1\\)"],
+        correct: 1,
+        level: "NHẬN BIẾT",
+        rationale: "Hệ số của \\(x^2\\) là 1, của \\(x\\) là -4, hệ số tự do là 1."
+      },
+      {
+        text: "Biệt thức \\(\\Delta\\) của phương trình bậc hai \\(ax^2 + bx + c = 0\\) được tính theo công thức nào?",
+        options: ["\\(\\Delta = b^2 - 4ac\\)", "\\(\\Delta = b^2 - ac\\)", "\\(\\Delta = 4ac - b^2\\)", "\\(\\Delta = b' ^2 - ac\\)"],
+        correct: 0,
+        level: "NHẬN BIẾT",
+        rationale: "Công thức chuẩn: \\(\\Delta = b^2 - 4ac\\)."
+      },
+      {
+        text: "Phương trình bậc hai có hai nghiệm phân biệt khi và chỉ khi:",
+        options: ["\\(\\Delta < 0\\)", "\\(\\Delta = 0\\)", "\\(\\Delta > 0\\)", "\\(\\Delta \\ge 0\\)"],
+        correct: 2,
+        level: "NHẬN BIẾT",
+        rationale: "Có hai nghiệm phân biệt khi \\(\\Delta > 0\\)."
+      },
+      {
+        text: "Nếu \\(ac < 0\\) thì phương trình bậc hai \\(ax^2 + bx + c = 0\\) có bao nhiêu nghiệm?",
+        options: ["Vô nghiệm", "Nghiệm kép", "2 nghiệm phân biệt", "Không xác định được"],
+        correct: 2,
+        level: "NHẬN BIẾT",
+        rationale: "Vì \\(ac<0\\Rightarrow -4ac>0\\Rightarrow \\Delta=b^2-4ac>0\\). Nên luôn có 2 nghiệm phân biệt."
+      },
+      {
+        text: "Công thức tính biệt thức thu gọn \\(\\Delta'\\) là:",
+        options: ["\\(\\Delta' = b'^2 - 4ac\\)", "\\(\\Delta' = b'^2 - ac\\)", "\\(\\Delta' = b^2 - ac\\)", "\\(\\Delta' = 2b' - ac\\)"],
+        correct: 1,
+        level: "NHẬN BIẾT",
+        rationale: "Khi \\(b=2b'\\) thì \\(\\Delta' = b'^2 - ac\\)."
+      },
+      {
+        text: "Giải phương trình \\(x^2 - 16 = 0\\).",
+        options: ["\\(x = 4\\)", "\\(x = -4\\)", "\\(x = \\pm 4\\)", "\\(x = 16\\)"],
+        correct: 2,
+        level: "NHẬN BIẾT",
+        rationale: "\\(x^2=16\\Rightarrow x=\\pm 4\\)."
+      },
+
+      // THÔNG HIỂU (8)
+      {
+        text: "Giải phương trình \\(2x^2 - 8x = 0\\).",
+        options: ["\\(x = 0; x = 4\\)", "\\(x = 4\\)", "\\(x = 0; x = -4\\)", "\\(x = 2; x = 4\\)"],
+        correct: 0,
+        level: "THÔNG HIỂU",
+        rationale: "Đặt nhân tử chung: \\(2x(x-4)=0\\Rightarrow x=0\\) hoặc \\(x=4\\)."
+      },
+      {
+        text: "Tính \\(\\Delta\\) của phương trình \\(x^2 - 5x - 6 = 0\\).",
+        options: ["\\(\\Delta = 1\\)", "\\(\\Delta = 49\\)", "\\(\\Delta = -1\\)", "\\(\\Delta = 29\\)"],
+        correct: 1,
+        level: "THÔNG HIỂU",
+        rationale: "\\(\\Delta=(-5)^2-4(1)(-6)=25+24=49\\)."
+      },
+      {
+        text: "Tìm nghiệm của phương trình \\(x^2 + 6x + 9 = 0\\).",
+        options: ["\\(x = 3\\)", "\\(x = -3\\)", "\\(x = \\pm 3\\)", "Vô nghiệm"],
+        correct: 1,
+        level: "THÔNG HIỂU",
+        rationale: "\\((x+3)^2=0\\Rightarrow x=-3\\) (nghiệm kép)."
+      },
+      {
+        text: "Phương trình \\(x^2 + x + 1 = 0\\) có bao nhiêu nghiệm?",
+        options: ["0", "1", "2", "3"],
+        correct: 0,
+        level: "THÔNG HIỂU",
+        rationale: "\\(\\Delta=1-4=-3<0\\Rightarrow\\) vô nghiệm."
+      },
+      {
+        text: "Nếu phương trình \\(ax^2 + bx + c = 0\\) có \\(a + b + c = 0\\) thì một nghiệm là:",
+        options: ["\\(x_1 = 1\\)", "\\(x_1 = -1\\)", "\\(x_1 = 0\\)", "\\(x_1 = \\frac{c}{a}\\)"],
+        correct: 0,
+        level: "THÔNG HIỂU",
+        rationale: "Nếu \\(a+b+c=0\\) thì \\(x=1\\) là một nghiệm."
+      },
+      {
+        text: "Nếu phương trình \\(ax^2 + bx + c = 0\\) có \\(a - b + c = 0\\) thì một nghiệm là:",
+        options: ["\\(x_1 = 1\\)", "\\(x_1 = -1\\)", "\\(x_1 = -\\frac{c}{a}\\)", "\\(x_1 = 0\\)"],
+        correct: 1,
+        level: "THÔNG HIỂU",
+        rationale: "Vì thay \\(x=-1\\): \\(a(-1)^2+b(-1)+c=a-b+c=0\\Rightarrow x=-1\\) là nghiệm."
+      },
+      {
+        text: "Phương trình \\(3x^2 - 2\\sqrt{3}x + 1 = 0\\) có biệt thức \\(\\Delta'\\) bằng:",
+        options: ["0", "3", "1", "12"],
+        correct: 0,
+        level: "THÔNG HIỂU",
+        rationale: "\\(b=-2\\sqrt3\\Rightarrow b'=-\\sqrt3\\). \\(\\Delta'=b'^2-ac=3-3=0\\)."
+      },
+      {
+        text: "Tổng hai nghiệm của phương trình \\(x^2 - 7x + 12 = 0\\) là:",
+        options: ["7", "-7", "12", "-12"],
+        correct: 0,
+        level: "THÔNG HIỂU",
+        rationale: "Hai nghiệm 3 và 4 nên tổng là 7 (hoặc Vi-ét: \\(x_1+x_2=-b/a=7\\))."
+      },
+
+      // VẬN DỤNG (3)
+      {
+        text: "Một vật rơi tự do từ độ cao 500m. Quãng đường rơi \\(s\\) (m) phụ thuộc thời gian \\(t\\) (s) theo \\(s = 5t^2\\). Hỏi sau bao lâu vật chạm đất?",
+        options: ["10 giây", "100 giây", "5 giây", "50 giây"],
+        correct: 0,
+        level: "VẬN DỤNG",
+        rationale: "Khi chạm đất: \\(500=5t^2\\Rightarrow t^2=100\\Rightarrow t=10\\) (do \\(t>0\\))."
+      },
+      {
+        text: "Một mảnh vườn hình chữ nhật có diện tích \\(120m^2\\). Dài hơn rộng 2m. Gọi rộng là \\(x\\) (m), phương trình tìm \\(x\\) là:",
+        options: ["\\(x(x+2) = 120\\)", "\\(x(x-2) = 120\\)", "\\(2x + 2 = 120\\)", "\\(x^2 + 2x - 100 = 0\\)"],
+        correct: 0,
+        level: "VẬN DỤNG",
+        rationale: "Rộng \\(x\\), dài \\(x+2\\), diện tích: \\(x(x+2)=120\\)."
+      },
+      {
+        text: "Tính kích thước hình chữ nhật có chu vi 40m và diện tích 96 \\(m^2\\).",
+        options: ["12m và 8m", "10m và 10m", "20m và 4.8m", "16m và 4m"],
+        correct: 0,
+        level: "VẬN DỤNG",
+        rationale: "Nửa chu vi 20. PT: \\(x(20-x)=96\\Rightarrow x^2-20x+96=0\\Rightarrow x=12\\) hoặc 8."
+      },
+
+      // VẬN DỤNG CAO (2)
+      {
+        text: "Tìm \\(m\\) để phương trình \\(x^2 - 2(m-1)x + m^2 = 0\\) có hai nghiệm phân biệt.",
+        options: ["\\(m < 0.5\\)", "\\(m > 0.5\\)", "\\(m < 1\\)", "\\(m \\ne 1\\)"],
+        correct: 0,
+        level: "VẬN DỤNG CAO",
+        rationale: "\\(\\Delta=4[(m-1)^2-m^2]=4(1-2m)\\). Hai nghiệm phân biệt: \\(\\Delta>0\\Rightarrow m<0.5\\)."
+      },
+      {
+        text: "Cho phương trình \\(x^2 - 2x + m - 3 = 0\\). Tìm \\(m\\) để phương trình có nghiệm kép.",
+        options: ["\\(m = 4\\)", "\\(m = 2\\)", "\\(m = -4\\)", "\\(m = 1\\)"],
+        correct: 0,
+        level: "VẬN DỤNG CAO",
+        rationale: "Nghiệm kép khi \\(\\Delta'=0\\). \\(\\Delta'=(-1)^2-1(m-3)=4-m\\Rightarrow m=4\\)."
+      }
+    ];
+
+    // --- GAME ENGINE ---
+    const game = {
+      index: 0,
+      score: 0,
+      audioCtx: null,
+      sessionOrders: null, // {options, correct} per question
+      correctCount: 0,
+
+      initAudio: function() {
+        if (!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      },
+
+      beep: function(type) {
+        if (!this.audioCtx) return;
+        const osc = this.audioCtx.createOscillator();
+        const gain = this.audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(this.audioCtx.destination);
+        const now = this.audioCtx.currentTime;
+
+        if (type === 'win') {
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(800, now);
+          osc.frequency.exponentialRampToValueAtTime(1200, now + 0.08);
+          gain.gain.setValueAtTime(0.10, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(160, now);
+          osc.frequency.linearRampToValueAtTime(90, now + 0.25);
+          gain.gain.setValueAtTime(0.10, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        }
+      },
+
+      start: function() {
+        this.initAudio();
+        this.sessionOrders = buildSessionOrders(questions); // RANDOM + BALANCED per session
+        this.index = 0;
+        this.score = 0;
+        this.correctCount = 0;
+
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        this.loadQ();
+      },
+
+      setLevelColor: function(level) {
+        const tag = document.getElementById('level-tag');
+        tag.innerText = level;
+        tag.className = "absolute -top-6 right-0 badge-level";
+        if (level.includes("NHẬN")) tag.classList.add("text-yellow-400", "border-yellow-400");
+        else if (level.includes("THÔNG")) tag.classList.add("text-blue-400", "border-blue-400");
+        else if (level.includes("CAO")) tag.classList.add("text-purple-400", "border-purple-400");
+        else tag.classList.add("text-green-400", "border-green-400");
+      },
+
+      loadQ: function() {
+        const q = questions[this.index];
+        const order = this.sessionOrders[this.index];
+
+        document.getElementById('q-curr').innerText = (this.index + 1).toString().padStart(2, '0');
+        document.getElementById('q-text').innerHTML = q.text;
+        document.getElementById('score').innerText = this.score.toString().padStart(4, '0');
+
+        // Progress: show progress by current question (nice UX)
+        const pct = Math.round(((this.index) / questions.length) * 100);
+        document.getElementById('progress-bar').style.width = `${pct}%`;
+
+        this.setLevelColor(q.level);
+
+        const opts = document.getElementById('options-grid');
+        opts.innerHTML = '';
+        document.getElementById('rationale-box').classList.add('hidden');
+
+        order.options.forEach((opt, i) => {
+          const btn = document.createElement('button');
+          btn.className = "btn-option w-full p-4 rounded text-left font-medium mono-font text-lg";
+          btn.innerHTML = `<span class="inline-block w-10 text-[#00ff41] font-bold">&gt;${String.fromCharCode(65 + i)}</span> ${opt}`;
+          btn.onclick = () => this.check(i, btn);
+          opts.appendChild(btn);
+        });
+
+        if (window.MathJax) MathJax.typesetPromise();
+      },
+
+      check: function(choice) {
+        const q = questions[this.index];
+        const order = this.sessionOrders[this.index];
+
+        const btns = document.querySelectorAll('.btn-option');
+        btns.forEach(b => b.disabled = true);
+
+        if (choice === order.correct) {
+          btns[choice].classList.add('correct');
+          this.score += 10;
+          this.correctCount += 1;
+          this.beep('win');
+          this.showRat(true, q.rationale);
+          fireConfetti();
+        } else {
+          btns[choice].classList.add('incorrect');
+          btns[order.correct].classList.add('correct');
+          this.beep('lose');
+          this.showRat(false, q.rationale);
+        }
+        document.getElementById('score').innerText = this.score.toString().padStart(4, '0');
+      },
+
+      showRat: function(isCorrect, text) {
+        const box = document.getElementById('rationale-box');
+        box.classList.remove('hidden');
+
+        const title = document.getElementById('rat-title');
+        const icon = document.getElementById('rat-icon');
+
+        if (isCorrect) {
+          title.innerText = "ACCESS GRANTED";
+          title.className = "font-bold text-[#00ff41] mb-1 mono-font uppercase";
+          icon.innerHTML = '<i class="fa-solid fa-unlock text-[#00ff41]"></i>';
+        } else {
+          title.innerText = "ACCESS DENIED";
+          title.className = "font-bold text-red-500 mb-1 mono-font uppercase";
+          icon.innerHTML = '<i class="fa-solid fa-lock text-red-500"></i>';
+        }
+
+        document.getElementById('rat-content').innerHTML = text;
+        if (window.MathJax) MathJax.typesetPromise([box]);
+      },
+
+      next: function() {
+        if (this.index < questions.length - 1) {
+          this.index++;
+          this.loadQ();
+        } else {
+          this.end();
+        }
+      },
+
+      end: function() {
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+
+        // set progress 100%
+        document.getElementById('progress-bar').style.width = `100%`;
+
+        const finalScore = this.score;
+        const acc = Math.round((this.correctCount / questions.length) * 100);
+
+        document.getElementById('final-score').innerText = finalScore;
+        document.getElementById('final-acc').innerText = acc + "%";
+
+        let msg = "";
+        if (acc >= 90) msg = "Tuyệt vời! Kỹ năng giải mã của em đạt cấp độ CAO NHẤT. Delta không thể làm khó em!";
+        else if (acc >= 70) msg = "Rất tốt! Hệ thống ghi nhận em đã nắm vững các thuật toán cơ bản.";
+        else msg = "Cần nạp thêm dữ liệu kiến thức. Hãy ôn lại công thức nghiệm và thử lại nhé!";
+
+        document.getElementById('final-msg').innerText = msg;
+        if (acc >= 50) fireConfetti();
+      }
+    };
+
+    // --- CONFETTI ---
+    const cCanvas = document.getElementById('confetti-canvas');
+    const cCtx = cCanvas.getContext('2d');
+    let parts = [];
+    let animating = false;
+
+    function resizeC() {
+      cCanvas.width = window.innerWidth;
+      cCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeC);
+    resizeC();
+
+    function fireConfetti() {
+      for (let i = 0; i < 80; i++) {
+        parts.push({
+          x: cCanvas.width / 2, y: cCanvas.height / 2,
+          vx: (Math.random() - 0.5) * 15,
+          vy: (Math.random() - 0.5) * 15,
+          life: 100,
+          color: `hsl(${Math.random() * 120}, 100%, 50%)`,
+          size: Math.random() * 5 + 2
+        });
+      }
+      if (!animating) updateC();
+    }
+
+    function updateC() {
+      if (parts.length === 0) {
+        animating = false;
+        cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
+        return;
+      }
+      animating = true;
+      cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
+      for (let i = 0; i < parts.length; i++) {
+        const p = parts[i];
+        p.x += p.vx; p.y += p.vy;
+        p.vy += 0.5;
+        p.life--;
+        cCtx.fillStyle = p.color;
+        cCtx.fillRect(p.x, p.y, p.size, p.size);
+        if (p.life <= 0) { parts.splice(i, 1); i--; }
+      }
+      requestAnimationFrame(updateC);
+    }
+  </script>
+</body>
+</html>
