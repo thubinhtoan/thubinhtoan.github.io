@@ -228,167 +228,140 @@
     <script>
         // --- Questions Data (10 Questions) ---
         // ĐÃ CHỈNH: phân bố đáp án gốc A=3, B=3, C=2, D=2 (cân nhất cho 10 câu)
-        const questions = [
-            // 1) ĐÚNG = B
-            {
-                text: "Tứ giác ABCD nội tiếp đường tròn. Nếu \\(\\angle A = 70^\\circ\\) thì số đo góc \\(\\angle C\\) là:",
-                options: ["\\(70^\\circ\\)", "\\(110^\\circ\\)", "\\(20^\\circ\\)", "\\(90^\\circ\\)"],
-                correct: 1,
-                level: "NHẬN BIẾT",
-                rationale: "Trong tứ giác nội tiếp, tổng hai góc đối bằng \\(180^\\circ\\). \\(\\angle C = 180^\\circ - 70^\\circ = 110^\\circ\\)."
-            },
-            // 2) ĐÚNG = A
-            {
-                text: "Tâm của đường tròn ngoại tiếp đa giác đều là:",
-                options: ["Giao điểm các đường phân giác của các góc", "Giao điểm các đường chéo", "Trọng tâm của đa giác", "Điểm bất kì bên trong đa giác"],
-                correct: 0,
-                level: "NHẬN BIẾT",
-                rationale: "Tâm đa giác đều là điểm cách đều các đỉnh, đồng thời là giao điểm các đường trung trực và các đường phân giác."
-            },
-            // 3) ĐÚNG = C
-            {
-                text: "Trong các hình sau, hình nào luôn nội tiếp được đường tròn?",
-                options: ["Hình bình hành", "Hình thoi", "Hình thang cân", "Hình thang vuông"],
-                correct: 2,
-                level: "NHẬN BIẾT",
-                rationale: "Hình thang cân luôn nội tiếp đường tròn vì hai góc đối bù nhau (tổng \\(180^\\circ\\))."
-            },
-            // 4) ĐÚNG = D  (đảo vị trí để cân đáp án)
-            {
-                text: "Cho tam giác ABC đều nội tiếp đường tròn (O; R). Độ dài cạnh của tam giác ABC tính theo R là:",
-                options: ["\\(R\\sqrt{2}\\)", "\\(R\\)", "\\(\\frac{R\\sqrt{3}}{2}\\)", "\\(R\\sqrt{3}\\)"],
-                correct: 3,
-                level: "THÔNG HIỂU",
-                rationale: "Với tam giác đều: \\(R = \\frac{a}{\\sqrt{3}}\\Rightarrow a = R\\sqrt{3}\\)."
-            },
-            // 5) ĐÚNG = A
-            {
-                text: "Hình vuông ABCD có cạnh bằng \\(4\\) cm. Bán kính đường tròn ngoại tiếp hình vuông đó là:",
-                options: ["\\(2\\sqrt{2}\\) cm", "\\(2\\) cm", "\\(4\\) cm", "\\(4\\sqrt{2}\\) cm"],
-                correct: 0,
-                level: "THÔNG HIỂU",
-                rationale: "Đường chéo hình vuông là đường kính: \\(d = 4\\sqrt{2}\\). Bán kính \\(R = d/2 = 2\\sqrt{2}\\)."
-            },
-            // 6) ĐÚNG = B
-            {
-                text: "Phép quay tâm O góc \\(180^\\circ\\) biến điểm \\(M(2; -3)\\) thành điểm M' có tọa độ:",
-                options: ["\\(M'(2; 3)\\)", "\\(M'(-2; 3)\\)", "\\(M'(-2; -3)\\)", "\\(M'(3; -2)\\)"],
-                correct: 1,
-                level: "THÔNG HIỂU",
-                rationale: "Quay \\(180^\\circ\\) quanh O là đối xứng tâm O: đổi dấu cả x và y → \\(M'(-2; 3)\\)."
-            },
-            
-            // 8) ĐÚNG = D
-            {
-                text: "Một cái bàn tròn đường kính 1.2m. Người ta muốn đặt 4 chiếc ghế A, B, C, D sát mép bàn tạo thành hình chữ nhật. Nếu biết AB = 60cm thì BC là bao nhiêu?",
-                options: ["60 cm", "80 cm", "100 cm", "103.9 cm"],
-                correct: 3,
-                level: "VẬN DỤNG THỰC TẾ",
-                rationale: "Đường chéo HCN nội tiếp bằng đường kính: \\(d=120\\)cm. \\(BC=\\sqrt{120^2-60^2}=\\sqrt{10800}\\approx 103.9\\)cm."
-            },
-            // 9) ĐÚNG = A
-            {
-                text: "Tính diện tích của một lục giác đều nội tiếp đường tròn bán kính \\(R = 4\\) cm.",
-                options: ["\\(24\\sqrt{3}\\) cm²", "\\(16\\sqrt{3}\\) cm²", "\\(48\\sqrt{3}\\) cm²", "\\(12\\sqrt{3}\\) cm²"],
-                correct: 0,
-                level: "VẬN DỤNG",
-                rationale: "Lục giác đều nội tiếp: cạnh \\(a=R=4\\). Diện tích \\(S=\\frac{3\\sqrt{3}}{2}a^2=\\frac{3\\sqrt{3}}{2}\\cdot16=24\\sqrt{3}\\)."
-            },
-            {
-    text: "Cho tam giác đều ABC có đường cao \\(AH = 9\\) cm. Bán kính \\(r\\) của đường tròn nội tiếp tam giác bằng:",
+       const questions = [
+  {
+    text: "Tứ giác ABCD nội tiếp đường tròn. Nếu \\(\\angle A = 70^\\circ\\) thì số đo góc \\(\\angle C\\) là:",
+    options: ["\\(70^\\circ\\)", "\\(110^\\circ\\)", "\\(20^\\circ\\)", "\\(90^\\circ\\)"],
+    correct: 1,
+    level: "NHẬN BIẾT",
+    rationale: "Trong tứ giác nội tiếp, tổng hai góc đối bằng \\(180^\\circ\\). Suy ra \\(\\angle C = 110^\\circ\\)."
+  },
+  {
+    text: "Tâm của đường tròn ngoại tiếp đa giác đều là:",
+    options: [
+      "Giao điểm các đường phân giác của các góc",
+      "Giao điểm các đường chéo",
+      "Trọng tâm của đa giác",
+      "Điểm bất kì bên trong đa giác"
+    ],
+    correct: 0,
+    level: "NHẬN BIẾT",
+    rationale: "Đa giác đều có tâm là điểm cách đều các đỉnh, là giao điểm các đường trung trực và phân giác."
+  },
+  {
+    text: "Trong các hình sau, hình nào luôn nội tiếp được đường tròn?",
+    options: ["Hình bình hành", "Hình thoi", "Hình thang cân", "Hình thang vuông"],
+    correct: 2,
+    level: "NHẬN BIẾT",
+    rationale: "Hình thang cân có tổng hai góc đối bằng \\(180^\\circ\\) nên luôn nội tiếp."
+  },
+  {
+    text: "Cho tam giác ABC đều nội tiếp đường tròn \\((O;R)\\). Độ dài cạnh tam giác theo \\(R\\) là:",
+    options: ["\\(R\\sqrt{2}\\)", "\\(R\\)", "\\(\\dfrac{R\\sqrt{3}}{2}\\)", "\\(R\\sqrt{3}\\)"],
+    correct: 3,
+    level: "THÔNG HIỂU",
+    rationale: "Với tam giác đều: \\(R = \\dfrac{a}{\\sqrt{3}} \\Rightarrow a = R\\sqrt{3}\\)."
+  },
+  {
+    text: "Hình vuông ABCD có cạnh bằng \\(4\\) cm. Bán kính đường tròn ngoại tiếp hình vuông là:",
+    options: ["\\(2\\sqrt{2}\\) cm", "\\(2\\) cm", "\\(4\\) cm", "\\(4\\sqrt{2}\\) cm"],
+    correct: 0,
+    level: "THÔNG HIỂU",
+    rationale: "Đường chéo hình vuông là \\(4\\sqrt{2}\\), bán kính bằng nửa đường chéo."
+  },
+  {
+    text: "Phép quay tâm O góc \\(180^\\circ\\) biến điểm \\(M(2;-3)\\) thành:",
+    options: ["\\(2;3\\)", "\\(-2;3\\)", "\\(-2;-3\\)", "\\(3;-2\\)"],
+    correct: 1,
+    level: "THÔNG HIỂU",
+    rationale: "Quay \\(180^\\circ\\) là đối xứng tâm: đổi dấu cả hoành và tung."
+  },
+  {
+    text: "Một bàn tròn đường kính 1.2m. Bốn ghế tạo thành hình chữ nhật, biết AB = 60cm. BC bằng:",
+    options: ["60 cm", "80 cm", "100 cm", "103.9 cm"],
+    correct: 3,
+    level: "VẬN DỤNG THỰC TẾ",
+    rationale: "Đường chéo HCN bằng đường kính: \\(BC = \\sqrt{120^2 - 60^2} \\approx 103.9\\) cm."
+  },
+  {
+    text: "Diện tích lục giác đều nội tiếp đường tròn bán kính \\(R=4\\) cm là:",
+    options: ["\\(24\\sqrt{3}\\) cm²", "\\(16\\sqrt{3}\\) cm²", "\\(48\\sqrt{3}\\) cm²", "\\(12\\sqrt{3}\\) cm²"],
+    correct: 0,
+    level: "VẬN DỤNG",
+    rationale: "Lục giác đều gồm 6 tam giác đều cạnh 4 → diện tích \\(=24\\sqrt{3}\\)."
+  },
+  {
+    text: "Cho tam giác đều ABC có đường cao \\(AH=9\\) cm. Bán kính đường tròn nội tiếp là:",
     options: ["6 cm", "3 cm", "4,5 cm", "\\(\\dfrac{3\\sqrt{3}}{2}\\) cm"],
     correct: 1,
     level: "NHẬN BIẾT",
-    rationale:
-      "Trong tam giác đều: \\(h = \\dfrac{a\\sqrt{3}}{2}\\Rightarrow a = 6\\sqrt{3}\\). Bán kính đường tròn nội tiếp là \\(r = \\dfrac{h}{3} = 3\\) cm."
+    rationale: "Trong tam giác đều: \\(r = \\dfrac{h}{3} = 3\\) cm."
   },
   {
-    text: "Cho tam giác vuông cân ABC có \\(AB = AC = 4\\) cm. Bán kính \\(R\\) của đường tròn ngoại tiếp tam giác bằng:",
+    text: "Cho tam giác vuông cân có hai cạnh góc vuông dài 4 cm. Bán kính đường tròn ngoại tiếp là:",
     options: ["\\(2\\sqrt{2}\\) cm", "\\(\\sqrt{2}\\) cm", "\\(4\\sqrt{2}\\) cm", "\\(8\\sqrt{2}\\) cm"],
     correct: 0,
     level: "NHẬN BIẾT",
-    rationale:
-      "Tam giác vuông có tâm đường tròn ngoại tiếp là trung điểm cạnh huyền. Cạnh huyền \\(BC = 4\\sqrt{2}\\) nên \\(R = \\dfrac{BC}{2} = 2\\sqrt{2}\\) cm."
+    rationale: "Tam giác vuông có bán kính ngoại tiếp bằng nửa cạnh huyền."
   },
   {
-    {
-    text: "Trong các phát biểu sau, phát biểu nào đúng?",
+    text: "Phát biểu nào đúng về tứ giác nội tiếp?",
     options: [
-      "Mọi tứ giác luôn nội tiếp được đường tròn",
-      "Trong tứ giác nội tiếp, tổng hai góc đối bằng \\(90^\\circ\\)",
-      "Tổng số đo hai góc đối của tứ giác nội tiếp bằng \\(180^\\circ\\)",
-      "Tất cả các hình thang đều là tứ giác nội tiếp"
+      "Mọi tứ giác đều nội tiếp",
+      "Hai góc đối bằng \\(90^\\circ\\)",
+      "Hai góc đối bù nhau",
+      "Mọi hình thang đều nội tiếp"
     ],
     correct: 2,
     level: "NHẬN BIẾT",
-    rationale:
-      "Tính chất cơ bản của tứ giác nội tiếp: tổng hai góc đối diện luôn bằng \\(180^\\circ\\)."
+    rationale: "Tính chất chuẩn: tổng hai góc đối của tứ giác nội tiếp bằng \\(180^\\circ\\)."
   },
   {
-    text: "Cho tứ giác MNPQ nội tiếp đường tròn \\((O;R)\\) và \\(\\widehat{M} = 60^\\circ\\). Số đo góc \\(\\widehat{P}\\) bằng:",
-    options: ["\\(30^\\circ\\)", "\\(120^\\circ\\)", "\\(180^\\circ\\)", "\\(90^\\circ\\)"],
-    correct: 1,
-    level: "THÔNG HIỂU",
-    rationale:
-      "Trong tứ giác nội tiếp, hai góc đối bù nhau: \\(\\widehat{P} = 180^\\circ - 60^\\circ = 120^\\circ\\)."
-  },
-    {
-    text: "Cho tứ giác ABCD nội tiếp có \\(\\widehat{ACD} = 60^\\circ\\). Khẳng định nào sau đây đúng?",
+    text: "Cho tứ giác nội tiếp có \\(\\angle ACD = 60^\\circ\\). Khẳng định đúng là:",
     options: [
-      "\\(\\widehat{ADC} = 60^\\circ\\)",
-      "\\(\\widehat{ADC} = 120^\\circ\\)",
-      "\\(\\widehat{ABD} = 60^\\circ\\)",
-      "\\(\\widehat{ABD} = 120^\\circ\\)"
+      "\\(\\angle ADC = 60^\\circ\\)",
+      "\\(\\angle ADC = 120^\\circ\\)",
+      "\\(\\angle ABD = 60^\\circ\\)",
+      "\\(\\angle ABD = 120^\\circ\\)"
     ],
     correct: 3,
     level: "THÔNG HIỂU",
-    rationale:
-      "Hai góc nội tiếp cùng chắn một cung thì bằng nhau. \\(\\widehat{ACD}\\) và \\(\\widehat{ABD}\\) chắn cung AD nên \\(\\widehat{ABD} = 60^\\circ\\). Suy ra góc ngoài tương ứng là \\(120^\\circ\\)."
+    rationale: "Hai góc nội tiếp chắn cùng cung bằng nhau → suy ra góc đối là \\(120^\\circ\\)."
   },
   {
-    text: "Cho lục giác đều ABCDEF nội tiếp đường tròn bán kính \\(R\\). Độ dài cạnh AB bằng:",
-    options: ["\\(R\\)", "\\(R\\sqrt{3}\\)", "\\(\\dfrac{R\\sqrt{3}}{2}\\)", "\\(\\dfrac{R}{2}\\)"],
-    correct: 0,
-    level: "NHẬN BIẾT",
-    rationale:
-      "Trong lục giác đều nội tiếp, mỗi cạnh bằng bán kính đường tròn ngoại tiếp: \\(AB = R\\)."
-  },
-  {
-    text: "Phép quay nào với tâm O biến tam giác đều thành chính nó?",
+    text: "Phép quay nào biến tam giác đều thành chính nó?",
     options: ["\\(90^\\circ\\)", "\\(100^\\circ\\)", "\\(110^\\circ\\)", "\\(120^\\circ\\)"],
     correct: 3,
     level: "NHẬN BIẾT",
-    rationale:
-      "Tam giác đều có 3 đỉnh phân bố đều trên đường tròn. Góc quay nhỏ nhất khác 0 để biến hình thành chính nó là \\(360^\\circ/3 = 120^\\circ\\)."
+    rationale: "Tam giác đều có đối xứng quay bậc 3 → góc quay nhỏ nhất là \\(120^\\circ\\)."
+  },
+  {
+    text: "Cho tam giác nhọn ABC nội tiếp đường tròn. Giao điểm đường cao là H. AD cắt đường tròn tại K. Khẳng định đúng:",
+    options: [
+      "K là tâm ngoại tiếp HBC",
+      "BHCK là hình bình hành",
+      "H và K đối xứng qua BC",
+      "H là tâm nội tiếp ABC"
+    ],
+    correct: 2,
+    level: "VẬN DỤNG CAO",
+    rationale: "Tính chất quen thuộc: điểm K đối xứng trực tâm H qua cạnh BC."
   }
 ];
 
-            // 10) ĐÚNG = C
-            {
-                text: "Cho tam giác nhọn ABC nội tiếp đường tròn (O). Các đường cao AD, BE, CF cắt nhau tại H. Tia AD cắt (O) tại K (K khác A). Khẳng định nào sau đây đúng?",
-                options: ["K là tâm đường tròn ngoại tiếp tam giác HBC", "Tứ giác BHCK là hình bình hành", "H và K đối xứng nhau qua BC", "H là tâm đường tròn nội tiếp tam giác ABC"],
-                correct: 2,
-                level: "VẬN DỤNG CAO",
-                rationale: "Tính chất: Điểm K (giao của đường cao AD với (O)) là ảnh đối xứng của trực tâm H qua cạnh BC."
-            }
-        ];
-
         // --- Helpers: Shuffle options (random thứ tự đáp án, không lệch đáp án) ---
         function shuffleArray(arr) {
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
-        }
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
 
-        function prepareQuestion(originalQ) {
-            const correctText = originalQ.options[originalQ.correct];
-            const mixed = shuffleArray([...originalQ.options]);
-            const newCorrect = mixed.indexOf(correctText);
-            return { ...originalQ, options: mixed, correct: newCorrect };
-        }
-
+function shuffleQuestion(q) {
+  const correctAnswer = q.options[q.correct];
+  shuffleArray(q.options);
+  q.correct = q.options.indexOf(correctAnswer);
+}
         const game = {
             index: 0,
             score: 0,
@@ -432,8 +405,9 @@
                 document.getElementById('game-screen').classList.remove('hidden');
                 this.loadQ();
             },
+              loadQ: function() {
+                shuffleQuestion(q);
 
-            loadQ: function() {
                 // Random thứ tự đáp án mỗi lần load câu
                 const q = prepareQuestion(questions[this.index]);
                 this.currentQ = q;
