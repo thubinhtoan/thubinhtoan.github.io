@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hành Trình Tìm Kho Báu Cổ Đại - Cô Thu Bình Toán</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Merriweather:ital,wght@0,300;0,700;1,300&display=swap');
+        
+        body {
+            font-family: 'Merriweather', serif;
+            background-color: #1a1a1a;
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+                url("https://www.transparenttextures.com/patterns/wall-4-light.png");
+            min-height: 100vh;
+            color: #d4af37; /* Gold color */
+            overflow-x: hidden;
+        }
+
+        .ancient-font {
+            font-family: 'Cinzel Decorative', cursive;
+        }
+
+        .relic-card {
+            background: linear-gradient(135deg, #2c2c2c 0%, #1f1f1f 100%);
+            border: 4px solid #8b6c42;
+            border-radius: 12px;
+            box-shadow: 
+                0 0 0 2px #000,
+                0 0 20px rgba(212, 175, 55, 0.2),
+                inset 0 0 30px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .relic-card::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 1px solid #d4af37;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .btn-ancient {
+            background: #3d3d3d;
+            border: 2px solid #5c4d3c;
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+        }
+
+        .btn-ancient:hover:not(:disabled) {
+            background: #4a4a4a;
+            border-color: #d4af37;
+            color: #d4af37;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(212, 175, 55, 0.2);
+        }
+
+        .btn-ancient.correct {
+            background: #1b4d1b !important;
+            border-color: #4caf50 !important;
+            color: #a5d6a7 !important;
+            box-shadow: 0 0 15px #4caf50;
+        }
+
+        .btn-ancient.incorrect {
+            background: #4d1b1b !important;
+            border-color: #f44336 !important;
+            color: #ef9a9a !important;
+            opacity: 0.8;
+        }
+
+        .torch-anim {
+            animation: flicker 2s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.8; transform: scale(1); filter: drop-shadow(0 0 10px #ff6600); }
+            100% { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 20px #ffcc00); }
+        }
+
+        .progress-track {
+            background: #000;
+            border: 1px solid #5c4d3c;
+            height: 8px;
+            border-radius: 4px;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #d4af37, #fdf5e6);
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        #confetti-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 100;
+        }
+
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="relic-card max-w-2xl w-full p-12 text-center fade-in">
+        <div class="mb-8 flex justify-center gap-8">
+            <i class="fa-solid fa-fire text-4xl text-orange-500 torch-anim"></i>
+            <div class="w-24 h-24 border-4 border-[#d4af37] rounded-full flex items-center justify-center bg-black shadow-[0_0_30px_#d4af37]">
+                <i class="fa-solid fa-compass-drafting text-5xl text-[#d4af37]"></i>
+            </div>
+            <i class="fa-solid fa-fire text-4xl text-orange-500 torch-anim"></i>
+        </div>
+        
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 ancient-font text-[#d4af37] tracking-wider">
+            Kho Báu Cổ Đại
+        </h1>
+        <h2 class="text-xl text-[#a8a8a8] mb-8 italic">Tổng Kết Chương 9: Đa Giác & Đường Tròn</h2>
+        
+        <div class="grid grid-cols-2 gap-4 mb-8 text-left max-w-md mx-auto bg-black/40 p-6 rounded border border-[#5c4d3c]">
+            <div>
+                <div class="text-xs text-[#d4af37] uppercase mb-1">Thử Thách</div>
+                <div class="text-white font-bold">10 Câu Hỏi</div>
+            </div>
+            <div>
+                <div class="text-xs text-[#d4af37] uppercase mb-1">Độ Khó</div>
+                <div class="text-white font-bold">Tổng Hợp</div>
+            </div>
+            <div class="col-span-2 mt-2 pt-2 border-t border-[#5c4d3c] text-sm text-[#a8a8a8]">
+                <i class="fa-solid fa-scroll mr-2"></i> Nhiệm vụ: Giải mã các bí ẩn về đường tròn, tứ giác nội tiếp và phép quay để mở rương kho báu.
+            </div>
+        </div>
+
+        <button onclick="game.start()" class="group relative px-10 py-4 bg-[#8b6c42] hover:bg-[#a08050] text-black font-bold text-lg rounded shadow-lg transition transform hover:scale-105 border-2 border-[#d4af37]">
+            <span class="relative z-10 flex items-center">
+                KHỞI HÀNH <i class="fa-solid fa-route ml-2"></i>
+            </span>
+        </button>
+        <div class="mt-6 text-xs text-[#5c4d3c]">Biên soạn bởi Cô Thu Bình Toán</div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="hidden w-full max-w-4xl relic-card p-6 md:p-10 fade-in">
+        <!-- HUD -->
+        <div class="flex justify-between items-end mb-4 border-b border-[#5c4d3c] pb-2">
+            <div>
+                <span class="text-xs uppercase tracking-widest text-[#8b6c42]">Bản đồ</span>
+                <div class="text-2xl font-bold ancient-font text-white"><span id="q-curr">1</span><span class="text-base text-[#5c4d3c]">/10</span></div>
+            </div>
+            <div class="text-right">
+                <span class="text-xs uppercase tracking-widest text-[#8b6c42]">Vàng thu thập</span>
+                <div id="score" class="text-2xl font-bold text-[#d4af37] ancient-font">0</div>
+            </div>
+        </div>
+
+        <div class="progress-track mb-8">
+            <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+        </div>
+
+        <!-- Question -->
+        <div class="relative mb-6">
+            <div class="absolute right-0 -top-12">
+                <span id="level-badge" class="text-xs px-3 py-1 rounded bg-[#3d3d3d] text-[#d4af37] border border-[#d4af37] uppercase font-bold tracking-wider">Nhận Biết</span>
+            </div>
+            <h2 id="q-text" class="text-xl md:text-2xl font-medium text-[#e0e0e0] leading-relaxed mb-8"></h2>
+        </div>
+
+        <!-- Options -->
+        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
+
+        <!-- Rationale -->
+        <div id="rationale-box" class="hidden mt-6 p-6 bg-black/60 rounded border border-[#d4af37] fade-in">
+            <div class="flex items-start gap-4">
+                <div id="rat-icon" class="text-2xl mt-1"></div>
+                <div>
+                    <h3 id="rat-title" class="font-bold text-lg mb-2 ancient-font"></h3>
+                    <div id="rat-content" class="text-[#c0c0c0] leading-relaxed text-sm md:text-base"></div>
+                </div>
+            </div>
+            <div class="mt-4 text-right">
+                <button onclick="game.next()" class="text-[#d4af37] hover:text-white font-bold uppercase tracking-wider text-sm transition flex items-center ml-auto">
+                    Tiếp bước <i class="fa-solid fa-shoe-prints ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div id="end-screen" class="hidden relic-card max-w-lg w-full p-10 text-center fade-in">
+        <div class="mb-6 relative inline-block">
+            <i class="fa-solid fa-chest-open text-6xl text-[#d4af37] drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]"></i>
+            <div class="absolute -top-2 -right-2 text-white animate-bounce"><i class="fa-solid fa-star"></i></div>
+        </div>
+        
+        <h2 class="text-3xl font-bold text-white mb-2 ancient-font">Chuyến đi hoàn tất!</h2>
+        <p class="text-[#a8a8a8] mb-8">Bạn đã khám phá xong tàn tích Chương 9.</p>
+
+        <div class="bg-black/40 p-4 rounded border border-[#5c4d3c] mb-8">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-xs uppercase text-[#8b6c42]">Tổng Vàng</span>
+                <span id="final-score" class="text-2xl font-bold text-[#d4af37]">0</span>
+            </div>
+            <div class="w-full bg-[#3d3d3d] h-2 rounded-full overflow-hidden">
+                <div id="final-bar" class="h-full bg-[#d4af37]" style="width: 0%"></div>
+            </div>
+            <div id="final-acc" class="text-right text-xs text-[#a8a8a8] mt-1">0% Chính xác</div>
+        </div>
+
+        <div id="final-msg" class="mb-8 font-serif italic text-[#e0e0e0]"></div>
+
+        <button onclick="location.reload()" class="w-full py-4 bg-[#3d3d3d] hover:bg-[#4a4a4a] text-[#d4af37] font-bold border border-[#5c4d3c] rounded transition">
+            <i class="fa-solid fa-dungeon mr-2"></i> Khám Phá Lại
+        </button>
+    </div>
+
+    <script>
+        // --- Questions Data (10 Questions) ---
+        // ĐÃ CHỈNH: phân bố đáp án gốc A=3, B=3, C=2, D=2 (cân nhất cho 10 câu)
+        const questions = [
+            // 1) ĐÚNG = B
+            {
+                text: "Tứ giác ABCD nội tiếp đường tròn. Nếu \\(\\angle A = 70^\\circ\\) thì số đo góc \\(\\angle C\\) là:",
+                options: ["\\(70^\\circ\\)", "\\(110^\\circ\\)", "\\(20^\\circ\\)", "\\(90^\\circ\\)"],
+                correct: 1,
+                level: "NHẬN BIẾT",
+                rationale: "Trong tứ giác nội tiếp, tổng hai góc đối bằng \\(180^\\circ\\). \\(\\angle C = 180^\\circ - 70^\\circ = 110^\\circ\\)."
+            },
+            // 2) ĐÚNG = A
+            {
+                text: "Tâm của đường tròn ngoại tiếp đa giác đều là:",
+                options: ["Giao điểm các đường phân giác của các góc", "Giao điểm các đường chéo", "Trọng tâm của đa giác", "Điểm bất kì bên trong đa giác"],
+                correct: 0,
+                level: "NHẬN BIẾT",
+                rationale: "Tâm đa giác đều là điểm cách đều các đỉnh, đồng thời là giao điểm các đường trung trực và các đường phân giác."
+            },
+            // 3) ĐÚNG = C
+            {
+                text: "Trong các hình sau, hình nào luôn nội tiếp được đường tròn?",
+                options: ["Hình bình hành", "Hình thoi", "Hình thang cân", "Hình thang vuông"],
+                correct: 2,
+                level: "NHẬN BIẾT",
+                rationale: "Hình thang cân luôn nội tiếp đường tròn vì hai góc đối bù nhau (tổng \\(180^\\circ\\))."
+            },
+            // 4) ĐÚNG = D  (đảo vị trí để cân đáp án)
+            {
+                text: "Cho tam giác ABC đều nội tiếp đường tròn (O; R). Độ dài cạnh của tam giác ABC tính theo R là:",
+                options: ["\\(R\\sqrt{2}\\)", "\\(R\\)", "\\(\\frac{R\\sqrt{3}}{2}\\)", "\\(R\\sqrt{3}\\)"],
+                correct: 3,
+                level: "THÔNG HIỂU",
+                rationale: "Với tam giác đều: \\(R = \\frac{a}{\\sqrt{3}}\\Rightarrow a = R\\sqrt{3}\\)."
+            },
+            // 5) ĐÚNG = A
+            {
+                text: "Hình vuông ABCD có cạnh bằng \\(4\\) cm. Bán kính đường tròn ngoại tiếp hình vuông đó là:",
+                options: ["\\(2\\sqrt{2}\\) cm", "\\(2\\) cm", "\\(4\\) cm", "\\(4\\sqrt{2}\\) cm"],
+                correct: 0,
+                level: "THÔNG HIỂU",
+                rationale: "Đường chéo hình vuông là đường kính: \\(d = 4\\sqrt{2}\\). Bán kính \\(R = d/2 = 2\\sqrt{2}\\)."
+            },
+            // 6) ĐÚNG = B
+            {
+                text: "Phép quay tâm O góc \\(180^\\circ\\) biến điểm \\(M(2; -3)\\) thành điểm M' có tọa độ:",
+                options: ["\\(M'(2; 3)\\)", "\\(M'(-2; 3)\\)", "\\(M'(-2; -3)\\)", "\\(M'(3; -2)\\)"],
+                correct: 1,
+                level: "THÔNG HIỂU",
+                rationale: "Quay \\(180^\\circ\\) quanh O là đối xứng tâm O: đổi dấu cả x và y → \\(M'(-2; 3)\\)."
+            },
+            // 7) ĐÚNG = B
+            {
+                text: "Cho đường tròn (O) và dây cung AB chia đường tròn thành hai cung. Biết số đo cung nhỏ AB là \\(100^\\circ\\). Góc nội tiếp chắn cung lớn AB có số đo là:",
+                options: ["\\(80^\\circ\\)", "\\(130^\\circ\\)", "\\(100^\\circ\\)", "\\(50^\\circ\\)"],
+                correct: 1,
+                level: "THÔNG HIỂU",
+                rationale: "Cung lớn: \\(360-100=260^\\circ\\). Góc nội tiếp chắn cung lớn: \\(260/2=130^\\circ\\)."
+            },
+            // 8) ĐÚNG = D
+            {
+                text: "Một cái bàn tròn đường kính 1.2m. Người ta muốn đặt 4 chiếc ghế A, B, C, D sát mép bàn tạo thành hình chữ nhật. Nếu biết AB = 60cm thì BC là bao nhiêu?",
+                options: ["60 cm", "80 cm", "100 cm", "103.9 cm"],
+                correct: 3,
+                level: "VẬN DỤNG THỰC TẾ",
+                rationale: "Đường chéo HCN nội tiếp bằng đường kính: \\(d=120\\)cm. \\(BC=\\sqrt{120^2-60^2}=\\sqrt{10800}\\approx 103.9\\)cm."
+            },
+            // 9) ĐÚNG = A
+            {
+                text: "Tính diện tích của một lục giác đều nội tiếp đường tròn bán kính \\(R = 4\\) cm.",
+                options: ["\\(24\\sqrt{3}\\) cm²", "\\(16\\sqrt{3}\\) cm²", "\\(48\\sqrt{3}\\) cm²", "\\(12\\sqrt{3}\\) cm²"],
+                correct: 0,
+                level: "VẬN DỤNG",
+                rationale: "Lục giác đều nội tiếp: cạnh \\(a=R=4\\). Diện tích \\(S=\\frac{3\\sqrt{3}}{2}a^2=\\frac{3\\sqrt{3}}{2}\\cdot16=24\\sqrt{3}\\)."
+            },
+            // 10) ĐÚNG = C
+            {
+                text: "Cho tam giác nhọn ABC nội tiếp đường tròn (O). Các đường cao AD, BE, CF cắt nhau tại H. Tia AD cắt (O) tại K (K khác A). Khẳng định nào sau đây đúng?",
+                options: ["K là tâm đường tròn ngoại tiếp tam giác HBC", "Tứ giác BHCK là hình bình hành", "H và K đối xứng nhau qua BC", "H là tâm đường tròn nội tiếp tam giác ABC"],
+                correct: 2,
+                level: "VẬN DỤNG CAO",
+                rationale: "Tính chất: Điểm K (giao của đường cao AD với (O)) là ảnh đối xứng của trực tâm H qua cạnh BC."
+            }
+        ];
+
+        // --- Helpers: Shuffle options (random thứ tự đáp án, không lệch đáp án) ---
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function prepareQuestion(originalQ) {
+            const correctText = originalQ.options[originalQ.correct];
+            const mixed = shuffleArray([...originalQ.options]);
+            const newCorrect = mixed.indexOf(correctText);
+            return { ...originalQ, options: mixed, correct: newCorrect };
+        }
+
+        const game = {
+            index: 0,
+            score: 0,
+            audioCtx: null,
+            currentQ: null,
+
+            initAudio: function() {
+                if(!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            },
+
+            playSound: function(type) {
+                if(!this.audioCtx) return;
+                const osc = this.audioCtx.createOscillator();
+                const gain = this.audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(this.audioCtx.destination);
+                
+                const now = this.audioCtx.currentTime;
+                if(type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(110, now);
+                    osc.frequency.exponentialRampToValueAtTime(220, now + 0.1);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                    osc.start(now);
+                    osc.stop(now + 0.6);
+                } else {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(50, now);
+                    osc.frequency.exponentialRampToValueAtTime(20, now + 0.2);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                }
+            },
+
+            start: function() {
+                this.initAudio();
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('game-screen').classList.remove('hidden');
+                this.loadQ();
+            },
+
+            loadQ: function() {
+                // Random thứ tự đáp án mỗi lần load câu
+                const q = prepareQuestion(questions[this.index]);
+                this.currentQ = q;
+
+                document.getElementById('q-curr').innerText = this.index + 1;
+                document.getElementById('score').innerText = this.score;
+                document.getElementById('q-text').innerHTML = q.text;
+                document.getElementById('level-badge').innerText = q.level;
+                
+                // Color Badge
+                const badge = document.getElementById('level-badge');
+                if(q.level.includes("NHẬN")) badge.className = "text-xs px-3 py-1 rounded bg-[#2e3b2a] text-[#a5d6a7] border border-[#a5d6a7] uppercase font-bold tracking-wider";
+                else if(q.level.includes("THÔNG")) badge.className = "text-xs px-3 py-1 rounded bg-[#2a3b45] text-[#90caf9] border border-[#90caf9] uppercase font-bold tracking-wider";
+                else if(q.level.includes("THỰC")) badge.className = "text-xs px-3 py-1 rounded bg-[#3b352a] text-[#ffe082] border border-[#ffe082] uppercase font-bold tracking-wider";
+                else badge.className = "text-xs px-3 py-1 rounded bg-[#452a2a] text-[#ef9a9a] border border-[#ef9a9a] uppercase font-bold tracking-wider";
+
+                // Progress (SỬA: lên đúng 100%)
+                const pct = ((this.index + 1) / questions.length) * 100;
+                document.getElementById('progress-fill').style.width = `${pct}%`;
+
+                // Options
+                const grid = document.getElementById('options-grid');
+                grid.innerHTML = '';
+                document.getElementById('rationale-box').classList.add('hidden');
+
+                q.options.forEach((opt, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = "btn-ancient w-full p-5 rounded-lg text-left font-medium text-lg flex items-center";
+                    btn.innerHTML = `<span class="w-8 h-8 rounded border border-[#5c4d3c] bg-black/30 flex items-center justify-center text-sm mr-4 text-[#d4af37] font-bold">${String.fromCharCode(65+i)}</span> ${opt}`;
+                    btn.onclick = () => this.check(i, btn);
+                    grid.appendChild(btn);
+                });
+
+                if(window.MathJax) MathJax.typesetPromise();
+            },
+
+            check: function(choice, btn) {
+                const q = this.currentQ;
+                const btns = document.querySelectorAll('.btn-ancient');
+                btns.forEach(b => b.disabled = true);
+
+                if(choice === q.correct) {
+                    btn.classList.add('correct');
+                    this.score += 10;
+                    this.playSound('correct');
+                    this.showRat(true, q.rationale);
+                    fireConfetti();
+                } else {
+                    btn.classList.add('incorrect');
+                    btns[q.correct].classList.add('correct');
+                    this.playSound('incorrect');
+                    this.showRat(false, q.rationale);
+                }
+                document.getElementById('score').innerText = this.score;
+            },
+
+            showRat: function(isCorrect, text) {
+                const box = document.getElementById('rationale-box');
+                box.classList.remove('hidden');
+                
+                if(isCorrect) {
+                    document.getElementById('rat-icon').innerHTML = '<i class="fa-solid fa-check text-[#4caf50]"></i>';
+                    document.getElementById('rat-title').innerHTML = '<span class="text-[#4caf50]">Chính Xác!</span>';
+                } else {
+                    document.getElementById('rat-icon').innerHTML = '<i class="fa-solid fa-xmark text-[#f44336]"></i>';
+                    document.getElementById('rat-title').innerHTML = '<span class="text-[#f44336]">Sai Rồi!</span>';
+                }
+                document.getElementById('rat-content').innerHTML = text;
+                if(window.MathJax) MathJax.typesetPromise([box]);
+            },
+
+            next: function() {
+                if(this.index < questions.length - 1) {
+                    this.index++;
+                    this.loadQ();
+                } else {
+                    this.end();
+                }
+            },
+
+            end: function() {
+                document.getElementById('game-screen').classList.add('hidden');
+                document.getElementById('end-screen').classList.remove('hidden');
+                
+                const score = this.score;
+                const acc = Math.round((score / (questions.length * 10)) * 100);
+                
+                document.getElementById('final-score').innerText = score;
+                document.getElementById('final-bar').style.width = `${acc}%`;
+                document.getElementById('final-acc').innerText = `${acc}% Chính xác`;
+
+                let msg = "";
+                if(acc >= 90) msg = "Tuyệt vời! Bạn đã tìm ra Kho Báu Tri Thức của người xưa!";
+                else if(acc >= 70) msg = "Rất tốt! Bạn đã giải mã được hầu hết các bí ẩn.";
+                else msg = "Hãy ôn luyện thêm và quay lại chinh phục tàn tích này nhé!";
+                document.getElementById('final-msg').innerText = msg;
+                
+                if(acc>=50) fireConfetti();
+            }
+        };
+
+        // --- Confetti ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function fireConfetti() {
+            for(let i=0; i<100; i++) {
+                particles.push({
+                    x: canvas.width/2, y: canvas.height/2,
+                    vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15,
+                    life: 100,
+                    color: `hsl(${40 + Math.random()*20}, 100%, 50%)`, // Gold palette
+                    size: Math.random()*5+3
+                });
+            }
+            if(!animating) updateConfetti();
+        }
+
+        let animating = false;
+        function updateConfetti() {
+            if(particles.length===0) { animating=false; ctx.clearRect(0,0,canvas.width,canvas.height); return; }
+            animating=true;
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            for(let i=0; i<particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx; p.y += p.vy; p.vy += 0.5; p.life--;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+                if(p.life<=0) { particles.splice(i,1); i--; }
+            }
+            requestAnimationFrame(updateConfetti);
+        }
+    </script>
+</body>
+</html>
