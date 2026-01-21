@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thử Thách Đỉnh Cao Hình Nón - Cô Thu Bình Toán</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- MathJax for rendering math formulas -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        .option-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background-color: #f0f9ff;
+            border-color: #3b82f6;
+        }
+
+        .option-btn.correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #15803d !important;
+            font-weight: bold;
+        }
+
+        .option-btn.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #b91c1c !important;
+            opacity: 0.85;
+        }
+
+        .confetti-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Animations */
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        .level-badge {
+            background: linear-gradient(45deg, #FF9A9E 0%, #FECFEF 99%, #FECFEF 100%);
+            color: #be123c;
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center p-4">
+    <canvas id="confetti" class="confetti-canvas"></canvas>
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="glass-card max-w-2xl w-full p-8 text-center animate-pop">
+        <div class="mb-6 flex justify-center">
+            <div class="w-24 h-24 bg-gradient-to-tr from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                <i class="fa-solid fa-ice-cream text-5xl text-white"></i>
+            </div>
+        </div>
+        <h1 class="text-4xl font-extrabold text-slate-800 mb-2">Thử Thách Đỉnh Cao Hình Nón</h1>
+        <p class="text-slate-500 text-lg mb-6 font-semibold">Toán 9 - Chương 10 - Kết Nối Tri Thức & Chân Trời Sáng Tạo</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-blue-50 p-4 rounded-xl text-blue-700">
+                <i class="fa-solid fa-question-circle text-2xl mb-2"></i>
+                <div class="font-bold">20 Câu Hỏi</div>
+            </div>
+            <div class="bg-purple-50 p-4 rounded-xl text-purple-700">
+                <i class="fa-solid fa-layer-group text-2xl mb-2"></i>
+                <div class="font-bold">4 Mức Độ</div>
+            </div>
+            <div class="bg-green-50 p-4 rounded-xl text-green-700">
+                <i class="fa-solid fa-brain text-2xl mb-2"></i>
+                <div class="font-bold">Giải Thích Chi Tiết</div>
+            </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="bg-white rounded-2xl p-5 mb-6 text-left shadow-sm border border-slate-100">
+            <div class="font-bold text-slate-800 mb-3 flex items-center">
+                <i class="fa-solid fa-sliders mr-2 text-slate-500"></i> Tuỳ chọn khi làm bài
+            </div>
+            <label class="flex items-center gap-3 mb-3 cursor-pointer select-none">
+                <input id="toggle-shuffle-options" type="checkbox" class="w-5 h-5" checked />
+                <span class="text-slate-700">Random thứ tự đáp án (A/B/C/D)</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer select-none">
+                <input id="toggle-shuffle-questions" type="checkbox" class="w-5 h-5" />
+                <span class="text-slate-700">Random thứ tự câu hỏi</span>
+            </label>
+            <p class="text-xs text-slate-400 mt-2">
+                (Khi <b>tắt</b> random đáp án, bộ câu hỏi đã được em chỉnh để đáp án A/B/C/D chia đều <b>5–5–5–5</b>.)
+            </p>
+        </div>
+
+        <button onclick="game.start()" class="w-full md:w-auto px-10 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl shadow-xl transition transform hover:scale-105">
+            <i class="fa-solid fa-play mr-2"></i> BẮT ĐẦU CHƠI
+        </button>
+        <div class="mt-4 text-sm text-slate-400">Biên soạn bởi Cô Thu Bình Toán</div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="hidden w-full max-w-4xl">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-4 text-slate-700 font-bold">
+            <div class="flex items-center bg-white px-4 py-2 rounded-full shadow-sm">
+                <i class="fa-solid fa-list-ol mr-2 text-blue-500"></i>
+                Câu <span id="current-q">1</span>/20
+            </div>
+            <div class="flex items-center bg-white px-4 py-2 rounded-full shadow-sm">
+                <i class="fa-solid fa-star mr-2 text-yellow-500"></i>
+                Điểm: <span id="score">0</span>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-200 rounded-full h-3 mb-6 overflow-hidden">
+            <div id="progress-bar" class="bg-gradient-to-r from-blue-400 to-purple-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="glass-card p-6 md:p-10 relative">
+            <div class="absolute top-0 right-0 mt-4 mr-4">
+                <span id="q-level" class="level-badge px-3 py-1 rounded-lg text-xs font-bold shadow-sm tracking-wider">NHẬN BIẾT</span>
+            </div>
+
+            <div class="mb-8">
+                <h2 id="q-text" class="text-xl md:text-2xl font-bold text-slate-800 leading-relaxed text-justify"></h2>
+            </div>
+
+            <!-- Options -->
+            <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+            <!-- Rationale / Feedback -->
+            <div id="rationale-box" class="hidden mt-8 border-t pt-6 animate-pop">
+                <div id="feedback-header" class="flex items-center mb-2 font-bold text-lg"></div>
+                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 text-slate-700">
+                    <p class="font-bold text-sm text-slate-400 uppercase mb-1">Giải thích:</p>
+                    <div id="rationale-text" class="leading-relaxed"></div>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="game.next()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition flex items-center">
+                        Tiếp theo <i class="fa-solid fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div id="end-screen" class="hidden glass-card max-w-lg w-full p-8 text-center animate-pop">
+        <div class="w-32 h-32 mx-auto bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center mb-6 shadow-xl text-6xl text-white">
+            <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h2 class="text-3xl font-bold text-slate-800 mb-2">Hoàn Thành Xuất Sắc!</h2>
+        <p class="text-slate-500 mb-6">Em đã chinh phục thử thách hình nón.</p>
+
+        <div class="bg-white p-6 rounded-2xl shadow-inner mb-8 border border-slate-100">
+            <div class="text-sm text-slate-400 uppercase font-bold tracking-widest">Tổng Điểm</div>
+            <div class="text-5xl font-black text-slate-800 mt-2 mb-1"><span id="final-score">0</span></div>
+            <div id="final-msg" class="text-blue-600 font-semibold"></div>
+        </div>
+
+        <button onclick="location.reload()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-4 rounded-xl transition shadow-lg">
+            <i class="fa-solid fa-rotate-left mr-2"></i> Chơi Lại
+        </button>
+    </div>
+
+    <script>
+        // =========================
+        // QUESTIONS (ĐÃ CHIA ĐỀU A/B/C/D = 5-5-5-5 khi TẮT random đáp án)
+        // =========================
+        const questions = [
+            // NHẬN BIẾT (7)
+            {
+                text: "Hình nón được tạo thành khi quay một tam giác vuông một vòng quanh:",
+                options: ["Cạnh huyền", "Một cạnh góc vuông cố định", "Đường cao tam giác", "Đường trung tuyến"],
+                correct: 1, // B
+                level: "NHẬN BIẾT",
+                rationale: "Hình nón được tạo thành khi quay một tam giác vuông một vòng quanh một cạnh góc vuông cố định của nó."
+            },
+            {
+                text: "Công thức tính diện tích xung quanh của hình nón có bán kính đáy \\(r\\) và đường sinh \\(l\\) là:",
+                options: ["\\(S_{xq} = \\pi r l\\)", "\\(S_{xq} = 2\\pi r l\\)", "\\(S_{xq} = \\pi r^2 l\\)", "\\(S_{xq} = \\pi r h\\)"],
+                correct: 0, // A
+                level: "NHẬN BIẾT",
+                rationale: "Diện tích xung quanh hình nón: \\(S_{xq} = \\pi r l\\)."
+            },
+            {
+                text: "Mối liên hệ giữa đường sinh \\(l\\), chiều cao \\(h\\) và bán kính đáy \\(r\\) của hình nón là:",
+                options: ["\\(l^2 = h^2 - r^2\\)", "\\(h^2 = l^2 + r^2\\)", "\\(l^2 = h^2 + r^2\\)", "\\(r^2 = l^2 + h^2\\)"],
+                correct: 2, // C
+                level: "NHẬN BIẾT",
+                rationale: "Theo định lý Pythagoras trong tam giác vuông tạo bởi \\(h, r, l\\): \\(l^2 = h^2 + r^2\\)."
+            },
+            {
+                text: "Thể tích \\(V\\) của hình nón được tính theo công thức nào?",
+                options: ["\\(V = \\pi r^2 h\\)", "\\(V = \\frac{4}{3}\\pi r^3\\)", "\\(V = 2\\pi r h\\)", "\\(V = \\frac{1}{3}\\pi r^2 h\\)"],
+                correct: 3, // D
+                level: "NHẬN BIẾT",
+                rationale: "Thể tích hình nón: \\(V = \\frac{1}{3}\\pi r^2 h\\)."
+            },
+            {
+                text: "Khi cắt hình nón bởi một mặt phẳng đi qua trục, ta được thiết diện là hình gì?",
+                options: ["Tam giác đều", "Tam giác cân", "Tam giác vuông", "Hình tròn"],
+                correct: 1, // B
+                level: "NHẬN BIẾT",
+                rationale: "Thiết diện qua trục của hình nón là một tam giác cân tại đỉnh của nón."
+            },
+            {
+                text: "Hình nón có bao nhiêu đỉnh và bao nhiêu đáy?",
+                options: ["1 đỉnh, 1 đáy", "1 đỉnh, 2 đáy", "Không đỉnh, 1 đáy", "2 đỉnh, 1 đáy"],
+                correct: 0, // A
+                level: "NHẬN BIẾT",
+                rationale: "Hình nón có 1 đỉnh và 1 đáy là hình tròn."
+            },
+            {
+                text: "Khai triển mặt xung quanh của hình nón ta được hình gì?",
+                options: ["Hình tam giác", "Hình chữ nhật", "Hình quạt tròn", "Hình tròn"],
+                correct: 2, // C
+                level: "NHẬN BIẾT",
+                rationale: "Khai triển mặt xung quanh hình nón thu được một hình quạt tròn."
+            },
+
+            // THÔNG HIỂU (8)
+            {
+                text: "Cho hình nón có bán kính đáy \\(r = 3\\) cm và chiều cao \\(h = 4\\) cm. Độ dài đường sinh \\(l\\) là:",
+                options: ["7 cm", "6 cm", "\\(\\sqrt{7}\\) cm", "5 cm"],
+                correct: 3, // D
+                level: "THÔNG HIỂU",
+                rationale: "Áp dụng Pythagoras: \\(l = \\sqrt{h^2 + r^2} = \\sqrt{4^2 + 3^2} = 5\\) cm."
+            },
+            {
+                text: "Hình nón có đường sinh \\(l = 10\\) cm và bán kính đáy \\(r = 6\\) cm. Chiều cao \\(h\\) của hình nón là:",
+                options: ["8 cm", "4 cm", "64 cm", "12 cm"],
+                correct: 0, // A
+                level: "THÔNG HIỂU",
+                rationale: "Ta có \\(h = \\sqrt{l^2 - r^2} = \\sqrt{100 - 36} = 8\\) cm."
+            },
+            {
+                text: "Tính diện tích xung quanh hình nón có \\(r = 5\\) cm và \\(l = 12\\) cm.",
+                options: ["\\(30\\pi\\) cm²", "\\(60\\pi\\) cm²", "\\(120\\pi\\) cm²", "\\(17\\pi\\) cm²"],
+                correct: 1, // B
+                level: "THÔNG HIỂU",
+                rationale: "\\(S_{xq} = \\pi r l = \\pi \\cdot 5 \\cdot 12 = 60\\pi\\) cm²."
+            },
+            {
+                text: "Một hình nón có thể tích \\(V = 12\\pi\\) cm³ và chiều cao \\(h = 4\\) cm. Bán kính đáy \\(r\\) là:",
+                options: ["9 cm", "1 cm", "3 cm", "6 cm"],
+                correct: 2, // C
+                level: "THÔNG HIỂU",
+                rationale: "\\(12\\pi = \\frac{1}{3}\\pi r^2\\cdot 4 \\Rightarrow r^2 = 9 \\Rightarrow r = 3\\) cm."
+            },
+            {
+                text: "Diện tích toàn phần của hình nón có \\(r = 3\\) và \\(l = 5\\) là:",
+                options: ["\\(15\\pi\\)", "\\(20\\pi\\)", "\\(33\\pi\\)", "\\(24\\pi\\)"],
+                correct: 3, // D
+                level: "THÔNG HIỂU",
+                rationale: "\\(S_{tp} = \\pi r l + \\pi r^2 = 15\\pi + 9\\pi = 24\\pi\\)."
+            },
+            {
+                text: "Nếu tăng bán kính đáy hình nón lên 2 lần và giữ nguyên chiều cao thì thể tích hình nón thay đổi như thế nào?",
+                options: ["Tăng 4 lần", "Tăng 2 lần", "Không đổi", "Tăng 8 lần"],
+                correct: 0, // A
+                level: "THÔNG HIỂU",
+                rationale: "\\(V \\sim r^2\\). Nếu \\(r\\) tăng 2 lần thì \\(V\\) tăng \\(2^2 = 4\\) lần."
+            },
+            {
+                text: "Cho hình nón có góc ở đỉnh là \\(60^\\circ\\) và đường sinh bằng \\(10\\). Bán kính đáy của hình nón là:",
+                options: ["10", "5", "\\(5\\sqrt{3}\\)", "2.5"],
+                correct: 1, // B
+                level: "THÔNG HIỂU",
+                rationale: "Thiết diện qua trục là tam giác đều (góc đỉnh 60°). Đường kính đáy = cạnh tam giác đều = 10 ⇒ \\(r=5\\)."
+            },
+            {
+                text: "Hình nón có diện tích xung quanh gấp đôi diện tích đáy. Tỉ số giữa đường sinh và bán kính đáy \\(\\frac{l}{r}\\) là:",
+                options: ["1", "3", "2", "4"],
+                correct: 2, // C
+                level: "THÔNG HIỂU",
+                rationale: "\\(\\pi r l = 2\\pi r^2 \\Rightarrow l = 2r \\Rightarrow \\frac{l}{r}=2\\)."
+            },
+
+            // VẬN DỤNG (3)
+            {
+                text: "Chiếc nón lá Việt Nam có dạng hình nón. Biết đường kính vành nón là 40cm, đường sinh là 30cm. Tính diện tích lá cần dùng để phủ kín một lớp mặt ngoài (không tính phần ghép nối).",
+                options: ["\\(1200\\pi\\) cm²", "\\(300\\pi\\) cm²", "\\(400\\pi\\) cm²", "\\(600\\pi\\) cm²"],
+                correct: 3, // D
+                level: "VẬN DỤNG",
+                rationale: "Bán kính \\(r=20\\) cm. \\(S_{xq}=\\pi r l = \\pi\\cdot20\\cdot30 = 600\\pi\\) cm²."
+            },
+            {
+                text: "Một đống cát hình nón có chu vi đáy là 12,56m và độ cao là 1,5m. Tính thể tích khối cát đó. (Lấy \\(\\pi \\approx 3,14\\))",
+                options: ["6,28 m³", "2,0 m³", "12,56 m³", "4,18 m³"],
+                correct: 0, // A
+                level: "VẬN DỤNG",
+                rationale: "Chu vi \\(C=2\\pi r=12,56\\Rightarrow r=\\frac{12,56}{6,28}=2\\) m.<br>Thể tích \\(V=\\frac{1}{3}\\pi r^2 h=\\frac{1}{3}\\cdot 3,14\\cdot 2^2\\cdot 1,5=6,28\\) m³."
+            },
+            {
+                text: "Một cây kem ốc quế có phần bánh hình nón. Miệng ốc quế có đường kính 4cm, chiều dài đường sinh là 10cm. Tính diện tích mặt ngoài của chiếc bánh ốc quế.",
+                options: ["\\(40\\pi\\) cm²", "\\(20\\pi\\) cm²", "\\(10\\pi\\) cm²", "\\(80\\pi\\) cm²"],
+                correct: 1, // B
+                level: "VẬN DỤNG",
+                rationale: "Bán kính \\(r=2\\) cm. \\(S_{xq}=\\pi r l=\\pi\\cdot2\\cdot10=20\\pi\\) cm²."
+            },
+
+            // VẬN DỤNG CAO (2)
+            {
+                text: "Khi khai triển mặt xung quanh của hình nón có bán kính đáy \\(r\\) và đường sinh \\(l\\), ta được một hình quạt tròn có góc ở tâm là \\(n^\\circ\\). Công thức tính \\(n\\) là:",
+                options: [
+                    "\\(n = \\frac{l}{r} \\cdot 360\\)",
+                    "\\(n = \\frac{r}{l} \\cdot 180\\)",
+                    "\\(n = \\frac{r}{l} \\cdot 360\\)",
+                    "\\(n = \\frac{r^2}{l} \\cdot 360\\)"
+                ],
+                correct: 2, // C
+                level: "VẬN DỤNG CAO",
+                rationale: "Độ dài cung quạt bằng chu vi đáy: \\(\\frac{\\pi l n}{180}=2\\pi r\\Rightarrow n=\\frac{360r}{l}=\\frac{r}{l}\\cdot360\\)."
+            },
+            {
+                text: "Một tam giác vuông ABC vuông tại A có AB = 6, AC = 8. Quay tam giác ABC quanh cạnh AC một vòng. Thể tích khối nón tạo thành là:",
+                options: ["\\(48\\pi\\)", "\\(57,6\\pi\\)", "\\(38,4\\pi\\)", "\\(96\\pi\\)"],
+                correct: 3, // D
+                level: "VẬN DỤNG CAO",
+                rationale: "Quay quanh AC: \\(h=AC=8\\), \\(r=AB=6\\).<br>\\(V=\\frac{1}{3}\\pi r^2 h=\\frac{1}{3}\\pi\\cdot 36\\cdot 8=96\\pi\\)."
+            }
+        ];
+
+        // =========================
+        // HELPERS: shuffle (để random đáp án/câu hỏi mà vẫn chấm đúng)
+        // =========================
+        function shuffleInPlace(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function buildQuestionForPlay(q, shuffleOptions) {
+            if (!shuffleOptions) {
+                return { ...q };
+            }
+            const idxs = [0,1,2,3];
+            shuffleInPlace(idxs);
+
+            const newOptions = idxs.map(i => q.options[i]);
+            const newCorrect = idxs.indexOf(q.correct);
+
+            return {
+                ...q,
+                options: newOptions,
+                correct: newCorrect
+            };
+        }
+
+        function typesetSafe(targets) {
+            if (!window.MathJax || !MathJax.typesetPromise) return;
+            MathJax.typesetPromise(targets ? targets : undefined).catch(() => {});
+        }
+
+        // =========================
+        // GAME
+        // =========================
+        const game = {
+            index: 0,
+            score: 0,
+            audioCtx: null,
+            order: [],
+            currentQ: null,
+            settings: { shuffleOptions: true, shuffleQuestions: false },
+
+            initAudio: function() {
+                if (!this.audioCtx) {
+                    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+
+            playSound: function(type) {
+                if (!this.audioCtx) return;
+                const osc = this.audioCtx.createOscillator();
+                const gain = this.audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(this.audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(600, this.audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1000, this.audioCtx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.2, this.audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.5);
+                    osc.start();
+                    osc.stop(this.audioCtx.currentTime + 0.5);
+                } else {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(200, this.audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(100, this.audioCtx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.2, this.audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(this.audioCtx.currentTime + 0.3);
+                }
+            },
+
+            start: function() {
+                this.initAudio();
+
+                // Read toggles
+                this.settings.shuffleOptions = document.getElementById('toggle-shuffle-options').checked;
+                this.settings.shuffleQuestions = document.getElementById('toggle-shuffle-questions').checked;
+
+                // Build order
+                this.order = Array.from({ length: questions.length }, (_, i) => i);
+                if (this.settings.shuffleQuestions) shuffleInPlace(this.order);
+
+                // Reset
+                this.index = 0;
+                this.score = 0;
+                document.getElementById('score').innerText = "0";
+
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('game-screen').classList.remove('hidden');
+                this.loadQuestion();
+            },
+
+            loadQuestion: function() {
+                const realIndex = this.order[this.index];
+                const baseQ = questions[realIndex];
+                const q = buildQuestionForPlay(baseQ, this.settings.shuffleOptions);
+                this.currentQ = q;
+
+                document.getElementById('current-q').innerText = this.index + 1;
+
+                // Badge
+                const badge = document.getElementById('q-level');
+                badge.innerText = q.level;
+                if(q.level.includes("NHẬN")) badge.className = "level-badge px-3 py-1 rounded-lg text-xs font-bold shadow-sm bg-green-100 text-green-700";
+                if(q.level.includes("THÔNG")) badge.className = "level-badge px-3 py-1 rounded-lg text-xs font-bold shadow-sm bg-blue-100 text-blue-700";
+                if(q.level.includes("VẬN")) badge.className = "level-badge px-3 py-1 rounded-lg text-xs font-bold shadow-sm bg-purple-100 text-purple-700";
+
+                document.getElementById('q-text').innerHTML = q.text;
+
+                // Progress: SỬA để lên đúng 100%
+                document.getElementById('progress-bar').style.width = `${((this.index + 1) / questions.length) * 100}%`;
+
+                // Render options
+                const grid = document.getElementById('options-grid');
+                grid.innerHTML = '';
+                document.getElementById('rationale-box').classList.add('hidden');
+
+                q.options.forEach((opt, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn bg-white border-2 border-slate-100 p-5 rounded-xl text-left text-slate-700 font-medium text-lg w-full';
+                    btn.innerHTML = `<span class="inline-block w-8 h-8 rounded-full bg-slate-100 text-slate-500 text-center leading-8 mr-3 font-bold text-sm shadow-inner">${String.fromCharCode(65+i)}</span> ${opt}`;
+                    btn.onclick = () => this.check(i, btn);
+                    grid.appendChild(btn);
+                });
+
+                typesetSafe();
+            },
+
+            check: function(choice, btn) {
+                const q = this.currentQ;
+                const btns = document.querySelectorAll('.option-btn');
+                btns.forEach(b => b.disabled = true);
+
+                if (choice === q.correct) {
+                    btn.classList.add('correct');
+                    btn.innerHTML += ' <i class="fa-solid fa-check-circle ml-2 float-right text-2xl"></i>';
+                    this.score += 10;
+                    document.getElementById('score').innerText = this.score;
+                    this.playSound('correct');
+                    this.showFeedback(true, q.rationale);
+                    fireConfetti();
+                } else {
+                    btn.classList.add('incorrect');
+                    btns[q.correct].classList.add('correct');
+                    btns[q.correct].innerHTML += ' <i class="fa-solid fa-check-circle ml-2 float-right text-2xl"></i>';
+                    this.playSound('wrong');
+                    this.showFeedback(false, q.rationale);
+                }
+            },
+
+            showFeedback: function(isCorrect, text) {
+                const box = document.getElementById('rationale-box');
+                const header = document.getElementById('feedback-header');
+                const content = document.getElementById('rationale-text');
+
+                box.classList.remove('hidden');
+                if(isCorrect) {
+                    header.innerHTML = '<i class="fa-solid fa-face-smile-wink text-green-500 text-3xl mr-3"></i> <span class="text-green-600">Tuyệt vời! Chính xác.</span>';
+                } else {
+                    header.innerHTML = '<i class="fa-solid fa-face-frown text-red-500 text-3xl mr-3"></i> <span class="text-red-600">Ôi tiếc quá! Chưa đúng rồi.</span>';
+                }
+                content.innerHTML = text;
+
+                typesetSafe([box]);
+            },
+
+            next: function() {
+                if (this.index < questions.length - 1) {
+                    this.index++;
+                    this.loadQuestion();
+                } else {
+                    this.finish();
+                }
+            },
+
+            finish: function() {
+                document.getElementById('game-screen').classList.add('hidden');
+                document.getElementById('end-screen').classList.remove('hidden');
+                document.getElementById('final-score').innerText = this.score;
+
+                let msg = "";
+                if(this.score >= 180) msg = "Đỉnh của chóp! Em là thiên tài hình học!";
+                else if(this.score >= 140) msg = "Rất tốt! Em nắm bài rất vững.";
+                else msg = "Cố gắng thêm nhé! Em sẽ làm tốt hơn lần sau.";
+                document.getElementById('final-msg').innerText = msg;
+                fireConfetti();
+            }
+        };
+
+        // =========================
+        // CONFETTI (SỬA loop an toàn)
+        // =========================
+        const canvas = document.getElementById('confetti');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animateId = null;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function fireConfetti() {
+            for(let i=0; i<80; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 15,
+                    vy: (Math.random() - 1) * 15,
+                    color: `hsl(${Math.random()*360}, 100%, 50%)`,
+                    size: Math.random() * 8 + 4,
+                    life: 100
+                });
+            }
+            if(!animateId) updateConfetti();
+        }
+
+        function updateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.5;
+                p.life--;
+
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+
+            if(particles.length > 0) {
+                animateId = requestAnimationFrame(updateConfetti);
+            } else {
+                animateId = null;
+            }
+        }
+    </script>
+</body>
+</html>
