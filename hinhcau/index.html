@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bí Mật Hành Tinh Tròn - Cô Thu Bình Toán</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: radial-gradient(circle at center, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a2a6c;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 2px solid transparent;
+        }
+
+        .option-card:hover:not(:disabled) {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            background: #fff;
+        }
+
+        .option-card.correct {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .option-card.incorrect {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .planet {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #4facfe, #00f2fe);
+            box-shadow: 0 0 60px rgba(79, 172, 254, 0.6);
+            margin: 0 auto;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .progress-container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 999px;
+            height: 8px;
+            width: 100%;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.5s ease;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center p-4">
+<canvas id="confetti-canvas"></canvas>
+
+<!-- START SCREEN -->
+<div id="start-screen" class="glass-panel max-w-2xl w-full p-10 text-center fade-in-up">
+    <div class="planet mb-8"></div>
+    <h1 class="text-4xl md:text-5xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">
+        Bí Mật Hành Tinh Tròn
+    </h1>
+    <p class="text-blue-100 text-lg mb-6">Chinh phục kiến thức Hình Cầu - Toán 9</p>
+
+    <!-- SETTINGS -->
+    <div class="max-w-xl mx-auto bg-black/20 p-5 rounded-2xl border border-white/10 mb-8 text-left">
+        <div class="font-bold mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-sliders text-blue-200"></i>
+            Tuỳ chọn khi làm bài
+        </div>
+        <label class="flex items-center gap-3 cursor-pointer select-none mb-3">
+            <input id="toggle-shuffle-options" type="checkbox" class="w-5 h-5" checked>
+            <span class="text-blue-100">Random thứ tự đáp án (A/B/C/D)</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer select-none">
+            <input id="toggle-shuffle-questions" type="checkbox" class="w-5 h-5">
+            <span class="text-blue-100">Random thứ tự câu hỏi</span>
+        </label>
+        <p class="mt-3 text-xs text-blue-200/70">
+            (Khi <b>tắt</b> random đáp án, bộ câu hỏi đã được em chỉnh để đáp án đúng chia đều <b>5–5–5–5</b>.)
+        </p>
+    </div>
+
+    <button onclick="game.start()" class="group relative px-8 py-4 bg-white text-blue-900 font-bold rounded-full text-xl shadow-[0_0_20px_rgba(255,255,255,0.5)] transition hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.8)]">
+        <span class="relative z-10">KHÁM PHÁ NGAY <i class="fa-solid fa-rocket ml-2 group-hover:translate-x-1 transition"></i></span>
+    </button>
+    <div class="mt-6 text-xs text-blue-200 opacity-60">Biên soạn bởi Cô Thu Bình Toán</div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen" class="hidden w-full max-w-4xl">
+    <!-- HUD -->
+    <div class="flex justify-between items-end mb-4 px-2">
+        <div>
+            <span class="text-xs uppercase tracking-wider text-blue-200">Câu hỏi</span>
+            <div class="text-3xl font-bold"><span id="q-current">1</span><span class="text-lg text-blue-300">/20</span></div>
+        </div>
+        <div class="text-right">
+            <span class="text-xs uppercase tracking-wider text-blue-200">Điểm số</span>
+            <div class="text-3xl font-bold text-yellow-300" id="score">0</div>
+        </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-container mb-8">
+        <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="glass-panel p-6 md:p-10 min-h-[400px] flex flex-col justify-center relative fade-in-up">
+        <span id="level-badge" class="absolute top-6 right-6 px-3 py-1 bg-white/20 rounded-lg text-xs font-bold uppercase tracking-wider">Nhận biết</span>
+
+        <h2 id="q-text" class="text-xl md:text-2xl font-bold mb-8 leading-relaxed mt-4"></h2>
+
+        <!-- Options -->
+        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+        <!-- Rationale -->
+        <div id="rationale" class="hidden mt-8 p-6 bg-black/20 rounded-xl border border-white/10 fade-in-up">
+            <div class="flex items-start gap-4">
+                <div id="rat-icon" class="text-3xl mt-1"></div>
+                <div>
+                    <h3 id="rat-title" class="font-bold text-lg mb-2"></h3>
+                    <div id="rat-content" class="text-gray-100 leading-relaxed text-sm md:text-base"></div>
+                </div>
+            </div>
+            <div class="mt-6 text-right">
+                <button onclick="game.next()" class="bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg font-semibold transition">
+                    Tiếp tục <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- END SCREEN -->
+<div id="end-screen" class="hidden glass-panel max-w-lg w-full p-8 text-center fade-in-up">
+    <div class="inline-block p-6 rounded-full bg-white/10 mb-6">
+        <i class="fa-solid fa-crown text-6xl text-yellow-400"></i>
+    </div>
+    <h2 class="text-3xl font-bold mb-2">Hoàn Thành Sứ Mệnh!</h2>
+    <p class="text-blue-200 mb-8">Em đã hoàn thành xuất sắc chuyến du hành.</p>
+
+    <div class="grid grid-cols-2 gap-4 mb-8">
+        <div class="bg-black/20 p-4 rounded-xl">
+            <div class="text-xs text-gray-400 uppercase">Tổng điểm</div>
+            <div class="text-3xl font-bold text-yellow-300" id="final-score">0</div>
+        </div>
+        <div class="bg-black/20 p-4 rounded-xl">
+            <div class="text-xs text-gray-400 uppercase">Chính xác</div>
+            <div class="text-3xl font-bold text-green-300" id="final-correct">0/20</div>
+        </div>
+    </div>
+
+    <div id="final-message" class="mb-8 font-semibold italic text-lg text-white/90"></div>
+
+    <button onclick="location.reload()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg transition">
+        <i class="fa-solid fa-rotate-right mr-2"></i> Chơi Lại
+    </button>
+</div>
+
+<script>
+    // =========================
+    // QUESTIONS (ĐÃ CHỈNH: đáp án đúng chia đều 5–5–5–5 khi TẮT random)
+    // =========================
+    const questions = [
+        // NHẬN BIẾT (7)
+        {
+            text: "Hình cầu được tạo thành khi quay một nửa hình tròn một vòng quanh:",
+            options: ["Đường kính của nó", "Dây cung bất kỳ", "Tiếp tuyến", "Đường trung trực"],
+            correct: 0, // A
+            level: "NHẬN BIẾT",
+            rationale: "Hình cầu được tạo thành khi quay nửa hình tròn bán kính R quanh đường kính của nó."
+        },
+        {
+            text: "Công thức tính diện tích mặt cầu \\(S\\) có bán kính \\(R\\) là:",
+            options: ["\\(S = \\pi R^2\\)", "\\(S = 4\\pi R^2\\)", "\\(S = \\frac{4}{3}\\pi R^2\\)", "\\(S = 2\\pi R^2\\)"],
+            correct: 1, // B
+            level: "NHẬN BIẾT",
+            rationale: "Diện tích mặt cầu: \\(S = 4\\pi R^2\\)."
+        },
+        {
+            text: "Công thức tính thể tích \\(V\\) của hình cầu có bán kính \\(R\\) là:",
+            options: ["\\(V = 4\\pi R^3\\)", "\\(V = \\frac{1}{3}\\pi R^3\\)", "\\(V = \\frac{4}{3}\\pi R^3\\)", "\\(V = \\pi R^3\\)"],
+            correct: 2, // C
+            level: "NHẬN BIẾT",
+            rationale: "Thể tích hình cầu: \\(V = \\frac{4}{3}\\pi R^3\\)."
+        },
+        {
+            text: "Cắt mặt cầu bởi một mặt phẳng, thiết diện thu được luôn là hình gì?",
+            options: ["Hình elip", "Hình vuông", "Hình chữ nhật", "Hình tròn"],
+            correct: 3, // D
+            level: "NHẬN BIẾT",
+            rationale: "Mọi thiết diện của mặt cầu bởi một mặt phẳng đều là hình tròn."
+        },
+        {
+            text: "Nếu bán kính mặt cầu là \\(R\\) thì đường kính \\(d\\) của mặt cầu là:",
+            options: ["\\(d = 2R\\)", "\\(d = R^2\\)", "\\(d = \\frac{R}{2}\\)", "\\(d = 4R\\)"],
+            correct: 0, // A
+            level: "NHẬN BIẾT",
+            rationale: "Đường kính gấp đôi bán kính: \\(d=2R\\)."
+        },
+        {
+            text: "Trong các hình sau, hình nào có tâm đối xứng?",
+            options: ["Hình nón", "Hình cầu", "Hình chóp tam giác", "Hình lăng trụ tam giác"],
+            correct: 1, // B
+            level: "NHẬN BIẾT",
+            rationale: "Hình cầu có tâm đối xứng chính là tâm của nó."
+        },
+        {
+            text: "Một điểm M nằm trên mặt cầu tâm O bán kính R thì khoảng cách OM bằng:",
+            options: ["\\(2R\\)", "\\(\\frac{R}{2}\\)", "\\(R\\)", "\\(0\\)"],
+            correct: 2, // C
+            level: "NHẬN BIẾT",
+            rationale: "Điểm trên mặt cầu luôn cách tâm một khoảng bằng bán kính R."
+        },
+
+        // THÔNG HIỂU (8)
+        {
+            text: "Diện tích của mặt cầu có bán kính \\(R = 5\\) cm là:",
+            options: ["\\(25\\pi\\) cm²", "\\(50\\pi\\) cm²", "\\(20\\pi\\) cm²", "\\(100\\pi\\) cm²"],
+            correct: 3, // D
+            level: "THÔNG HIỂU",
+            rationale: "\\(S=4\\pi R^2=4\\pi\\cdot25=100\\pi\\) cm²."
+        },
+        {
+            text: "Thể tích của hình cầu có đường kính \\(d = 6\\) cm là:",
+            options: ["\\(36\\pi\\) cm³", "\\(288\\pi\\) cm³", "\\(108\\pi\\) cm³", "\\(12\\pi\\) cm³"],
+            correct: 0, // A
+            level: "THÔNG HIỂU",
+            rationale: "R=3. \\(V=\\frac{4}{3}\\pi\\cdot27=36\\pi\\) cm³."
+        },
+        {
+            text: "Một mặt cầu có diện tích là \\(36\\pi\\) cm². Bán kính của mặt cầu đó là:",
+            options: ["3 cm", "6 cm", "9 cm", "4.5 cm"],
+            correct: 0, // A
+            level: "THÔNG HIỂU",
+            rationale: "\\(36\\pi=4\\pi R^2\\Rightarrow R^2=9\\Rightarrow R=3\\) cm."
+        },
+        {
+            text: "Nếu bán kính hình cầu tăng lên 3 lần thì diện tích mặt cầu tăng lên bao nhiêu lần?",
+            options: ["9 lần", "3 lần", "6 lần", "27 lần"],
+            correct: 0, // A
+            level: "THÔNG HIỂU",
+            rationale: "S tỉ lệ R^2 ⇒ tăng 3 lần thì tăng 9 lần."
+        },
+        {
+            text: "Nếu bán kính hình cầu tăng lên 2 lần thì thể tích hình cầu tăng lên bao nhiêu lần?",
+            options: ["4 lần", "2 lần", "8 lần", "6 lần"],
+            correct: 2, // C
+            level: "THÔNG HIỂU",
+            rationale: "V tỉ lệ R^3 ⇒ tăng 2 lần thì tăng 8 lần."
+        },
+        {
+            text: "Một hình cầu có thể tích \\(V = 288\\pi\\) cm³. Diện tích mặt cầu đó là:",
+            options: ["\\(144\\pi\\) cm²", "\\(36\\pi\\) cm²", "\\(72\\pi\\) cm²", "\\(288\\pi\\) cm²"],
+            correct: 0, // A
+            level: "THÔNG HIỂU",
+            rationale: "R^3=216 ⇒ R=6. \\(S=4\\pi\\cdot36=144\\pi\\)."
+        },
+        {
+            text: "Cho mặt cầu tâm O bán kính 10 cm. Một mặt phẳng cắt mặt cầu tại đường tròn có bán kính 8 cm. Khoảng cách từ tâm O đến mặt phẳng đó là:",
+            options: ["2 cm", "\\(\\sqrt{164}\\) cm", "10 cm", "6 cm"],
+            correct: 3, // D
+            level: "THÔNG HIỂU",
+            rationale: "\\(d^2=R^2-r^2=100-64=36\\Rightarrow d=6\\) cm."
+        },
+        {
+            text: "Tỉ số giữa thể tích hình cầu và diện tích mặt cầu tương ứng (cùng bán kính R) là:",
+            options: ["\\(\\frac{R}{4}\\)", "\\(\\frac{R}{3}\\)", "\\(3R\\)", "\\(\\frac{3}{R}\\)"],
+            correct: 1, // B
+            level: "THÔNG HIỂU",
+            rationale: "\\(\\frac{V}{S}=\\frac{\\frac{4}{3}\\pi R^3}{4\\pi R^2}=\\frac{R}{3}\\)."
+        },
+
+        // VẬN DỤNG (3)
+        {
+            text: "Một quả bóng da có chu vi đường tròn lớn khoảng 69 cm. Tính diện tích da cần dùng để may quả bóng (làm tròn đến hàng đơn vị).",
+            options: ["1515 cm²", "379 cm²", "4752 cm²", "6060 cm²"],
+            correct: 0, // A
+            level: "VẬN DỤNG",
+            rationale: "C=2πR=69 ⇒ R=69/(2π). S=4πR²=69²/π ≈ 1515 cm²."
+        },
+        {
+            text: "Một bồn nước inox hình cầu có đường kính 2m. Bồn chứa được tối đa bao nhiêu lít nước? (Lấy \\(\\pi \\approx 3,14\\), làm tròn đến lít)",
+            options: ["33500 lít", "12560 lít", "3140 lít", "4187 lít"],
+            correct: 3, // D
+            level: "VẬN DỤNG",
+            rationale: "R=1m. V≈4,1866 m³ = 4186,6 lít ⇒ 4187 lít."
+        },
+        {
+            text: "Trái Đất được xem là một hình cầu bán kính khoảng 6371 km. Diện tích bề mặt Trái Đất xấp xỉ là:",
+            options: ["128 triệu km²", "85 triệu km²", "510 triệu km²", "380 triệu km²"],
+            correct: 2, // C
+            level: "VẬN DỤNG",
+            rationale: "S=4πR²≈4·3,14·6371²≈510 triệu km²."
+        },
+
+        // VẬN DỤNG CAO (2)
+        {
+            text: "Một hình trụ có chiều cao bằng đường kính đáy và nội tiếp trong một mặt cầu bán kính \\(R\\). Gọi \\(V_1\\) là thể tích hình cầu, \\(V_2\\) là thể tích hình trụ. Tỉ số \\(\\frac{V_1}{V_2}\\) là:",
+            options: ["\\(\\frac{4\\sqrt{2}}{3}\\)", "\\(\\frac{2}{3}\\)", "\\(\\sqrt{2}\\)", "\\(2\\)"],
+            correct: 0, // A
+            level: "VẬN DỤNG CAO",
+            rationale: "Suy ra r²=R²/2, h=R√2. Vtrụ=π·(R²/2)·R√2=πR³√2/2. Vcầu=4/3πR³ ⇒ tỉ số = 4√2/3."
+        },
+        {
+            text: "Thả một quả cầu đặc vào bình trụ, nước dâng thêm 2 cm. Bán kính đáy bình trụ là 6 cm. Bán kính quả cầu là:",
+            options: ["3 cm", "6 cm", "4 cm", "\\(3\\sqrt[3]{2}\\) cm"],
+            correct: 3, // D
+            level: "VẬN DỤNG CAO",
+            rationale: "Vdâng=π·6²·2=72π. 4/3πR³=72π ⇒ R³=54 ⇒ R=3∛2 cm."
+        }
+    ];
+
+    // =========================
+    // CHECK DISTRIBUTION (optional debug)
+    // =========================
+    // Khi tắt random, đáp án đúng đã chia đều: A,B,C,D = 5,5,5,5
+
+    // =========================
+    // SHUFFLE HELPERS (để random đáp án/câu hỏi mà vẫn chấm đúng)
+    // =========================
+    function shuffleInPlace(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function buildQuestionForPlay(q, shuffleOptions) {
+        if (!shuffleOptions) return { ...q };
+
+        const idxs = [0, 1, 2, 3];
+        shuffleInPlace(idxs);
+
+        const newOptions = idxs.map(i => q.options[i]);
+        const newCorrect = idxs.indexOf(q.correct);
+
+        return { ...q, options: newOptions, correct: newCorrect };
+    }
+
+    function typesetSafe(targets) {
+        if (!window.MathJax || !MathJax.typesetPromise) return;
+        MathJax.typesetPromise(targets ? targets : undefined).catch(() => {});
+    }
+
+    // =========================
+    // GAME LOGIC
+    // =========================
+    const game = {
+        order: [],
+        index: 0,
+        score: 0,
+        audioCtx: null,
+        currentQ: null,
+        settings: { shuffleOptions: true, shuffleQuestions: false },
+
+        initSound: function() {
+            if (!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        },
+
+        playTone: function(type) {
+            if (!this.audioCtx) return;
+            const osc = this.audioCtx.createOscillator();
+            const gain = this.audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(this.audioCtx.destination);
+
+            if (type === 'win') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, this.audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, this.audioCtx.currentTime + 0.1);
+                osc.frequency.exponentialRampToValueAtTime(1760, this.audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.1, this.audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, this.audioCtx.currentTime + 0.5);
+                osc.start();
+                osc.stop(this.audioCtx.currentTime + 0.5);
+            } else {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, this.audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(100, this.audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.1, this.audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, this.audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(this.audioCtx.currentTime + 0.3);
+            }
+        },
+
+        start: function() {
+            this.initSound();
+
+            // Read settings
+            this.settings.shuffleOptions = document.getElementById('toggle-shuffle-options').checked;
+            this.settings.shuffleQuestions = document.getElementById('toggle-shuffle-questions').checked;
+
+            // Build order
+            this.order = Array.from({ length: questions.length }, (_, i) => i);
+            if (this.settings.shuffleQuestions) shuffleInPlace(this.order);
+
+            // Reset
+            this.index = 0;
+            this.score = 0;
+            document.getElementById('score').innerText = "0";
+
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-screen').classList.remove('hidden');
+            this.loadQuestion();
+        },
+
+        loadQuestion: function() {
+            const realIdx = this.order[this.index];
+            const baseQ = questions[realIdx];
+            const q = buildQuestionForPlay(baseQ, this.settings.shuffleOptions);
+            this.currentQ = q;
+
+            document.getElementById('q-current').innerText = this.index + 1;
+            document.getElementById('q-text').innerHTML = q.text;
+            document.getElementById('level-badge').innerText = q.level;
+
+            // FIX progress: lên đúng 100%
+            document.getElementById('progress-fill').style.width = `${((this.index + 1) / questions.length) * 100}%`;
+
+            // Render Options
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            document.getElementById('rationale').classList.add('hidden');
+
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = "option-card w-full p-6 rounded-xl font-semibold text-lg text-left shadow-sm";
+                btn.innerHTML = `<span class="font-extrabold mr-2">${String.fromCharCode(65+i)}.</span> ${opt}`;
+                btn.onclick = () => this.check(i, btn);
+                container.appendChild(btn);
+            });
+
+            typesetSafe();
+        },
+
+        check: function(choice, btn) {
+            const q = this.currentQ;
+            const btns = document.querySelectorAll('.option-card');
+            btns.forEach(b => b.disabled = true);
+
+            if (choice === q.correct) {
+                btn.classList.add('correct');
+                this.score += 10;
+                this.playTone('win');
+                this.showRationale(true, q.rationale);
+                fireConfetti();
+            } else {
+                btn.classList.add('incorrect');
+                btns[q.correct].classList.add('correct');
+                this.playTone('lose');
+                this.showRationale(false, q.rationale);
+            }
+            document.getElementById('score').innerText = this.score;
+        },
+
+        showRationale: function(isCorrect, text) {
+            const div = document.getElementById('rationale');
+            div.classList.remove('hidden');
+
+            if (isCorrect) {
+                document.getElementById('rat-icon').innerHTML = '🌟';
+                document.getElementById('rat-title').innerText = "Chính xác! Tuyệt vời!";
+                document.getElementById('rat-title').className = "font-bold text-lg mb-2 text-green-300";
+            } else {
+                document.getElementById('rat-icon').innerHTML = '💡';
+                document.getElementById('rat-title').innerText = "Chưa đúng rồi, xem giải thích nhé:";
+                document.getElementById('rat-title').className = "font-bold text-lg mb-2 text-red-300";
+            }
+            document.getElementById('rat-content').innerHTML = text;
+            typesetSafe([div]);
+        },
+
+        next: function() {
+            if (this.index < questions.length - 1) {
+                this.index++;
+                this.loadQuestion();
+            } else {
+                this.endGame();
+            }
+        },
+
+        endGame: function() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+
+            document.getElementById('final-score').innerText = this.score;
+            document.getElementById('final-correct').innerText = (this.score / 10) + "/20";
+
+            let msg = "";
+            if (this.score >= 180) msg = "Đẳng cấp vũ trụ! Em là nhà toán học thiên tài!";
+            else if (this.score >= 140) msg = "Rất tốt! Em đã nắm vững kiến thức.";
+            else msg = "Cố gắng thêm nhé, thành công đang chờ em!";
+            document.getElementById('final-message').innerText = msg;
+
+            if (this.score >= 150) fireConfetti();
+        }
+    };
+
+    // =========================
+    // CONFETTI (loop an toàn)
+    // =========================
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animating = false;
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function fireConfetti() {
+        for (let i = 0; i < 100; i++) {
+            particles.push({
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                vx: (Math.random() - 0.5) * 15,
+                vy: (Math.random() - 0.5) * 15,
+                color: `hsl(${Math.random() * 360}, 100%, 70%)`,
+                life: 100,
+                size: Math.random() * 5 + 2
+            });
+        }
+        if (!animating) update();
+    }
+
+    function update() {
+        animating = true;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life--;
+            p.vy += 0.2;
+
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (p.life <= 0) particles.splice(i, 1);
+        }
+
+        if (particles.length > 0) requestAnimationFrame(update);
+        else { animating = false; ctx.clearRect(0,0,canvas.width,canvas.height); }
+    }
+</script>
+</body>
+</html>
