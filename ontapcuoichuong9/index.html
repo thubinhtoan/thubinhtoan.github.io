@@ -277,14 +277,7 @@
                 level: "THÔNG HIỂU",
                 rationale: "Quay \\(180^\\circ\\) quanh O là đối xứng tâm O: đổi dấu cả x và y → \\(M'(-2; 3)\\)."
             },
-            // 7) ĐÚNG = B
-            {
-                text: "Cho đường tròn (O) và dây cung AB chia đường tròn thành hai cung. Biết số đo cung nhỏ AB là \\(100^\\circ\\). Góc nội tiếp chắn cung lớn AB có số đo là:",
-                options: ["\\(80^\\circ\\)", "\\(130^\\circ\\)", "\\(100^\\circ\\)", "\\(50^\\circ\\)"],
-                correct: 1,
-                level: "THÔNG HIỂU",
-                rationale: "Cung lớn: \\(360-100=260^\\circ\\). Góc nội tiếp chắn cung lớn: \\(260/2=130^\\circ\\)."
-            },
+            
             // 8) ĐÚNG = D
             {
                 text: "Một cái bàn tròn đường kính 1.2m. Người ta muốn đặt 4 chiếc ghế A, B, C, D sát mép bàn tạo thành hình chữ nhật. Nếu biết AB = 60cm thì BC là bao nhiêu?",
@@ -301,6 +294,75 @@
                 level: "VẬN DỤNG",
                 rationale: "Lục giác đều nội tiếp: cạnh \\(a=R=4\\). Diện tích \\(S=\\frac{3\\sqrt{3}}{2}a^2=\\frac{3\\sqrt{3}}{2}\\cdot16=24\\sqrt{3}\\)."
             },
+            {
+    text: "Cho tam giác đều ABC có đường cao \\(AH = 9\\) cm. Bán kính \\(r\\) của đường tròn nội tiếp tam giác bằng:",
+    options: ["6 cm", "3 cm", "4,5 cm", "\\(\\dfrac{3\\sqrt{3}}{2}\\) cm"],
+    correct: 1,
+    level: "NHẬN BIẾT",
+    rationale:
+      "Trong tam giác đều: \\(h = \\dfrac{a\\sqrt{3}}{2}\\Rightarrow a = 6\\sqrt{3}\\). Bán kính đường tròn nội tiếp là \\(r = \\dfrac{h}{3} = 3\\) cm."
+  },
+  {
+    text: "Cho tam giác vuông cân ABC có \\(AB = AC = 4\\) cm. Bán kính \\(R\\) của đường tròn ngoại tiếp tam giác bằng:",
+    options: ["\\(2\\sqrt{2}\\) cm", "\\(\\sqrt{2}\\) cm", "\\(4\\sqrt{2}\\) cm", "\\(8\\sqrt{2}\\) cm"],
+    correct: 0,
+    level: "NHẬN BIẾT",
+    rationale:
+      "Tam giác vuông có tâm đường tròn ngoại tiếp là trung điểm cạnh huyền. Cạnh huyền \\(BC = 4\\sqrt{2}\\) nên \\(R = \\dfrac{BC}{2} = 2\\sqrt{2}\\) cm."
+  },
+  {
+    {
+    text: "Trong các phát biểu sau, phát biểu nào đúng?",
+    options: [
+      "Mọi tứ giác luôn nội tiếp được đường tròn",
+      "Trong tứ giác nội tiếp, tổng hai góc đối bằng \\(90^\\circ\\)",
+      "Tổng số đo hai góc đối của tứ giác nội tiếp bằng \\(180^\\circ\\)",
+      "Tất cả các hình thang đều là tứ giác nội tiếp"
+    ],
+    correct: 2,
+    level: "NHẬN BIẾT",
+    rationale:
+      "Tính chất cơ bản của tứ giác nội tiếp: tổng hai góc đối diện luôn bằng \\(180^\\circ\\)."
+  },
+  {
+    text: "Cho tứ giác MNPQ nội tiếp đường tròn \\((O;R)\\) và \\(\\widehat{M} = 60^\\circ\\). Số đo góc \\(\\widehat{P}\\) bằng:",
+    options: ["\\(30^\\circ\\)", "\\(120^\\circ\\)", "\\(180^\\circ\\)", "\\(90^\\circ\\)"],
+    correct: 1,
+    level: "THÔNG HIỂU",
+    rationale:
+      "Trong tứ giác nội tiếp, hai góc đối bù nhau: \\(\\widehat{P} = 180^\\circ - 60^\\circ = 120^\\circ\\)."
+  },
+    {
+    text: "Cho tứ giác ABCD nội tiếp có \\(\\widehat{ACD} = 60^\\circ\\). Khẳng định nào sau đây đúng?",
+    options: [
+      "\\(\\widehat{ADC} = 60^\\circ\\)",
+      "\\(\\widehat{ADC} = 120^\\circ\\)",
+      "\\(\\widehat{ABD} = 60^\\circ\\)",
+      "\\(\\widehat{ABD} = 120^\\circ\\)"
+    ],
+    correct: 3,
+    level: "THÔNG HIỂU",
+    rationale:
+      "Hai góc nội tiếp cùng chắn một cung thì bằng nhau. \\(\\widehat{ACD}\\) và \\(\\widehat{ABD}\\) chắn cung AD nên \\(\\widehat{ABD} = 60^\\circ\\). Suy ra góc ngoài tương ứng là \\(120^\\circ\\)."
+  },
+  {
+    text: "Cho lục giác đều ABCDEF nội tiếp đường tròn bán kính \\(R\\). Độ dài cạnh AB bằng:",
+    options: ["\\(R\\)", "\\(R\\sqrt{3}\\)", "\\(\\dfrac{R\\sqrt{3}}{2}\\)", "\\(\\dfrac{R}{2}\\)"],
+    correct: 0,
+    level: "NHẬN BIẾT",
+    rationale:
+      "Trong lục giác đều nội tiếp, mỗi cạnh bằng bán kính đường tròn ngoại tiếp: \\(AB = R\\)."
+  },
+  {
+    text: "Phép quay nào với tâm O biến tam giác đều thành chính nó?",
+    options: ["\\(90^\\circ\\)", "\\(100^\\circ\\)", "\\(110^\\circ\\)", "\\(120^\\circ\\)"],
+    correct: 3,
+    level: "NHẬN BIẾT",
+    rationale:
+      "Tam giác đều có 3 đỉnh phân bố đều trên đường tròn. Góc quay nhỏ nhất khác 0 để biến hình thành chính nó là \\(360^\\circ/3 = 120^\\circ\\)."
+  }
+];
+
             // 10) ĐÚNG = C
             {
                 text: "Cho tam giác nhọn ABC nội tiếp đường tròn (O). Các đường cao AD, BE, CF cắt nhau tại H. Tia AD cắt (O) tại K (K khác A). Khẳng định nào sau đây đúng?",
