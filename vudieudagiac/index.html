@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vũ Điệu Đa Giác - Cô Thu Bình Toán</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- MathJax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&family=Mulish:wght@400;600;800&display=swap');
+
+    body {
+      font-family: 'Mulish', sans-serif;
+      background: radial-gradient(circle at center, #2e1065, #000000);
+      min-height: 100vh;
+      color: white;
+    }
+
+    .title-font { font-family: 'Comfortaa', cursive; }
+
+    .glass-panel {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      box-shadow: 0 0 40px rgba(139,92,246,0.15);
+    }
+
+    .btn-poly {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: all .25s ease;
+    }
+    .btn-poly:hover:not(:disabled) {
+      background: rgba(255,255,255,0.2);
+      transform: scale(1.02);
+    }
+    .btn-poly.correct {
+      background: linear-gradient(90deg,#059669,#10b981)!important;
+      color:#fff!important;
+    }
+    .btn-poly.incorrect {
+      background: linear-gradient(90deg,#dc2626,#ef4444)!important;
+      color:#fff!important;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: rgba(255,255,255,.15);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg,#ec4899,#8b5cf6);
+      transition: width .5s ease;
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+  </style>
+</head>
+
+<body class="flex items-center justify-center p-4">
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- START -->
+<div id="start-screen" class="glass-panel max-w-2xl w-full p-10 text-center">
+  <h1 class="text-4xl font-bold title-font mb-4">Vũ Điệu Đa Giác</h1>
+  <p class="text-purple-200 mb-8">Phép Quay Huyền Bí – Toán 9</p>
+  <button onclick="game.start()"
+    class="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold">
+    BẮT ĐẦU
+  </button>
+</div>
+
+<!-- GAME -->
+<div id="game-screen" class="hidden max-w-4xl w-full">
+
+  <div class="flex justify-between mb-4">
+    <div>
+      <div class="text-sm text-purple-300">Câu</div>
+      <div class="text-3xl font-bold title-font">
+        <span id="q-curr">1</span>/20
+      </div>
+    </div>
+    <div class="text-right">
+      <div class="text-sm text-pink-300">Điểm</div>
+      <div id="score" class="text-3xl font-bold">0</div>
+    </div>
+  </div>
+
+  <div class="progress-bar mb-6">
+    <div id="progress-fill" class="progress-fill" style="width:0%"></div>
+  </div>
+
+  <div class="glass-panel p-8 relative">
+    <span id="level-badge"
+      class="absolute top-4 right-4 px-3 py-1 text-xs rounded-full bg-white/10">
+      NHẬN BIẾT
+    </span>
+
+    <h2 id="q-text" class="text-xl font-bold mb-8"></h2>
+
+    <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+    <div id="feedback-panel" class="hidden mt-8 p-5 bg-black/30 rounded-xl">
+      <h3 id="fb-title" class="font-bold mb-2"></h3>
+      <div id="fb-content"></div>
+      <div class="text-right mt-4">
+        <button onclick="game.next()" class="px-6 py-2 bg-white/20 rounded-lg">
+          Tiếp tục →
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- END -->
+<div id="end-screen" class="hidden glass-panel max-w-lg w-full p-8 text-center">
+  <h2 class="text-3xl font-bold mb-4 title-font">Hoàn thành!</h2>
+  <div class="grid grid-cols-2 gap-4 mb-6">
+    <div>
+      <div class="text-sm">Điểm</div>
+      <div id="final-score" class="text-3xl font-bold"></div>
+    </div>
+    <div>
+      <div class="text-sm">Chính xác</div>
+      <div id="final-acc" class="text-3xl font-bold"></div>
+    </div>
+  </div>
+  <div id="final-msg" class="mb-6 italic"></div>
+  <button onclick="location.reload()" class="w-full py-3 bg-white/20 rounded-xl">
+    Chơi lại
+  </button>
+</div>
+
+<script>
+/* ========= QUESTION DATA ========= */
+const questions = [ /* ⬅️ giữ NGUYÊN 20 câu của cô, không đổi nội dung */ ];
+
+/* ========= RANDOM ANSWER ========= */
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function prepareQuestion(q){
+  const correctText=q.options[q.correct];
+  const mixed=shuffle([...q.options]);
+  return {
+    ...q,
+    options:mixed,
+    correct:mixed.indexOf(correctText)
+  };
+}
+
+/* ========= GAME ========= */
+const game={
+  index:0, score:0, currentQ:null,
+
+  start(){
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('game-screen').classList.remove('hidden');
+    this.loadQ();
+  },
+
+  loadQ(){
+    const q=prepareQuestion(questions[this.index]);
+    this.currentQ=q;
+
+    document.getElementById('q-curr').innerText=this.index+1;
+    document.getElementById('q-text').innerHTML=q.text;
+    document.getElementById('score').innerText=this.score;
+    document.getElementById('level-badge').innerText=q.level;
+
+    document.getElementById('progress-fill').style.width =
+      ((this.index+1)/questions.length*100)+'%';
+
+    const grid=document.getElementById('options-grid');
+    grid.innerHTML='';
+    document.getElementById('feedback-panel').classList.add('hidden');
+
+    q.options.forEach((opt,i)=>{
+      const btn=document.createElement('button');
+      btn.className="btn-poly p-5 rounded-xl text-left flex gap-4 font-bold";
+      btn.innerHTML=`
+        <span class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+          ${String.fromCharCode(65+i)}
+        </span>
+        <span>${opt}</span>`;
+      btn.onclick=()=>this.check(i,btn);
+      grid.appendChild(btn);
+    });
+
+    if(window.MathJax) MathJax.typesetPromise();
+  },
+
+  check(choice,btn){
+    const q=this.currentQ;
+    const btns=document.querySelectorAll('.btn-poly');
+    btns.forEach(b=>b.disabled=true);
+
+    if(choice===q.correct){
+      btn.classList.add('correct');
+      this.score+=10;
+      this.showFB(true,q.rationale);
+      fireConfetti();
+    }else{
+      btn.classList.add('incorrect');
+      btns[q.correct].classList.add('correct');
+      this.showFB(false,q.rationale);
+    }
+    document.getElementById('score').innerText=this.score;
+  },
+
+  showFB(ok,text){
+    const p=document.getElementById('feedback-panel');
+    p.classList.remove('hidden');
+    document.getElementById('fb-title').innerText=
+      ok?'✔ Chính xác':'✘ Chưa đúng';
+    document.getElementById('fb-content').innerHTML=text;
+    if(window.MathJax) MathJax.typesetPromise([p]);
+  },
+
+  next(){
+    if(this.index<questions.length-1){
+      this.index++;
+      this.loadQ();
+    }else this.end();
+  },
+
+  end(){
+    document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('end-screen').classList.remove('hidden');
+    document.getElementById('final-score').innerText=this.score;
+    document.getElementById('final-acc').innerText=
+      Math.round(this.score/(questions.length*10)*100)+'%';
+    document.getElementById('final-msg').innerText=
+      this.score>=160?'Xuất sắc!':'Cố gắng thêm nhé!';
+  }
+};
+
+/* ========= CONFETTI ========= */
+const canvas=document.getElementById('confetti-canvas');
+const ctx=canvas.getContext('2d');
+let particles=[],anim=false;
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight;}
+window.onresize=resize; resize();
+
+function fireConfetti(){
+  for(let i=0;i<80;i++){
+    particles.push({
+      x:canvas.width/2,y:canvas.height/2,
+      vx:(Math.random()-0.5)*16,vy:(Math.random()-0.5)*16,
+      life:80,color:`hsl(${Math.random()*360},100%,70%)`
+    });
+  }
+  if(!anim) animate();
+}
+function animate(){
+  if(!particles.length){anim=false;ctx.clearRect(0,0,canvas.width,canvas.height);return;}
+  anim=true; ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach((p,i)=>{
+    p.x+=p.vx; p.y+=p.vy; p.vy+=0.4; p.life--;
+    ctx.fillStyle=p.color;
+    ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2); ctx.fill();
+    if(p.life<=0) particles.splice(i,1);
+  });
+  requestAnimationFrame(animate);
+}
+</script>
+</body>
+</html>
