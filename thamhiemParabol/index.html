@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thám Hiểm Đồ Thị Parabol - Cô Thu Bình Toán</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- MathJax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Rubik:wght@400;600;800&display=swap');
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      background-color: #0f172a;
+      background-image:
+        linear-gradient(rgba(30, 41, 59, 0.8) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 41, 59, 0.8) 1px, transparent 1px);
+      background-size: 30px 30px;
+      min-height: 100vh;
+      color: #e2e8f0;
+      overflow-x: hidden;
+    }
+
+    .code-font { font-family: 'Roboto Mono', monospace; }
+
+    .tech-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+    }
+
+    .btn-answer {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .btn-answer:hover:not(:disabled) {
+      transform: translateX(5px);
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-answer.correct {
+      background: rgba(34, 197, 94, 0.2) !important;
+      border-color: #22c55e !important;
+      color: #4ade80 !important;
+    }
+
+    .btn-answer.incorrect {
+      background: rgba(239, 68, 68, 0.2) !important;
+      border-color: #ef4444 !important;
+      color: #f87171 !important;
+      opacity: 0.7;
+    }
+
+    .glow-text { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slide { animation: slideIn 0.5s ease-out; }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.2); }
+      50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.5); }
+    }
+    .pulse-effect { animation: pulse-glow 2s infinite; }
+
+    .progress-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      transition: width 0.5s ease;
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .level-tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+    }
+  </style>
+</head>
+
+<body class="flex items-center justify-center p-4">
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="tech-card max-w-3xl w-full p-10 text-center animate-slide">
+    <div class="w-24 h-24 mx-auto mb-6 bg-blue-500/10 rounded-full flex items-center justify-center border border-blue-400/30 pulse-effect">
+      <i class="fa-solid fa-chart-line text-5xl text-blue-400"></i>
+    </div>
+
+    <h1 class="text-4xl md:text-5xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 glow-text">
+      Thám Hiểm Đồ Thị Parabol
+    </h1>
+    <p class="text-slate-400 text-lg mb-8 code-font">Module: Hàm số y = ax² | Class: Math 9</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10 text-left">
+      <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+        <div class="flex items-center mb-2">
+          <i class="fa-solid fa-bullseye text-green-400 mr-2"></i>
+          <span class="font-bold text-slate-200">Mục tiêu</span>
+        </div>
+        <p class="text-sm text-slate-400">Chinh phục 20 thử thách từ cơ bản đến nâng cao về hàm số bậc hai.</p>
+      </div>
+      <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+        <div class="flex items-center mb-2">
+          <i class="fa-solid fa-microchip text-purple-400 mr-2"></i>
+          <span class="font-bold text-slate-200">Cơ chế</span>
+        </div>
+        <p class="text-sm text-slate-400">Giải thích chi tiết ngay lập tức + random đáp án mỗi câu.</p>
+      </div>
+    </div>
+
+    <button onclick="game.start()" class="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-blue-600 rounded-xl focus:outline-none hover:bg-blue-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.5)]">
+      <span class="mr-2">KHỞI ĐỘNG HỆ THỐNG</span>
+      <i class="fa-solid fa-power-off transition-transform group-hover:rotate-180"></i>
+    </button>
+    <div class="mt-6 text-xs text-slate-500 font-mono">System created by Cô Thu Bình Toán</div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="hidden w-full max-w-4xl">
+    <!-- HUD -->
+    <div class="flex justify-between items-end mb-6">
+      <div>
+        <div class="text-xs text-blue-400 font-mono mb-1">QUESTION INDEX</div>
+        <div class="flex items-baseline">
+          <span id="q-current" class="text-3xl font-bold text-white">01</span>
+          <span class="text-slate-500 text-xl font-medium">/20</span>
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="text-xs text-green-400 font-mono mb-1">TOTAL SCORE</div>
+        <div id="score" class="text-3xl font-bold text-white tabular-nums">000</div>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-track h-2 mb-8">
+      <div id="progress-bar" class="progress-fill h-full w-0"></div>
+    </div>
+
+    <!-- Question Area -->
+    <div class="tech-card p-6 md:p-10 relative animate-slide">
+      <div class="absolute top-0 right-0 mt-6 mr-6">
+        <span id="level-badge" class="level-tag bg-slate-700 text-slate-300">LOADING...</span>
+      </div>
+
+      <h2 id="q-text" class="text-xl md:text-2xl font-bold text-slate-100 mb-8 leading-relaxed mt-4"></h2>
+
+      <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+      <div id="rationale-panel" class="hidden mt-8 pt-6 border-t border-slate-600/50 animate-slide">
+        <div class="flex items-start gap-4">
+          <div id="rat-icon" class="text-2xl mt-1 shrink-0"></div>
+          <div class="grow">
+            <h4 id="rat-title" class="font-bold text-lg mb-2"></h4>
+            <div id="rat-content" class="text-slate-300 leading-relaxed text-sm md:text-base bg-slate-800/50 p-4 rounded-lg border-l-4 border-blue-500"></div>
+          </div>
+        </div>
+        <div class="mt-6 flex justify-end">
+          <button onclick="game.next()" class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-lg font-bold transition flex items-center shadow-lg">
+            TIẾP TỤC <i class="fa-solid fa-chevron-right ml-2 text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- END SCREEN -->
+  <div id="end-screen" class="hidden tech-card max-w-lg w-full p-8 text-center animate-slide">
+    <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-tr from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(234,179,8,0.4)]">
+      <i class="fa-solid fa-trophy text-4xl text-white"></i>
+    </div>
+
+    <h2 class="text-3xl font-bold text-white mb-2">NHIỆM VỤ HOÀN TẤT</h2>
+    <p class="text-slate-400 mb-8">Dữ liệu kết quả của bạn đã được phân tích.</p>
+
+    <div class="grid grid-cols-2 gap-4 mb-8">
+      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+        <div class="text-xs text-slate-500 uppercase font-bold mb-1">Điểm số</div>
+        <div id="final-score" class="text-3xl font-bold text-blue-400">0</div>
+      </div>
+      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+        <div class="text-xs text-slate-500 uppercase font-bold mb-1">Độ chính xác</div>
+        <div id="final-accuracy" class="text-3xl font-bold text-purple-400">0%</div>
+      </div>
+    </div>
+
+    <div id="final-message" class="mb-8 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg text-blue-200 font-medium"></div>
+
+    <button onclick="location.reload()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition shadow-lg">
+      <i class="fa-solid fa-rotate-left mr-2"></i> KHỞI ĐỘNG LẠI
+    </button>
+  </div>
+
+  <script>
+    // --- QUESTIONS ---
+    // Lưu ý: correct là index của options GỐC (trước khi shuffle).
+    const questions = [
+      // NHẬN BIẾT (7)
+      {
+        text: "Hàm số nào sau đây có dạng \\(y = ax^2\\) với \\(a \\ne 0\\)?",
+        options: ["\\(y = 2x^2 + 1\\)", "\\(y = 2x\\)", "\\(y = -\\frac{1}{2}x^2\\)", "\\(y = \\frac{1}{x^2}\\)"],
+        correct: 2,
+        level: "NHẬN BIẾT",
+        rationale: "Hàm số dạng \\(y=ax^2\\) chỉ có hạng tử \\(x^2\\). Đúng là \\(y=-\\frac{1}{2}x^2\\)."
+      },
+      {
+        text: "Xác định hệ số \\(a\\) của hàm số \\(y = -3x^2\\).",
+        options: ["\\(a = 3\\)", "\\(a = -3\\)", "\\(a = 2\\)", "\\(a = -2\\)"],
+        correct: 1,
+        level: "NHẬN BIẾT",
+        rationale: "Hệ số \\(a\\) là số đứng trước \\(x^2\\). Ở đây \\(a=-3\\)."
+      },
+      {
+        text: "Đồ thị của hàm số \\(y = ax^2\\) (\\(a \\ne 0\\)) được gọi là:",
+        options: ["Đường thẳng", "Đường tròn", "Đường Hypebol", "Đường Parabol"],
+        correct: 3,
+        level: "NHẬN BIẾT",
+        rationale: "Đồ thị của \\(y=ax^2\\) là Parabol."
+      },
+      {
+        text: "Điểm nào sau đây LUÔN thuộc đồ thị \\(y = ax^2\\) với mọi \\(a\\)?",
+        options: ["\\(A(1;1)\\)", "\\(O(0;0)\\)", "\\(B(1;0)\\)", "\\(C(0;1)\\)"],
+        correct: 1,
+        level: "NHẬN BIẾT",
+        rationale: "Thế \\(x=0\\) thì \\(y=0\\) nên luôn qua \\(O(0;0)\\)."
+      },
+      {
+        text: "Nếu \\(a > 0\\) thì đồ thị \\(y=ax^2\\) nằm:",
+        options: ["Phía trên trục hoành", "Phía dưới trục hoành", "Bên phải trục tung", "Bên trái trục tung"],
+        correct: 0,
+        level: "NHẬN BIẾT",
+        rationale: "Vì \\(x^2\\ge0\\) nên \\(y=ax^2\\ge0\\) (tiếp xúc tại O)."
+      },
+      {
+        text: "Trục đối xứng của Parabol \\(y = ax^2\\) là:",
+        options: ["Trục hoành (Ox)", "Trục tung (Oy)", "\\(y=x\\)", "\\(y=-x\\)"],
+        correct: 1,
+        level: "NHẬN BIẾT",
+        rationale: "Hàm chẵn nên đối xứng qua trục \\(Oy\\)."
+      },
+      {
+        text: "Với \\(a < 0\\), điểm cao nhất của đồ thị \\(y=ax^2\\) là:",
+        options: ["\\(O(0;0)\\)", "Không có", "Một điểm có tung độ dương", "Một điểm bất kì"],
+        correct: 0,
+        level: "NHẬN BIẾT",
+        rationale: "Parabol quay xuống, \\(y\\le0\\), lớn nhất tại \\(x=0\\) là \\(O(0;0)\\)."
+      },
+
+      // THÔNG HIỂU (8)
+      {
+        text: "Tìm \\(a\\) của \\(y=ax^2\\), biết đồ thị đi qua \\(M(2;4)\\).",
+        options: ["\\(a=1\\)", "\\(a=2\\)", "\\(a=4\\)", "\\(a=-1\\)"],
+        correct: 0,
+        level: "THÔNG HIỂU",
+        rationale: "Thế \\(x=2,y=4\\): \\(4=4a\\Rightarrow a=1\\)."
+      },
+      {
+        text: "Cho \\(y=f(x)=-2x^2\\). Tính \\(f(3)\\).",
+        options: ["18", "-18", "12", "-12"],
+        correct: 1,
+        level: "THÔNG HIỂU",
+        rationale: "\\(f(3)=-2\\cdot 9=-18\\)."
+      },
+      {
+        text: "Điểm nào thuộc đồ thị \\(y=3x^2\\)?",
+        options: ["\\((-1;-3)\\)", "\\((1;3)\\)", "\\((2;6)\\)", "\\((0;3)\\)"],
+        correct: 1,
+        level: "THÔNG HIỂU",
+        rationale: "\\((1;3)\\) thỏa: \\(3=3\\cdot1^2\\)."
+      },
+      {
+        text: "Cho \\(y=2x^2\\). Kết luận đúng:",
+        options: ["Đồng biến khi \\(x>0\\)", "Nghịch biến khi \\(x>0\\)", "Luôn đồng biến", "Luôn nghịch biến"],
+        correct: 0,
+        level: "THÔNG HIỂU",
+        rationale: "Với \\(a>0\\): nghịch biến \\((x<0)\\), đồng biến \\((x>0)\\)."
+      },
+      {
+        text: "Cho \\(y=-x^2\\). So sánh \\(f(-2)\\) và \\(f(-1)\\).",
+        options: ["\\(f(-2)>f(-1)\\)", "\\(f(-2)<f(-1)\\)", "\\(f(-2)=f(-1)\\)", "Không so sánh được"],
+        correct: 1,
+        level: "THÔNG HIỂU",
+        rationale: "\\(f(-2)=-4, f(-1)=-1\\Rightarrow -4<-1\\)."
+      },
+      {
+        text: "Tìm tung độ điểm trên \\(y=\\frac12 x^2\\) có hoành độ \\(-4\\).",
+        options: ["\\(-8\\)", "4", "8", "\\(-4\\)"],
+        correct: 2,
+        level: "THÔNG HIỂU",
+        rationale: "\\(y=\\frac12\\cdot16=8\\)."
+      },
+      {
+        text: "Đồ thị \\(y=ax^2\\) qua \\(A(-2;-2)\\). Hàm số là:",
+        options: ["\\(y=x^2\\)", "\\(y=-x^2\\)", "\\(y=-\\frac12x^2\\)", "\\(y=\\frac12x^2\\)"],
+        correct: 2,
+        level: "THÔNG HIỂU",
+        rationale: "\\(-2=4a\\Rightarrow a=-\\frac12\\)."
+      },
+      {
+        text: "Giá trị nhỏ nhất của \\(y=5x^2\\) là:",
+        options: ["5", "0", "1", "Không xác định"],
+        correct: 1,
+        level: "THÔNG HIỂU",
+        rationale: "\\(x^2\\ge0\\Rightarrow y\\ge0\\). Min = 0."
+      },
+
+      // VẬN DỤNG (3)
+      {
+        text: "Vật rơi tự do: \\(S=4,9t^2\\). Sau 2 giây rơi được:",
+        options: ["9,8 m", "19,6 m", "4,9 m", "39,2 m"],
+        correct: 1,
+        level: "VẬN DỤNG",
+        rationale: "\\(S=4,9\\cdot 2^2=19,6\\) m."
+      },
+      {
+        text: "Diện tích hình tròn \\(S=\\pi R^2\\). Nếu \\(R\\) tăng gấp 3 lần thì \\(S\\):",
+        options: ["Tăng 3 lần", "Tăng 6 lần", "Tăng 9 lần", "Không đổi"],
+        correct: 2,
+        level: "VẬN DỤNG",
+        rationale: "Vì \\(S\\sim R^2\\), tăng 3 lần → tăng \\(9\\) lần."
+      },
+      {
+        text: "Cổng vòm parabol \\(y=-x^2\\) (m). Chiều rộng chân cổng 4m. Chiều cao cổng:",
+        options: ["2 m", "4 m", "8 m", "16 m"],
+        correct: 1,
+        level: "VẬN DỤNG",
+        rationale: "Hai chân ở \\(x=\\pm 2\\), khi đó \\(y=-4\\). Chiều cao là \\(|-4|=4\\) m."
+      },
+
+      // VẬN DỤNG CAO (2)
+      {
+        text: "Giao điểm của \\(y=x^2\\) và \\(y=2x+3\\) là:",
+        options: ["\\((-1;1)\\) và \\((3;9)\\)", "\\((1;1)\\) và \\((-3;9)\\)", "\\((0;0)\\) và \\((2;7)\\)", "\\((2;4)\\) và \\((-1;1)\\)"],
+        correct: 0,
+        level: "VẬN DỤNG CAO",
+        rationale: "\\(x^2=2x+3\\Rightarrow x^2-2x-3=0\\Rightarrow x=-1,3\\)."
+      },
+      {
+        text: "Tìm \\(m\\) để \\(y=(m-2)x^2\\) đồng biến khi \\(x<0\\).",
+        options: ["\\(m>2\\)", "\\(m<2\\)", "\\(m=2\\)", "\\(m\\ne2\\)"],
+        correct: 1,
+        level: "VẬN DỤNG CAO",
+        rationale: "Với \\(y=ax^2\\), đồng biến khi \\(x<0\\) nếu \\(a<0\\). Nên \\(m-2<0\\Rightarrow m<2\\)."
+      }
+    ];
+
+    // ---------- RANDOM OPTIONS EACH LOAD (GIỮ ĐÚNG ĐÁP ÁN) ----------
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function prepareQuestionEveryLoad(q) {
+      const correctText = q.options[q.correct];  // đáp án đúng theo text
+      const mixed = shuffleArray([...q.options]); // trộn 4 đáp án
+      const newCorrect = mixed.findIndex(opt => opt === correctText);
+
+      q._displayOptions = mixed;
+      q._displayCorrect = newCorrect;
+    }
+
+    // ---------- GAME ENGINE ----------
+    const game = {
+      index: 0,
+      score: 0,
+      audioCtx: null,
+
+      initSound: function() {
+        if (!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      },
+
+      playSound: function(type) {
+        if (!this.audioCtx) return;
+        const t = this.audioCtx.currentTime;
+        const osc = this.audioCtx.createOscillator();
+        const gain = this.audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(this.audioCtx.destination);
+
+        if (type === 'correct') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, t);
+          osc.frequency.exponentialRampToValueAtTime(1046.5, t + 0.1);
+          gain.gain.setValueAtTime(0.12, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+          osc.start(t);
+          osc.stop(t + 0.4);
+        } else {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(150, t);
+          osc.frequency.linearRampToValueAtTime(100, t + 0.2);
+          gain.gain.setValueAtTime(0.10, t);
+          gain.gain.linearRampToValueAtTime(0.001, t + 0.3);
+          osc.start(t);
+          osc.stop(t + 0.3);
+        }
+      },
+
+      start: function() {
+        this.initSound();
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        this.index = 0;
+        this.score = 0;
+        this.loadQuestion();
+      },
+
+      getBadgeColor: function(level) {
+        if (level.includes('NHẬN')) return 'bg-green-600';
+        if (level.includes('THÔNG')) return 'bg-blue-600';
+        if (level.includes('VẬN DỤNG CAO')) return 'bg-purple-600';
+        if (level.includes('VẬN')) return 'bg-orange-600';
+        return 'bg-slate-700';
+      },
+
+      loadQuestion: function() {
+        const q = questions[this.index];
+
+        // ✅ random lại mỗi lần vào câu
+        prepareQuestionEveryLoad(q);
+
+        // Update UI
+        document.getElementById('q-current').innerText = (this.index + 1).toString().padStart(2, '0');
+        document.getElementById('score').innerText = this.score.toString().padStart(3, '0');
+        document.getElementById('level-badge').innerText = q.level;
+        document.getElementById('level-badge').className = `level-tag text-white ${this.getBadgeColor(q.level)} shadow-lg`;
+
+        document.getElementById('progress-bar').style.width = `${(this.index / questions.length) * 100}%`;
+        document.getElementById('q-text').innerHTML = q.text;
+
+        // Reset
+        const grid = document.getElementById('options-grid');
+        grid.innerHTML = '';
+        document.getElementById('rationale-panel').classList.add('hidden');
+
+        // Render options (đã trộn)
+        q._displayOptions.forEach((opt, i) => {
+          const btn = document.createElement('button');
+          btn.className = "btn-answer w-full p-5 rounded-xl text-left bg-slate-800 text-slate-200 font-medium text-lg";
+          btn.innerHTML = `<span class="inline-block w-8 h-8 rounded bg-slate-700 text-center leading-8 mr-3 text-sm font-bold code-font text-blue-300">${String.fromCharCode(65+i)}</span> ${opt}`;
+          btn.onclick = () => this.check(i, btn);
+          grid.appendChild(btn);
+        });
+
+        if (window.MathJax) MathJax.typesetPromise();
+      },
+
+      lockButtons: function() {
+        document.querySelectorAll('.btn-answer').forEach(b => b.disabled = true);
+      },
+
+      check: function(choice, btn) {
+        const q = questions[this.index];
+        const btns = document.querySelectorAll('.btn-answer');
+        this.lockButtons();
+
+        if (choice === q._displayCorrect) {
+          btn.classList.add('correct');
+          this.score += 10;
+          this.playSound('correct');
+          this.showRationale(true, q.rationale);
+          fireConfetti();
+        } else {
+          btn.classList.add('incorrect');
+          btns[q._displayCorrect].classList.add('correct');
+          this.playSound('incorrect');
+          this.showRationale(false, q.rationale);
+        }
+
+        document.getElementById('score').innerText = this.score.toString().padStart(3, '0');
+      },
+
+      showRationale: function(isCorrect, text) {
+        const panel = document.getElementById('rationale-panel');
+        panel.classList.remove('hidden');
+
+        if (isCorrect) {
+          document.getElementById('rat-icon').innerHTML = '<i class="fa-solid fa-check-circle text-green-400"></i>';
+          document.getElementById('rat-title').innerHTML = '<span class="text-green-400">CHÍNH XÁC!</span> Dữ liệu khớp.';
+        } else {
+          document.getElementById('rat-icon').innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-400"></i>';
+          document.getElementById('rat-title').innerHTML = '<span class="text-red-400">CHƯA ĐÚNG.</span> Phân tích lỗi:';
+        }
+
+        document.getElementById('rat-content').innerHTML = text;
+        if (window.MathJax) MathJax.typesetPromise([panel]);
+      },
+
+      next: function() {
+        if (this.index < questions.length - 1) {
+          this.index++;
+          this.loadQuestion();
+        } else {
+          this.endGame();
+        }
+      },
+
+      endGame: function() {
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+
+        const finalScore = this.score;
+        const accuracy = Math.round((finalScore / (questions.length * 10)) * 100);
+
+        document.getElementById('final-score').innerText = finalScore;
+        document.getElementById('final-accuracy').innerText = accuracy + "%";
+
+        let msg = "";
+        if (accuracy >= 90) msg = "Tuyệt vời! Kỹ năng xử lý hàm số của em đạt mức CHUYÊN GIA. 🚀";
+        else if (accuracy >= 70) msg = "Rất tốt! Em đã nắm vững kiến thức nền tảng. Tiếp tục phát huy! ✨";
+        else msg = "Hoàn thành nhiệm vụ. Hãy ôn tập lại các khái niệm cơ bản để đạt điểm cao hơn nhé! 📚";
+
+        document.getElementById('final-message').innerText = msg;
+        if (accuracy >= 50) fireConfetti();
+      }
+    };
+
+    // ---------- CONFETTI ----------
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animating = false;
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function fireConfetti() {
+      const colors = ['#60A5FA', '#34D399', '#F472B6', '#A78BFA', '#FBBF24'];
+      for (let i = 0; i < 80; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 20,
+          vy: (Math.random() - 0.5) * 20,
+          size: Math.random() * 6 + 2,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          life: 100,
+          drag: 0.92
+        });
+      }
+      if (!animating) animate();
+    }
+
+    function animate() {
+      if (particles.length === 0) {
+        animating = false;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+      animating = true;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx; p.y += p.vy;
+        p.vx *= p.drag; p.vy *= p.drag; p.vy += 0.5;
+        p.life--;
+
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.rect(p.x, p.y, p.size, p.size);
+        ctx.fill();
+
+        if (p.life <= 0 || p.y > canvas.height) {
+          particles.splice(i, 1);
+          i--;
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+  </script>
+</body>
+</html>
