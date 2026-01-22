@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vương Quốc Kẹo Ngọt: Đường Phân Giác</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Varela+Round&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Varela Round', sans-serif;
+            background-color: #fdf2f8;
+            background-image:
+                radial-gradient(#fbcfe8 15%, transparent 16%),
+                radial-gradient(#fbcfe8 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            overflow-x: hidden;
+        }
+
+        .font-candy { font-family: 'Fredoka One', cursive; }
+
+        .candy-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 30px;
+            border: 6px solid #fff;
+            box-shadow:
+                0 10px 0 #f472b6,
+                0 20px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .btn-sweet {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 20px;
+            border-bottom: 6px solid rgba(0,0,0,0.15);
+        }
+        .btn-sweet:active { transform: translateY(4px); border-bottom-width: 2px; }
+        .btn-sweet:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        .btn-option {
+            background: #fff;
+            border: 3px solid #fce7f3;
+            color: #831843;
+        }
+        .btn-option:hover { background: #fdf2f8; border-color: #f472b6; }
+
+        .candy-stripe {
+            background: repeating-linear-gradient(
+                45deg,
+                #f472b6,
+                #f472b6 10px,
+                #ec4899 10px,
+                #ec4899 20px
+            );
+            animation: moveStripe 1s linear infinite;
+        }
+        @keyframes moveStripe {
+            0% { background-position: 0 0; }
+            100% { background-position: 28px 0; }
+        }
+
+        .sweet-float {
+            position: absolute;
+            animation: float 3s ease-in-out infinite;
+            z-index: -1;
+            font-size: 3rem;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(10deg); }
+        }
+
+        @keyframes popUp {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal-anim { animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        .confetti-piece {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            top: 0;
+            opacity: 0;
+            z-index: 100;
+        }
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(720deg); opacity: 1;}
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Decor -->
+    <div class="sweet-float top-10 left-10">🍬</div>
+    <div class="sweet-float bottom-20 right-10" style="animation-delay: 1s">🍩</div>
+    <div class="sweet-float top-20 right-20" style="animation-delay: 0.5s">🍭</div>
+    <div class="sweet-float bottom-10 left-20" style="animation-delay: 1.5s">🧁</div>
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="candy-card p-8 max-w-2xl w-full text-center z-10">
+        <div class="mb-4 text-7xl animate-bounce">🏰</div>
+        <h1 class="font-candy text-5xl md:text-6xl text-pink-500 mb-2 drop-shadow-sm">
+            Vương Quốc<br><span class="text-cyan-500">Kẹo Ngọt</span>
+        </h1>
+        <p class="text-xl text-gray-500 font-bold mb-8">Thử thách đường phân giác 🍰</p>
+
+        <div class="grid grid-cols-2 gap-3 text-left mb-8">
+            <div class="bg-green-100 p-4 rounded-2xl text-green-700 font-bold border-2 border-green-200">🌱 6 Nhận biết</div>
+            <div class="bg-blue-100 p-4 rounded-2xl text-blue-700 font-bold border-2 border-blue-200">💧 5 Thông hiểu</div>
+            <div class="bg-yellow-100 p-4 rounded-2xl text-yellow-700 font-bold border-2 border-yellow-200">⭐ 3 Vận dụng</div>
+            <div class="bg-purple-100 p-4 rounded-2xl text-purple-700 font-bold border-2 border-purple-200">👑 1 Vận dụng cao</div>
+        </div>
+
+        <button onclick="startGame()" class="btn-sweet w-full bg-gradient-to-r from-pink-400 to-rose-400 text-white text-3xl py-4 rounded-2xl font-candy shadow-lg">
+            Vào Cổng Ngay! 🍫
+        </button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="hidden w-full max-w-3xl flex flex-col h-[90vh]">
+        <!-- Header -->
+        <div class="candy-card p-4 mb-4 flex justify-between items-center bg-white/80">
+            <div class="flex items-center space-x-2">
+                <div class="bg-pink-100 text-pink-600 px-3 py-1 rounded-full font-bold text-sm uppercase">Câu hỏi</div>
+                <div class="text-2xl font-candy text-gray-700">
+                    <span id="q-curr" class="text-pink-500 text-3xl">1</span>/15
+                </div>
+            </div>
+
+            <div class="flex-1 mx-4 h-6 bg-gray-200 rounded-full overflow-hidden border-2 border-white box-content shadow-inner">
+                <div id="progress-bar" class="h-full candy-stripe transition-all duration-500 rounded-full" style="width: 0%"></div>
+            </div>
+
+            <div class="bg-yellow-100 px-4 py-2 rounded-2xl border-2 border-yellow-200 flex items-center">
+                <i class="fas fa-cookie-bite text-yellow-600 mr-2"></i>
+                <span id="score" class="text-2xl font-candy text-yellow-700">0</span>
+            </div>
+        </div>
+
+        <!-- Question Body -->
+        <div class="flex-1 candy-card p-6 md:p-8 flex flex-col overflow-hidden relative">
+            <div id="level-badge" class="absolute top-4 right-4 bg-gray-100 text-gray-500 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider">
+                Khởi động
+            </div>
+
+            <div class="flex-1 overflow-y-auto pr-2 flex flex-col justify-center">
+                <h2 id="question-text" class="font-candy text-2xl md:text-3xl text-slate-700 mb-8 text-center leading-relaxed">
+                    Loading...
+                </h2>
+
+                <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEEDBACK MODAL -->
+    <div id="feedback-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+        <div class="bg-white rounded-[40px] p-8 max-w-lg w-full text-center border-8 border-white shadow-2xl modal-anim relative overflow-hidden">
+            <div id="modal-bg" class="absolute top-0 left-0 w-full h-32 bg-green-100 -z-10 rounded-t-[32px]"></div>
+
+            <div id="fb-icon" class="text-8xl mb-4 transform -translate-y-8 drop-shadow-md">🎉</div>
+            <h3 id="fb-title" class="font-candy text-3xl text-green-600 mb-4 uppercase">Tuyệt Vời!</h3>
+
+            <div class="bg-gray-50 p-6 rounded-2xl mb-6 text-left border-2 border-gray-100">
+                <p id="fb-text" class="text-gray-600 text-lg leading-relaxed"></p>
+            </div>
+
+            <button onclick="nextQuestion()" class="btn-sweet w-full bg-cyan-400 text-white py-4 rounded-2xl text-xl font-bold uppercase tracking-wide">
+                Đi Tiếp Thôi! 🍭
+            </button>
+        </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen" class="hidden candy-card p-10 max-w-md w-full text-center z-20">
+        <div class="mb-6">
+            <i class="fas fa-crown text-8xl text-yellow-400 drop-shadow-lg animate-pulse"></i>
+        </div>
+
+        <h2 class="font-candy text-4xl text-pink-500 mb-2">Bữa Tiệc Hoàn Tất!</h2>
+        <p class="text-gray-400 font-bold mb-6">Số bánh kẹo bạn thu thập được</p>
+
+        <div class="bg-gradient-to-br from-yellow-100 to-orange-100 rounded-3xl p-8 mb-8 border-4 border-white shadow-inner">
+            <span id="final-score" class="font-candy text-7xl text-orange-500">0</span>
+        </div>
+
+        <p id="result-msg" class="text-xl font-bold text-slate-600 mb-8"></p>
+
+        <button onclick="restartGame()" class="btn-sweet w-full bg-green-500 text-white py-4 rounded-2xl text-xl font-bold">
+            <i class="fas fa-redo-alt mr-2"></i> Chơi Lại
+        </button>
+    </div>
+
+    <script>
+        // --- SOUND ENGINE ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                const notes = [523.25, 659.25, 783.99];
+                notes.forEach((freq, i) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.type = 'sine';
+                    o.frequency.value = freq;
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    g.gain.setValueAtTime(0.1, now + i*0.05);
+                    g.gain.exponentialRampToValueAtTime(0.01, now + i*0.05 + 0.4);
+                    o.start(now + i*0.05);
+                    o.stop(now + i*0.05 + 0.4);
+                });
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(150, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start();
+                osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(523.25, now + 0.1);
+                osc.frequency.setValueAtTime(659.25, now + 0.2);
+                osc.frequency.setValueAtTime(783.99, now + 0.4);
+                osc.frequency.setValueAtTime(1046.50, now + 0.6);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 1.2);
+                osc.start();
+                osc.stop(now + 1.2);
+            }
+        }
+
+        // --- DATA ---
+        const questions = [
+            // NB (6)
+            {
+                level: "Nhận biết",
+                text: "Đường phân giác AD của tam giác ABC chia cạnh đối diện BC thành hai đoạn thẳng tỉ lệ với:",
+                options: ["Hai cạnh kề AB và AC", "Hai đường cao", "Hai đường trung tuyến", "Hai góc ở đáy"],
+                correct: 0,
+                rationale: "Định lí: DB/DC = AB/AC."
+            },
+            {
+                level: "Nhận biết",
+                text: "Cho tam giác ABC, AD là phân giác của góc A (D thuộc BC). Hệ thức nào sau đây đúng?",
+                options: ["DB/DC = AB/AC", "DB/DC = AC/AB", "DB/AB = DC/BC", "AD/AB = AD/AC"],
+                correct: 0,
+                rationale: "Theo tính chất đường phân giác: DB/DC = AB/AC."
+            },
+            {
+                level: "Nhận biết",
+                text: "Nếu tam giác ABC cân tại A, đường phân giác AD có tính chất gì đặc biệt?",
+                options: ["Vừa là đường cao, trung tuyến", "Chỉ là đường cao", "Chỉ là trung tuyến", "Không có gì đặc biệt"],
+                correct: 0,
+                rationale: "Trong tam giác cân, phân giác từ đỉnh đồng thời là trung tuyến và đường cao."
+            },
+            {
+                level: "Nhận biết",
+                text: "Điều kiện để áp dụng định lí đường phân giác trong tam giác ABC với cát tuyến AD là:",
+                options: ["AD vuông góc BC", "AD chia đôi góc A", "D là trung điểm BC", "AD // BC"],
+                correct: 1,
+                rationale: "AD phải là phân giác tức là chia góc A thành 2 góc bằng nhau."
+            },
+            {
+                level: "Nhận biết",
+                text: "Cho hình vẽ, AD là phân giác. Nếu DB/DC = 1 thì tam giác ABC là tam giác gì?",
+                options: ["Tam giác cân tại A", "Tam giác vuông tại A", "Tam giác thường", "Tam giác tù"],
+                correct: 0,
+                rationale: "DB=DC ⇒ D là trung điểm; phân giác đồng thời là trung tuyến ⇒ tam giác cân tại A."
+            },
+            {
+                level: "Nhận biết",
+                text: "Tính chất đường phân giác cũng đúng cho trường hợp nào?",
+                options: ["Đường phân giác góc ngoài", "Đường cao", "Đường trung trực", "Trọng tâm"],
+                correct: 0,
+                rationale: "Định lí mở rộng đúng cho phân giác góc ngoài (xét đoạn thẳng theo hướng phù hợp)."
+            },
+
+            // TH (5)
+            {
+                level: "Thông hiểu",
+                text: "Tam giác ABC có AB=4, AC=6, phân giác AD. Tỉ số DB/DC bằng bao nhiêu?",
+                options: ["2/3", "3/2", "1/2", "4/10"],
+                correct: 0,
+                rationale: "DB/DC = AB/AC = 4/6 = 2/3."
+            },
+            {
+                level: "Thông hiểu",
+                text: "Cho tam giác ABC, phân giác AD. Biết DB=2, DC=3. Tỉ số AC/AB bằng bao nhiêu?",
+                options: ["3/2", "2/3", "5/2", "1"],
+                correct: 0,
+                rationale: "DB/DC = AB/AC ⇒ 2/3 = AB/AC ⇒ AC/AB = 3/2."
+            },
+            {
+                level: "Thông hiểu",
+                text: "Tam giác ABC có AB=12, AC=20, BC=28. Phân giác AD. Độ dài đoạn DB là:",
+                options: ["10.5", "17.5", "12", "14"],
+                correct: 0,
+                rationale: "DB/(28-DB)=12/20=3/5 ⇒ DB=10.5."
+            },
+            {
+                level: "Thông hiểu",
+                text: "Cho tam giác ABC vuông tại A, AB=3, AC=4. Phân giác AD. Tính tỉ số DB/DC.",
+                options: ["3/4", "4/3", "3/5", "4/5"],
+                correct: 0,
+                rationale: "DB/DC = AB/AC = 3/4."
+            },
+            {
+                level: "Thông hiểu",
+                text: "Tam giác MNP có phân giác MI. Biết MN=5, MP=8, NI=3. Độ dài IP là:",
+                options: ["4.8", "5", "6", "3.5"],
+                correct: 0,
+                rationale: "NI/IP = MN/MP ⇒ 3/IP = 5/8 ⇒ IP = 24/5 = 4.8."
+            },
+
+            // VD (3)
+            {
+                level: "Vận dụng",
+                text: "Cho tam giác ABC có chu vi là 45cm. Phân giác AD chia BC thành DB=6cm, DC=9cm. Tính độ dài cạnh AB, AC.",
+                options: ["AB=12, AC=18", "AB=10, AC=15", "AB=15, AC=22.5", "AB=8, AC=12"],
+                correct: 0,
+                rationale: "BC=15 ⇒ AB+AC=30; AB/AC=2/3 ⇒ AB=12, AC=18."
+            },
+            {
+                level: "Vận dụng (Thực tế)",
+                text: "Một mảnh đất hình tam giác ABC có AB=30m, AC=50m. Dựng hàng rào AD chia đôi góc A. Tỉ lệ diện tích ABD so với ACD là?",
+                options: ["3/5", "5/3", "9/25", "1/1"],
+                correct: 0,
+                rationale: "S_ABD/S_ACD = DB/DC = AB/AC = 30/50 = 3/5."
+            },
+            {
+                level: "Vận dụng",
+                text: "Cho tam giác ABC, trung tuyến AM. Phân giác góc AMB cắt AB tại D, phân giác góc AMC cắt AC tại E. Khẳng định nào đúng?",
+                options: ["DE // BC", "DE vuông góc AM", "D là trung điểm AB", "E là trung điểm AC"],
+                correct: 0,
+                rationale: "Từ tỉ số do phân giác và MB=MC suy ra DA/DB = EA/EC ⇒ DE // BC."
+            },
+
+            // VDC (1)
+            {
+                level: "Vận dụng cao",
+                text: "Tam giác ABC có AB=4, AC=5, BC=6. Hai đường phân giác AD và BE cắt nhau tại I. Tính tỉ số AI/ID.",
+                options: ["3/2", "2/3", "4/5", "9/4"],
+                correct: 0,
+                rationale: "BD/DC=AB/AC=4/5 ⇒ BD=6·4/9=8/3. Trong ΔABD, BI là phân giác tại B (vì D nằm trên BC) ⇒ AI/ID = AB/BD = 4/(8/3)=3/2."
+            }
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+        let isLocked = false;
+
+        // Shuffle helper (Fisher–Yates)
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+
+            // reset UI score immediately
+            document.getElementById('score').innerText = score;
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isLocked = false;
+            const q = questions[currentIdx];
+
+            // UI Updates
+            document.getElementById('q-curr').innerText = currentIdx + 1;
+            document.getElementById('score').innerText = score;
+
+            const pct = (currentIdx / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = pct + '%';
+
+            // Level badge style
+            const badge = document.getElementById('level-badge');
+            badge.innerText = q.level;
+            if (q.level.includes("Nhận biết")) badge.className = "absolute top-4 right-4 bg-green-100 text-green-600 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-green-200";
+            else if (q.level.includes("Thông hiểu")) badge.className = "absolute top-4 right-4 bg-blue-100 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-blue-200";
+            else if (q.level.includes("Vận dụng cao")) badge.className = "absolute top-4 right-4 bg-purple-100 text-purple-600 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-purple-200";
+            else badge.className = "absolute top-4 right-4 bg-yellow-100 text-yellow-600 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-yellow-200";
+
+            document.getElementById('question-text').innerText = q.text;
+
+            // Build options as objects to keep correct mapping when shuffled
+            const optionObjects = q.options.map((text, idx) => ({
+                text,
+                isCorrect: idx === q.correct
+            }));
+
+            // RANDOMIZE options order
+            shuffleArray(optionObjects);
+
+            // Render options
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            optionObjects.forEach((optObj, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `btn-sweet btn-option w-full p-6 text-left rounded-2xl flex items-center text-lg group`;
+                btn.innerHTML = `
+                    <span class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center mr-4 font-bold font-candy group-hover:bg-pink-500 group-hover:text-white transition-colors">
+                        ${String.fromCharCode(65 + idx)}
+                    </span>
+                    <span class="font-bold text-gray-700">${optObj.text}</span>
+                `;
+                btn.onclick = () => checkAnswer(optObj.isCorrect, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(isCorrect, btn) {
+            if (isLocked) return;
+            isLocked = true;
+
+            const q = questions[currentIdx];
+            const allBtns = Array.from(document.getElementById('options-container').children);
+
+            // Disable all buttons immediately
+            allBtns.forEach(b => b.disabled = true);
+
+            if (isCorrect) {
+                score++;
+                document.getElementById('score').innerText = score;
+                playSound('correct');
+                fireConfetti(false);
+
+                btn.style.backgroundColor = '#d1fae5';
+                btn.style.borderColor = '#34d399';
+                const bubble = btn.querySelector('span:first-child');
+                bubble.className = "w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center mr-4 font-bold font-candy";
+
+                showFeedback(true, q.rationale);
+            } else {
+                playSound('wrong');
+                btn.style.backgroundColor = '#ffe4e6';
+                btn.style.borderColor = '#fb7185';
+
+                // Highlight the correct one among shuffled options
+                const correctBtn = allBtns.find(b => {
+                    const text = b.querySelector('span:nth-child(2)')?.innerText;
+                    return text === q.options[q.correct];
+                });
+                if (correctBtn) {
+                    correctBtn.style.backgroundColor = '#d1fae5';
+                    correctBtn.style.borderColor = '#34d399';
+                    const bubble = correctBtn.querySelector('span:first-child');
+                    if (bubble) bubble.className = "w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center mr-4 font-bold font-candy";
+                }
+
+                showFeedback(false, q.rationale);
+            }
+        }
+
+        function showFeedback(isCorrect, text) {
+            const modal = document.getElementById('feedback-modal');
+            const bg = document.getElementById('modal-bg');
+            const icon = document.getElementById('fb-icon');
+            const title = document.getElementById('fb-title');
+
+            modal.classList.remove('hidden');
+
+            if (isCorrect) {
+                bg.className = "absolute top-0 left-0 w-full h-32 bg-green-100 -z-10 rounded-t-[32px]";
+                icon.innerText = "🍬";
+                title.innerText = "Chuẩn Không Cần Chỉnh!";
+                title.className = "font-candy text-3xl text-green-600 mb-4 uppercase";
+            } else {
+                bg.className = "absolute top-0 left-0 w-full h-32 bg-red-100 -z-10 rounded-t-[32px]";
+                icon.innerText = "🍩";
+                title.innerText = "Tiếc Quá Đi Mất!";
+                title.className = "font-candy text-3xl text-red-500 mb-4 uppercase";
+            }
+
+            document.getElementById('fb-text').innerHTML = `<strong class="text-pink-500">Giải thích:</strong> ${text}`;
+        }
+
+        function nextQuestion() {
+            document.getElementById('feedback-modal').classList.add('hidden');
+            currentIdx++;
+            if (currentIdx < questions.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            const scoreEl = document.getElementById('final-score');
+            let s = 0;
+            const interval = setInterval(() => {
+                if (s >= score) {
+                    clearInterval(interval);
+                    playSound('win');
+                    fireConfetti(true);
+                } else {
+                    s++;
+                    scoreEl.innerText = s;
+                }
+            }, 50);
+
+            const msg = document.getElementById('result-msg');
+            if (score >= 12) msg.innerText = "TUYỆT VỜI! Bạn là Vua Kẹo Ngọt! 👑🍭";
+            else if (score >= 8) msg.innerText = "LÀM TỐT LẮM! Bánh kẹo đầy túi rồi! 🍬";
+            else msg.innerText = "CỐ GẮNG HƠN NHÉ! Lần sau sẽ được nhiều kẹo hơn! 💪";
+        }
+
+        function restartGame() {
+            currentIdx = 0;
+            score = 0;
+
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
+        // --- CONFETTI ---
+        function fireConfetti(isBig = false) {
+            const colors = ['#f472b6', '#34d399', '#facc15', '#60a5fa'];
+            const count = isBig ? 100 : 30;
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('div');
+                el.className = 'confetti-piece';
+                el.style.left = Math.random() * 100 + 'vw';
+                el.style.background = colors[Math.floor(Math.random() * colors.length)];
+                el.style.animation = `fall ${Math.random() * 2 + 1}s linear`;
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 3000);
+            }
+        }
+    </script>
+</body>
+</html>
