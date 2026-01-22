@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Huyền Thoại Thalès: Giải Mã Kim Tự Tháp</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Mulish:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Mulish', sans-serif;
+      background-color: #fceabb;
+      background-image: linear-gradient(to bottom, #f8b500 0%, #fceabb 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .font-egypt { font-family: 'Cinzel', serif; }
+
+    .pyramid-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(184, 134, 11, 0.2);
+      position: relative;
+      overflow: hidden;
+      border: 2px solid #fff;
+    }
+    .pyramid-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 8px;
+      background: linear-gradient(90deg, #FFD700, #FF8C00, #00CED1);
+    }
+
+    .btn-pharaoh {
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .btn-pharaoh::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(120deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 70%);
+      transform: translateX(-100%);
+      transition: transform 0.6s;
+      z-index: -1;
+    }
+    .btn-pharaoh:hover::after { transform: translateX(100%); }
+    .btn-pharaoh:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 15px 25px rgba(212, 175, 55, 0.4);
+    }
+    .btn-pharaoh:active { transform: scale(0.95); }
+
+    @keyframes hieroglyph-float {
+      0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+      50% { transform: translateY(-20px) rotate(5deg); opacity: 0.6; }
+    }
+    .bg-symbol {
+      position: absolute;
+      font-size: 4rem;
+      color: #d4af37;
+      animation: hieroglyph-float 6s infinite ease-in-out;
+      z-index: -1;
+    }
+
+    @keyframes golden-glow {
+      0% { box-shadow: 0 0 10px #FFD700; }
+      50% { box-shadow: 0 0 30px #FFD700, 0 0 50px #FFA500; }
+      100% { box-shadow: 0 0 10px #FFD700; }
+    }
+    .correct-answer {
+      animation: golden-glow 1s infinite;
+      background-color: #ecfdf5 !important;
+      border-color: #059669 !important;
+      color: #065f46 !important;
+    }
+
+    .feedback-sheet { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+    #canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+  </style>
+</head>
+
+<body class="flex items-center justify-center p-4 relative">
+  <canvas id="canvas"></canvas>
+
+  <!-- Background Symbols -->
+  <div class="bg-symbol top-10 left-10">👁️</div>
+  <div class="bg-symbol bottom-20 right-20" style="animation-delay: 1s">☥</div>
+  <div class="bg-symbol top-1/3 right-10" style="animation-delay: 2s">📐</div>
+  <div class="bg-symbol bottom-10 left-20" style="animation-delay: 1.5s">🔺</div>
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="pyramid-card p-8 md:p-12 max-w-2xl w-full text-center">
+    <div class="mb-6 relative inline-block">
+      <div class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
+      <!-- đổi icon cho chắc chắn có -->
+      <i class="fas fa-mountain text-7xl text-yellow-600 relative z-10 drop-shadow-md"></i>
+    </div>
+
+    <h1 class="font-egypt text-5xl md:text-6xl text-yellow-800 mb-2 font-bold tracking-tighter">
+      Huyền Thoại <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-red-500">Thalès</span>
+    </h1>
+    <p class="text-xl text-yellow-700 font-bold mb-8">Giải Mã Bí Ẩn Kim Tự Tháp 🏜️</p>
+
+    <div class="grid grid-cols-2 gap-4 mb-8 bg-orange-50 p-6 rounded-2xl border border-orange-200">
+      <div class="flex items-center"><div class="w-8 h-8 rounded bg-green-500 text-white flex justify-center items-center font-bold mr-3">6</div><span class="font-bold text-gray-700">Nhận biết</span></div>
+      <div class="flex items-center"><div class="w-8 h-8 rounded bg-blue-500 text-white flex justify-center items-center font-bold mr-3">5</div><span class="font-bold text-gray-700">Thông hiểu</span></div>
+      <div class="flex items-center"><div class="w-8 h-8 rounded bg-purple-500 text-white flex justify-center items-center font-bold mr-3">3</div><span class="font-bold text-gray-700">Vận dụng</span></div>
+      <div class="flex items-center"><div class="w-8 h-8 rounded bg-red-500 text-white flex justify-center items-center font-bold mr-3">1</div><span class="font-bold text-gray-700">Vận dụng cao</span></div>
+    </div>
+
+    <button onclick="startGame()" class="btn-pharaoh w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-white text-2xl py-4 rounded-xl font-egypt font-bold shadow-lg">
+      Khám Phá Ngay 🗝️
+    </button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="hidden w-full max-w-3xl flex flex-col h-[90vh] relative">
+    <!-- Header -->
+    <div class="bg-white/90 backdrop-blur rounded-2xl p-4 mb-4 flex justify-between items-center shadow-md border-b-4 border-yellow-400">
+      <div>
+        <div class="text-xs font-bold text-yellow-600 uppercase tracking-widest">Tiến độ khảo cổ</div>
+        <div class="flex items-baseline">
+          <span id="q-curr" class="text-3xl font-black text-gray-800">1</span>
+          <span class="text-gray-400 font-bold text-lg">/15</span>
+        </div>
+      </div>
+
+      <div class="flex-1 mx-4 h-3 bg-gray-200 rounded-full overflow-hidden">
+        <div id="progress-bar" class="h-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-500" style="width: 0%"></div>
+      </div>
+
+      <div class="bg-yellow-100 px-4 py-2 rounded-xl border border-yellow-300">
+        <i class="fas fa-coins text-yellow-600 mr-2"></i>
+        <span id="score" class="text-2xl font-black text-yellow-800">0</span>
+      </div>
+    </div>
+
+    <!-- Question Area -->
+    <div class="flex-1 pyramid-card p-6 md:p-8 flex flex-col overflow-y-auto relative">
+      <div id="level-badge" class="absolute top-0 right-0 bg-gray-800 text-white px-4 py-1 rounded-bl-xl font-bold uppercase text-xs tracking-wider">
+        Cấp độ
+      </div>
+
+      <h2 id="question-text" class="font-bold text-2xl md:text-3xl text-gray-800 mb-8 leading-snug">
+        Đang giải mã văn bia...
+      </h2>
+
+      <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-auto md:mt-0 pb-20">
+        <!-- injected -->
+      </div>
+    </div>
+
+    <!-- Feedback Sheet -->
+    <div id="feedback-sheet" class="feedback-sheet fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.2)] z-50 p-6 md:p-8 transform translate-y-full max-w-3xl mx-auto border-t-8 border-yellow-500">
+      <div class="flex items-start mb-4">
+        <div id="fb-icon" class="text-5xl mr-4"></div>
+        <div>
+          <h3 id="fb-title" class="font-egypt text-2xl font-bold mb-1"></h3>
+          <p id="fb-rationale" class="text-gray-600 text-lg leading-relaxed font-medium"></p>
+        </div>
+      </div>
+      <button onclick="nextQuestion()" class="w-full bg-gray-800 text-white font-bold py-4 rounded-xl text-xl hover:bg-gray-900 transition shadow-lg">
+        Tiếp Tục Hành Trình <i class="fas fa-arrow-right ml-2"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="result-screen" class="hidden pyramid-card p-8 max-w-md w-full text-center relative z-20">
+    <div class="absolute -top-12 left-1/2 transform -translate-x-1/2">
+      <span class="text-8xl drop-shadow-2xl filter">👑</span>
+    </div>
+
+    <h2 class="font-egypt text-4xl text-yellow-800 mt-10 mb-2 font-bold">Hoàn Thành Sứ Mệnh!</h2>
+    <p class="text-gray-500 font-bold mb-6">Kho báu bạn thu thập được</p>
+
+    <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-6 mb-8 border-2 border-yellow-200">
+      <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-orange-600" id="final-score">0</div>
+      <div class="text-yellow-600 font-bold uppercase tracking-widest mt-2">Điểm Vàng</div>
+    </div>
+
+    <p id="result-msg" class="text-lg font-bold text-gray-700 mb-8 px-4 leading-relaxed"></p>
+
+    <button onclick="restartGame()" class="btn-pharaoh w-full bg-gray-800 text-white font-bold py-4 rounded-xl text-xl shadow-xl">
+      <i class="fas fa-redo-alt mr-2"></i> Chơi Lại Từ Đầu
+    </button>
+  </div>
+
+  <script>
+    // --- SOUND ENGINE ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+
+      if (type === 'correct') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(466.16, now + 0.1);
+        osc.frequency.setValueAtTime(554.37, now + 0.2);
+        osc.frequency.setValueAtTime(659.25, now + 0.3);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
+        osc.start();
+        osc.stop(now + 0.6);
+      } else if (type === 'wrong') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(100, now);
+        osc.frequency.linearRampToValueAtTime(50, now + 0.2);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+        osc.start();
+        osc.stop(now + 0.2);
+      } else if (type === 'win') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(554.37, now + 0.15);
+        osc.frequency.setValueAtTime(659.25, now + 0.3);
+        osc.frequency.setValueAtTime(880, now + 0.6);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 2);
+        osc.start();
+        osc.stop(now + 2);
+      }
+    }
+
+    // --- DATA: Math 8 Chapter 7 (Thales) ---
+    // NOTE: Câu “dụng cụ chia đoạn” đã sửa option D để khớp rationale.
+    const questions = [
+      // NB (6)
+      {
+        level: "Nhận biết",
+        text: "Định lí Thalès trong tam giác phát biểu về điều gì?",
+        options: ["Đường trung bình của tam giác", "Đường thẳng song song cắt hai cạnh tam giác", "Đường phân giác trong tam giác", "Đường cao của tam giác"],
+        correct: 1,
+        rationale: "Định lí Thalès nói về tỉ lệ các đoạn thẳng khi một đường thẳng song song với một cạnh cắt hai cạnh còn lại."
+      },
+      {
+        level: "Nhận biết",
+        text: "Cho tam giác ABC, MN // BC (M thuộc AB, N thuộc AC). Tỉ lệ thức nào sau đây là ĐÚNG?",
+        options: ["AM/AB = AN/AC", "AM/MB = AN/AC", "AM/AB = AC/AN", "AB/AM = AN/AC"],
+        correct: 0,
+        rationale: "Theo định lí Thalès: Nếu MN // BC thì AM/AB = AN/AC."
+      },
+      {
+        level: "Nhận biết",
+        text: "Nếu tỉ số AM/MB = AN/NC thì ta suy ra được điều gì trong tam giác ABC?",
+        options: ["MN vuông góc BC", "MN = BC", "MN // BC", "MN là đường trung tuyến"],
+        correct: 2,
+        rationale: "Đây là định lí Thalès đảo: Nếu các đoạn thẳng tương ứng tỉ lệ thì hai đường thẳng song song."
+      },
+      {
+        level: "Nhận biết",
+        text: "Cho hình vẽ có DE // BC. Tỉ số AD/DB bằng tỉ số nào?",
+        options: ["AE/EC", "AE/AC", "DE/BC", "EC/AE"],
+        correct: 0,
+        rationale: "Các đoạn tương ứng tỉ lệ: AD/DB = AE/EC."
+      },
+      {
+        level: "Nhận biết",
+        text: "Cho đoạn thẳng AB dài 10cm. Điểm C thuộc AB sao cho AC/CB = 2/3. Tính AC?",
+        options: ["4cm", "6cm", "2cm", "5cm"],
+        correct: 0,
+        rationale: "AC/CB = 2/3 => tổng 5 phần = 10cm => 1 phần = 2cm => AC = 4cm."
+      },
+      {
+        level: "Nhận biết",
+        text: "Điều kiện để áp dụng định lí Thalès trong tam giác là gì?",
+        options: ["Tam giác phải vuông", "Phải có đường thẳng song song với một cạnh", "Tam giác phải cân", "Tam giác phải đều"],
+        correct: 1,
+        rationale: "Điều kiện tiên quyết là phải có sự song song (MN // BC)."
+      },
+
+      // TH (5)
+      {
+        level: "Thông hiểu",
+        text: "Tam giác ABC có AB=6, AC=9. MN // BC (M thuộc AB, N thuộc AC). Biết AM=2. Tính AN.",
+        options: ["3", "4.5", "1.5", "3.5"],
+        correct: 0,
+        rationale: "AM/AB = AN/AC => 2/6 = AN/9 => AN = 3."
+      },
+      {
+        level: "Thông hiểu",
+        text: "Cho tam giác ABC, D thuộc AB, E thuộc AC. Biết AD=3, DB=6, AE=4, EC=8. Kết luận gì về DE và BC?",
+        options: ["DE // BC", "DE cắt BC", "DE vuông góc BC", "Không kết luận được"],
+        correct: 0,
+        rationale: "AD/DB = 3/6 = 1/2 và AE/EC = 4/8 = 1/2 => DE // BC (Thalès đảo)."
+      },
+      {
+        level: "Thông hiểu",
+        text: "Tam giác ABC có MN // BC. Biết AM=4, MB=2, AN=x, NC=3. Giá trị của x là:",
+        options: ["6", "5", "8", "4"],
+        correct: 0,
+        rationale: "AM/MB = AN/NC => 4/2 = x/3 => x = 6."
+      },
+      {
+        level: "Thông hiểu",
+        text: "Cho tam giác ABC. Đường thẳng d song song BC cắt AB tại D, AC tại E. Nếu AD = 1/3 AB thì AE bằng bao nhiêu phần AC?",
+        options: ["1/3", "2/3", "1/2", "1/4"],
+        correct: 0,
+        rationale: "Vì d // BC nên AD/AB = AE/AC = 1/3."
+      },
+      {
+        level: "Thông hiểu",
+        text: "Để chia đoạn thẳng AB thành 3 phần bằng nhau mà không cần đo độ dài, ta dùng dụng cụ nào kết hợp với định lí Thalès?",
+        options: ["Chỉ cần thước kẻ", "Thước kẻ và thước đo góc", "Thước kẻ và compa", "Thước kẻ, compa và ê-ke (để vẽ song song)"],
+        correct: 3,
+        rationale: "Dựng tia Ax bất kỳ, dùng compa lấy 3 đoạn bằng nhau trên tia, nối điểm cuối với B rồi kẻ song song (dùng ê-ke) để được các đoạn bằng nhau."
+      },
+
+      // VD (3)
+      {
+        level: "Vận dụng (Thực tế)",
+        text: "Để đo chiều cao Kim Tự Tháp, Thalès cắm 1 cái cọc cao 1m. Bóng cọc dài 1.5m. Cùng lúc đó bóng Kim Tự Tháp dài 210m. Chiều cao Kim Tự Tháp là bao nhiêu?",
+        options: ["140m", "315m", "210m", "105m"],
+        correct: 0,
+        rationale: "Tỉ số chiều cao/bóng như nhau: h/210 = 1/1.5 => h = 210/1.5 = 140m."
+      },
+      {
+        level: "Vận dụng",
+        text: "Cho hình thang ABCD (AB // CD). Hai đường chéo AC và BD cắt nhau tại O. Tỉ số OA/OC bằng tỉ số nào?",
+        options: ["AB/CD", "OB/OD", "Cả A và B đều đúng", "AD/BC"],
+        correct: 2,
+        rationale: "Với AB // CD: OA/OC = OB/OD = AB/CD."
+      },
+      {
+        level: "Vận dụng",
+        text: "Tam giác ABC có đường phân giác AD. Biết AB=6, AC=8, BD=3. Tính DC.",
+        options: ["4", "3", "5", "4.5"],
+        correct: 0,
+        rationale: "DB/DC = AB/AC => 3/DC = 6/8 => 3/DC = 3/4 => DC = 4."
+      },
+
+      // VDC (1)
+      {
+        level: "Vận dụng cao",
+        text: "Cho tam giác ABC, trung tuyến AM. I là trung điểm AM. BI cắt AC tại D. Tính tỉ số AD/DC.",
+        options: ["1/2", "1/3", "1/4", "2/3"],
+        correct: 0,
+        rationale: "Kết quả AD/DC = 1/2 (điểm D chia AC theo tỉ số 1:2 tính từ A)."
+      }
+    ];
+
+    // ====== YÊU CẦU CỦA CÔ: random đáp án + rải đều A/B/C/D ======
+    // Chu kỳ đích cho vị trí đáp án đúng: A B C D lặp lại
+    const targetCorrectSlots = [0,1,2,3, 0,1,2,3, 0,1,2,3, 0,1,2]; // 15 câu
+
+    // Bản hiển thị (options đã shuffle + correct index đã cập nhật)
+    let prepared = [];
+
+    function shuffleArray(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function prepareQuestions() {
+      prepared = questions.map((q, qi) => {
+        const correctText = q.options[q.correct];
+
+        // lấy các phương án sai rồi shuffle
+        const wrongs = q.options.filter((_, idx) => idx !== q.correct);
+        const shuffledWrongs = shuffleArray(wrongs);
+
+        // đặt đáp án đúng vào vị trí mục tiêu (A/B/C/D)
+        const target = targetCorrectSlots[qi] ?? Math.floor(Math.random() * 4);
+        const newOptions = [];
+        let w = 0;
+
+        for (let i = 0; i < 4; i++) {
+          if (i === target) newOptions.push(correctText);
+          else newOptions.push(shuffledWrongs[w++]);
+        }
+
+        return {
+          ...q,
+          options: newOptions,
+          correct: target
+        };
+      });
+    }
+
+    // --- GAME ENGINE ---
+    let currentIdx = 0;
+    let score = 0;
+    let isLocked = false;
+
+    function getLevelColor(level) {
+      if (level.includes("Nhận biết")) return "bg-green-600 border-green-400";
+      if (level.includes("Thông hiểu")) return "bg-blue-600 border-blue-400";
+      if (level.includes("Vận dụng cao")) return "bg-red-600 border-red-400";
+      return "bg-purple-600 border-purple-400";
+    }
+
+    function startGame() {
+      // chuẩn bị câu hỏi ngay khi start (mỗi lượt chơi sẽ random khác)
+      prepareQuestions();
+
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.remove('hidden');
+      document.getElementById('game-screen').classList.add('flex');
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      isLocked = false;
+      const q = prepared[currentIdx];
+
+      document.getElementById('q-curr').innerText = currentIdx + 1;
+      document.getElementById('score').innerText = score;
+      const pct = (currentIdx / prepared.length) * 100;
+      document.getElementById('progress-bar').style.width = pct + '%';
+
+      document.getElementById('question-text').innerText = q.text;
+
+      const badge = document.getElementById('level-badge');
+      badge.innerText = q.level;
+      badge.className = `absolute top-0 right-0 text-white px-4 py-1 rounded-bl-xl font-bold uppercase text-xs tracking-wider border-l-2 border-b-2 ${getLevelColor(q.level)}`;
+
+      // hide feedback
+      document.getElementById('feedback-sheet').classList.add('translate-y-full');
+
+      // render options
+      const container = document.getElementById('options-container');
+      container.innerHTML = '';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `btn-pharaoh w-full p-6 text-left bg-white border-2 border-yellow-100 rounded-xl hover:border-yellow-400 hover:bg-yellow-50 transition-all shadow-sm group`;
+        btn.innerHTML = `
+          <div class="flex items-center">
+            <span class="w-10 h-10 rounded-full bg-yellow-100 text-yellow-700 font-bold flex items-center justify-center mr-4 group-hover:bg-yellow-400 group-hover:text-white transition-colors">${String.fromCharCode(65 + idx)}</span>
+            <span class="text-lg font-bold text-gray-700 group-hover:text-yellow-800">${opt}</span>
+          </div>
+        `;
+        btn.onclick = () => checkAnswer(idx, btn);
+        container.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedIdx, btn) {
+      if (isLocked) return;
+      isLocked = true;
+
+      const q = prepared[currentIdx];
+      const isCorrect = selectedIdx === q.correct;
+      const allBtns = document.getElementById('options-container').children;
+
+      if (isCorrect) {
+        score += 10;
+        document.getElementById('score').innerText = score;
+        playSound('correct');
+        fireConfetti();
+
+        btn.classList.add('correct-answer');
+        const badge = btn.querySelector('span.w-10');
+        if (badge) badge.classList.add('bg-green-500', 'text-white');
+
+        showFeedback(true, q.rationale);
+      } else {
+        playSound('wrong');
+        btn.classList.add('bg-red-50', 'border-red-400');
+        const b1 = btn.querySelector('span.w-10');
+        if (b1) b1.classList.add('bg-red-500', 'text-white');
+
+        const correctBtn = allBtns[q.correct];
+        correctBtn.classList.add('bg-green-50', 'border-green-400');
+        const b2 = correctBtn.querySelector('span.w-10');
+        if (b2) b2.classList.add('bg-green-500', 'text-white');
+
+        showFeedback(false, q.rationale);
+      }
+
+      Array.from(allBtns).forEach(b => b.disabled = true);
+    }
+
+    function showFeedback(isCorrect, rationale) {
+      const sheet = document.getElementById('feedback-sheet');
+      const icon = document.getElementById('fb-icon');
+      const title = document.getElementById('fb-title');
+      const text = document.getElementById('fb-rationale');
+
+      sheet.classList.remove('translate-y-full');
+
+      if (isCorrect) {
+        icon.innerHTML = "🏺";
+        title.innerHTML = "<span class='text-green-600'>Chính Xác!</span>";
+      } else {
+        icon.innerHTML = "🦂";
+        title.innerHTML = "<span class='text-red-600'>Cẩn Thận Nào!</span>";
+      }
+      text.innerHTML = `<strong class="text-yellow-700">Giải mã:</strong> ${rationale}`;
+    }
+
+    function nextQuestion() {
+      currentIdx++;
+      if (currentIdx < prepared.length) loadQuestion();
+      else showResult();
+    }
+
+    function showResult() {
+      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.remove('hidden');
+
+      const finalScore = document.getElementById('final-score');
+      let s = 0;
+      const interval = setInterval(() => {
+        if (s >= score) {
+          clearInterval(interval);
+          playSound('win');
+          fireConfetti(true);
+        } else {
+          s++;
+          finalScore.innerText = s;
+        }
+      }, 30);
+
+      const msg = document.getElementById('result-msg');
+      if (score >= 120) msg.innerText = "TUYỆT VỜI! Bạn chính là truyền nhân của Thalès! 🏛️✨";
+      else if (score >= 80) msg.innerText = "RẤT TỐT! Kiến thức của bạn vững như Kim Tự Tháp! 🐪";
+      else msg.innerText = "CỐ LÊN! Hãy nghiên cứu thêm văn bia để giải mã nhé! 📜";
+    }
+
+    function restartGame() {
+      currentIdx = 0;
+      score = 0;
+      document.getElementById('result-screen').classList.add('hidden');
+      document.getElementById('start-screen').classList.remove('hidden');
+    }
+
+    // --- CONFETTI (fix splice/forEach bug) ---
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    let particles = [];
+
+    function fireConfetti(longParams = false) {
+      const colors = ['#FFD700', '#00CED1', '#FF4500', '#C0C0C0'];
+      const count = longParams ? 150 : 30;
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2,
+          vx: (Math.random() - 0.5) * 15,
+          vy: (Math.random() - 0.5) * 15,
+          life: 110,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          size: Math.random() * 8 + 4
+        });
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // duyệt ngược để splice an toàn
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.3;
+        p.life--;
+        p.size *= 0.95;
+
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+
+        if (p.life <= 0 || p.size < 0.5) particles.splice(i, 1);
+      }
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
