@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinh Phục Đỉnh Dốc: Biệt Đội Hệ Số Góc</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            background: #1a2a6c;
+            background: linear-gradient(to right, #fdbb2d, #b21f1f, #1a2a6c);
+            overflow-x: hidden;
+            color: #fff;
+        }
+
+        .font-sport { font-family: 'Russo One', sans-serif; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            border: 4px solid #fff;
+            color: #333;
+        }
+
+        .btn-action {
+            background: linear-gradient(45deg, #FF512F 0%, #DD2476 100%);
+            box-shadow: 0 4px 15px rgba(221, 36, 118, 0.4);
+            transition: all 0.2s ease;
+        }
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(221, 36, 118, 0.6);
+        }
+        .btn-action:active { transform: scale(0.95); }
+
+        .option-card {
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-left: 6px solid transparent;
+        }
+        .option-card:hover {
+            transform: translateX(10px);
+            background-color: #f0f4f8;
+            border-left: 6px solid #FF512F;
+        }
+
+        @keyframes mountainClimb {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+        .climber-icon { animation: mountainClimb 2s infinite ease-in-out; }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.33); opacity: 1; }
+            80%, 100% { opacity: 0; }
+        }
+        .ring-anim::before {
+            content: '';
+            position: absolute;
+            left: -10px; top: -10px; right: -10px; bottom: -10px;
+            border: 2px solid #FF512F;
+            border-radius: 50%;
+            animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+
+        .mountain-path {
+            clip-path: polygon(0% 100%, 10% 80%, 20% 90%, 30% 60%, 40% 70%, 50% 40%, 60% 50%, 70% 20%, 80% 30%, 90% 10%, 100% 0%, 100% 100%);
+            background: rgba(255,255,255,0.2);
+        }
+        .climber-progress { transition: left 0.5s ease, bottom 0.5s ease; }
+
+        .confetti {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #f00;
+            animation: fall linear forwards;
+        }
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(720deg); }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="glass-card p-8 max-w-2xl w-full text-center relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-4 opacity-20">
+            <i class="fas fa-mountain text-9xl text-blue-900"></i>
+        </div>
+
+        <div class="mb-6 flex justify-center">
+            <div class="bg-orange-100 p-6 rounded-full border-4 border-orange-500 ring-anim relative">
+                <i class="fas fa-hiking text-6xl text-orange-600 climber-icon"></i>
+            </div>
+        </div>
+
+        <h1 class="font-sport text-5xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-600 mb-2 uppercase tracking-tighter">
+            Chinh Phục<br>Đỉnh Dốc
+        </h1>
+        <p class="text-xl text-gray-600 font-bold mb-8 uppercase tracking-widest">Biệt Đội Hệ Số Góc 📐</p>
+
+        <div class="grid grid-cols-2 gap-4 text-left mb-8 bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <div class="flex items-center">
+                <span class="bg-green-500 text-white w-8 h-8 rounded flex items-center justify-center font-bold mr-3">6</span>
+                <span class="font-bold text-gray-700">Nhận biết</span>
+            </div>
+            <div class="flex items-center">
+                <span class="bg-blue-500 text-white w-8 h-8 rounded flex items-center justify-center font-bold mr-3">5</span>
+                <span class="font-bold text-gray-700">Thông hiểu</span>
+            </div>
+            <div class="flex items-center">
+                <span class="bg-orange-500 text-white w-8 h-8 rounded flex items-center justify-center font-bold mr-3">3</span>
+                <span class="font-bold text-gray-700">Vận dụng</span>
+            </div>
+            <div class="flex items-center">
+                <span class="bg-red-600 text-white w-8 h-8 rounded flex items-center justify-center font-bold mr-3">1</span>
+                <span class="font-bold text-gray-700">Vận dụng cao</span>
+            </div>
+        </div>
+
+        <button onclick="startGame()" class="btn-action w-full text-white text-2xl py-4 rounded-xl font-sport uppercase tracking-wide">
+            Bắt đầu leo núi! <i class="fas fa-arrow-up ml-2"></i>
+        </button>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quiz-screen" class="hidden w-full max-w-4xl flex flex-col h-[90vh]">
+        <!-- HUD -->
+        <div class="flex justify-between items-end mb-4 px-2">
+            <div>
+                <span class="text-orange-300 font-bold uppercase text-sm">Độ cao hiện tại</span>
+                <div class="text-4xl font-sport text-white"><span id="score">0</span>m</div>
+            </div>
+            <div class="text-right">
+                <span class="text-blue-200 font-bold uppercase text-sm">Câu hỏi</span>
+                <div class="text-2xl font-sport text-white"><span id="q-current">1</span>/15</div>
+            </div>
+        </div>
+
+        <!-- Progress Mountain -->
+        <div class="relative h-16 w-full bg-white/10 rounded-lg mb-6 overflow-hidden border border-white/20">
+            <div class="mountain-path absolute bottom-0 w-full h-full bg-orange-500/30"></div>
+            <div id="climber-avatar" class="climber-progress absolute bottom-0 left-0">
+                <i class="fas fa-hiking text-3xl text-yellow-300 drop-shadow-lg" style="transform: scaleX(-1);"></i>
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="glass-card flex-1 flex flex-col overflow-hidden relative">
+            <div id="level-badge" class="absolute top-0 right-0 bg-gray-800 text-white px-6 py-2 rounded-bl-xl font-bold uppercase text-sm z-10">
+                Khởi động
+            </div>
+
+            <div class="p-6 md:p-10 flex-1 overflow-y-auto">
+                <h2 id="question-text" class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 leading-tight">
+                    Loading question...
+                </h2>
+
+                <div id="options-container" class="grid grid-cols-1 gap-4"></div>
+            </div>
+
+            <!-- Feedback Panel -->
+            <div id="feedback-panel" class="hidden bg-gray-900 text-white p-6 absolute bottom-0 w-full transform translate-y-full transition-transform duration-300 border-t-4 border-orange-500">
+                <div class="flex items-start">
+                    <div id="fb-icon" class="text-4xl mr-4 mt-1"></div>
+                    <div class="flex-1">
+                        <h3 id="fb-title" class="font-sport text-xl text-orange-400 mb-1 uppercase"></h3>
+                        <p id="fb-text" class="text-gray-300 leading-relaxed"></p>
+                    </div>
+                </div>
+                <button onclick="nextQuestion()" class="mt-4 w-full bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-bold uppercase">
+                    Tiếp tục <i class="fas fa-chevron-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen" class="hidden glass-card p-8 max-w-md w-full text-center relative z-20">
+        <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-white rounded-full p-4 shadow-xl border-4 border-yellow-400">
+            <i class="fas fa-flag-checkered text-5xl text-black"></i>
+        </div>
+
+        <h2 class="font-sport text-4xl text-gray-800 mt-8 mb-2 uppercase">Chinh Phục!</h2>
+        <p class="text-gray-500 font-bold mb-6">Bạn đã leo được bao nhiêu mét?</p>
+
+        <div class="bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-2xl p-8 mb-8 shadow-inner">
+            <div class="text-6xl font-sport mb-2"><span id="final-score">0</span>m</div>
+            <div class="text-orange-200 text-sm font-bold uppercase tracking-widest">Độ cao tối đa: 1500m</div>
+        </div>
+
+        <p id="result-msg" class="text-lg font-bold text-blue-900 mb-8 px-4"></p>
+
+        <button onclick="restartGame()" class="btn-action w-full text-white font-bold py-4 rounded-xl uppercase tracking-wider shadow-lg">
+            <i class="fas fa-redo-alt mr-2"></i> Leo lại từ đầu
+        </button>
+    </div>
+
+    <script>
+        /* =========================
+           SOUND ENGINE (khởi tạo sau click để tránh bị chặn)
+           ========================= */
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playSound(type) {
+            initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.linearRampToValueAtTime(0.001, now + 0.3);
+
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'wrong') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.2);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.linearRampToValueAtTime(0.001, now + 0.2);
+
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'win') {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, i) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g); g.connect(audioCtx.destination);
+
+                    o.type = 'triangle';
+                    o.frequency.value = freq;
+
+                    const t0 = now + i * 0.1;
+                    g.gain.setValueAtTime(0.10, t0);
+                    g.gain.exponentialRampToValueAtTime(0.01, t0 + 0.5);
+
+                    o.start(t0);
+                    o.stop(t0 + 0.5);
+                });
+            }
+        }
+
+        /* =========================
+           DATA (ĐÃ CÂN ĐỀU ABCD)
+           - A = 4, B = 4, C = 4, D = 3
+           - Sau đó sẽ SHUFFLE đáp án khi hiển thị (random)
+           ========================= */
+        const questions = [
+            // 1 (A)
+            {
+                level: "Nhận biết",
+                text: "Trong hàm số bậc nhất y = ax + b (a ≠ 0), hệ số a được gọi là gì?",
+                options: ["Hệ số góc", "Hệ số tự do", "Tung độ gốc", "Hoành độ gốc"],
+                correct: 0,
+                rationale: "Trong phương trình y=ax+b, a được gọi là hệ số góc của đường thẳng."
+            },
+            // 2 (B)
+            {
+                level: "Nhận biết",
+                text: "Tìm hệ số góc a của đường thẳng y = 3x - 5.",
+                options: ["a = -5", "a = 3", "a = 5", "a = -3"],
+                correct: 1,
+                rationale: "Hệ số góc là hệ số đi kèm với biến x. Ở đây a = 3."
+            },
+            // 3 (C)
+            {
+                level: "Nhận biết",
+                text: "Đường thẳng nào sau đây có hệ số góc a = -2?",
+                options: ["y = 2x - 2", "y = x - 2", "y = -2x + 1", "y = 2 - 2x"],
+                correct: 2,
+                rationale: "Phương trình y = -2x + 1 có hệ số của x là -2."
+            },
+            // 4 (D)
+            {
+                level: "Nhận biết",
+                text: "Góc tạo bởi đường thẳng y = ax + b và trục Ox là góc nhọn khi nào?",
+                options: ["a < 0", "a = 0", "b > 0", "a > 0"],
+                correct: 3,
+                rationale: "Khi hệ số góc a > 0, đường thẳng đi lên từ trái sang phải, tạo với trục Ox một góc nhọn."
+            },
+            // 5 (A)
+            {
+                level: "Nhận biết",
+                text: "Hai đường thẳng y = ax + b và y = a'x + b' song song với nhau khi nào?",
+                options: ["a = a' và b ≠ b'", "a ≠ a'", "a = a' và b = b'", "b = b'"],
+                correct: 0,
+                rationale: "Hai đường thẳng song song có cùng hệ số góc (a = a') nhưng tung độ gốc khác nhau (b ≠ b')."
+            },
+            // 6 (B)
+            {
+                level: "Nhận biết",
+                text: "Hai đường thẳng cắt nhau khi và chỉ khi:",
+                options: ["a = a'", "a ≠ a'", "b ≠ b'", "a . a' = 1"],
+                correct: 1,
+                rationale: "Điều kiện để hai đường thẳng cắt nhau là hệ số góc của chúng phải khác nhau (a ≠ a')."
+            },
+
+            // 7 (C)
+            {
+                level: "Thông hiểu",
+                text: "Cho hai đường thẳng (d1): y = 2x + 1 và (d2): y = 2x - 3. Khẳng định nào đúng?",
+                options: ["(d1) cắt (d2)", "(d1) vuông góc (d2)", "(d1) song song (d2)", "(d1) trùng (d2)"],
+                correct: 2,
+                rationale: "a1 = 2 và a2 = 2; b1 = 1 ≠ b2 = -3 ⇒ song song."
+            },
+            // 8 (D)
+            {
+                level: "Thông hiểu",
+                text: "So sánh góc tạo bởi các đường thẳng y = 2x + 1 (góc α) và y = 4x + 1 (góc β) với trục Ox.",
+                options: ["α > β", "α = β", "Không so sánh được", "α < β"],
+                correct: 3,
+                rationale: "Với a>0, a càng lớn thì góc càng lớn. Vì 2 < 4 nên α < β."
+            },
+            // 9 (A)
+            {
+                level: "Thông hiểu",
+                text: "Hệ số góc của đường thẳng đi qua gốc tọa độ O(0;0) và điểm M(1; 3) là bao nhiêu?",
+                options: ["3", "1/3", "-3", "1"],
+                correct: 0,
+                rationale: "Qua O ⇒ y=ax. Qua M(1;3) ⇒ a=3."
+            },
+            // 10 (B)
+            {
+                level: "Thông hiểu",
+                text: "Tìm m để đường thẳng y = (m-1)x + 2 song song với đường thẳng y = 3x - 1.",
+                options: ["m = 3", "m = 4", "m = 2", "m = -2"],
+                correct: 1,
+                rationale: "Song song ⇒ m-1 = 3 ⇒ m = 4."
+            },
+            // 11 (C)
+            {
+                level: "Thông hiểu",
+                text: "Trong các đường thẳng sau, đường thẳng nào tạo với trục Ox góc tù?",
+                options: ["y = x + 5", "y = 3x", "y = -0.5x + 4", "y = 100x"],
+                correct: 2,
+                rationale: "Góc tù khi a < 0. Chỉ có a = -0.5."
+            },
+
+            // 12 (D)
+            {
+                level: "Vận dụng",
+                text: "Viết phương trình đường thẳng đi qua điểm A(0; 3) và song song với đường thẳng y = -2x + 1.",
+                options: ["y = 2x + 3", "y = -2x + 1", "y = 3x - 2", "y = -2x + 3"],
+                correct: 3,
+                rationale: "Song song ⇒ a=-2. Qua A(0;3) ⇒ b=3 ⇒ y=-2x+3."
+            },
+            // 13 (A)
+            {
+                level: "Vận dụng (Thực tế)",
+                text: "Một cái dốc có độ dốc 10% (đi ngang 100m thì lên 10m). Hệ số góc a là bao nhiêu?",
+                options: ["a = 0.1", "a = 10", "a = 1", "a = 100"],
+                correct: 0,
+                rationale: "a = 10/100 = 0.1."
+            },
+            // 14 (B)
+            {
+                level: "Vận dụng",
+                text: "Tìm giá trị của m để hai đường thẳng y = 2x + 3 và y = (m+1)x + 2 cắt nhau.",
+                options: ["m = 1", "m ≠ 1", "m ≠ 2", "m ≠ -1"],
+                correct: 1,
+                rationale: "Cắt nhau ⇒ hệ số góc khác nhau: m+1 ≠ 2 ⇒ m ≠ 1."
+            },
+
+            // 15 (C)
+            {
+                level: "Vận dụng cao",
+                text: "Cho ba điểm A(2; -1), B(1; 1), C(3; k). Tìm k để ba điểm A, B, C thẳng hàng.",
+                options: ["k = 3", "k = -2", "k = -3", "k = -5"],
+                correct: 2,
+                rationale: "a_AB = (1-(-1))/(1-2)=2/(-1)=-2 ⇒ y=-2x+3. Thay x=3 ⇒ k=-2·3+3=-3."
+            }
+        ];
+
+        /* =========================
+           RANDOM THỨ TỰ ĐÁP ÁN
+           ========================= */
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        function prepareQuestion(q) {
+            const nq = { ...q, options: [...q.options] };
+            const correctText = nq.options[nq.correct];
+            shuffleArray(nq.options);
+            nq.correct = nq.options.indexOf(correctText);
+            return nq;
+        }
+
+        let currentIdx = 0;
+        let score = 0;      // mỗi câu đúng +100m
+        let isLocked = false;
+        let currentQ = null;
+
+        function setLevelBadge(level) {
+            const badge = document.getElementById('level-badge');
+            badge.innerText = level;
+
+            if (level.includes("Nhận biết"))
+                badge.className = "absolute top-0 right-0 bg-green-600 text-white px-6 py-2 rounded-bl-xl font-bold uppercase text-sm z-10";
+            else if (level.includes("Thông hiểu"))
+                badge.className = "absolute top-0 right-0 bg-blue-600 text-white px-6 py-2 rounded-bl-xl font-bold uppercase text-sm z-10";
+            else if (level.includes("Vận dụng cao"))
+                badge.className = "absolute top-0 right-0 bg-red-600 text-white px-6 py-2 rounded-bl-xl font-bold uppercase text-sm z-10";
+            else
+                badge.className = "absolute top-0 right-0 bg-orange-500 text-white px-6 py-2 rounded-bl-xl font-bold uppercase text-sm z-10";
+        }
+
+        function startGame() {
+            initAudio();
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            document.getElementById('quiz-screen').classList.add('flex');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isLocked = false;
+
+            // random đáp án mỗi lần load câu
+            currentQ = prepareQuestion(questions[currentIdx]);
+
+            document.getElementById('q-current').innerText = currentIdx + 1;
+            document.getElementById('question-text').innerText = currentQ.text;
+            setLevelBadge(currentQ.level);
+
+            // Climber progress (đi tới 100% ở câu cuối)
+            const climber = document.getElementById('climber-avatar');
+            const denom = Math.max(1, questions.length - 1);
+            const pct = (currentIdx / denom) * 100;
+            climber.style.left = `${pct}%`;
+            climber.style.bottom = `${pct / 3}%`;
+
+            // hide feedback panel mượt
+            const fbPanel = document.getElementById('feedback-panel');
+            fbPanel.classList.add('translate-y-full');
+            fbPanel.classList.add('hidden');
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            currentQ.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "option-card w-full p-5 bg-white border border-gray-200 rounded-lg text-left text-lg text-gray-700 font-medium shadow-sm hover:shadow-md relative overflow-hidden";
+                btn.innerHTML = `<span class="inline-block w-8 font-bold text-gray-400 mr-2">${String.fromCharCode(65 + idx)}.</span> ${opt}`;
+                btn.onclick = () => checkAnswer(idx, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIdx, btn) {
+            if (isLocked) return;
+            isLocked = true;
+
+            const q = currentQ;
+            const isCorrect = selectedIdx === q.correct;
+            const allBtns = document.getElementById('options-container').children;
+
+            if (isCorrect) {
+                score += 100;
+                document.getElementById('score').innerText = score;
+                playSound('correct');
+                fireConfetti();
+
+                btn.classList.add('bg-green-100', 'border-green-500', 'text-green-900');
+                btn.innerHTML += `<i class="fas fa-check-circle absolute right-4 top-1/2 -translate-y-1/2 text-green-500 text-2xl"></i>`;
+                showFeedback(true, q.rationale);
+            } else {
+                playSound('wrong');
+
+                btn.classList.add('bg-red-50', 'border-red-500', 'text-red-900');
+                btn.innerHTML += `<i class="fas fa-times-circle absolute right-4 top-1/2 -translate-y-1/2 text-red-500 text-2xl"></i>`;
+
+                const correctBtn = allBtns[q.correct];
+                correctBtn.classList.add('bg-green-50', 'border-green-500');
+                correctBtn.innerHTML += `<i class="fas fa-check-circle absolute right-4 top-1/2 -translate-y-1/2 text-green-500 text-2xl opacity-50"></i>`;
+                showFeedback(false, q.rationale);
+            }
+
+            Array.from(allBtns).forEach(b => b.disabled = true);
+        }
+
+        function showFeedback(isCorrect, text) {
+            const panel = document.getElementById('feedback-panel');
+            const title = document.getElementById('fb-title');
+            const icon = document.getElementById('fb-icon');
+            const content = document.getElementById('fb-text');
+
+            panel.classList.remove('hidden');
+
+            // để transition chạy mượt
+            requestAnimationFrame(() => panel.classList.remove('translate-y-full'));
+
+            if (isCorrect) {
+                panel.className = "bg-green-900 text-white p-6 absolute bottom-0 w-full transform transition-transform duration-300 border-t-4 border-green-500 shadow-2xl z-20";
+                icon.innerHTML = "🧗";
+                title.innerText = "Chính xác! Leo tiếp thôi!";
+                title.className = "font-sport text-xl text-green-400 mb-1 uppercase";
+            } else {
+                panel.className = "bg-red-900 text-white p-6 absolute bottom-0 w-full transform transition-transform duration-300 border-t-4 border-red-500 shadow-2xl z-20";
+                icon.innerHTML = "⚠️";
+                title.innerText = "Trượt chân rồi!";
+                title.className = "font-sport text-xl text-red-400 mb-1 uppercase";
+            }
+
+            content.innerHTML = `<strong class="text-white">Giải thích:</strong> ${text}`;
+        }
+
+        function nextQuestion() {
+            currentIdx++;
+            if (currentIdx < questions.length) loadQuestion();
+            else showResult();
+        }
+
+        function showResult() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+
+            const msg = document.getElementById('result-msg');
+            playSound('win');
+            fireConfetti();
+
+            if (score === 1500) msg.innerText = "ĐỈNH CỦA CHÓP! Bạn đã chinh phục đỉnh Everest toán học! 🏔️👑";
+            else if (score >= 1200) msg.innerText = "TUYỆT VỜI! Một nhà leo núi tài ba với kiến thức vững vàng! 🧗‍♂️";
+            else if (score >= 800) msg.innerText = "KHÁ LẮM! Bạn đã vượt qua nửa chặng đường, cố lên nhé! 💪";
+            else msg.innerText = "ĐỪNG NẢN CHÍ! Hãy rèn luyện thêm kỹ năng leo núi (và toán học) nhé! 🎒";
+        }
+
+        function restartGame() {
+            currentIdx = 0;
+            score = 0;
+            document.getElementById('score').innerText = '0';
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
+        function fireConfetti() {
+            const colors = ['#FF512F', '#DD2476', '#FFD700', '#ffffff'];
+            for (let i = 0; i < 60; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                conf.style.top = '-10px';
+                document.body.appendChild(conf);
+                setTimeout(() => conf.remove(), 3000);
+            }
+        }
+    </script>
+</body>
+</html>
