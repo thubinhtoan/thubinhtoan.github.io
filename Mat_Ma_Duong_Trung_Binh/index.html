@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mật Mã Gen Z: Truy Tìm Đường Trung Bình</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #f0f9ff;
+      background-image: radial-gradient(#bae6fd 20%, transparent 20%), radial-gradient(#bae6fd 20%, transparent 20%);
+      background-position: 0 0, 10px 10px;
+      background-size: 20px 20px;
+      overflow-x: hidden;
+    }
+    .font-comic { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
+
+    .comic-box {
+      background: white;
+      border: 4px solid #000;
+      box-shadow: 8px 8px 0px #000;
+      border-radius: 12px;
+      position: relative;
+    }
+
+    .btn-comic {
+      border: 3px solid #000;
+      box-shadow: 4px 4px 0px #000;
+      transition: all 0.1s;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+    .btn-comic:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px #000; }
+    .btn-comic:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px #000; }
+
+    .option-btn { background-color: #fff; }
+    .option-btn:hover { background-color: #fff9c4; }
+
+    @keyframes pop {
+      0% { transform: scale(0.8); opacity: 0; }
+      80% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .pop-in { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+    .confetti-piece {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      top: -12px;
+      opacity: 1; /* chỉnh lại để nhìn chắc chắn */
+      z-index: 100;
+      pointer-events: none;
+    }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 1; } }
+
+    .progress-striped {
+      background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+      background-size: 1rem 1rem;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4">
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="comic-box p-8 max-w-2xl w-full text-center z-10 bg-yellow-300">
+    <div class="absolute -top-6 -left-6 transform -rotate-12 bg-white border-4 border-black p-2 shadow-[4px_4px_0px_#000]">
+      <i class="fas fa-star text-4xl text-yellow-500"></i>
+    </div>
+
+    <h1 class="font-comic text-6xl text-black mb-2 leading-none drop-shadow-sm">
+      MẬT MÃ<br><span class="text-blue-600">ĐƯỜNG TRUNG BÌNH</span>
+    </h1>
+    <p class="text-xl font-bold text-black mb-8 border-b-4 border-black inline-block pb-1">Biệt Đội Gen Z Giải Toán 📐</p>
+
+    <div class="grid grid-cols-2 gap-4 mb-8 text-left">
+      <div class="bg-white border-2 border-black p-3 shadow-[4px_4px_0px_#000] flex items-center">
+        <span class="bg-green-500 text-white w-8 h-8 flex items-center justify-center border-2 border-black font-bold mr-2">6</span> Nhận biết
+      </div>
+      <div class="bg-white border-2 border-black p-3 shadow-[4px_4px_0px_#000] flex items-center">
+        <span class="bg-blue-500 text-white w-8 h-8 flex items-center justify-center border-2 border-black font-bold mr-2">5</span> Thông hiểu
+      </div>
+      <div class="bg-white border-2 border-black p-3 shadow-[4px_4px_0px_#000] flex items-center">
+        <span class="bg-orange-500 text-white w-8 h-8 flex items-center justify-center border-2 border-black font-bold mr-2">3</span> Vận dụng
+      </div>
+      <div class="bg-white border-2 border-black p-3 shadow-[4px_4px_0px_#000] flex items-center">
+        <span class="bg-red-500 text-white w-8 h-8 flex items-center justify-center border-2 border-black font-bold mr-2">1</span> Vận dụng cao
+      </div>
+    </div>
+
+    <button onclick="startGame()" class="btn-comic bg-pink-500 text-white text-3xl py-4 px-12 rounded-lg font-comic w-full md:w-auto">
+      BẮT ĐẦU GAME! 🚀
+    </button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="hidden w-full max-w-4xl flex flex-col h-[90vh]">
+    <!-- HUD -->
+    <div class="flex justify-between items-center mb-6 bg-white border-4 border-black p-3 rounded-lg shadow-[4px_4px_0px_#000]">
+      <div class="flex items-center">
+        <span class="font-comic text-2xl mr-2">CÂU:</span>
+        <span id="q-curr" class="font-black text-2xl text-blue-600">1</span>
+        <span class="font-bold text-gray-400 text-lg">/15</span>
+      </div>
+
+      <div class="flex-1 mx-4 h-6 bg-gray-200 border-2 border-black rounded-full overflow-hidden">
+        <div id="progress-bar" class="h-full bg-yellow-400 progress-striped transition-all duration-300 border-r-2 border-black" style="width: 0%"></div>
+      </div>
+
+      <div class="flex items-center">
+        <i class="fas fa-bolt text-yellow-500 text-2xl mr-2 animate-pulse"></i>
+        <span id="score" class="font-comic text-3xl">0</span>
+      </div>
+    </div>
+
+    <!-- Question Area -->
+    <div class="flex-1 comic-box p-6 md:p-10 flex flex-col overflow-hidden bg-white">
+      <div id="level-tag" class="absolute top-0 right-0 bg-black text-white px-4 py-1 font-bold font-comic uppercase text-lg border-b-4 border-l-4 border-white">
+        Cấp độ
+      </div>
+
+      <div class="flex-1 overflow-y-auto pr-2">
+        <h2 id="question-text" class="font-bold text-2xl md:text-3xl text-black mb-8 leading-snug">
+          Loading...
+        </h2>
+
+        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-24 md:pb-0"></div>
+      </div>
+
+      <!-- Feedback Overlay -->
+      <div id="feedback-area" class="hidden absolute bottom-0 left-0 right-0 p-4 bg-black/80 backdrop-blur-sm h-full flex items-center justify-center z-20">
+        <div class="bg-white border-4 border-black p-6 rounded-xl max-w-lg w-full shadow-[8px_8px_0px_#fff] pop-in relative">
+          <div id="fb-badge" class="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-yellow-400 border-4 border-black px-4 py-2 font-comic text-2xl rotate-3 shadow-[4px_4px_0px_#000]">
+            <span id="fb-status">CHÍNH XÁC!</span>
+          </div>
+
+          <div class="mt-6 mb-6">
+            <p id="fb-text" class="text-lg font-bold text-gray-800 leading-relaxed"></p>
+          </div>
+
+          <button onclick="nextQuestion()" class="btn-comic w-full bg-blue-500 text-white py-3 rounded text-xl">
+            TIẾP THEO <i class="fas fa-forward"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="result-screen" class="hidden comic-box p-8 max-w-md w-full text-center z-20 bg-cyan-200">
+    <div class="absolute -top-12 left-1/2 transform -translate-x-1/2">
+      <i class="fas fa-trophy text-8xl text-yellow-400 drop-shadow-[4px_4px_0px_#000]"></i>
+    </div>
+
+    <h2 class="font-comic text-5xl text-black mt-12 mb-2">NHIỆM VỤ HOÀN TẤT!</h2>
+    <p class="font-bold text-gray-700 mb-6">Điểm số của bạn:</p>
+
+    <div class="bg-white border-4 border-black p-4 mb-8 shadow-[4px_4px_0px_#000] rotate-2">
+      <span id="final-score" class="font-comic text-7xl text-black">0</span>
+    </div>
+
+    <p id="result-msg" class="text-xl font-bold text-black mb-8 uppercase"></p>
+
+    <button onclick="restartGame()" class="btn-comic bg-green-500 text-white w-full py-4 rounded text-2xl">
+      CHƠI LẠI <i class="fas fa-undo"></i>
+    </button>
+  </div>
+
+  <script>
+    // --- SOUND ENGINE ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const now = audioCtx.currentTime;
+
+      if (type === 'correct') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.linearRampToValueAtTime(1200, now + 0.1);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(); osc.stop(now + 0.5);
+      } else if (type === 'wrong') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.linearRampToValueAtTime(100, now + 0.15);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.start(); osc.stop(now + 0.3);
+      } else if (type === 'win') {
+        const notes = [440, 554, 659, 880];
+        notes.forEach((freq, i) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g); g.connect(audioCtx.destination);
+          o.type = 'triangle';
+          o.frequency.value = freq;
+          g.gain.setValueAtTime(0.2, now + i * 0.1);
+          g.gain.linearRampToValueAtTime(0, now + i * 0.1 + 0.3);
+          o.start(now + i * 0.1);
+          o.stop(now + i * 0.1 + 0.3);
+        });
+      }
+    }
+
+    // --- QUESTIONS (đã sửa câu MN = 5) ---
+    const questions = [
+      // NB (6)
+      {
+        level: "Nhận biết",
+        text: "Đường trung bình của tam giác là đoạn thẳng nối:",
+        options: ["Hai đỉnh của tam giác", "Trung điểm hai cạnh của tam giác", "Một đỉnh và trung điểm cạnh đối diện", "Hai điểm bất kì trên hai cạnh"],
+        correct: 1,
+        rationale: "Định nghĩa: Đường trung bình của tam giác là đoạn thẳng nối trung điểm hai cạnh của tam giác đó."
+      },
+      {
+        level: "Nhận biết",
+        text: "Trong một tam giác, đường trung bình có tính chất gì với cạnh thứ ba?",
+        options: ["Vuông góc", "Cắt nhau", "Song song và bằng một nửa", "Bằng nhau"],
+        correct: 2,
+        rationale: "Định lí: Đường trung bình của tam giác song song với cạnh thứ ba và bằng nửa cạnh ấy."
+      },
+      {
+        level: "Nhận biết",
+        text: "Cho tam giác ABC có M, N lần lượt là trung điểm của AB và AC. MN là gì?",
+        options: ["Đường cao", "Đường trung tuyến", "Đường phân giác", "Đường trung bình"],
+        correct: 3,
+        rationale: "Vì nối 2 trung điểm M, N nên MN là đường trung bình của tam giác ABC."
+      },
+      {
+        level: "Nhận biết",
+        text: "Tam giác ABC có BC = 12cm. MN là đường trung bình ứng với cạnh BC. Độ dài MN là bao nhiêu?",
+        options: ["6cm", "12cm", "24cm", "4cm"],
+        correct: 0,
+        rationale: "MN = 1/2 * BC = 1/2 * 12 = 6cm."
+      },
+      {
+        level: "Nhận biết",
+        text: "Nếu MN là đường trung bình của tam giác ABC (MN // BC) và MN = 5cm thì độ dài BC là:",
+        options: ["2.5cm", "5cm", "10cm", "15cm"],
+        correct: 2,
+        rationale: "BC = 2 * MN = 2 * 5 = 10cm."
+      },
+      {
+        level: "Nhận biết",
+        text: "Một tam giác có tối đa bao nhiêu đường trung bình?",
+        options: ["1", "2", "3", "Vô số"],
+        correct: 2,
+        rationale: "Tam giác có 3 đường trung bình."
+      },
+
+      // TH (5)
+      {
+        level: "Thông hiểu",
+        text: "Tam giác ABC có chu vi là 20cm. Gọi M, N, P là trung điểm 3 cạnh. Chu vi tam giác MNP là bao nhiêu?",
+        options: ["10cm", "20cm", "40cm", "5cm"],
+        correct: 0,
+        rationale: "Chu vi tam giác trung bình bằng một nửa chu vi tam giác ban đầu: 20/2 = 10cm."
+      },
+      {
+        level: "Thông hiểu",
+        text: "Cho tam giác ABC, đường thẳng đi qua trung điểm M của cạnh AB và song song với cạnh BC sẽ đi qua đâu?",
+        options: ["Đỉnh C", "Trung điểm cạnh AC", "Điểm bất kì trên AC", "Trọng tâm tam giác"],
+        correct: 1,
+        rationale: "Định lí đảo: Qua trung điểm 1 cạnh, song song cạnh thứ hai thì đi qua trung điểm cạnh thứ ba."
+      },
+      {
+        level: "Thông hiểu",
+        text: "Tam giác đều ABC cạnh a. Độ dài đường trung bình của tam giác này bằng:",
+        options: ["a", "2a", "a/2", "a√3/2"],
+        correct: 2,
+        rationale: "Đường trung bình luôn bằng một nửa cạnh đáy tương ứng ⇒ a/2."
+      },
+      {
+        level: "Thông hiểu",
+        text: "Cho tam giác ABC vuông tại A, AB=6, AC=8. Độ dài đường trung bình MN (M thuộc AB, N thuộc AC) là:",
+        options: ["5", "10", "3", "4"],
+        correct: 0,
+        rationale: "MN nối trung điểm AB và AC nên MN // BC và MN = BC/2. BC = √(6²+8²)=10 ⇒ MN=5."
+      },
+      {
+        level: "Thông hiểu",
+        text: "Cho tam giác ABC có góc B = 70°. MN là đường trung bình (MN // BC). Số đo góc AMN là:",
+        options: ["70°", "110°", "35°", "140°"],
+        correct: 0,
+        rationale: "MN // BC nên ∠AMN = ∠ABC = 70°."
+      },
+
+      // VD (3)
+      {
+        level: "Vận dụng (Thực tế)",
+        text: "Để đo khoảng cách giữa hai điểm A và B bị ngăn cách bởi hồ nước, người ta chọn điểm C, lấy trung điểm M của CA và N của CB. Đo được MN = 45m. Khoảng cách AB là:",
+        options: ["45m", "90m", "22.5m", "100m"],
+        correct: 1,
+        rationale: "Trong tam giác CAB, MN là đường trung bình ⇒ AB = 2MN = 90m."
+      },
+      {
+        level: "Vận dụng",
+        text: "Cho tam giác ABC vuông tại A. Gọi M, N, P lần lượt là trung điểm của AB, BC, AC. Tứ giác AMNP là hình gì?",
+        options: ["Hình thoi", "Hình bình hành", "Hình chữ nhật", "Hình vuông"],
+        correct: 2,
+        rationale: "AMNP là hình bình hành và có góc A = 90° ⇒ AMNP là hình chữ nhật."
+      },
+      {
+        level: "Vận dụng",
+        text: "Tam giác ABC, trung tuyến AM. Gọi I là trung điểm AM. Đường thẳng CI cắt AB tại K. Tính tỉ số AK/AB.",
+        options: ["1/2", "1/3", "1/4", "2/3"],
+        correct: 1,
+        rationale: "K là điểm chia AB theo tỉ số AK = 1/3 AB ⇒ AK/AB = 1/3."
+      },
+
+      // VDC (1)
+      {
+        level: "Vận dụng cao",
+        text: "Cho tứ giác ABCD. Gọi M, N, P, Q lần lượt là trung điểm của AB, BC, CD, DA. Tứ giác MNPQ là hình gì?",
+        options: ["Hình thang", "Hình chữ nhật", "Hình bình hành", "Hình vuông"],
+        correct: 2,
+        rationale: "Định lí Varignon: Nối trung điểm 4 cạnh của tứ giác được hình bình hành."
+      }
+    ];
+
+    // ====== RANDOM + RẢI ĐỀU A/B/C/D ======
+    const targetCorrectSlots = [0,1,2,3, 0,1,2,3, 0,1,2,3, 0,1,2];
+    let prepared = [];
+
+    function shuffleArray(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function prepareQuestions() {
+      prepared = questions.map((q, qi) => {
+        const correctText = q.options[q.correct];
+        const wrongs = q.options.filter((_, idx) => idx !== q.correct);
+        const shuffledWrongs = shuffleArray(wrongs);
+
+        const target = targetCorrectSlots[qi] ?? Math.floor(Math.random() * 4);
+
+        const newOptions = [];
+        let w = 0;
+        for (let i = 0; i < 4; i++) {
+          if (i === target) newOptions.push(correctText);
+          else newOptions.push(shuffledWrongs[w++]);
+        }
+
+        return { ...q, options: newOptions, correct: target };
+      });
+    }
+
+    // --- GAME STATE ---
+    let currentIdx = 0;
+    let score = 0;
+    let isLocked = false;
+
+    function startGame() {
+      prepareQuestions(); // mỗi lượt chơi sẽ random khác
+
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.remove('hidden');
+      document.getElementById('game-screen').classList.add('flex');
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      isLocked = false;
+      const q = prepared[currentIdx];
+
+      document.getElementById('q-curr').innerText = currentIdx + 1;
+      document.getElementById('score').innerText = score;
+
+      const pct = (currentIdx / prepared.length) * 100;
+      document.getElementById('progress-bar').style.width = pct + '%';
+
+      const tag = document.getElementById('level-tag');
+      tag.innerText = q.level;
+
+      if (q.level.includes("Nhận biết")) tag.className = "absolute top-0 right-0 bg-green-500 text-white px-4 py-1 font-bold font-comic uppercase text-lg border-b-4 border-l-4 border-black";
+      else if (q.level.includes("Thông hiểu")) tag.className = "absolute top-0 right-0 bg-blue-500 text-white px-4 py-1 font-bold font-comic uppercase text-lg border-b-4 border-l-4 border-black";
+      else if (q.level.includes("Vận dụng cao")) tag.className = "absolute top-0 right-0 bg-red-500 text-white px-4 py-1 font-bold font-comic uppercase text-lg border-b-4 border-l-4 border-black";
+      else tag.className = "absolute top-0 right-0 bg-orange-500 text-white px-4 py-1 font-bold font-comic uppercase text-lg border-b-4 border-l-4 border-black";
+
+      document.getElementById('question-text').innerText = q.text;
+      document.getElementById('feedback-area').classList.add('hidden');
+
+      const container = document.getElementById('options-container');
+      container.innerHTML = '';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `btn-comic option-btn w-full p-4 text-left rounded-lg border-2 border-black flex items-center text-lg`;
+        btn.innerHTML = `<span class="bg-black text-white w-8 h-8 rounded-full flex items-center justify-center mr-3 font-bold">${String.fromCharCode(65 + idx)}</span> ${opt}`;
+        btn.onclick = () => checkAnswer(idx, btn);
+        container.appendChild(btn);
+      });
+    }
+
+    function lockButtons() {
+      const allBtns = document.getElementById('options-container').children;
+      Array.from(allBtns).forEach(b => b.disabled = true);
+    }
+
+    function checkAnswer(idx, btn) {
+      if (isLocked) return;
+      isLocked = true;
+
+      const q = prepared[currentIdx];
+      const isCorrect = idx === q.correct;
+
+      if (isCorrect) {
+        score++;
+        document.getElementById('score').innerText = score;
+        playSound('correct');
+        fireConfetti();
+        btn.style.backgroundColor = '#86efac';
+        showFeedback(true, q.rationale);
+      } else {
+        playSound('wrong');
+        btn.style.backgroundColor = '#fca5a5';
+
+        const allBtns = document.getElementById('options-container').children;
+        allBtns[q.correct].style.backgroundColor = '#86efac';
+
+        showFeedback(false, q.rationale);
+      }
+
+      lockButtons();
+    }
+
+    function showFeedback(isCorrect, text) {
+      const area = document.getElementById('feedback-area');
+      area.classList.remove('hidden');
+
+      const status = document.getElementById('fb-status');
+      const badge = document.getElementById('fb-badge');
+
+      if (isCorrect) {
+        status.innerText = "CHUẨN KHÔNG CẦN CHỈNH!";
+        badge.className = "absolute -top-10 left-1/2 transform -translate-x-1/2 bg-green-400 border-4 border-black px-4 py-2 font-comic text-2xl rotate-3 shadow-[4px_4px_0px_#000]";
+      } else {
+        status.innerText = "TIẾC QUÁ ĐI MẤT!";
+        badge.className = "absolute -top-10 left-1/2 transform -translate-x-1/2 bg-red-400 border-4 border-black px-4 py-2 font-comic text-2xl -rotate-3 shadow-[4px_4px_0px_#000]";
+      }
+
+      document.getElementById('fb-text').innerHTML = `<strong class="text-black">Giải thích:</strong> ${text}`;
+    }
+
+    function nextQuestion() {
+      currentIdx++;
+      if (currentIdx < prepared.length) loadQuestion();
+      else showResult();
+    }
+
+    function showResult() {
+      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.remove('hidden');
+      document.getElementById('final-score').innerText = score;
+
+      const msg = document.getElementById('result-msg');
+      playSound('win');
+
+      if (score === 15) msg.innerText = "ĐỈNH CỦA CHÓP! BẠN LÀ THIÊN TÀI HÌNH HỌC! 🏆";
+      else if (score >= 12) msg.innerText = "QUÁ XUẤT SẮC! KIẾN THỨC VỮNG NHƯ BÀN THẠCH! 🔥";
+      else if (score >= 8) msg.innerText = "LÀM TỐT LẮM! CỐ GẮNG THÊM CHÚT NỮA NHÉ! 💪";
+      else msg.innerText = "ĐỪNG LO! HÃY ÔN TẬP LẠI VÀ THỬ LẠI NHÉ! 📚";
+    }
+
+    function restartGame() {
+      currentIdx = 0;
+      score = 0;
+      document.getElementById('result-screen').classList.add('hidden');
+      document.getElementById('start-screen').classList.remove('hidden');
+    }
+
+    // --- CONFETTI ---
+    function fireConfetti() {
+      const colors = ['#ff1744', '#00c853', '#2979ff', '#ffea00', '#d500f9'];
+      for (let i = 0; i < 50; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.transform = `rotate(${Math.random() * 360}deg)`;
+        el.style.animation = `fall ${Math.random() * 2 + 1}s linear`;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 3000);
+      }
+    }
+  </script>
+</body>
+</html>
