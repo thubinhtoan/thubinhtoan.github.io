@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đại Tiệc Hàm Số: Vũ Điệu Sắc Màu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #0f172a;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .font-display {
+            font-family: 'Bangers', cursive;
+            letter-spacing: 2px;
+        }
+
+        .neon-box {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+            border-radius: 24px;
+        }
+
+        .neon-text-pink { text-shadow: 0 0 10px #ec4899, 0 0 20px #ec4899; }
+        .neon-text-blue { text-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6; }
+        .neon-text-yellow { text-shadow: 0 0 10px #eab308, 0 0 20px #eab308; }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.8), 0 0 10px rgba(255,255,255,0.5); }
+        }
+
+        .btn-party {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-party:hover {
+            transform: scale(1.05) translateY(-3px);
+            animation: pulse-glow 1.5s infinite;
+        }
+        .btn-party:active { transform: scale(0.95); }
+
+        .modal-enter {
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="neon-box p-8 md:p-12 max-w-3xl w-full text-center relative z-10">
+        <div class="animate-float mb-6">
+            <i class="fas fa-music text-6xl text-pink-500 mx-2"></i>
+            <i class="fas fa-star text-7xl text-yellow-400 mx-2"></i>
+            <i class="fas fa-calculator text-6xl text-blue-500 mx-2"></i>
+        </div>
+
+        <h1 class="font-display text-6xl md:text-7xl mb-2 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 neon-text-pink">
+            ĐẠI TIỆC<br>HÀM SỐ
+        </h1>
+        <p class="text-xl md:text-2xl text-cyan-200 font-bold mb-8 uppercase tracking-widest">Vũ Điệu Sắc Màu Chương 5 💃🕺</p>
+
+        <div class="grid grid-cols-2 gap-4 text-left mb-10 bg-white/5 p-6 rounded-2xl border border-white/10">
+            <div class="flex items-center space-x-3">
+                <div class="w-3 h-3 rounded-full bg-green-400 shadow-[0_0_10px_#4ade80]"></div>
+                <span class="text-gray-200 font-bold">6 câu Nhận biết</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="w-3 h-3 rounded-full bg-blue-400 shadow-[0_0_10px_#60a5fa]"></div>
+                <span class="text-gray-200 font-bold">5 câu Thông hiểu</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="w-3 h-3 rounded-full bg-yellow-400 shadow-[0_0_10px_#facc15]"></div>
+                <span class="text-gray-200 font-bold">3 câu Vận dụng</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_#f87171]"></div>
+                <span class="text-gray-200 font-bold">1 câu Vận dụng cao</span>
+            </div>
+        </div>
+
+        <button onclick="startGame()" class="btn-party w-full md:w-auto px-12 py-4 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full text-2xl font-display uppercase tracking-wider text-white border-2 border-white/20 shadow-lg">
+            Vào Tiệc Ngay! 🚀
+        </button>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quiz-screen" class="hidden w-full max-w-4xl h-[90vh] flex flex-col relative z-10">
+        <!-- Top Bar -->
+        <div class="flex justify-between items-center mb-6 bg-black/30 p-4 rounded-full backdrop-blur-md border border-white/10">
+            <div class="flex items-center px-4">
+                <span class="text-pink-400 font-display text-2xl mr-2">CÂU</span>
+                <span id="q-current" class="text-3xl font-bold text-white">1</span>
+                <span class="text-gray-400 text-lg">/15</span>
+            </div>
+
+            <div class="flex-1 mx-4 md:mx-8 bg-gray-700 h-3 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 transition-all duration-500 shadow-[0_0_10px_rgba(236,72,153,0.8)]" style="width: 0%"></div>
+            </div>
+
+            <div class="flex items-center px-4">
+                <i class="fas fa-crown text-yellow-400 text-2xl mr-2 animate-pulse"></i>
+                <span id="score" class="text-3xl font-display text-yellow-400">0</span>
+            </div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="flex-1 neon-box p-6 md:p-10 flex flex-col relative overflow-hidden">
+            <!-- Level Tag -->
+            <div id="level-badge" class="absolute top-0 left-0 bg-pink-600 text-white px-6 py-2 rounded-br-2xl font-bold uppercase text-sm tracking-wider shadow-lg">
+                Khởi động
+            </div>
+
+            <!-- Question Text -->
+            <div class="flex-1 flex items-center justify-center">
+                <h2 id="question-text" class="text-2xl md:text-3xl font-bold text-center leading-relaxed text-white drop-shadow-md">
+                    Loading...
+                </h2>
+            </div>
+
+            <!-- Options -->
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8"></div>
+        </div>
+    </div>
+
+    <!-- FEEDBACK MODAL -->
+    <div id="feedback-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="neon-box bg-slate-900 p-8 max-w-2xl w-full modal-enter border-t-4" id="feedback-border">
+            <div class="text-center mb-6">
+                <div id="feedback-icon" class="text-6xl mb-4 inline-block"></div>
+                <h3 id="feedback-title" class="font-display text-4xl uppercase mb-2"></h3>
+                <div class="h-1 w-20 mx-auto bg-white/20 rounded-full"></div>
+            </div>
+
+            <div class="bg-white/5 p-6 rounded-xl border border-white/10 mb-8">
+                <p id="rationale-text" class="text-lg text-gray-200 leading-relaxed"></p>
+            </div>
+
+            <button onclick="nextQuestion()" class="btn-party w-full py-4 bg-gray-700 hover:bg-gray-600 rounded-xl text-xl font-bold uppercase tracking-wide text-white border border-white/20">
+                Tiếp Tục <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen" class="hidden neon-box p-8 max-w-md w-full text-center relative z-20 modal-enter">
+        <div class="absolute -top-16 left-1/2 transform -translate-x-1/2">
+            <div class="relative">
+                <i class="fas fa-trophy text-8xl text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]"></i>
+                <i class="fas fa-star text-4xl text-white absolute -top-2 -right-4 animate-spin-slow"></i>
+            </div>
+        </div>
+
+        <h2 class="font-display text-5xl text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 mt-16 mb-2 neon-text-yellow">
+            Tổng Kết Tiệc
+        </h2>
+        <p class="text-gray-400 font-bold mb-6">Số điểm bạn đạt được</p>
+
+        <div class="bg-black/30 rounded-3xl p-6 mb-8 border border-white/10 shadow-inner">
+            <span id="final-score" class="text-7xl font-display text-white">0</span>
+            <span class="text-2xl text-gray-500">/15</span>
+        </div>
+
+        <p id="result-msg" class="text-xl font-bold text-pink-300 mb-8 px-4 leading-relaxed"></p>
+
+        <button onclick="restartGame()" class="btn-party w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold py-4 rounded-xl text-xl border-2 border-cyan-400/30">
+            <i class="fas fa-redo-alt mr-2"></i> Chơi Lại Từ Đầu
+        </button>
+    </div>
+
+    <script>
+        /* ======================
+           SETTINGS
+           ====================== */
+        const RANDOMIZE_OPTIONS = true; // cô muốn cố định A/B/C/D thì đổi thành false
+
+        /* ======================
+           SOUND (khởi tạo sau click để tránh bị chặn)
+           ====================== */
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playSound(type) {
+            initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.linearRampToValueAtTime(1046.50, now + 0.1);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start();
+                osc.stop(now + 0.35);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                osc.start();
+                osc.stop(now + 0.2);
+            } else if (type === 'win') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554, now + 0.1);
+                osc.frequency.setValueAtTime(659, now + 0.2);
+                osc.frequency.setValueAtTime(880, now + 0.4);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 1.2);
+                osc.start();
+                osc.stop(now + 1.2);
+            }
+        }
+
+        /* ======================
+           DATA (ĐÃ CÂN ĐỀU ABCD)
+           A=4, B=4, C=4, D=3  (khi RANDOMIZE_OPTIONS=false)
+           ====================== */
+        const questions = [
+            // NHẬN BIẾT (6)
+            {
+                level: "Nhận biết",
+                text: "Điều kiện để hàm số y = ax + b là hàm số bậc nhất là gì?",
+                options: ["b ≠ 0", "a > 0", "b = 0", "a ≠ 0"], // đúng D
+                correct: 3,
+                rationale: "Theo định nghĩa, hàm số bậc nhất có dạng y = ax + b với điều kiện hệ số a phải khác 0."
+            },
+            {
+                level: "Nhận biết",
+                text: "Trong hàm số y = -2x + 5, hệ số góc a bằng bao nhiêu?",
+                options: ["a = 5", "a = 2", "a = -2", "a = -5"], // đúng C
+                correct: 2,
+                rationale: "Hệ số góc là hệ số đi kèm với biến x. Vậy a = -2."
+            },
+            {
+                level: "Nhận biết",
+                text: "Điểm nào sau đây luôn thuộc trục tung Oy?",
+                options: ["A(1; 2)", "C(3; 0)", "D(2; 2)", "B(0; -3)"], // đúng D
+                correct: 3,
+                rationale: "Điểm thuộc trục tung luôn có hoành độ x = 0. Điểm B(0; -3) thỏa mãn điều này."
+            },
+            {
+                level: "Nhận biết",
+                text: "Đồ thị của hàm số y = ax + b (a ≠ 0) là hình gì?",
+                options: ["Một đường cong", "Một đoạn thẳng", "Một hình tròn", "Một đường thẳng"], // đúng D
+                correct: 3,
+                rationale: "Đồ thị của hàm số bậc nhất luôn là một đường thẳng."
+            },
+            {
+                level: "Nhận biết",
+                text: "Hàm số nào dưới đây KHÔNG phải là hàm số bậc nhất?",
+                options: ["y = 2x", "y = 3 - x", "y = x² + 1", "y = 0.5x - 1"], // đúng C
+                correct: 2,
+                rationale: "Hàm số y = x² + 1 có bậc là 2, không phải hàm bậc nhất (bậc 1)."
+            },
+            {
+                level: "Nhận biết",
+                text: "Nếu hệ số góc a > 0 thì góc tạo bởi đường thẳng y = ax + b và trục Ox là góc gì?",
+                options: ["Góc nhọn", "Góc tù", "Góc vuông", "Góc bẹt"], // đúng A
+                correct: 0,
+                rationale: "Khi a > 0, đường thẳng đi lên từ trái sang phải, tạo với tia Ox một góc nhọn."
+            },
+
+            // THÔNG HIỂU (5)
+            {
+                level: "Thông hiểu",
+                text: "Tìm giá trị của m để đồ thị hàm số y = (m - 2)x + 3 song song với đường thẳng y = 2x - 1.",
+                options: ["m = 2", "m = 4", "m = 0", "m = -2"], // đúng B
+                correct: 1,
+                rationale: "Hai đường thẳng song song khi hệ số góc bằng nhau: m - 2 = 2 => m = 4."
+            },
+            {
+                level: "Thông hiểu",
+                text: "Điểm M(1; -1) thuộc đồ thị hàm số nào sau đây?",
+                options: ["y = x + 1", "y = 2x - 3", "y = -2x + 1", "y = -x + 1"], // đúng C
+                correct: 2,
+                rationale: "Thay x=1, y=-1 vào y = -2x + 1 ta được: -1 = -2(1) + 1 => -1 = -1 (Đúng)."
+            },
+            {
+                level: "Thông hiểu",
+                text: "Xác định đường thẳng y = ax + b đi qua gốc tọa độ O và điểm A(2; 4).",
+                options: ["y = 2x", "y = 2x + 2", "y = x + 2", "y = 4x"], // đúng A
+                correct: 0,
+                rationale: "Đi qua O(0;0) nên b=0. Đi qua A(2;4) => 4 = a.2 => a = 2. Vậy y = 2x."
+            },
+            {
+                level: "Thông hiểu",
+                text: "Hai đường thẳng y = x + 2 và y = 3x + 2 cắt nhau tại điểm nào?",
+                options: ["A(1; 3)", "B(0; 2)", "C(2; 0)", "D(-1; 1)"], // đúng B
+                correct: 1,
+                rationale: "Vì hai đường thẳng có cùng tung độ gốc b = 2 nên chúng cắt nhau tại điểm trên trục tung là (0; 2)."
+            },
+            {
+                level: "Thông hiểu",
+                text: "Cho hàm số f(x) = -0.5x + 3. Tính f(4).",
+                options: ["5", "1", "2.5", "-1"], // đúng B
+                correct: 1,
+                rationale: "f(4) = -0.5(4) + 3 = -2 + 3 = 1."
+            },
+
+            // VẬN DỤNG (3)
+            {
+                level: "Vận dụng (Thực tế)",
+                text: "Một cửa hàng cho thuê xe đạp: Phí cố định 50.000đ và 10.000đ cho mỗi giờ thuê. Hàm số biểu thị tổng số tiền y (nghìn đồng) theo x (giờ) là:",
+                options: ["y = 10x + 50", "y = 50x + 10", "y = 60x", "y = 10x"], // đúng A
+                correct: 0,
+                rationale: "Tổng tiền = (Giá mỗi giờ * số giờ) + Phí cố định = 10x + 50."
+            },
+            {
+                level: "Vận dụng",
+                text: "Tìm tọa độ giao điểm của hai đường thẳng y = x và y = -x + 4.",
+                options: ["(2; 2)", "(1; 3)", "(0; 4)", "(4; 0)"], // đúng A
+                correct: 0,
+                rationale: "x = -x + 4 => 2x = 4 => x = 2. Thay vào y=x => y=2. Vậy (2;2)."
+            },
+            {
+                level: "Vận dụng",
+                text: "Viết phương trình đường thẳng đi qua A(1; 3) và song song với đường thẳng y = 2x.",
+                options: ["y = 2x + 3", "y = 2x + 1", "y = 3x", "y = x + 2"], // đúng B
+                correct: 1,
+                rationale: "Song song với y=2x nên a=2. Dạng y=2x+b. Qua A(1;3) => b=1. Vậy y=2x+1."
+            },
+
+            // VẬN DỤNG CAO (1)
+            {
+                level: "Vận dụng cao",
+                text: "Tính diện tích tam giác tạo bởi đường thẳng y = -x + 3 và hai trục tọa độ Ox, Oy.",
+                options: ["9", "3", "4.5", "6"], // đúng C
+                correct: 2,
+                rationale: "Giao Ox: x=3 => OA=3. Giao Oy: y=3 => OB=3. S = 1/2*3*3 = 4.5."
+            }
+        ];
+
+        /* ======================
+           RANDOM OPTIONS (shuffle)
+           ====================== */
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        function prepareQuestion(q) {
+            if (!RANDOMIZE_OPTIONS) return { ...q, options: [...q.options] };
+
+            const nq = { ...q, options: [...q.options] };
+            const correctText = nq.options[nq.correct];
+            shuffleArray(nq.options);
+            nq.correct = nq.options.indexOf(correctText);
+            return nq;
+        }
+
+        let currentIdx = 0;
+        let score = 0;
+        let isLocked = false;
+        let currentQ = null;
+
+        function getLevelStyle(level) {
+            if (level.includes("Nhận biết")) return { color: "bg-green-500", label: "NHẬN BIẾT" };
+            if (level.includes("Thông hiểu")) return { color: "bg-blue-500", label: "THÔNG HIỂU" };
+            if (level.includes("Vận dụng cao")) return { color: "bg-red-600", label: "VẬN DỤNG CAO" };
+            return { color: "bg-yellow-500", label: "VẬN DỤNG" };
+        }
+
+        function startGame() {
+            initAudio();
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            document.getElementById('quiz-screen').classList.add('flex');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isLocked = false;
+            currentQ = prepareQuestion(questions[currentIdx]);
+
+            document.getElementById('q-current').textContent = currentIdx + 1;
+            document.getElementById('score').textContent = score;
+
+            // progress lên đúng 100% ở câu cuối
+            const denom = Math.max(1, questions.length - 1);
+            const pct = (currentIdx / denom) * 100;
+            document.getElementById('progress-bar').style.width = pct + '%';
+
+            document.getElementById('question-text').textContent = currentQ.text;
+
+            const style = getLevelStyle(currentQ.level);
+            const badge = document.getElementById('level-badge');
+            badge.className = `absolute top-0 left-0 text-white px-6 py-2 rounded-br-2xl font-bold uppercase text-sm tracking-wider shadow-lg ${style.color}`;
+            badge.textContent = style.label;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            currentQ.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `btn-party p-6 rounded-2xl bg-white/10 border border-white/20 text-left hover:bg-white/20 hover:border-pink-400 transition-all flex items-center group w-full`;
+
+                btn.innerHTML = `
+                    <span class="w-10 h-10 rounded-full bg-black/40 text-white flex items-center justify-center mr-4 font-bold group-hover:bg-pink-500 transition-colors">
+                        ${String.fromCharCode(65 + idx)}
+                    </span>
+                    <span class="text-lg font-medium text-gray-100">${opt}</span>
+                `;
+                btn.onclick = () => checkAnswer(idx, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIdx, btn) {
+            if (isLocked) return;
+            isLocked = true;
+
+            const q = currentQ;
+            const isCorrect = selectedIdx === q.correct;
+            const allBtns = document.getElementById('options-container').children;
+
+            if (isCorrect) {
+                score++;
+                document.getElementById('score').textContent = score;
+                playSound('correct');
+                fireConfetti();
+
+                btn.className = "p-6 rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 border border-green-400 text-left flex items-center w-full shadow-[0_0_20px_rgba(34,197,94,0.5)] transform scale-105";
+                btn.querySelector('span').className = "w-10 h-10 rounded-full bg-white text-green-700 flex items-center justify-center mr-4 font-bold";
+
+                showFeedback(true, q.rationale);
+            } else {
+                playSound('wrong');
+
+                btn.className = "p-6 rounded-2xl bg-gradient-to-r from-red-600 to-pink-700 border border-red-400 text-left flex items-center w-full opacity-90";
+
+                const correctBtn = allBtns[q.correct];
+                correctBtn.className = "p-6 rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 border border-green-400 text-left flex items-center w-full shadow-[0_0_20px_rgba(34,197,94,0.5)]";
+
+                showFeedback(false, q.rationale);
+            }
+
+            Array.from(allBtns).forEach(b => b.disabled = true);
+        }
+
+        function showFeedback(isCorrect, text) {
+            const modal = document.getElementById('feedback-modal');
+            const border = document.getElementById('feedback-border');
+            const icon = document.getElementById('feedback-icon');
+            const title = document.getElementById('feedback-title');
+            const content = document.getElementById('rationale-text');
+
+            modal.classList.remove('hidden');
+
+            if (isCorrect) {
+                border.className = "neon-box bg-slate-900 p-8 max-w-2xl w-full modal-enter border-t-4 border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.3)]";
+                icon.innerHTML = "🎉";
+                title.innerHTML = "<span class='text-green-400'>Chuẩn Không Cần Chỉnh!</span>";
+            } else {
+                border.className = "neon-box bg-slate-900 p-8 max-w-2xl w-full modal-enter border-t-4 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.3)]";
+                icon.innerHTML = "😅";
+                title.innerHTML = "<span class='text-red-400'>Tiếc Quá Đi Thôi!</span>";
+            }
+
+            content.innerHTML = `<strong class="text-white block mb-2">Giải thích:</strong> ${text}`;
+        }
+
+        function nextQuestion() {
+            document.getElementById('feedback-modal').classList.add('hidden');
+            currentIdx++;
+            if (currentIdx < questions.length) loadQuestion();
+            else showResult();
+        }
+
+        function showResult() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            let s = 0;
+            const scoreEl = document.getElementById('final-score');
+            const interval = setInterval(() => {
+                if (s >= score) {
+                    clearInterval(interval);
+                    playSound('win');
+                    fireConfetti(true);
+                } else {
+                    s++;
+                    scoreEl.textContent = s;
+                }
+            }, 50);
+
+            const msg = document.getElementById('result-msg');
+            if (score === 15) msg.textContent = "ĐỈNH CỦA CHÓP! Bạn là Ngôi Sao Sáng Nhất đêm nay! 🌟👑";
+            else if (score >= 12) msg.textContent = "XUẤT SẮC! Màn trình diễn quá ấn tượng! 💃🕺";
+            else if (score >= 8) msg.textContent = "LÀM TỐT LẮM! Bạn đã khuấy động bữa tiệc thành công! 🎉";
+            else msg.textContent = "ĐỪNG LO! Hãy tập nhảy thêm vài bước Hàm Số nữa nhé! 🎵";
+        }
+
+        function restartGame() {
+            currentIdx = 0;
+            score = 0;
+            document.getElementById('progress-bar').style.width = "0%";
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
+        /* ======================
+           CONFETTI CANVAS (fix splice)
+           ====================== */
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+
+        function fireConfetti(longParams = false) {
+            const colors = ['#ec4899', '#8b5cf6', '#3b82f6', '#eab308', '#22c55e'];
+            const count = longParams ? 200 : 50;
+
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    life: 100,
+                    gravity: 0.5
+                });
+            }
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += p.gravity;
+                p.life--;
+                p.size *= 0.96;
+
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+            });
+
+            particles = particles.filter(p => p.life > 0 && p.size >= 0.5);
+
+            requestAnimationFrame(animateConfetti);
+        }
+        animateConfetti();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
