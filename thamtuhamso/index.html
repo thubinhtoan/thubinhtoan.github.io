@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thám Tử Hàm Số: Truy Tìm Quy Luật</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Roboto:wght@400;700&display=swap');
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+      overflow-x: hidden;
+    }
+    .game-title { font-family: 'Patrick Hand', cursive; }
+    .btn-hover:hover { transform: translateY(-2px); }
+    .confetti {
+      position: fixed; width: 8px; height: 8px; top: -10px;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      to { transform: translateY(100vh) rotate(720deg); }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4">
+
+<!-- START -->
+<div id="start-screen" class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full text-center">
+  <h1 class="game-title text-5xl text-blue-600 mb-4 font-bold">
+    Thám Tử Hàm Số 🕵️‍♂️
+  </h1>
+  <p class="text-gray-600 mb-6">
+    Giải 15 câu hỏi về hàm số để trở thành thám tử Toán học xuất sắc!
+  </p>
+
+  <div class="grid grid-cols-2 gap-3 text-left bg-blue-50 p-4 rounded mb-6">
+    <div>⭐ Nhận biết: 6</div>
+    <div>🧠 Thông hiểu: 5</div>
+    <div>🚀 Vận dụng: 3</div>
+    <div>👑 Vận dụng cao: 1</div>
+  </div>
+
+  <button onclick="startGame()"
+    class="btn-hover bg-blue-600 text-white text-xl px-10 py-3 rounded-full font-bold">
+    BẮT ĐẦU 🚀
+  </button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz-screen" class="hidden bg-white rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col">
+  <div class="p-4 flex justify-between bg-slate-100 border-b">
+    <div>Câu <span id="q-current">1</span>/<span id="q-total">15</span></div>
+    <div>🏆 <span id="score">0</span></div>
+  </div>
+
+  <div class="h-1 bg-gray-200">
+    <div id="progress-bar" class="h-1 bg-blue-500"></div>
+  </div>
+
+  <div class="p-6 flex-grow">
+    <span id="level-badge" class="text-xs px-2 py-1 rounded text-white"></span>
+    <h2 id="question-text" class="text-xl font-medium mt-3 mb-6"></h2>
+
+    <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  </div>
+
+  <div id="feedback-area" class="hidden p-6 bg-gray-50 border-t">
+    <div id="feedback-header" class="font-bold mb-2"></div>
+    <div id="rationale-text" class="text-gray-700 mb-4"></div>
+    <button onclick="nextQuestion()"
+      class="w-full bg-blue-600 text-white py-2 rounded font-bold">
+      Câu tiếp theo →
+    </button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result-screen" class="hidden bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+  <h2 class="text-3xl font-bold mb-3">Hoàn thành!</h2>
+  <div class="text-5xl text-blue-600 mb-4">
+    <span id="final-score">0</span>/15
+  </div>
+  <p id="result-message" class="mb-6 font-medium"></p>
+  <button onclick="restartGame()"
+    class="bg-gray-800 text-white py-2 px-6 rounded font-bold">
+    Chơi lại
+  </button>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const questions = [
+  {level:"Nhận biết",text:"Đại lượng y được gọi là hàm số của x nếu:",options:[
+    "Với mỗi x xác định duy nhất một y",
+    "Một x cho nhiều y",
+    "Một y cho một x",
+    "x,y độc lập"],correct:0,
+    rationale:"Theo định nghĩa, mỗi x chỉ cho một y."},
+
+  {level:"Nhận biết",text:"Kí hiệu thường dùng cho hàm số là:",options:[
+    "x = f(y)","y = f(x)","x + y = 0","y > x"],correct:1,
+    rationale:"Kí hiệu chuẩn: y = f(x)."},
+
+  {level:"Nhận biết",text:"Trong y = f(x), x được gọi là:",options:[
+    "Hàm số","Hằng số","Biến số","Giá trị"],correct:2,
+    rationale:"x là đại lượng thay đổi → biến số."},
+
+  {level:"Nhận biết",text:"Bảng nào KHÔNG biểu thị hàm số?",options:[
+    "x=1→y=2; x=2→y=4",
+    "x=1→y=5; x=2→y=5",
+    "x=-1→y=1; x=1→y=1",
+    "x=1→y=2; x=1→y=3"],correct:3,
+    rationale:"Một x có 2 y → không phải hàm số."},
+
+  {level:"Nhận biết",text:"Cho y=2x. Giá trị f(0) là:",options:[
+    "0","2","1","Không xác định"],correct:0,
+    rationale:"f(0)=2·0=0."},
+
+  {level:"Nhận biết",text:"Đồ thị y=f(x) là tập hợp các điểm:",options:[
+    "M(f(x);x)","M(x;f(x))","M(x;0)","M(0;f(x))"],correct:1,
+    rationale:"Đúng theo định nghĩa đồ thị."},
+
+  {level:"Thông hiểu",text:"Cho f(x)=x²−1. Tính f(−2).",options:[
+    "-5","-3","3","5"],correct:2,
+    rationale:"4−1=3."},
+
+  {level:"Thông hiểu",text:"Điểm thuộc đồ thị y=3x−1 là:",options:[
+    "B(1;3)","C(0;1)","D(2;4)","A(1;2)"],correct:3,
+    rationale:"3·1−1=2."},
+
+  {level:"Thông hiểu",text:"Hàm y=4/x xác định khi:",options:[
+    "x≠0","x>0","x<4","Mọi x"],correct:0,
+    rationale:"Mẫu khác 0."},
+
+  {level:"Thông hiểu",text:"Đồ thị y=ax qua (2;6) thì a bằng:",options:[
+    "2","3","1/3","12"],correct:1,
+    rationale:"6=2a ⇒ a=3."},
+
+  {level:"Thông hiểu",text:"Ô tô chạy 60km/h. Quãng đường s theo t là:",options:[
+    "s=60+t","t=60s","s=60t","s=60/t"],correct:2,
+    rationale:"s=v·t."},
+
+  {level:"Vận dụng",text:"C=4a. Nếu a tăng 3 lần thì C:",options:[
+    "Tăng 4 lần","Tăng 12 lần","Không đổi","Tăng 3 lần"],correct:3,
+    rationale:"C tỉ lệ thuận với a."},
+
+  {level:"Vận dụng",text:"Taxi: 10.000đ mở cửa + 15.000đ/km. Công thức:",options:[
+    "y=15000x+10000","y=10000x+15000","y=25000x","y=15000x"],correct:0,
+    rationale:"Tiền = tiền/km + tiền cố định."},
+
+  {level:"Vận dụng",text:"Cho f(x)=2x+m, biết f(1)=5. Tìm m.",options:[
+    "2","3","−3","7"],correct:1,
+    rationale:"2+m=5 ⇒ m=3."},
+
+  {level:"Vận dụng cao",text:"Biết f(a+b)=f(a)+f(b), f(2)=6. Tính f(5).",options:[
+    "10","12","15","30"],correct:2,
+    rationale:"f(1)=3 ⇒ f(5)=15."}
+];
+
+/* ===== SHUFFLE ===== */
+let currentQ=null, index=0, score=0, locked=false;
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+}
+function prepare(q){
+  const nq={...q,options:[...q.options]};
+  const ans=nq.options[nq.correct];
+  shuffle(nq.options);
+  nq.correct=nq.options.indexOf(ans);
+  return nq;
+}
+
+/* ===== GAME ===== */
+function startGame(){
+  document.getElementById("start-screen").classList.add("hidden");
+  document.getElementById("quiz-screen").classList.remove("hidden");
+  load();
+}
+function load(){
+  locked=false;
+  currentQ=prepare(questions[index]);
+
+  document.getElementById("q-current").textContent=index+1;
+  document.getElementById("q-total").textContent=questions.length;
+  document.getElementById("question-text").textContent=currentQ.text;
+
+  const badge=document.getElementById("level-badge");
+  badge.textContent=currentQ.level;
+  badge.className="text-xs px-2 py-1 rounded text-white bg-blue-500";
+
+  document.getElementById("progress-bar").style.width=
+    ((index+1)/questions.length*100)+"%";
+
+  const box=document.getElementById("options-container");
+  box.innerHTML="";
+  currentQ.options.forEach((o,i)=>{
+    const b=document.createElement("button");
+    b.className="border p-3 rounded hover:bg-blue-50 text-left";
+    b.innerHTML=`<b>${String.fromCharCode(65+i)}.</b> ${o}`;
+    b.onclick=()=>check(i,b);
+    box.appendChild(b);
+  });
+
+  document.getElementById("feedback-area").classList.add("hidden");
+}
+function check(i,btn){
+  if(locked) return;
+  locked=true;
+
+  const all=[...document.getElementById("options-container").children];
+  all.forEach(b=>b.disabled=true);
+
+  const fb=document.getElementById("feedback-area");
+  const head=document.getElementById("feedback-header");
+
+  if(i===currentQ.correct){
+    score++;
+    document.getElementById("score").textContent=score;
+    btn.classList.add("bg-green-200");
+    head.textContent="✔ Chính xác!";
+  }else{
+    btn.classList.add("bg-red-200");
+    all[currentQ.correct].classList.add("bg-green-200");
+    head.textContent="✘ Chưa đúng!";
+  }
+
+  document.getElementById("rationale-text").textContent=currentQ.rationale;
+  fb.classList.remove("hidden");
+}
+function nextQuestion(){
+  index++;
+  if(index<questions.length) load();
+  else finish();
+}
+function finish(){
+  document.getElementById("quiz-screen").classList.add("hidden");
+  document.getElementById("result-screen").classList.remove("hidden");
+  document.getElementById("final-score").textContent=score;
+  const pct=score/questions.length*100;
+  document.getElementById("result-message").textContent=
+    pct===100?"Xuất sắc 🌟":pct>=70?"Rất tốt 👏":pct>=50?"Khá ổn 💪":"Cần cố gắng 📚";
+}
+function restartGame(){
+  index=0; score=0;
+  document.getElementById("score").textContent=0;
+  document.getElementById("result-screen").classList.add("hidden");
+  document.getElementById("start-screen").classList.remove("hidden");
+}
+</script>
+</body>
+</html>
