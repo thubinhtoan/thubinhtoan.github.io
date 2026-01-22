@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vũ Trụ Tọa Độ: Truy Tìm Kho Báu Oxy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.2'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm40 40c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E"), linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+        }
+
+        .font-game { font-family: 'Fredoka', sans-serif; }
+
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-bouncy { transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .btn-bouncy:active { transform: scale(0.95); }
+        .btn-bouncy:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2); }
+
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+        .animate-pop { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+
+        .emoji-burst {
+            position: absolute;
+            font-size: 2rem;
+            animation: burst 1s forwards;
+            pointer-events: none;
+        }
+        @keyframes burst {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(1.5) rotate(var(--rot)); opacity: 0; }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #d8b4fe; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c084fc; }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="bg-white/95 backdrop-blur-sm rounded-3xl p-8 max-w-2xl w-full text-center card-shadow animate-pop border-4 border-white">
+        <div class="mb-6 animate-float relative inline-block">
+            <span class="text-7xl">🚀</span>
+            <span class="text-7xl absolute -right-4 -top-4 rotate-12">⭐</span>
+        </div>
+
+        <h1 class="font-game text-5xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 mb-4 font-bold drop-shadow-sm">
+            Vũ Trụ Tọa Độ
+        </h1>
+        <p class="text-slate-600 text-xl mb-8 font-medium">Chào mừng các phi hành gia lớp 8! Hãy khởi động động cơ Oxy để truy tìm kho báu nhé! 🌌</p>
+
+        <div class="grid grid-cols-2 gap-4 text-left mb-8 bg-purple-50 p-6 rounded-2xl border-2 border-purple-100">
+            <div class="flex items-center"><div class="w-3 h-3 rounded-full bg-green-400 mr-2"></div><span class="font-bold text-gray-700">Nhận biết: 6 câu</span></div>
+            <div class="flex items-center"><div class="w-3 h-3 rounded-full bg-blue-400 mr-2"></div><span class="font-bold text-gray-700">Thông hiểu: 5 câu</span></div>
+            <div class="flex items-center"><div class="w-3 h-3 rounded-full bg-orange-400 mr-2"></div><span class="font-bold text-gray-700">Vận dụng: 3 câu</span></div>
+            <div class="flex items-center"><div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div><span class="font-bold text-gray-700">Vận dụng cao: 1 câu</span></div>
+        </div>
+
+        <button onclick="startGame()" class="btn-bouncy bg-gradient-to-r from-purple-500 to-pink-500 text-white text-2xl py-4 px-12 rounded-full font-game font-bold shadow-lg ring-4 ring-pink-200">
+            KHỞI HÀNH NGAY!
+        </button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen" class="hidden w-full max-w-4xl h-[85vh] flex-col relative">
+        <!-- Header Board -->
+        <div class="bg-white rounded-t-3xl p-4 flex justify-between items-center shadow-sm z-10 border-b-4 border-purple-100">
+            <div class="flex items-center space-x-3">
+                <div class="bg-purple-100 p-2 rounded-lg">
+                    <span class="block text-xs font-bold text-purple-600 uppercase">Câu hỏi</span>
+                    <span class="text-2xl font-black text-purple-800"><span id="q-current">1</span><span class="text-sm text-purple-400">/15</span></span>
+                </div>
+                <div id="level-badge" class="px-3 py-1 rounded-full text-sm font-bold bg-gray-100 text-gray-500">
+                    Mức độ
+                </div>
+            </div>
+
+            <div class="flex items-center">
+                <div class="bg-yellow-100 px-4 py-2 rounded-full border-2 border-yellow-300 shadow-sm flex items-center">
+                    <span class="text-2xl mr-2">💎</span>
+                    <span id="score" class="text-xl font-black text-yellow-700">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="bg-purple-200 h-2 w-full">
+            <div id="progress-bar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-full transition-all duration-500 rounded-r-full" style="width: 0%"></div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 bg-white/90 backdrop-blur overflow-y-auto p-6 md:p-8 flex flex-col">
+            <div class="mb-8">
+                <h2 id="question-text" class="font-game text-2xl md:text-3xl text-slate-800 leading-snug">
+                    Đang tải dữ liệu từ vũ trụ...
+                </h2>
+                <div id="q-image" class="mt-4 hidden rounded-xl overflow-hidden border-2 border-purple-100 shadow-md"></div>
+            </div>
+
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-auto md:mt-0"></div>
+        </div>
+
+        <!-- Feedback -->
+        <div id="feedback-area" class="hidden bg-white rounded-b-3xl border-t-2 border-gray-100 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-20">
+            <div class="p-6">
+                <div class="flex items-start mb-3">
+                    <div id="feedback-icon" class="text-3xl mr-3 mt-1"></div>
+                    <div>
+                        <h3 id="feedback-title" class="font-game text-xl font-bold mb-1"></h3>
+                        <p id="rationale-text" class="text-slate-600 text-base leading-relaxed"></p>
+                    </div>
+                </div>
+                <button onclick="nextQuestion()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl transition shadow-lg mt-2 flex items-center justify-center">
+                    Tiếp tục hành trình <i class="fas fa-rocket ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen" class="hidden bg-white/95 backdrop-blur-sm rounded-3xl p-8 max-w-md w-full text-center card-shadow animate-pop border-4 border-white relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-yellow-100 to-transparent -z-10"></div>
+
+        <div class="mb-6 relative inline-block">
+            <span class="text-8xl filter drop-shadow-md">🏆</span>
+            <span class="absolute -bottom-2 -right-2 text-4xl">✨</span>
+        </div>
+
+        <h2 class="font-game text-4xl text-purple-700 mb-2">Hoàn thành Sứ mệnh!</h2>
+        <p class="text-slate-500 mb-6 font-medium">Tổng số kim cương bạn thu thập được:</p>
+
+        <div class="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 mb-8 border-2 border-white shadow-inner">
+            <span id="final-score" class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">0</span>
+            <span class="text-3xl text-purple-400 font-bold">/15</span>
+        </div>
+
+        <p id="result-message" class="text-lg font-bold text-slate-700 mb-8 px-4"></p>
+
+        <button onclick="restartGame()" class="btn-bouncy w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-game font-bold py-4 rounded-xl shadow-lg ring-4 ring-cyan-100">
+            <i class="fas fa-redo-alt mr-2"></i> CHƠI LẠI TỪ ĐẦU
+        </button>
+    </div>
+
+    <script>
+        /* =========================
+           DATA (ĐÃ CÂN ĐÁP ÁN GỐC)
+           A=4, B=4, C=4, D=3 (15 câu)
+           ========================= */
+
+        const questions = [
+            // NHẬN BIẾT (6)
+            { level:"Nhận biết", text:"Trong mặt phẳng tọa độ Oxy, trục nằm ngang Ox được gọi là gì?",
+              options:["Trục tung","Trục hoành","Gốc tọa độ","Đường phân giác"], correct:1,
+              rationale:"Trục nằm ngang là trục hoành (Ox), trục thẳng đứng là trục tung (Oy)." },
+
+            { level:"Nhận biết", text:"Điểm gốc tọa độ O có tọa độ là bao nhiêu?",
+              options:["O(1; 0)","O(0; 1)","O(0; 0)","O(1; 1)"], correct:2,
+              rationale:"Gốc tọa độ O là giao điểm của hai trục Ox và Oy, có tọa độ là (0; 0)." },
+
+            { level:"Nhận biết", text:"Trong kí hiệu tọa độ điểm M(x; y), giá trị x được gọi là gì?",
+              options:["Tung độ","Hoành độ","Cao độ","Góc độ"], correct:1,
+              rationale:"Số đứng trước (x) là hoành độ, số đứng sau (y) là tung độ." },
+
+            // (ĐÃ ĐỔI: đáp án đúng chuyển sang D)
+            { level:"Nhận biết", text:"Điểm A(3; -2) có tung độ bằng bao nhiêu?",
+              options:["3","2","-3","-2"], correct:3,
+              rationale:"Trong cặp số (3; -2), tung độ là giá trị y, tức là -2." },
+
+            // (ĐÃ ĐỔI: đáp án đúng chuyển sang A)
+            { level:"Nhận biết", text:"Mọi điểm nằm trên trục hoành Ox đều có tung độ bằng bao nhiêu?",
+              options:["y = 0","x = 0","y = 1","y = x"], correct:0,
+              rationale:"Điểm nằm trên trục hoành thì tung độ y = 0." },
+
+            { level:"Nhận biết", text:"Góc phần tư thứ I là vùng mà các điểm có đặc điểm gì?",
+              options:["x > 0, y > 0","x < 0, y > 0","x < 0, y < 0","x > 0, y < 0"], correct:0,
+              rationale:"Góc phần tư thứ I nằm ở phía trên bên phải, nơi cả hoành độ và tung độ đều dương." },
+
+            // THÔNG HIỂU (5)
+            // (ĐÃ ĐỔI: đáp án đúng chuyển sang D)
+            { level:"Thông hiểu", text:"Điểm nào sau đây nằm ở Góc phần tư thứ II?",
+              options:["M(2; 5)","P(-2; -5)","Q(2; -5)","N(-2; 5)"], correct:3,
+              rationale:"Góc phần tư thứ II có x < 0 và y > 0. Điểm N(-2; 5) thỏa mãn." },
+
+            { level:"Thông hiểu", text:"Cho hàm số y = 2x. Đồ thị của hàm số này đi qua điểm nào?",
+              options:["A(1; 1)","B(2; 1)","C(1; 2)","D(2; 2)"], correct:2,
+              rationale:"Thay x=1: y=2·1=2, nên đi qua C(1;2)." },
+
+            { level:"Thông hiểu", text:"Điểm M(0; -5) nằm ở vị trí nào trên mặt phẳng tọa độ?",
+              options:["Gốc tọa độ","Góc phần tư thứ III","Trên trục hoành","Trên trục tung"], correct:3,
+              rationale:"Vì hoành độ x = 0 nên điểm nằm trên trục tung Oy." },
+
+            // (ĐÃ ĐỔI: đáp án đúng chuyển sang B)
+            { level:"Thông hiểu", text:"Đồ thị hàm số y = ax đi qua điểm M(2; -4). Tìm hệ số a.",
+              options:["a = 2","a = -2","a = -8","a = -0.5"], correct:1,
+              rationale:"-4 = a·2 ⇒ a = -2." },
+
+            { level:"Thông hiểu", text:"Cho các điểm A(1;2), B(2;4), C(3;6). Các điểm này cùng thuộc đồ thị hàm số nào?",
+              options:["y = x + 1","y = 2x","y = x + 2","y = 3x"], correct:1,
+              rationale:"Thử A: 2=2·1 đúng; B:4=2·2 đúng; C:6=2·3 đúng ⇒ y=2x." },
+
+            // VẬN DỤNG (3)
+            // (ĐÃ ĐỔI: đáp án đúng chuyển sang B)
+            { level:"Vận dụng", text:"Biết đồ thị hàm số y = ax + b đi qua O(0;0) và A(1; 3). Hãy xác định hàm số.",
+              options:["y = 3x + 1","y = 3x","y = x + 3","y = -3x"], correct:1,
+              rationale:"Qua O ⇒ b=0 nên y=ax. Qua A(1;3) ⇒ a=3. Vậy y=3x." },
+
+            // (ĐÃ ĐỔI: đáp án đúng chuyển sang A)
+            { level:"Vận dụng (Thực tế)", text:"Trên bản đồ, nhà Lan A(2;1), trường B(2;5). Mỗi đơn vị là 1km. Khoảng cách từ nhà đến trường?",
+              options:["4 km","3 km","5 km","6 km"], correct:0,
+              rationale:"Cùng hoành độ x=2 ⇒ khoảng cách = |5-1| = 4 km." },
+
+            { level:"Vận dụng", text:"Diện tích tam giác OAB với O(0;0), A(4;0), B(0;3) là bao nhiêu?",
+              options:["12","7","6","14"], correct:2,
+              rationale:"Tam giác vuông tại O. S = 1/2·OA·OB = 1/2·4·3=6." },
+
+            // VẬN DỤNG CAO (1)
+            // (ĐÃ ĐỔI: đáp án đúng chuyển sang A)
+            { level:"Vận dụng cao", text:"Cho ba điểm A(-1; -2), B(0; 1), C(1; 4). Hỏi ba điểm này có thẳng hàng không?",
+              options:["Có, nằm trên đường thẳng y = 3x + 1","Có, nằm trên đường thẳng y = 2x","Không thẳng hàng","Có, nằm trên đường thẳng y = -3x + 1"], correct:0,
+              rationale:"Qua B(0;1) ⇒ b=1. Qua A(-1;-2): -2=-a+1 ⇒ a=3 ⇒ y=3x+1. Thử C(1;4): 4=3·1+1 đúng ⇒ thẳng hàng." },
+        ];
+
+        /* ========= RANDOM ĐÁP ÁN (SHUFFLE) ========= */
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        // clone + shuffle options, giữ đúng đáp án
+        function prepareQuestion(q) {
+            const nq = { ...q, options: [...q.options] };
+            const correctText = nq.options[nq.correct];
+            shuffleArray(nq.options);
+            nq.correct = nq.options.indexOf(correctText);
+            return nq;
+        }
+
+        /* ========= GAME ENGINE ========= */
+        let currentIdx = 0;
+        let score = 0;
+        let isLocked = false;
+        let currentQ = null;
+
+        // Audio (khởi tạo an toàn sau thao tác người dùng)
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        function playSound(type) {
+            initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+            if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(160, now);
+                osc.frequency.linearRampToValueAtTime(110, now + 0.25);
+                gain.gain.setValueAtTime(0.10, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } else if (type === 'win') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(523.25, now);
+                gain.gain.setValueAtTime(0.10, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.8);
+                osc.start(now);
+                osc.stop(now + 0.8);
+            }
+        }
+
+        function createEmojiBurst(x, y, isGood) {
+            const emojis = isGood ? ['⭐', '💎', '🎉', '🤩', '🎯'] : ['🤔', '😅', '🐌'];
+            for (let i = 0; i < 8; i++) {
+                const el = document.createElement('div');
+                el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                el.className = 'emoji-burst';
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+                el.style.setProperty('--tx', (Math.random() * 200 - 100) + 'px');
+                el.style.setProperty('--ty', (Math.random() * 200 - 100) + 'px');
+                el.style.setProperty('--rot', (Math.random() * 360) + 'deg');
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 1000);
+            }
+        }
+
+        function getLevelColor(level) {
+            if (level.includes("Nhận biết")) return "bg-green-100 text-green-700 border-green-200";
+            if (level.includes("Thông hiểu")) return "bg-blue-100 text-blue-700 border-blue-200";
+            if (level.includes("Vận dụng cao")) return "bg-red-100 text-red-700 border-red-200";
+            return "bg-orange-100 text-orange-700 border-orange-200";
+        }
+
+        function startGame() {
+            initAudio();
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            document.getElementById('quiz-screen').classList.add('flex');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isLocked = false;
+
+            // chuẩn bị câu hỏi + random đáp án
+            currentQ = prepareQuestion(questions[currentIdx]);
+
+            // Header
+            document.getElementById('q-current').innerText = currentIdx + 1;
+            const badge = document.getElementById('level-badge');
+            badge.className = `px-3 py-1 rounded-full text-sm font-bold border ${getLevelColor(currentQ.level)}`;
+            badge.innerText = currentQ.level;
+
+            // Progress (SỬA: lên đúng 100% câu cuối)
+            const pct = ((currentIdx + 1) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = pct + '%';
+
+            // Question text
+            document.getElementById('question-text').innerText = currentQ.text;
+
+            // Reset feedback + options
+            document.getElementById('feedback-area').classList.add('hidden');
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            // Render options
+            currentQ.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `btn-bouncy p-6 rounded-2xl bg-white border-2 border-purple-100 shadow-sm hover:border-purple-300 hover:bg-purple-50 text-left transition-all relative overflow-hidden group`;
+                btn.onclick = (e) => checkAnswer(idx, btn, e);
+
+                const circle = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 text-purple-600 font-bold mr-3 group-hover:bg-purple-200">${String.fromCharCode(65 + idx)}</span>`;
+                btn.innerHTML = `<div class="flex items-center text-lg text-slate-700 font-medium z-10 relative">${circle} ${opt}</div>`;
+
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIdx, btn, event) {
+            if (isLocked) return;
+            isLocked = true;
+
+            const q = currentQ;
+            const isCorrect = selectedIdx === q.correct;
+            const allBtns = document.getElementById('options-container').children;
+
+            if (isCorrect) {
+                score++;
+                document.getElementById('score').innerText = score;
+                playSound('correct');
+                createEmojiBurst(event.clientX, event.clientY, true);
+
+                btn.className = "p-6 rounded-2xl bg-green-50 border-2 border-green-400 shadow-md text-left transition-all relative overflow-hidden";
+                btn.innerHTML += `<i class="fas fa-check absolute right-4 top-1/2 -translate-y-1/2 text-green-500 text-2xl animate-pop"></i>`;
+
+                document.getElementById('feedback-icon').innerHTML = "🎉";
+                document.getElementById('feedback-title').innerHTML = "<span class='text-green-600'>Tuyệt vời! Chính xác!</span>";
+            } else {
+                playSound('wrong');
+                createEmojiBurst(event.clientX, event.clientY, false);
+
+                btn.className = "p-6 rounded-2xl bg-red-50 border-2 border-red-400 shadow-md text-left transition-all relative opacity-70";
+                btn.innerHTML += `<i class="fas fa-times absolute right-4 top-1/2 -translate-y-1/2 text-red-500 text-2xl animate-pop"></i>`;
+
+                // highlight đáp án đúng
+                const correctBtn = allBtns[q.correct];
+                correctBtn.className = "p-6 rounded-2xl bg-green-50 border-2 border-green-400 shadow-md text-left transition-all relative";
+                correctBtn.innerHTML += `<i class="fas fa-check absolute right-4 top-1/2 -translate-y-1/2 text-green-500 text-2xl animate-pop"></i>`;
+
+                document.getElementById('feedback-icon').innerHTML = "🤔";
+                document.getElementById('feedback-title').innerHTML =
+                    "<span class='text-orange-600'>Tiếc quá! Đáp án đúng là " + String.fromCharCode(65 + q.correct) + "</span>";
+            }
+
+            Array.from(allBtns).forEach(b => b.disabled = true);
+
+            document.getElementById('rationale-text').innerHTML = `<strong>💡 Giải thích:</strong> ${q.rationale}`;
+            const fbArea = document.getElementById('feedback-area');
+            fbArea.classList.remove('hidden');
+            fbArea.classList.add('animate-pop');
+
+            setTimeout(() => fbArea.scrollIntoView({ behavior: 'smooth', block: 'end' }), 100);
+        }
+
+        function nextQuestion() {
+            currentIdx++;
+            if (currentIdx < questions.length) loadQuestion();
+            else showResult();
+        }
+
+        function showResult() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+
+            playSound('win');
+            const msg = document.getElementById('result-message');
+
+            if (score === 15) msg.innerText = "Đẳng cấp vũ trụ! Bạn là Thuyền trưởng tài ba nhất! 👑";
+            else if (score >= 12) msg.innerText = "Rất xuất sắc! Kiến thức của bạn vững như bàn thạch! 🚀";
+            else if (score >= 8) msg.innerText = "Khá lắm! Cố gắng thêm chút nữa để đạt điểm tối đa nhé! ⭐";
+            else msg.innerText = "Đừng nản lòng! Hãy ôn tập lại tọa độ và thử lại nhé! 💪";
+        }
+
+        function restartGame() {
+            currentIdx = 0;
+            score = 0;
+            document.getElementById('score').innerText = '0';
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
