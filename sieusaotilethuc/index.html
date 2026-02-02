@@ -106,7 +106,6 @@ body{
 <script>
 /* ===== DATA (LATEX CHUẨN) ===== */
 let questions=[
-let questions = [
 /* ================= NHẬN BIẾT (5 câu) ================= */
 {
   q: "Tỉ lệ thức là đẳng thức của hai tỉ số nào?",
@@ -283,10 +282,10 @@ let questions = [
 
 questions.sort(() => Math.random() - 0.5);
 
-let i = 0;
+let current = 0;
 let score = 0;
 
-/* START */
+/* START GAME */
 function startGame(){
   document.getElementById("start-screen").classList.add("hidden");
   document.getElementById("quiz-screen").classList.remove("hidden");
@@ -295,40 +294,39 @@ function startGame(){
 
 /* SHOW QUESTION */
 function showQuestion(){
-  const q = questions[i];
+  const q = questions[current];
 
-  document.getElementById("current-q").innerText = i + 1;
+  document.getElementById("current-q").innerText = current + 1;
   document.getElementById("score").innerText = score;
   document.getElementById("progress").style.width =
-    `${(i / questions.length) * 100}%`;
+    `${(current / questions.length) * 100}%`;
 
   document.getElementById("question-text").innerHTML =
     `<p class="text-xl font-bold text-center">${q.q}</p>`;
 
-  const ctn = document.getElementById("choices-container");
-  ctn.innerHTML = "";
+  const box = document.getElementById("choices-container");
+  box.innerHTML = "";
 
   let order = [0,1,2,3].sort(() => Math.random() - 0.5);
 
-  order.forEach((k, idx) => {
+  order.forEach((k, i) => {
     const btn = document.createElement("button");
     btn.className =
       "option-card py-4 px-5 rounded-xl text-lg font-bold text-left";
     btn.innerHTML =
-      `<span class="text-pink-400 mr-2">${String.fromCharCode(65+idx)}.</span>
+      `<span class="text-pink-400 mr-2">${String.fromCharCode(65+i)}.</span>
        ${q.options[k]}`;
     btn.onclick = () => checkAnswer(k);
-    ctn.appendChild(btn);
+    box.appendChild(btn);
   });
 
   MathJax.typesetPromise();
 }
 
-/* CHECK */
+/* CHECK ANSWER */
 function checkAnswer(k){
-  const q = questions[i];
-  const modal = document.getElementById("feedback-modal");
-  modal.classList.remove("hidden");
+  const q = questions[current];
+  document.getElementById("feedback-modal").classList.remove("hidden");
 
   if(k === q.correct){
     score++;
@@ -349,8 +347,8 @@ function checkAnswer(k){
 /* NEXT */
 function nextQuestion(){
   document.getElementById("feedback-modal").classList.add("hidden");
-  i++;
-  if(i < questions.length) showQuestion();
+  current++;
+  if(current < questions.length) showQuestion();
   else showEnd();
 }
 
