@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đấu Trường Đường Xiên - Toán 7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Space+Grotesk', sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .neon-box {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 2px solid #22d3ee;
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+            border-radius: 2rem;
+        }
+        .option-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .option-card:hover {
+            transform: scale(1.02);
+            background: rgba(34, 211, 238, 0.1);
+            border-color: #22d3ee;
+        }
+        .progress-bar-fill {
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, #22d3ee, #818cf8);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .float-icon { animation: float 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="p-4">
+
+    <div id="game-container" class="max-w-3xl w-full neon-box p-6 md:p-10 relative overflow-hidden">
+        
+        <!-- Màn hình khởi đầu -->
+        <div id="start-screen" class="text-center py-10">
+            <div class="text-8xl mb-6 float-icon">⚡</div>
+            <h1 class="text-4xl md:text-6xl font-bold text-cyan-400 mb-4 tracking-tighter">ĐẤU TRƯỜNG<br>ĐƯỜNG XIÊN</h1>
+            <p class="text-slate-400 text-lg mb-8">Thử thách hình học dành riêng cho lớp của cô <b>Thu Bình</b>!<br>Ai sẽ là "Chiến thần hình chiếu" hôm nay?</p>
+            <button onclick="startGame()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-black py-4 px-12 rounded-full text-xl shadow-[0_0_30px_rgba(34,211,238,0.5)] transition-all transform hover:scale-110">
+                THÁCH ĐẤU NGAY! 🚀
+            </button>
+        </div>
+
+        <!-- Màn hình câu hỏi -->
+        <div id="quiz-screen" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <div class="text-cyan-400 font-bold">Thử thách: <span id="q-num" class="text-2xl">1</span>/15</div>
+                <div class="text-indigo-400 font-bold">Điểm: <span id="score" class="text-2xl">0</span></div>
+            </div>
+
+            <div class="w-full bg-slate-800 rounded-full h-3 mb-8">
+                <div id="progress" class="progress-bar-fill h-3 rounded-full" style="width: 0%"></div>
+            </div>
+
+            <div id="question-box" class="mb-10">
+                <div id="difficulty" class="inline-block px-3 py-1 rounded text-[10px] font-bold tracking-widest uppercase mb-4"></div>
+                <h2 id="question-text" class="text-xl md:text-2xl font-medium leading-relaxed"></h2>
+            </div>
+
+            <div id="choices" class="grid grid-cols-1 gap-4">
+                <!-- Nút đáp án -->
+            </div>
+        </div>
+
+        <!-- Màn hình kết thúc -->
+        <div id="end-screen" class="hidden text-center py-10">
+            <div id="final-emoji" class="text-8xl mb-6"></div>
+            <h2 class="text-4xl font-bold text-cyan-400 mb-2">HẾT GIỜ!</h2>
+            <p class="text-xl mb-8">Em đã chinh phục được: <span id="final-score" class="text-3xl font-bold text-indigo-400"></span>/15 câu</p>
+            <div id="rank-text" class="text-slate-400 mb-10 italic"></div>
+            <button onclick="location.reload()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-10 rounded-full transition-all">
+                PHỤC THÙ 🔄
+            </button>
+        </div>
+
+        <!-- Modal giải thích -->
+        <div id="feedback-modal" class="hidden fixed inset-0 flex items-center justify-center z-50 p-4">
+            <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"></div>
+            <div class="neon-box max-w-md w-full p-8 relative animate-in fade-in zoom-in duration-300">
+                <div id="fb-icon" class="text-6xl text-center mb-4"></div>
+                <h3 id="fb-title" class="text-2xl font-bold text-center mb-4"></h3>
+                <div class="bg-slate-800/50 p-4 rounded-xl mb-6 border-l-4 border-cyan-500">
+                    <p id="fb-rationale" class="text-slate-300 text-sm italic leading-relaxed"></p>
+                </div>
+                <button onclick="nextQuestion()" class="w-full bg-cyan-500 text-slate-950 font-bold py-4 rounded-xl hover:bg-cyan-400 transition-all">
+                    TIẾP TỤC ➔
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+/* ================= RANDOM TOOL ================= */
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+}
+
+/* ================= ÂM THANH ================= */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSfx(type) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'win') {
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1046.5, audioCtx.currentTime + 0.3);
+    } else {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+    }
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.3);
+}
+        const questions = [
+            // NHẬN BIẾT (6 câu)
+            {
+                lvl: "Nhận biết",
+                q: "Trong các đoạn thẳng nối từ một điểm A ở ngoài đường thẳng d đến đường thẳng d, đoạn thẳng nào ngắn nhất?",
+                opts: ["Đường xiên", "Đường vuông góc", "Đường trung tuyến", "Đường phân giác"],
+                ans: 1,
+                rat: "Định lí 1: Trong các đường xiên và đường vuông góc kẻ từ một điểm ở ngoài một đường thẳng đến đường thẳng đó, đường vuông góc là đường ngắn nhất."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Khoảng cách từ điểm A đến đường thẳng d là độ dài của đoạn thẳng nào?",
+                opts: ["Đường xiên bất kì", "Đường vuông góc kẻ từ A đến d", "Đoạn thẳng nối A với một điểm trên d", "Đường thẳng d"],
+                ans: 1,
+                rat: "Khoảng cách từ điểm A đến đường thẳng d chính là độ dài đoạn vuông góc AH kẻ từ A đến d."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Cho AH ⊥ d tại H, AB là đường xiên. Khi đó đoạn thẳng HB được gọi là:",
+                opts: ["Đường xiên", "Hình chiếu của AB trên d", "Khoảng cách từ A đến d", "Đường trung trực"],
+                ans: 1,
+                rat: "Đoạn thẳng HB nối chân đường vuông góc H và chân đường xiên B được gọi là hình chiếu của đường xiên AB trên đường thẳng d."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "So sánh đường vuông góc và đường xiên kẻ từ cùng một điểm đến cùng một đường thẳng?",
+                opts: ["Đường vuông góc > Đường xiên", "Đường vuông góc < Đường xiên", "Hai đường bằng nhau", "Không so sánh được"],
+                ans: 1,
+                rat: "Trong tam giác vuông tạo bởi đường vuông góc và đường xiên, đường xiên là cạnh huyền nên luôn lớn hơn đường vuông góc (cạnh góc vuông)."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Cho AH ⊥ d. Điểm H được gọi là gì của đường vuông góc AH?",
+                opts: ["Đỉnh", "Hình chiếu", "Chân đường vuông góc", "Trung điểm"],
+                ans: 2,
+                rat: "Điểm H nơi đường vuông góc cắt đường thẳng d được gọi là chân đường vuông góc (hoặc hình chiếu của điểm A trên d)."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Nếu hai đường xiên kẻ từ một điểm đến một đường thẳng có hình chiếu bằng nhau thì:",
+                opts: ["Hai đường xiên đó bằng nhau", "Đường xiên nào dài hơn có hình chiếu nhỏ hơn", "Hai đường xiên đó vuông góc", "Không kết luận được"],
+                ans: 0,
+                rat: "Định lí 2: Hai đường xiên bằng nhau thì có hai hình chiếu bằng nhau và ngược lại."
+            },
+            // THÔNG HIỂU (5 câu)
+            {
+                lvl: "Thông hiểu",
+                q: "Cho đường xiên AB có hình chiếu HB và đường xiên AC có hình chiếu HC trên d. Nếu HB > HC thì:",
+                opts: ["AB < AC", "AB = AC", "AB > AC", "AB + AC = HB + HC"],
+                ans: 2,
+                rat: "Định lí 2: Đường xiên nào có hình chiếu lớn hơn thì đường xiên đó lớn hơn."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Cho tam giác ABC vuông tại A. Khoảng cách từ điểm B đến đường thẳng AC là độ dài đoạn thẳng nào?",
+                opts: ["BC", "AC", "AB", "Đường cao từ A"],
+                ans: 2,
+                rat: "Vì BA ⊥ AC tại A nên BA chính là đoạn vuông góc, độ dài BA là khoảng cách từ B đến AC."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Cho AH ⊥ d, AB và AC là hai đường xiên. Nếu AB < AC thì khẳng định nào sau đây ĐÚNG?",
+                opts: ["HB < HC", "HB > HC", "HB = HC", "HB + HC = AH"],
+                ans: 0,
+                rat: "Đường xiên nhỏ hơn thì có hình chiếu nhỏ hơn."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Cho điểm A nằm ngoài d. Vẽ AH ⊥ d. Lấy B, C trên d sao cho H nằm giữa B và C. Biết HB = 3cm, HC = 4cm. So sánh AB và AC?",
+                opts: ["AB = AC", "AB > AC", "AB < AC", "Không so sánh được"],
+                ans: 2,
+                rat: "Vì HB < HC (3 < 4) nên đường xiên AB < AC."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Trong một tam giác, đối diện với cạnh lớn hơn là góc lớn hơn. Áp dụng vào tam giác vuông AHB (∠H=90°), cạnh lớn nhất là:",
+                opts: ["AH", "HB", "AB", "Không có cạnh lớn nhất"],
+                ans: 2,
+                rat: "Trong tam giác vuông, góc vuông là góc lớn nhất nên cạnh huyền (đường xiên AB) đối diện với nó là cạnh lớn nhất."
+            },
+            // VẬN DỤNG (3 câu)
+            {
+                lvl: "Vận dụng",
+                q: "Cho tam giác ABC cân tại A. Gọi H là hình chiếu của A trên BC. Lấy điểm M bất kì trên đoạn thẳng HB. So sánh AM và AB?",
+                opts: ["AM > AB", "AM < AB", "AM = AB", "AM = 2AB"],
+                ans: 1,
+                rat: "Hình chiếu của AM là HM, hình chiếu của AB là HB. Vì M nằm trên HB nên HM < HB, suy ra AM < AB."
+            },
+            {
+                lvl: "Vận dụng thực tế",
+                q: "(Thực tế) Bạn Nam muốn bơi từ vị trí A bên bờ sông này sang bờ sông bên kia. Để quãng đường bơi là ngắn nhất, Nam nên bơi theo hướng nào?",
+                opts: ["Bơi xéo theo dòng nước", "Bơi vuông góc với bờ sông", "Bơi ngược dòng nước", "Hướng nào cũng như nhau"],
+                ans: 1,
+                rat: "Đường vuông góc là đường ngắn nhất nối từ một điểm đến một đường thẳng. Bơi vuông góc giúp tối thiểu hóa quãng đường."
+            },
+            {
+                lvl: "Vận dụng",
+                q: "Cho tam giác ABC nhọn, AH ⊥ BC. So sánh AH với AB và AC?",
+                opts: ["AH > AB và AH > AC", "AH < AB và AH < AC", "AB < AH < AC", "AH = AB = AC"],
+                ans: 1,
+                rat: "AH là đường vuông góc, AB và AC là các đường xiên. Đường vuông góc luôn ngắn hơn đường xiên."
+            },
+            // VẬN DỤNG CAO (1 câu)
+            {
+                lvl: "Vận dụng cao",
+                q: "Cho tam giác ABC vuông tại A. M là một điểm bất kì trên cạnh huyền BC (M không trùng B, C). Khẳng định nào sau đây luôn ĐÚNG?",
+                opts: ["AM > BC", "AM < AB", "AM < BC", "AM > AB + AC"],
+                ans: 2,
+                rat: "Kẻ AH ⊥ BC. Ta có AH ≤ AM (đường vuông góc ngắn hơn đường xiên). Đồng thời trong tam giác vuông ABM hoặc ACM, AM luôn nhỏ hơn cạnh huyền BC (đoạn thẳng nối 2 điểm trên cạnh huyền luôn nhỏ hơn hoặc bằng cạnh huyền đó)."
+            }
+        ];
+
+       shuffle(questions);
+
+/* ================= BIẾN TRẠNG THÁI ================= */
+let currentIdx = 0;
+let score = 0;
+let currentOptions = [];
+
+/* ================= BẮT ĐẦU ================= */
+function startGame() {
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    showQuestion();
+}
+
+/* ================= HIỂN THỊ CÂU ================= */
+function showQuestion() {
+    const q = questions[currentIdx];
+    document.getElementById('q-num').innerText = currentIdx + 1;
+    document.getElementById('score').innerText = score;
+    document.getElementById('progress').style.width =
+        `${(currentIdx / questions.length) * 100}%`;
+
+    const diff = document.getElementById('difficulty');
+    diff.innerText = q.lvl;
+    diff.className =
+        `inline-block px-3 py-1 rounded text-[10px] font-bold uppercase mb-4 ${
+            q.lvl === 'Nhận biết' ? 'bg-emerald-500/20 text-emerald-400' :
+            q.lvl === 'Thông hiểu' ? 'bg-cyan-500/20 text-cyan-400' :
+            q.lvl.includes('Vận dụng cao') ? 'bg-rose-500/20 text-rose-400' :
+            'bg-amber-500/20 text-amber-400'
+        }`;
+
+    document.getElementById('question-text').innerHTML = q.q;
+
+    /* Chuẩn hoá + random đáp án */
+    currentOptions = q.opts.map((t, i) => ({
+        text: t,
+        correct: i === q.ans
+    }));
+    shuffle(currentOptions);
+
+    const choices = document.getElementById('choices');
+    choices.innerHTML = '';
+
+    currentOptions.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className =
+            "option-card w-full p-4 rounded-xl text-left hover:bg-slate-800 flex items-center gap-4";
+        btn.innerHTML = `
+            <span class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center
+            text-cyan-400 border border-cyan-500/30 font-bold">
+            ${String.fromCharCode(65 + i)}
+            </span>
+            <span>${opt.text}</span>`;
+        btn.onclick = () => checkAnswer(i);
+        choices.appendChild(btn);
+    });
+}
+
+/* ================= KIỂM TRA ================= */
+function checkAnswer(i) {
+    const isCorrect = currentOptions[i].correct;
+
+    if (isCorrect) {
+        score++;
+        playSfx('win');
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        setFb("✨", "CHÍNH XÁC!", "cyan");
+    } else {
+        playSfx('lose');
+        setFb("⚠️", "CẦN CẨN THẬN HƠN!", "rose");
+    }
+
+    document.getElementById('fb-rationale').innerHTML =
+        `<b>Giải thích:</b> ${questions[currentIdx].rat}`;
+    document.getElementById('feedback-modal').classList.remove('hidden');
+}
+
+function setFb(icon, text, color) {
+    document.getElementById('fb-icon').innerText = icon;
+    document.getElementById('fb-title').innerText = text;
+    document.getElementById('fb-title').className =
+        `text-2xl font-bold text-center mb-4 text-${color}-400`;
+}
+
+/* ================= CHUYỂN CÂU ================= */
+function nextQuestion() {
+    document.getElementById('feedback-modal').classList.add('hidden');
+    currentIdx++;
+    currentIdx < questions.length ? showQuestion() : showEnd();
+}
+
+/* ================= KẾT THÚC ================= */
+function showEnd() {
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('end-screen').classList.remove('hidden');
+    document.getElementById('final-score').innerText = score;
+
+    const e = document.getElementById('final-emoji');
+    const r = document.getElementById('rank-text');
+
+    if (score === 15) {
+        e.innerText = "👑";
+        r.innerText = "Tuyệt đỉnh! Em là Chiến thần Đường xiên!";
+    } else if (score >= 12) {
+        e.innerText = "💎";
+        r.innerText = "Rất tốt! Kiến thức của em rất vững.";
+    } else if (score >= 8) {
+        e.innerText = "⚡";
+        r.innerText = "Khá lắm! Cần luyện thêm phần vận dụng.";
+    } else {
+        e.innerText = "🎯";
+        r.innerText = "Ôn lại bài và quay lại chinh phục nhé!";
+    }
+
+    confetti({ particleCount: 200, spread: 160, origin: { y: 0.6 } });
+}
+</script>
+</body>
+</html>
