@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Siêu Sao Tỉ Lệ Thức – Toán 7</title>
 
-<!-- ===== MathJax chuẩn Thợ săn kho báu ===== -->
+<!-- ===== MathJax CHUẨN ===== -->
 <script>
 window.MathJax = {
   tex: {
@@ -21,18 +21,26 @@ window.MathJax = {
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
-body {
-  font-family: 'Quicksand', sans-serif;
-  background: linear-gradient(135deg,#fbc2eb,#a6c1ee);
+body{
+  font-family:'Quicksand',sans-serif;
+  background:radial-gradient(circle at top,#2d0f4e,#0f172a);
   min-height:100vh;
 }
 .glass-card{
-  background:rgba(255,255,255,.92);
+  background:rgba(15,23,42,.92);
   border-radius:2rem;
-  box-shadow:0 20px 40px rgba(0,0,0,.25);
+  box-shadow:0 25px 60px rgba(0,0,0,.6);
+  color:white;
 }
-.btn-choice{transition:.25s}
-.btn-choice:hover{transform:scale(1.03)}
+.option-card{
+  background:rgba(30,41,59,.9);
+  border:1px solid rgba(148,163,184,.3);
+  transition:.25s;
+}
+.option-card:hover{
+  border-color:#f472b6;
+  transform:scale(1.03);
+}
 .progress-bar{transition:width .4s}
 </style>
 </head>
@@ -43,36 +51,38 @@ body {
 
 <!-- START -->
 <div id="start-screen" class="text-center">
-  <h1 class="text-4xl font-bold text-pink-600 mb-4">✨ SIÊU SAO TỈ LỆ ✨</h1>
-  <p class="mb-6 text-gray-600">Chinh phục 15 thử thách Tỉ lệ thức – Toán 7</p>
-  <button onclick="startGame()" class="bg-pink-500 text-white px-10 py-4 rounded-full text-xl font-bold">
+  <h1 class="text-4xl font-extrabold text-pink-400 mb-4">✨ SIÊU SAO TỈ LỆ ✨</h1>
+  <p class="mb-6 text-gray-300">15 thử thách Tỉ lệ thức – Toán 7</p>
+  <button onclick="startGame()"
+    class="bg-pink-500 hover:bg-pink-400 text-white px-10 py-4 rounded-full text-xl font-bold">
     VÀO GAME 🚀
   </button>
 </div>
 
 <!-- QUIZ -->
 <div id="quiz-screen" class="hidden">
-  <div class="flex justify-between font-bold mb-4">
+  <div class="flex justify-between font-bold mb-4 text-gray-200">
     <div>Câu <span id="current-q">1</span>/15</div>
     <div>Điểm: <span id="score">0</span></div>
   </div>
 
-  <div class="bg-gray-200 h-3 rounded-full mb-6">
+  <div class="bg-slate-700 h-3 rounded-full mb-6">
     <div id="progress" class="bg-pink-400 h-3 rounded-full progress-bar"></div>
   </div>
 
-  <div id="question-text" class="text-xl font-bold mb-6"></div>
+  <div id="question-text" class="mb-8"></div>
 
   <div id="choices-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
 </div>
 
 <!-- FEEDBACK -->
-<div id="feedback-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black/40">
+<div id="feedback-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black/60">
   <div class="glass-card p-8 text-center max-w-md w-full">
     <div id="fb-icon" class="text-5xl mb-3"></div>
     <h2 id="fb-title" class="text-2xl font-bold mb-2"></h2>
-    <div id="fb-rationale" class="italic mb-6"></div>
-    <button onclick="nextQuestion()" class="bg-blue-500 text-white px-8 py-3 rounded-xl font-bold">
+    <div id="fb-rationale" class="text-gray-200 mb-6"></div>
+    <button onclick="nextQuestion()"
+      class="bg-blue-500 hover:bg-blue-400 text-white px-8 py-3 rounded-xl font-bold">
       TIẾP TỤC →
     </button>
   </div>
@@ -80,10 +90,13 @@ body {
 
 <!-- END -->
 <div id="end-screen" class="hidden text-center">
-  <h2 class="text-4xl font-bold text-purple-600 mb-4">🎉 HOÀN THÀNH 🎉</h2>
-  <p class="text-xl">Số câu đúng: <span id="final-score" class="text-pink-500 font-bold text-3xl"></span>/15</p>
+  <h2 class="text-4xl font-extrabold text-yellow-400 mb-4">🏆 HOÀN THÀNH 🏆</h2>
+  <p class="text-xl">Số câu đúng:
+    <span id="final-score" class="text-pink-400 font-bold text-3xl"></span>/15
+  </p>
   <p id="performance-msg" class="mt-4 font-semibold"></p>
-  <button onclick="location.reload()" class="mt-6 bg-green-500 text-white px-8 py-3 rounded-full font-bold">
+  <button onclick="location.reload()"
+    class="mt-6 bg-green-500 hover:bg-green-400 text-white px-8 py-3 rounded-full font-bold">
     CHƠI LẠI
   </button>
 </div>
@@ -91,105 +104,123 @@ body {
 </div>
 
 <script>
-/* ===== ÂM THANH ===== */
-const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-function playSound(ok){
-  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
-  o.connect(g); g.connect(audioCtx.destination);
-  o.frequency.value= ok?700:200;
-  g.gain.value=.1;
-  o.start(); o.stop(audioCtx.currentTime+.2);
-}
-
-/* ===== DATA (CHUẨN LATEX) ===== */
+/* ===== DATA (LATEX CHUẨN) ===== */
 let questions=[
 {
- q:"Tỉ lệ thức là đẳng thức của hai tỉ số nào?",
- options:["\\(a+b=c+d\\)","\\(a/b=c/d\\)","\\(a-b=c-b\\)","\\(ab=cd\\)"],
- correct:1,
- rationale:"Theo định nghĩa, tỉ lệ thức là đẳng thức của hai tỉ số \\(a/b=c/d\\)."
-},
-{
- q:"Trong tỉ lệ thức \\(x/6=5/3\\), giá trị của \\(x\\) là:",
+ q:`Trong tỉ lệ thức`,
+ math:`\\(x/6 = 5/3\\)`,
+ ask:`giá trị của \\(x\\) là:`,
  options:["\\(10\\)","\\(15\\)","\\(2\\)","\\(30\\)"],
  correct:0,
- rationale:"Ta có \\(x=(6\\cdot5):3=10\\)."
+ rationale:`Ta có \\(x = (6\\cdot5):3 = 10\\).`
 },
 {
- q:"Nếu \\(3:5=9:x\\) thì \\(x=\\)?",
+ q:`Nếu có tỉ lệ thức`,
+ math:`\\(3:5 = 9:x\\)`,
+ ask:`thì \\(x =\\ ?\\)`,
  options:["\\(10\\)","\\(12\\)","\\(15\\)","\\(20\\)"],
  correct:2,
- rationale:"Vì \\(3x=5\\cdot9=45\\) nên \\(x=15\\)."
+ rationale:`Áp dụng tính chất: \\(3x = 5\\cdot9 = 45\\) nên \\(x = 15\\).`
+},
+{
+ q:`Tỉ lệ thức là đẳng thức của hai tỉ số dạng`,
+ math:`\\(?\\)`,
+ ask:``,
+ options:["\\(a+b=c+d\\)","\\(a/b=c/d\\)","\\(a-b=c-b\\)","\\(ab+cd\\)"],
+ correct:1,
+ rationale:`Theo định nghĩa, tỉ lệ thức là \\(a/b = c/d\\).`
 }
 ];
 
-/* ===== RANDOM CÂU HỎI ===== */
+/* RANDOM */
 questions.sort(()=>Math.random()-.5);
+let i=0,score=0;
 
-let i=0, score=0;
-
-/* ===== START ===== */
+/* START */
 function startGame(){
- document.getElementById("start-screen").classList.add("hidden");
- document.getElementById("quiz-screen").classList.remove("hidden");
+ startScreen().classList.add("hidden");
+ quizScreen().classList.remove("hidden");
  showQuestion();
 }
+const startScreen=()=>document.getElementById("start-screen");
+const quizScreen=()=>document.getElementById("quiz-screen");
 
-/* ===== SHOW ===== */
+/* RENDER QUESTION */
+function renderQuestion(q){
+ return `
+  <div class="text-center space-y-4">
+    <p class="text-gray-300 text-lg">${q.q}</p>
+    <div class="inline-block px-8 py-4 rounded-2xl
+                bg-black/40 border border-pink-500/40">
+      <span class="text-3xl font-bold text-pink-400">${q.math}</span>
+    </div>
+    <p class="text-gray-300 text-lg">${q.ask}</p>
+  </div>`;
+}
+
+/* SHOW */
 function showQuestion(){
  const q=questions[i];
- document.getElementById("current-q").innerText=i+1;
- document.getElementById("score").innerText=score;
- document.getElementById("progress").style.width=`${i/questions.length*100}%`;
+ currentQ().innerText=i+1;
+ scoreEl().innerText=score;
+ progress().style.width=`${i/questions.length*100}%`;
+ questionText().innerHTML=renderQuestion(q);
 
- document.getElementById("question-text").innerHTML=q.q;
-
- const ctn=document.getElementById("choices-container");
+ const ctn=choices();
  ctn.innerHTML="";
-
  let idx=[0,1,2,3].sort(()=>Math.random()-.5);
- idx.forEach(k=>{
-   const b=document.createElement("button");
-   b.className="btn-choice bg-white border p-4 rounded-xl font-semibold";
-   b.innerHTML=q.options[k];
-   b.onclick=()=>checkAnswer(k);
-   ctn.appendChild(b);
+
+ idx.forEach((k,n)=>{
+  const b=document.createElement("button");
+  b.className="option-card py-4 rounded-xl text-xl font-bold";
+  b.innerHTML=`<span class="text-pink-400 mr-2">${String.fromCharCode(65+n)}.</span>${q.options[k]}`;
+  b.onclick=()=>checkAnswer(k);
+  ctn.appendChild(b);
  });
 
  MathJax.typesetPromise();
 }
 
-/* ===== CHECK ===== */
+const currentQ=()=>document.getElementById("current-q");
+const scoreEl=()=>document.getElementById("score");
+const progress=()=>document.getElementById("progress");
+const questionText=()=>document.getElementById("question-text");
+const choices=()=>document.getElementById("choices-container");
+
+/* CHECK */
 function checkAnswer(k){
  const q=questions[i];
- document.getElementById("feedback-modal").classList.remove("hidden");
+ feedback().classList.remove("hidden");
 
  if(k===q.correct){
-   score++; playSound(true);
-   confetti({particleCount:120,spread:70});
-   document.getElementById("fb-icon").innerText="🎉";
-   document.getElementById("fb-title").innerText="Chính xác!";
- } else {
-   playSound(false);
-   document.getElementById("fb-icon").innerText="😅";
-   document.getElementById("fb-title").innerText="Chưa đúng!";
+  score++; confetti({particleCount:120,spread:70});
+  fbIcon().innerText="🎉";
+  fbTitle().innerText="Chính xác!";
+ }else{
+  fbIcon().innerText="😅";
+  fbTitle().innerText="Chưa đúng!";
  }
 
- document.getElementById("fb-rationale").innerHTML="Giải thích: "+q.rationale;
+ fbRationale().innerHTML=`<b class="text-pink-400">Giải thích:</b><br>${q.rationale}`;
  MathJax.typesetPromise();
 }
 
-/* ===== NEXT ===== */
+const feedback=()=>document.getElementById("feedback-modal");
+const fbIcon=()=>document.getElementById("fb-icon");
+const fbTitle=()=>document.getElementById("fb-title");
+const fbRationale=()=>document.getElementById("fb-rationale");
+
+/* NEXT */
 function nextQuestion(){
- document.getElementById("feedback-modal").classList.add("hidden");
+ feedback().classList.add("hidden");
  i++;
  if(i<questions.length) showQuestion();
  else showEnd();
 }
 
-/* ===== END ===== */
+/* END */
 function showEnd(){
- document.getElementById("quiz-screen").classList.add("hidden");
+ quizScreen().classList.add("hidden");
  document.getElementById("end-screen").classList.remove("hidden");
  document.getElementById("final-score").innerText=score;
  document.getElementById("performance-msg").innerText=
