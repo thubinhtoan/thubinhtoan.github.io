@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siêu Cấp Trung Trực - Toán 7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+            background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+            min-height: 100vh;
+        }
+        .neon-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 4px solid #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-radius: 3rem;
+        }
+        .answer-btn {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .answer-btn:hover {
+            transform: scale(1.03) translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+        }
+        .progress-bar-inner {
+            transition: width 0.6s ease-in-out;
+            background: linear-gradient(90deg, #f59e0b, #ef4444);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .floating { animation: float 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="p-4 flex items-center justify-center">
+
+    <div id="game-wrap" class="max-w-3xl w-full neon-card p-6 md:p-12 relative overflow-hidden">
+        
+        <!-- Màn hình khởi động -->
+        <div id="start-screen" class="text-center">
+            <div class="text-8xl mb-6 floating">✨</div>
+            <h1 class="text-4xl md:text-6xl font-black text-purple-600 mb-4 leading-tight">SIÊU CẤP<br>TRUNG TRỰC</h1>
+            <p class="text-gray-500 text-lg mb-10">Cô <b>Thu Bình</b> thách đấu cả lớp!<br>Ai sẽ là người nắm giữ bí mật của "Cách đều"?</p>
+            <button onclick="startGame()" class="bg-purple-600 text-white font-bold py-5 px-16 rounded-3xl text-2xl shadow-xl hover:bg-purple-700 transition-all transform hover:rotate-2">
+                THÁCH ĐẤU! 💥
+            </button>
+        </div>
+
+        <!-- Màn hình câu hỏi -->
+        <div id="quiz-screen" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <span class="bg-purple-100 text-purple-700 px-4 py-2 rounded-2xl font-bold">Thử thách: <span id="q-count">1</span>/15</span>
+                <span class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-2xl font-bold">Score: <span id="score">0</span></span>
+            </div>
+
+            <div class="w-full bg-gray-100 rounded-full h-4 mb-10">
+                <div id="progress" class="progress-bar-inner h-4 rounded-full" style="width: 0%"></div>
+            </div>
+
+            <div id="q-container">
+                <div id="q-level" class="text-xs font-bold uppercase tracking-widest text-purple-400 mb-2"></div>
+                <h2 id="q-text" class="text-xl md:text-2xl font-bold text-gray-800 mb-8 leading-snug"></h2>
+                
+                <div id="options" class="grid grid-cols-1 gap-4">
+                    <!-- Nút đáp án -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal giải thích -->
+        <div id="modal" class="hidden fixed inset-0 flex items-center justify-center z-50 p-4">
+            <div class="absolute inset-0 bg-purple-900/40 backdrop-blur-md"></div>
+            <div class="bg-white rounded-[3rem] max-w-md w-full p-8 relative shadow-2xl text-center">
+                <div id="modal-emoji" class="text-7xl mb-4"></div>
+                <h3 id="modal-title" class="text-3xl font-black mb-4"></h3>
+                <div class="bg-gray-50 p-5 rounded-3xl mb-8 border-l-8 border-purple-500 text-left">
+                    <p id="modal-rat" class="text-gray-600 text-sm italic leading-relaxed"></p>
+                </div>
+                <button onclick="nextQ()" class="w-full bg-purple-600 text-white font-bold py-4 rounded-2xl hover:bg-purple-700">
+                    TIẾP TỤC ➔
+                </button>
+            </div>
+        </div>
+
+        <!-- Màn hình kết thúc -->
+        <div id="end-screen" class="hidden text-center">
+            <div class="text-9xl mb-6">🏆</div>
+            <h2 class="text-4xl font-black text-purple-600 mb-2">PHÁ ĐẢO!</h2>
+            <p class="text-xl mb-8">Kết quả của em: <span id="final-score" class="text-3xl font-bold text-red-500">0</span>/15</p>
+            <div id="rank" class="text-gray-500 mb-10 font-bold px-6"></div>
+            <button onclick="location.reload()" class="bg-gray-800 text-white font-bold py-4 px-12 rounded-2xl">
+                CHƠI LẠI 🔄
+            </button>
+        </div>
+    </div>
+
+   <script>
+/* ================== TOOL RANDOM ================== */
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+}
+
+/* ================== ÂM THANH ================== */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSfx(correct) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (correct) {
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.2);
+    } else {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+    }
+
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.3);
+}
+        const questions = [
+            // NHẬN BIẾT (6 câu)
+            {
+                lvl: "Nhận biết",
+                q: "Đường trung trực của một đoạn thẳng là đường thẳng:",
+                opts: ["Đi qua trung điểm của đoạn thẳng", "Vuông góc với đoạn thẳng", "Vuông góc tại trung điểm của đoạn thẳng", "Song song với đoạn thẳng"],
+                ans: 2,
+                rat: "Theo định nghĩa, đường trung trực phải đồng thời thỏa mãn 2 điều kiện: đi qua trung điểm và vuông góc."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Mọi điểm nằm trên đường trung trực của một đoạn thẳng thì:",
+                opts: ["Cách đều hai đầu mút của đoạn thẳng đó", "Nằm giữa hai đầu mút", "Trùng với trung điểm", "Cách đều đường thẳng"],
+                ans: 0,
+                rat: "Đây là tính chất cơ bản: Điểm nằm trên đường trung trực thì cách đều hai đầu mút của đoạn thẳng."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Nếu MA = MB thì điểm M nằm trên:",
+                opts: ["Đường thẳng AB", "Đường trung trực của đoạn thẳng AB", "Đường vuông góc với AB", "Trung điểm của AB"],
+                ans: 1,
+                rat: "Đây là tính chất đảo: Điểm cách đều hai đầu mút của một đoạn thẳng thì nằm trên đường trung trực của đoạn thẳng đó."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Đường trung trực của đoạn thẳng AB là trục đối xứng của:",
+                opts: ["Đường thẳng AB", "Đoạn thẳng AB", "Góc A", "Điểm M"],
+                ans: 1,
+                rat: "Đường trung trực là trục đối xứng của đoạn thẳng đó, chia đoạn thẳng thành 2 phần bằng nhau và đối xứng nhau."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Giao điểm của đường trung trực và đoạn thẳng chính là:",
+                opts: ["Đỉnh tam giác", "Trung điểm của đoạn thẳng", "Chân đường cao", "Trọng tâm"],
+                ans: 1,
+                rat: "Đường trung trực đi qua trung điểm của đoạn thẳng theo đúng định nghĩa."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Để vẽ đường trung trực của đoạn thẳng AB bằng thước và compa, ta vẽ hai cung tròn có:",
+                opts: ["Cùng bán kính, tâm là A và B", "Bán kính khác nhau", "Tâm là trung điểm", "Bán kính nhỏ hơn AB/2"],
+                ans: 0,
+                rat: "Ta vẽ hai cung tròn tâm A và B có cùng bán kính (lớn hơn AB/2), giao điểm của chúng nằm trên trung trực."
+            },
+            // THÔNG HIỂU (5 câu)
+            {
+                lvl: "Thông hiểu",
+                q: "Cho d là đường trung trực của đoạn thẳng AB. Nếu MA = 7cm thì MB bằng bao nhiêu?",
+                opts: ["3,5cm", "14cm", "7cm", "10cm"],
+                ans: 2,
+                rat: "Vì M nằm trên trung trực nên MA = MB = 7cm."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Trong tam giác ABC cân tại A, đường phân giác của góc A cũng đồng thời là:",
+                opts: ["Đường trung trực của cạnh BC", "Đường trung trực của cạnh AB", "Cạnh đối diện", "Góc vuông"],
+                ans: 0,
+                rat: "Trong tam giác cân, đường phân giác xuất phát từ đỉnh cũng là đường trung trực của cạnh đáy tương ứng."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Cho I là trung điểm AB. Đường thẳng d đi qua I là đường trung trực của AB khi:",
+                opts: ["d song song với AB", "d vuông góc với AB", "d tạo với AB góc 45 độ", "d nằm trên AB"],
+                ans: 1,
+                rat: "I đã là trung điểm, nên chỉ cần thêm điều kiện d vuông góc với AB tại I thì d là trung trực."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Cho tam giác MAB có MA = MB và góc M = 60 độ. Khi đó M nằm trên đường trung trực AB và tam giác MAB là tam giác:",
+                opts: ["Cân", "Vuông", "Đều", "Vuông cân"],
+                ans: 2,
+                rat: "Tam giác cân có một góc 60 độ là tam giác đều."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Tập hợp các điểm cách đều hai điểm A và B cho trước là đường nào?",
+                opts: ["Đường trung tuyến của AB", "Đường trung trực của AB", "Đường thẳng AB", "Vòng tròn tâm A"],
+                ans: 1,
+                rat: "Tất cả các điểm cách đều A và B đều hội tụ trên đường trung trực của đoạn thẳng AB."
+            },
+            // VẬN DỤNG (3 câu)
+            {
+                lvl: "Vận dụng",
+                q: "Cho tam giác ABC có AC = 10cm. Đường trung trực của AB cắt AC tại D. Biết BD = 4cm. Tính AD?",
+                opts: ["4cm", "6cm", "10cm", "14cm"],
+                ans: 0,
+                rat: "Vì D thuộc trung trực AB nên AD = BD. Mà BD = 4cm nên AD = 4cm."
+            },
+            {
+                lvl: "Vận dụng thực tế",
+                q: "(Thực tế) Hai ngôi nhà A và B ở cùng một phía bờ sông. Người ta muốn xây một trạm bơm bên bờ sông sao cho cách đều hai nhà. Trạm bơm nằm ở đâu?",
+                opts: ["Giao điểm của bờ sông và đường trung trực AB", "Giao điểm bờ sông và đoạn AB", "Trung điểm AB", "Bất kì đâu trên bờ sông"],
+                ans: 0,
+                rat: "Để cách đều A và B, trạm bơm phải nằm trên đường trung trực của AB. Vì phải ở bên bờ sông nên nó là giao điểm của trung trực và bờ sông."
+            },
+            {
+                lvl: "Vận dụng",
+                q: "Cho đoạn thẳng AB = 8cm. Điểm M nằm trên trung trực AB. Biết khoảng cách từ M đến AB là 3cm. Tính độ dài MA?",
+                opts: ["4cm", "5cm", "11cm", "7cm"],
+                ans: 1,
+                rat: "Gọi H là trung điểm AB. Ta có tam giác MHA vuông tại H. $AH = 4, MH = 3 \\implies MA = \\sqrt{3^2 + 4^2} = 5cm$."
+            },
+            // VẬN DỤNG CAO (1 câu)
+            {
+                lvl: "Vận dụng cao",
+                q: "Cho đường thẳng d và hai điểm A, B nằm về một phía của d. Tìm điểm M trên d sao cho chu vi tam giác MAB nhỏ nhất?",
+                opts: ["M là trung điểm d", "M là hình chiếu của A trên d", "M là giao điểm của d và đường thẳng AB'", "M là giao điểm của d và trung trực AB"],
+                ans: 2,
+                rat: "Với B' là điểm đối xứng của B qua d, ta có MB = MB'. Chu vi nhỏ nhất khi AM + MB' ngắn nhất, tức A, M, B' thẳng hàng."
+            }
+        ];
+
+       /* ================== CHUẨN HOÁ CÂU HỎI ================== */
+questions.forEach(q => {
+    q.opts = q.opts.map((t, i) => ({
+        text: t,
+        correct: i === q.ans
+    }));
+    shuffle(q.opts);
+});
+shuffle(questions);
+
+/* ================== BIẾN GAME ================== */
+let currentIdx = 0;
+let score = 0;
+
+/* ================== BẮT ĐẦU ================== */
+function startGame() {
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    showQ();
+}
+
+/* ================== HIỂN THỊ CÂU ================== */
+function showQ() {
+    const q = questions[currentIdx];
+    document.getElementById('q-count').innerText = currentIdx + 1;
+    document.getElementById('score').innerText = score;
+    document.getElementById('q-level').innerText = `Mức độ: ${q.lvl}`;
+    document.getElementById('q-text').innerHTML = q.q;
+    document.getElementById('progress').style.width =
+        `${(currentIdx / questions.length) * 100}%`;
+
+    const optsDiv = document.getElementById('options');
+    optsDiv.innerHTML = '';
+
+    q.opts.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className =
+            "answer-btn bg-white border-2 border-purple-100 p-5 rounded-3xl text-left hover:border-purple-500 font-bold text-gray-700 shadow-sm flex items-center";
+        btn.innerHTML = `
+            <span class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center mr-4 text-lg">
+                ${String.fromCharCode(65 + i)}
+            </span>
+            ${opt.text}
+        `;
+        btn.onclick = () => checkAns(opt.correct);
+        optsDiv.appendChild(btn);
+    });
+}
+
+/* ================== KIỂM TRA ================== */
+function checkAns(correct) {
+    if (correct) {
+        score++;
+        playSfx(true);
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        setModal("🥳", "TUYỆT VỜI!", "text-green-500");
+    } else {
+        playSfx(false);
+        setModal("🥺", "CỐ LÊN NÀO!", "text-red-500");
+    }
+    document.getElementById('modal-rat').innerHTML =
+        `<b>Giải thích:</b> ${questions[currentIdx].rat}`;
+    document.getElementById('modal').classList.remove('hidden');
+}
+
+function setModal(icon, text, color) {
+    document.getElementById('modal-emoji').innerText = icon;
+    const title = document.getElementById('modal-title');
+    title.innerText = text;
+    title.className = `text-3xl font-black mb-4 ${color}`;
+}
+
+/* ================== CHUYỂN CÂU ================== */
+function nextQ() {
+    document.getElementById('modal').classList.add('hidden');
+    currentIdx++;
+    currentIdx < questions.length ? showQ() : showEnd();
+}
+
+/* ================== KẾT THÚC ================== */
+function showEnd() {
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('end-screen').classList.remove('hidden');
+    document.getElementById('final-score').innerText = score;
+
+    let msg = "";
+    if (score === questions.length)
+        msg = "👑 ĐỈNH CAO! Em chính là THẦN TRUNG TRỰC!";
+    else if (score >= 12)
+        msg = "✨ Rất tốt! Kiến thức của em rất vững!";
+    else if (score >= 8)
+        msg = "💪 Khá lắm! Luyện thêm câu vận dụng nhé!";
+    else
+        msg = "❤️ Đừng nản! Ôn lại bài và quay lại chinh phục!";
+
+    document.getElementById('rank').innerText = msg;
+    confetti({ particleCount: 300, spread: 160, origin: { y: 0.6 } });
+}
+</script>
+</body>
+</html>
