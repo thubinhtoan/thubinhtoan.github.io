@@ -106,29 +106,178 @@ body{
 <script>
 /* ===== DATA (LATEX CHUẨN) ===== */
 let questions=[
+let questions = [
+/* ================= NHẬN BIẾT (5 câu) ================= */
 {
- q:`Trong tỉ lệ thức`,
- math:`\\(x/6 = 5/3\\)`,
- ask:`giá trị của \\(x\\) là:`,
- options:["\\(10\\)","\\(15\\)","\\(2\\)","\\(30\\)"],
- correct:0,
- rationale:`Ta có \\(x = (6\\cdot5):3 = 10\\).`
+  q: "Tỉ lệ thức là đẳng thức của hai tỉ số nào?",
+  options: [
+    "\\(a+b=c+d\\)",
+    "\\(a:b=c:d\\)",
+    "\\(a-b=c-b\\)",
+    "\\(ab=cd\\)"
+  ],
+  correct: 1,
+  rationale: "Theo định nghĩa, tỉ lệ thức là đẳng thức của hai tỉ số \\(a:b=c:d\\)."
 },
 {
- q:`Nếu có tỉ lệ thức`,
- math:`\\(3:5 = 9:x\\)`,
- ask:`thì \\(x =\\ ?\\)`,
- options:["\\(10\\)","\\(12\\)","\\(15\\)","\\(20\\)"],
- correct:2,
- rationale:`Áp dụng tính chất: \\(3x = 5\\cdot9 = 45\\) nên \\(x = 15\\).`
+  q: "Trong các đẳng thức sau, đẳng thức nào là tỉ lệ thức?",
+  options: [
+    "\\(2+3=5\\)",
+    "\\(4:5=8:10\\)",
+    "\\(6-1=5\\)",
+    "\\(3\\times4=12\\)"
+  ],
+  correct: 1,
+  rationale: "Vì \\(4:5=8:10\\) là đẳng thức của hai tỉ số nên đó là tỉ lệ thức."
 },
 {
- q:`Tỉ lệ thức là đẳng thức của hai tỉ số dạng`,
- math:`\\(?\\)`,
- ask:``,
- options:["\\(a+b=c+d\\)","\\(a/b=c/d\\)","\\(a-b=c-b\\)","\\(ab+cd\\)"],
- correct:1,
- rationale:`Theo định nghĩa, tỉ lệ thức là \\(a/b = c/d\\).`
+  q: "Trong tỉ lệ thức \\(a:b=c:d\\), tích của hai số nào bằng nhau?",
+  options: [
+    "\\(a+c=b+d\\)",
+    "\\(a\\times b=c\\times d\\)",
+    "\\(a\\times d=b\\times c\\)",
+    "\\(a-b=c-d\\)"
+  ],
+  correct: 2,
+  rationale: "Tính chất cơ bản của tỉ lệ thức là \\(a\\times d=b\\times c\\)."
+},
+{
+  q: "Nếu \\(5:7=10:x\\) thì \\(x\\) bằng:",
+  options: [
+    "\\(7\\)",
+    "\\(14\\)",
+    "\\(5\\)",
+    "\\(10\\)"
+  ],
+  correct: 1,
+  rationale: "Ta có \\(5x=7\\times10=70\\Rightarrow x=14\\)."
+},
+{
+  q: "Tỉ lệ thức nào sau đây đúng?",
+  options: [
+    "\\(3:4=6:7\\)",
+    "\\(2:5=4:10\\)",
+    "\\(4:6=3:5\\)",
+    "\\(5:6=15:20\\)"
+  ],
+  correct: 1,
+  rationale: "Vì \\(2:5=4:10\\) (nhân cả tử và mẫu với 2)."
+},
+
+/* ================= THÔNG HIỂU (5 câu) ================= */
+{
+  q: "Trong tỉ lệ thức \\(x/6=5/3\\), giá trị của \\(x\\) là:",
+  options: [
+    "\\(10\\)",
+    "\\(15\\)",
+    "\\(2\\)",
+    "\\(30\\)"
+  ],
+  correct: 0,
+  rationale: "Ta có \\(x=(6\\times5):3=10\\)."
+},
+{
+  q: "Nếu \\(3:x=6:10\\) thì \\(x\\) bằng:",
+  options: [
+    "\\(5\\)",
+    "\\(6\\)",
+    "\\(10\\)",
+    "\\(20\\)"
+  ],
+  correct: 0,
+  rationale: "Ta có \\(3\\times10=6x\\Rightarrow x=5\\)."
+},
+{
+  q: "Cho tỉ lệ thức \\(a:b=c:d\\). Khi đó \\(b:a\\) bằng:",
+  options: [
+    "\\(c:d\\)",
+    "\\(d:c\\)",
+    "\\(a:b\\)",
+    "\\(b:c\\)"
+  ],
+  correct: 1,
+  rationale: "Đảo tỉ số ta được \\(b:a=d:c\\)."
+},
+{
+  q: "Nếu \\(7:x=21:15\\) thì \\(x\\) bằng:",
+  options: [
+    "\\(3\\)",
+    "\\(4\\)",
+    "\\(5\\)",
+    "\\(6\\)"
+  ],
+  correct: 2,
+  rationale: "Ta có \\(7\\times15=21x\\Rightarrow x=5\\)."
+},
+{
+  q: "Trong các tỉ lệ thức sau, tỉ lệ thức nào sai?",
+  options: [
+    "\\(4:6=8:12\\)",
+    "\\(5:7=10:14\\)",
+    "\\(6:8=9:12\\)",
+    "\\(3:5=6:9\\)"
+  ],
+  correct: 3,
+  rationale: "Vì \\(3:5\\ne6:9\\) nên đây là tỉ lệ thức sai."
+},
+
+/* ================= VẬN DỤNG (4 câu) ================= */
+{
+  q: "Ba bạn chia đều số tiền theo tỉ lệ \\(2:3:5\\). Tổng tiền là 100 000 đồng. Phần của bạn thứ nhất là:",
+  options: [
+    "\\(20\\,000\\)",
+    "\\(25\\,000\\)",
+    "\\(30\\,000\\)",
+    "\\(40\\,000\\)"
+  ],
+  correct: 0,
+  rationale: "Tổng tỉ số là \\(2+3+5=10\\). Phần bạn thứ nhất là \\(100\\,000\\times\\frac{2}{10}=20\\,000\\)."
+},
+{
+  q: "Nếu \\(a:b=4:7\\) và \\(a+b=33\\) thì \\(a\\) bằng:",
+  options: [
+    "\\(12\\)",
+    "\\(14\\)",
+    "\\(16\\)",
+    "\\(21\\)"
+  ],
+  correct: 1,
+  rationale: "Ta có \\(4+7=11\\) phần. \\(a=33\\times\\frac{4}{11}=12\\)."
+},
+{
+  q: "Cho \\(x:y=5:8\\) và \\(y=24\\). Khi đó \\(x\\) bằng:",
+  options: [
+    "\\(10\\)",
+    "\\(12\\)",
+    "\\(15\\)",
+    "\\(20\\)"
+  ],
+  correct: 2,
+  rationale: "Ta có \\(x=24\\times\\frac{5}{8}=15\\)."
+},
+{
+  q: "Bốn số \\(a,b,c,d\\) lập thành tỉ lệ thức. Nếu \\(a=6,b=9,c=8\\) thì \\(d\\) bằng:",
+  options: [
+    "\\(12\\)",
+    "\\(10\\)",
+    "\\(9\\)",
+    "\\(8\\)"
+  ],
+  correct: 0,
+  rationale: "Vì \\(6:9=8:d\\Rightarrow d=12\\)."
+},
+
+/* ================= VẬN DỤNG CAO (1 câu) ================= */
+{
+  q: "Tìm \\(x\\) biết \\(\\dfrac{x+1}{3}=\\dfrac{5}{4}\\).",
+  options: [
+    "\\(\\dfrac{11}{4}\\)",
+    "\\(\\dfrac{15}{4}\\)",
+    "\\(\\dfrac{7}{4}\\)",
+    "\\(\\dfrac{5}{4}\\)"
+  ],
+  correct: 0,
+  rationale: "Ta có \\(x+1=\\frac{15}{4}\\Rightarrow x=\\frac{11}{4}\\)."
 }
 ];
 
