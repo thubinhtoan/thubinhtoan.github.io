@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thử Thách Tỉ Lệ Nghịch - Toán 7</title>
+
+<!-- ===== MathJax chuẩn Thợ săn kho báu ===== -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']]
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+body{
+ font-family:'Montserrat',sans-serif;
+ background:linear-gradient(135deg,#667eea,#764ba2);
+ min-height:100vh;
+}
+.choice-card{transition:.2s}
+.choice-card:hover{transform:translateY(-4px)}
+</style>
+</head>
+
+<body class="flex items-center justify-center p-4">
+
+<div class="bg-white rounded-[2.5rem] shadow-2xl max-w-2xl w-full p-8">
+
+<!-- START -->
+<div id="start" class="text-center">
+ <div class="text-7xl mb-4">⚖️</div>
+ <h1 class="text-3xl font-black text-purple-700 mb-2">THỬ THÁCH</h1>
+ <h2 class="text-xl font-bold text-orange-500 mb-6">TỈ LỆ NGHỊCH</h2>
+ <button onclick="startGame()" class="bg-purple-600 text-white px-10 py-4 rounded-2xl font-black text-xl">
+  CHIẾN LUÔN 🚀
+ </button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="hidden">
+ <div class="flex justify-between font-bold mb-4">
+  <div>Câu <span id="qnum"></span>/<span id="total"></span></div>
+  <div>Điểm: <span id="score">0</span></div>
+ </div>
+
+ <div class="h-3 bg-gray-200 rounded mb-6">
+  <div id="bar" class="h-3 bg-orange-400 rounded"></div>
+ </div>
+
+ <div id="level" class="text-sm font-bold text-purple-600 mb-2"></div>
+ <div id="question" class="text-xl font-bold mb-6"></div>
+ <div id="answers" class="grid gap-4"></div>
+</div>
+
+<!-- FEEDBACK -->
+<div id="fb" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
+ <div class="bg-white p-6 rounded-2xl max-w-sm w-full text-center">
+  <div id="fbIcon" class="text-6xl mb-3"></div>
+  <h3 id="fbTitle" class="text-2xl font-black mb-2"></h3>
+  <div id="fbText" class="italic mb-4"></div>
+  <button onclick="nextQ()" class="bg-purple-600 text-white px-6 py-3 rounded-xl font-bold">
+   TIẾP TỤC →
+  </button>
+ </div>
+</div>
+
+<!-- END -->
+<div id="end" class="hidden text-center">
+ <div class="text-7xl mb-4">🏆</div>
+ <div class="text-4xl font-black text-orange-500 mb-4">
+  <span id="final"></span>/<span id="total2"></span>
+ </div>
+ <div id="comment" class="font-bold mb-6"></div>
+ <button onclick="location.reload()" class="bg-gray-800 text-white px-8 py-3 rounded-xl">
+  CHƠI LẠI
+ </button>
+</div>
+
+</div>
+
+<script>
+/* ===== DATA ===== */
+let questions = [
+{
+ lvl:"Nhận biết",
+ q:"Nếu \\(y = \\frac{a}{x}\\) (\\(a\\ne0\\)) thì:",
+ options:[
+  "y tỉ lệ thuận với x",
+  "y tỉ lệ nghịch với x theo hệ số a",
+  "x tỉ lệ thuận với y",
+  "y = ax"
+ ],
+ correct:1,
+ rationale:"Theo định nghĩa, \\(y=\\frac{a}{x}\\) hoặc \\(xy=a\\) là tỉ lệ nghịch."
+},
+{
+ lvl:"Thông hiểu",
+ q:"Cho \\(xy=20\\). Khi \\(x=4\\) thì \\(y\\) bằng:",
+ options:["5","4","20","80"],
+ correct:0,
+ rationale:"\\(y=20:4=5\\)."
+},
+{
+ lvl:"Vận dụng",
+ q:"12 người làm xong việc trong 10 ngày. 15 người làm trong:",
+ options:["8 ngày","12 ngày","6 ngày","15 ngày"],
+ correct:0,
+ rationale:"\\(12\\cdot10=15\\cdot t \\Rightarrow t=8\\)."
+}
+];
+
+/* ===== RANDOM ===== */
+questions.sort(()=>Math.random()-0.5);
+
+let i=0,score=0;
+
+document.getElementById("total").innerText=questions.length;
+document.getElementById("total2").innerText=questions.length;
+
+function startGame(){
+ start.classList.add("hidden");
+ quiz.classList.remove("hidden");
+ showQ();
+}
+
+function showQ(){
+ const q=questions[i];
+ qnum.innerText=i+1;
+ scoreEl.innerText=score;
+ level.innerText=q.lvl;
+ question.innerHTML=q.q;
+ bar.style.width=`${i/questions.length*100}%`;
+
+ answers.innerHTML="";
+ let arr=q.options.map((t,idx)=>({t,idx}))
+                 .sort(()=>Math.random()-0.5);
+
+ arr.forEach(o=>{
+  const d=document.createElement("div");
+  d.className="choice-card border p-4 rounded-xl font-semibold";
+  d.innerHTML=o.t;
+  d.onclick=()=>check(o.idx);
+  answers.appendChild(d);
+ });
+
+ MathJax.typesetPromise();
+}
+
+function check(idx){
+ const q=questions[i];
+ if(idx===q.correct){
+  score++;
+  fbIcon.innerText="🥳";
+  fbTitle.innerText="CHÍNH XÁC!";
+  confetti();
+ }else{
+  fbIcon.innerText="😅";
+  fbTitle.innerText="CHƯA ĐÚNG!";
+ }
+ fbText.innerHTML="Giải thích: "+q.rationale;
+ fb.classList.remove("hidden");
+ MathJax.typesetPromise();
+}
+
+function nextQ(){
+ fb.classList.add("hidden");
+ i++;
+ if(i<questions.length) showQ();
+ else{
+  quiz.classList.add("hidden");
+  end.classList.remove("hidden");
+  final.innerText=score;
+  comment.innerText=score===questions.length
+   ?"Xuất sắc! 🏆"
+   :"Cố gắng thêm nhé 💪";
+  confetti({particleCount:200});
+ }
+}
+</script>
+</body>
+</html>
