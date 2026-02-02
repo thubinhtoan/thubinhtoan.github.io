@@ -281,102 +281,90 @@ let questions = [
 }
 ];
 
-/* RANDOM */
-questions.sort(()=>Math.random()-.5);
-let i=0,score=0;
+questions.sort(() => Math.random() - 0.5);
+
+let i = 0;
+let score = 0;
 
 /* START */
 function startGame(){
- startScreen().classList.add("hidden");
- quizScreen().classList.remove("hidden");
- showQuestion();
-}
-const startScreen=()=>document.getElementById("start-screen");
-const quizScreen=()=>document.getElementById("quiz-screen");
-
-/* RENDER QUESTION */
-function renderQuestion(q){
- return `
-  <div class="text-center space-y-4">
-    <p class="text-gray-300 text-lg">${q.q}</p>
-    <div class="inline-block px-8 py-4 rounded-2xl
-                bg-black/40 border border-pink-500/40">
-      <span class="text-3xl font-bold text-pink-400">${q.math}</span>
-    </div>
-    <p class="text-gray-300 text-lg">${q.ask}</p>
-  </div>`;
+  document.getElementById("start-screen").classList.add("hidden");
+  document.getElementById("quiz-screen").classList.remove("hidden");
+  showQuestion();
 }
 
-/* SHOW */
+/* SHOW QUESTION */
 function showQuestion(){
- const q=questions[i];
- currentQ().innerText=i+1;
- scoreEl().innerText=score;
- progress().style.width=`${i/questions.length*100}%`;
- questionText().innerHTML=renderQuestion(q);
+  const q = questions[i];
 
- const ctn=choices();
- ctn.innerHTML="";
- let idx=[0,1,2,3].sort(()=>Math.random()-.5);
+  document.getElementById("current-q").innerText = i + 1;
+  document.getElementById("score").innerText = score;
+  document.getElementById("progress").style.width =
+    `${(i / questions.length) * 100}%`;
 
- idx.forEach((k,n)=>{
-  const b=document.createElement("button");
-  b.className="option-card py-4 rounded-xl text-xl font-bold";
-  b.innerHTML=`<span class="text-pink-400 mr-2">${String.fromCharCode(65+n)}.</span>${q.options[k]}`;
-  b.onclick=()=>checkAnswer(k);
-  ctn.appendChild(b);
- });
+  document.getElementById("question-text").innerHTML =
+    `<p class="text-xl font-bold text-center">${q.q}</p>`;
 
- MathJax.typesetPromise();
+  const ctn = document.getElementById("choices-container");
+  ctn.innerHTML = "";
+
+  let order = [0,1,2,3].sort(() => Math.random() - 0.5);
+
+  order.forEach((k, idx) => {
+    const btn = document.createElement("button");
+    btn.className =
+      "option-card py-4 px-5 rounded-xl text-lg font-bold text-left";
+    btn.innerHTML =
+      `<span class="text-pink-400 mr-2">${String.fromCharCode(65+idx)}.</span>
+       ${q.options[k]}`;
+    btn.onclick = () => checkAnswer(k);
+    ctn.appendChild(btn);
+  });
+
+  MathJax.typesetPromise();
 }
-
-const currentQ=()=>document.getElementById("current-q");
-const scoreEl=()=>document.getElementById("score");
-const progress=()=>document.getElementById("progress");
-const questionText=()=>document.getElementById("question-text");
-const choices=()=>document.getElementById("choices-container");
 
 /* CHECK */
 function checkAnswer(k){
- const q=questions[i];
- feedback().classList.remove("hidden");
+  const q = questions[i];
+  const modal = document.getElementById("feedback-modal");
+  modal.classList.remove("hidden");
 
- if(k===q.correct){
-  score++; confetti({particleCount:120,spread:70});
-  fbIcon().innerText="🎉";
-  fbTitle().innerText="Chính xác!";
- }else{
-  fbIcon().innerText="😅";
-  fbTitle().innerText="Chưa đúng!";
- }
+  if(k === q.correct){
+    score++;
+    confetti({ particleCount: 120, spread: 70 });
+    document.getElementById("fb-icon").innerText = "🎉";
+    document.getElementById("fb-title").innerText = "Chính xác!";
+  } else {
+    document.getElementById("fb-icon").innerText = "😅";
+    document.getElementById("fb-title").innerText = "Chưa đúng!";
+  }
 
- fbRationale().innerHTML=`<b class="text-pink-400">Giải thích:</b><br>${q.rationale}`;
- MathJax.typesetPromise();
+  document.getElementById("fb-rationale").innerHTML =
+    `<b class="text-pink-400">Giải thích:</b><br>${q.rationale}`;
+
+  MathJax.typesetPromise();
 }
-
-const feedback=()=>document.getElementById("feedback-modal");
-const fbIcon=()=>document.getElementById("fb-icon");
-const fbTitle=()=>document.getElementById("fb-title");
-const fbRationale=()=>document.getElementById("fb-rationale");
 
 /* NEXT */
 function nextQuestion(){
- feedback().classList.add("hidden");
- i++;
- if(i<questions.length) showQuestion();
- else showEnd();
+  document.getElementById("feedback-modal").classList.add("hidden");
+  i++;
+  if(i < questions.length) showQuestion();
+  else showEnd();
 }
 
 /* END */
 function showEnd(){
- quizScreen().classList.add("hidden");
- document.getElementById("end-screen").classList.remove("hidden");
- document.getElementById("final-score").innerText=score;
- document.getElementById("performance-msg").innerText=
-  score===questions.length?"Xuất sắc! 🌟":"Cố gắng thêm nhé!";
- confetti({particleCount:200,spread:160});
+  document.getElementById("quiz-screen").classList.add("hidden");
+  document.getElementById("end-screen").classList.remove("hidden");
+  document.getElementById("final-score").innerText = score;
+  document.getElementById("performance-msg").innerText =
+    score === questions.length
+      ? "Xuất sắc! 🌟"
+      : "Cố gắng thêm nhé!";
+  confetti({ particleCount: 200, spread: 160 });
 }
 </script>
-
 </body>
 </html>
