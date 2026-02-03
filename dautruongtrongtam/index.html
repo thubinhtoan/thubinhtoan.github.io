@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đấu Trường Trọng Tâm - Toán 7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: #0f172a;
+            background-image: radial-gradient(circle at 2px 2px, #334155 1px, transparent 0);
+            background-size: 40px 40px;
+            min-height: 100vh;
+        }
+        .bungee { font-family: 'Bungee', cursive; }
+        .glass-container {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(12px);
+            border: 2px solid #818cf8;
+            box-shadow: 0 0 30px rgba(129, 140, 248, 0.3);
+            border-radius: 2.5rem;
+        }
+        .btn-option {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(129, 140, 248, 0.2);
+        }
+        .btn-option:hover {
+            transform: scale(1.03) translateY(-3px);
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.1);
+        }
+        .progress-glow {
+            box-shadow: 0 0 15px #818cf8;
+            transition: width 0.6s ease-in-out;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .floating { animation: float 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex items-center justify-center">
+
+    <div id="game-app" class="max-w-3xl w-full glass-container p-6 md:p-12 relative overflow-hidden text-white">
+        
+        <!-- Màn hình khởi đầu -->
+        <div id="start-screen" class="text-center">
+            <div class="text-7xl mb-6 floating">🎯</div>
+            <h1 class="text-4xl md:text-6xl bungee text-yellow-400 mb-4 leading-tight">ĐẤU TRƯỜNG<br>TRỌNG TÂM</h1>
+            <p class="text-slate-400 text-lg mb-10">Chào các bạn học sinh của cô <b>Thu Bình</b>!<br>Sẵn sàng trở thành "Bậc thầy đường trung tuyến" chưa?</p>
+            <button onclick="startGame()" class="bg-yellow-400 text-slate-900 font-black py-5 px-16 rounded-full text-2xl shadow-[0_0_20px_rgba(251,191,36,0.5)] hover:scale-110 transition-transform">
+                CHƠI LUÔN! 🚀
+            </button>
+        </div>
+
+        <!-- Màn hình Câu hỏi -->
+        <div id="quiz-screen" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Tiến trình</span>
+                    <span class="text-2xl font-black text-indigo-400">Câu <span id="q-idx">1</span>/15</span>
+                </div>
+                <div class="flex flex-col items-end">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Điểm số</span>
+                    <span class="text-2xl font-black text-yellow-400" id="score">0</span>
+                </div>
+            </div>
+
+            <div class="w-full bg-slate-800 rounded-full h-4 mb-10 border border-slate-700">
+                <div id="progress" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full progress-glow" style="width: 0%"></div>
+            </div>
+
+            <div id="question-content">
+                <div id="difficulty" class="inline-block px-3 py-1 rounded-lg text-[10px] font-bold text-slate-900 mb-4 bg-yellow-400 uppercase"></div>
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold mb-8 leading-snug"></h2>
+                
+                <div id="options-grid" class="grid grid-cols-1 gap-4">
+                    <!-- Nút đáp án -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Phản hồi -->
+        <div id="feedback-modal" class="hidden fixed inset-0 flex items-center justify-center z-50 p-4">
+            <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-sm"></div>
+            <div class="bg-slate-800 border-2 border-indigo-400 rounded-[3rem] p-8 max-w-md w-full relative shadow-2xl text-center">
+                <div id="fb-emoji" class="text-7xl mb-4"></div>
+                <h3 id="fb-title" class="text-3xl font-black mb-4"></h3>
+                <div class="bg-slate-700/50 p-5 rounded-3xl mb-8 border-l-4 border-yellow-400 text-left">
+                    <p id="fb-rat" class="text-slate-300 text-sm italic leading-relaxed"></p>
+                </div>
+                <button onclick="nextQ()" class="w-full bg-indigo-500 text-white font-bold py-4 rounded-2xl hover:bg-indigo-600 shadow-lg">
+                    TIẾP TỤC ➔
+                </button>
+            </div>
+        </div>
+
+        <!-- Màn hình Kết thúc -->
+        <div id="end-screen" class="hidden text-center">
+            <div class="text-9xl mb-6">👑</div>
+            <h2 class="text-4xl font-black text-yellow-400 mb-2 leading-tight">XUẤT SẮC!</h2>
+            <p class="text-xl mb-8 text-slate-400">Em đã đạt được: <span id="final-score" class="text-4xl font-bold text-indigo-400">0</span>/15 điểm</p>
+            <div id="rank-comment" class="text-lg font-bold mb-10 px-6 text-slate-300"></div>
+            <button onclick="location.reload()" class="bg-white text-slate-900 font-bold py-4 px-12 rounded-2xl hover:bg-slate-200">
+                THỬ LẠI 🔄
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Audio Effects
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSfx(correct) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            if (correct) {
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime); // A4
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            } else {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            }
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        const questions = [
+            // NHẬN BIẾT (6 câu)
+            {
+                lvl: "Nhận biết",
+                q: "Đường trung tuyến của tam giác là đoạn thẳng nối:",
+                opts: ["Một đỉnh với trung điểm cạnh đối diện", "Một đỉnh với một điểm trên cạnh đối diện", "Hai trung điểm của hai cạnh", "Hai đỉnh của tam giác"],
+                ans: 0,
+                rat: "Theo định nghĩa, đường trung tuyến xuất phát từ đỉnh và đi qua trung điểm của cạnh đối diện."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Mỗi tam giác có bao nhiêu đường trung tuyến?",
+                opts: ["1 đường", "2 đường", "3 đường", "Vô số"],
+                ans: 2,
+                rat: "Vì tam giác có 3 đỉnh và 3 cạnh tương ứng nên có đúng 3 đường trung tuyến."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Ba đường trung tuyến của một tam giác có đặc điểm gì?",
+                opts: ["Cùng đi qua một điểm", "Cùng vuông góc với nhau", "Song song với nhau", "Luôn cắt nhau tại 3 điểm phân biệt"],
+                ans: 0,
+                rat: "Tính chất đồng quy: Ba đường trung tuyến của một tam giác cùng đi qua một điểm."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Điểm chung của ba đường trung tuyến của một tam giác được gọi là:",
+                opts: ["Trực tâm", "Tâm đường tròn nội tiếp", "Trọng tâm", "Tâm đường tròn ngoại tiếp"],
+                ans: 2,
+                rat: "Giao điểm của ba đường trung tuyến gọi là trọng tâm của tam giác đó."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Vị trí của trọng tâm tam giác ở đâu?",
+                opts: ["Luôn nằm trong tam giác", "Luôn nằm trên một cạnh", "Có thể nằm ngoài tam giác", "Là một đỉnh của tam giác"],
+                ans: 0,
+                rat: "Trọng tâm luôn nằm ở miền trong của tam giác (khác với trực tâm hay tâm đường tròn ngoại tiếp)."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Trọng tâm G của tam giác ABC cách mỗi đỉnh một khoảng bằng:",
+                opts: ["1/3 độ dài đường trung tuyến", "1/2 độ dài đường trung tuyến", "2/3 độ dài đường trung tuyến", "3/4 độ dài đường trung tuyến"],
+                ans: 2,
+                rat: "Khoảng cách từ trọng tâm đến đỉnh bằng 2/3 độ dài đường trung tuyến đi qua đỉnh đó."
+            },
+            // THÔNG HIỂU (5 câu)
+            {
+                lvl: "Thông hiểu",
+                q: "Cho AM là đường trung tuyến của ΔABC, G là trọng tâm. Khẳng định nào sau đây là SAI?",
+                opts: ["AG = 2/3 AM", "GM = 1/3 AM", "AG = 2 GM", "AM = 2 AG"],
+                ans: 3,
+                rat: "Vì AG = 2/3 AM nên AM = 3/2 AG, khẳng định AM = 2 AG là sai."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Cho AM là trung tuyến của ΔABC, G là trọng tâm. Nếu GM = 2cm thì AG bằng:",
+                opts: ["1cm", "2cm", "4cm", "6cm"],
+                ans: 2,
+                rat: "Vì AG = 2 GM nên AG = 2 * 2 = 4cm."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Cho ΔABC có ba đường trung tuyến AM, BN, CP cắt nhau tại G. Tỉ số của diện tích ΔGAB so với ΔABC là:",
+                opts: ["1/2", "1/3", "1/4", "2/3"],
+                ans: 1,
+                rat: "Ba đường trung tuyến chia tam giác thành 6 tam giác nhỏ có diện tích bằng nhau, suy ra S(GAB) = 1/3 S(ABC)."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Trong tam giác cân, đường trung tuyến ứng với cạnh đáy đồng thời là:",
+                opts: ["Đường cao", "Đường phân giác", "Đường trung trực", "Tất cả các ý trên"],
+                ans: 3,
+                rat: "Tính chất tam giác cân: Đường trung tuyến ứng với đáy cũng là đường cao, phân giác và trung trực."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Tam giác có hai đường trung tuyến bằng nhau là tam giác gì?",
+                opts: ["Tam giác cân", "Tam giác vuông", "Tam giác nhọn", "Tam giác tù"],
+                ans: 0,
+                rat: "Tam giác có hai đường trung tuyến tương ứng với hai cạnh bằng nhau là tam giác cân."
+            },
+            // VẬN DỤNG (3 câu)
+            {
+                lvl: "Vận dụng",
+                q: "Cho ΔABC cân tại A có AB = 10cm, BC = 12cm. Độ dài đường trung tuyến AM là:",
+                opts: ["6cm", "8cm", "10cm", "4cm"],
+                ans: 1,
+                rat: "M là trung điểm BC nên BM = 6cm. ΔABM vuông tại M (do tam giác cân), áp dụng Pytago: AM = sqrt(10^2 - 6^2) = 8cm."
+            },
+            {
+                lvl: "Vận dụng thực tế",
+                q: "(Thực tế) Để một tấm bìa hình tam giác thăng bằng trên đầu ngón tay, bạn cần đặt ngón tay vào vị trí nào của tam giác?",
+                opts: ["Trung điểm cạnh dài nhất", "Một đỉnh bất kì", "Trọng tâm của tam giác", "Điểm bất kì bên trong"],
+                ans: 2,
+                rat: "Trọng tâm là điểm cân bằng khối lượng của tam giác, nên khi đặt ngón tay tại đó, tấm bìa sẽ thăng bằng."
+            },
+            {
+                lvl: "Vận dụng",
+                q: "Cho ΔABC có G là trọng tâm. Biết tổng độ dài ba trung tuyến là 18cm. Tổng khoảng cách từ G đến ba đỉnh là:",
+                opts: ["6cm", "12cm", "9cm", "18cm"],
+                ans: 1,
+                rat: "Tổng AG + BG + CG = 2/3 * (AM + BN + CP) = 2/3 * 18 = 12cm."
+            },
+            // VẬN DỤNG CAO (1 câu)
+            {
+                lvl: "Vận dụng cao",
+                q: "Cho ΔABC, ba trung tuyến AM, BN, CP. Khẳng định nào sau đây ĐÚNG về tổng độ dài 3 trung tuyến và chu vi tam giác (P)?",
+                opts: ["AM + BN + CP > P", "AM + BN + CP < P", "AM + BN + CP = P", "AM + BN + CP < 3/4 P"],
+                ans: 1,
+                rat: "Sử dụng bất đẳng thức tam giác, ta chứng minh được tổng độ dài ba đường trung tuyến luôn nhỏ hơn chu vi tam giác."
+            }
+        ];
+
+        let currentQ = 0;
+        let score = 0;
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQ];
+            document.getElementById('q-idx').innerText = currentQ + 1;
+            document.getElementById('score').innerText = score;
+            document.getElementById('progress').style.width = `${(currentQ / questions.length) * 100}%`;
+            
+            const diff = document.getElementById('difficulty');
+            diff.innerText = q.lvl;
+            diff.className = `inline-block px-3 py-1 rounded-lg text-[10px] font-bold text-slate-900 mb-4 uppercase ${
+                q.lvl === 'Nhận biết' ? 'bg-green-400' : 
+                q.lvl === 'Thông hiểu' ? 'bg-blue-400' : 
+                q.lvl === 'Vận dụng' ? 'bg-yellow-400' : 'bg-red-500 text-white'
+            }`;
+
+            document.getElementById('question-text').innerText = q.q;
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            q.opts.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-option bg-slate-800/50 p-5 rounded-2xl text-left font-semibold flex items-center";
+                btn.innerHTML = `<span class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-4 flex-none border border-indigo-500/30">${String.fromCharCode(65+i)}</span> <span>${opt}</span>`;
+                btn.onclick = () => checkAnswer(i);
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(i) {
+            const q = questions[currentQ];
+            const correct = (i === q.ans);
+            if (correct) {
+                score++;
+                playSfx(true);
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#818cf8', '#fbbf24', '#f472b6']
+                });
+                document.getElementById('fb-emoji').innerText = "😎";
+                document.getElementById('fb-title').innerText = "QUÁ CHUẨN!";
+                document.getElementById('fb-title').className = "text-3xl font-black mb-4 text-yellow-400";
+            } else {
+                playSfx(false);
+                document.getElementById('fb-emoji').innerText = "🤔";
+                document.getElementById('fb-title').innerText = "CẦN CẨN THẬN!";
+                document.getElementById('fb-title').className = "text-3xl font-black mb-4 text-indigo-400";
+            }
+            document.getElementById('fb-rat').innerHTML = `<b>Giải thích nè:</b> ${q.rat}`;
+            document.getElementById('feedback-modal').classList.remove('hidden');
+        }
+
+        function nextQ() {
+            document.getElementById('feedback-modal').classList.add('hidden');
+            currentQ++;
+            if (currentQ < questions.length) {
+                showQuestion();
+            } else {
+                showEnd();
+            }
+        }
+
+        function showEnd() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            
+            let comment = "";
+            if (score === 15) comment = "Đỉnh của chóp! Em là 'Thần đồng Trọng tâm' của cô Thu Bình rồi! 🏆";
+            else if (score >= 12) comment = "Giỏi lắm! Kiến thức về trung tuyến của em rất vững vàng! ✨";
+            else if (score >= 8) comment = "Khá tốt! Em hãy ôn lại các tỉ lệ 2/3 để bứt phá hơn nhé! 💪";
+            else comment = "Đừng buồn nhé! Hãy ôn bài cùng cô Thu Bình và thử lại lần sau nha! ❤️";
+            
+            document.getElementById('rank-comment').innerText = comment;
+            confetti({ particleCount: 300, spread: 160, origin: { y: 0.6 } });
+        }
+    </script>
+</body>
+</html>
