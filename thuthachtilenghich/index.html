@@ -3,189 +3,236 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thử Thách Tỉ Lệ Nghịch - Toán 7</title>
+<title>Đường đua Tỉ lệ nghịch – Toán 7</title>
 
-<!-- ===== MathJax chuẩn Thợ săn kho báu ===== -->
+<!-- MathJax -->
 <script>
 window.MathJax = {
-  tex: {
-    inlineMath: [['\\(', '\\)']],
-    displayMath: [['\\[', '\\]']]
-  },
+  tex: { inlineMath: [['\\(','\\)']] },
   svg: { fontCache: 'global' }
 };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
 body{
- font-family:'Montserrat',sans-serif;
- background:linear-gradient(135deg,#667eea,#764ba2);
- min-height:100vh;
+  font-family: 'Quicksand', sans-serif;
+  background: linear-gradient(135deg,#1e3a8a,#4c1d95);
+  min-height:100vh;
 }
-.choice-card{transition:.2s}
-.choice-card:hover{transform:translateY(-4px)}
+.card{
+  background:#0f172a;
+  border-radius:2rem;
+  color:white;
+  box-shadow:0 25px 60px rgba(0,0,0,.5);
+}
+.option{
+  background:#1e293b;
+  border:1px solid #334155;
+  transition:.25s;
+}
+.option:hover{
+  border-color:#f97316;
+  transform:scale(1.03);
+}
 </style>
 </head>
 
 <body class="flex items-center justify-center p-4">
 
-<div class="bg-white rounded-[2.5rem] shadow-2xl max-w-2xl w-full p-8">
+<div class="max-w-3xl w-full card p-8">
 
 <!-- START -->
-<div id="start" class="text-center">
- <div class="text-7xl mb-4">⚖️</div>
- <h1 class="text-3xl font-black text-purple-700 mb-2">THỬ THÁCH</h1>
- <h2 class="text-xl font-bold text-orange-500 mb-6">TỈ LỆ NGHỊCH</h2>
- <button onclick="startGame()" class="bg-purple-600 text-white px-10 py-4 rounded-2xl font-black text-xl">
-  CHIẾN LUÔN 🚀
- </button>
-</div>
-
-<!-- QUIZ -->
-<div id="quiz" class="hidden">
- <div class="flex justify-between font-bold mb-4">
-  <div>Câu <span id="qnum"></span>/<span id="total"></span></div>
-  <div>Điểm: <span id="score">0</span></div>
- </div>
-
- <div class="h-3 bg-gray-200 rounded mb-6">
-  <div id="bar" class="h-3 bg-orange-400 rounded"></div>
- </div>
-
- <div id="level" class="text-sm font-bold text-purple-600 mb-2"></div>
- <div id="question" class="text-xl font-bold mb-6"></div>
- <div id="answers" class="grid gap-4"></div>
-</div>
-
-<!-- FEEDBACK -->
-<div id="fb" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
- <div class="bg-white p-6 rounded-2xl max-w-sm w-full text-center">
-  <div id="fbIcon" class="text-6xl mb-3"></div>
-  <h3 id="fbTitle" class="text-2xl font-black mb-2"></h3>
-  <div id="fbText" class="italic mb-4"></div>
-  <button onclick="nextQ()" class="bg-purple-600 text-white px-6 py-3 rounded-xl font-bold">
-   TIẾP TỤC →
+<div id="start-screen" class="text-center">
+  <h1 class="text-4xl font-bold text-cyan-400 mb-4">🏁 ĐƯỜNG ĐUA TỈ LỆ NGHỊCH</h1>
+  <p class="text-gray-300 mb-6">Toán 7 – 15 câu trắc nghiệm</p>
+  <button onclick="startGame()"
+    class="bg-cyan-500 hover:bg-cyan-400 text-black px-10 py-4 rounded-full font-bold text-xl">
+    START 🚀
   </button>
- </div>
 </div>
 
-<!-- END -->
-<div id="end" class="hidden text-center">
- <div class="text-7xl mb-4">🏆</div>
- <div class="text-4xl font-black text-orange-500 mb-4">
-  <span id="final"></span>/<span id="total2"></span>
- </div>
- <div id="comment" class="font-bold mb-6"></div>
- <button onclick="location.reload()" class="bg-gray-800 text-white px-8 py-3 rounded-xl">
-  CHƠI LẠI
- </button>
+<!-- GAME -->
+<div id="game-screen" class="hidden">
+  <div class="flex justify-between mb-4 font-bold">
+    <div>Câu <span id="current">1</span>/3</div>
+    <div>Điểm: <span id="score">0</span></div>
+  </div>
+
+  <div class="bg-slate-700 h-3 rounded mb-6">
+    <div id="progress" class="bg-orange-400 h-3 rounded"></div>
+  </div>
+
+  <div id="question" class="text-xl text-center mb-8"></div>
+
+  <div id="answers" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
 </div>
 
 </div>
 
 <script>
-/* ===== DATA ===== */
+/* ========= DATA ========= */
 let questions = [
-{
- lvl:"Nhận biết",
- q:"Nếu \\(y = \\frac{a}{x}\\) (\\(a\\ne0\\)) thì:",
- options:[
-  "y tỉ lệ thuận với x",
-  "y tỉ lệ nghịch với x theo hệ số a",
-  "x tỉ lệ thuận với y",
-  "y = ax"
- ],
- correct:1,
- rationale:"Theo định nghĩa, \\(y=\\frac{a}{x}\\) hoặc \\(xy=a\\) là tỉ lệ nghịch."
-},
-{
- lvl:"Thông hiểu",
- q:"Cho \\(xy=20\\). Khi \\(x=4\\) thì \\(y\\) bằng:",
- options:["5","4","20","80"],
- correct:0,
- rationale:"\\(y=20:4=5\\)."
-},
-{
- lvl:"Vận dụng",
- q:"12 người làm xong việc trong 10 ngày. 15 người làm trong:",
- options:["8 ngày","12 ngày","6 ngày","15 ngày"],
- correct:0,
- rationale:"\\(12\\cdot10=15\\cdot t \\Rightarrow t=8\\)."
-}
-];
+            // NHẬN BIẾT (6 câu)
+            {
+                lvl: "Nhận biết",
+                q: "Nếu đại lượng $y$ liên hệ với đại lượng $x$ theo công thức $y = a/x$ ($a \ne 0$) thì ta nói:",
+                options: ["y tỉ lệ thuận với x", "y tỉ lệ nghịch với x theo hệ số a", "x tỉ lệ nghịch với y theo hệ số 1/a", "y bằng a lần x"],
+                correct: 1,
+                rationale: "Đây là định nghĩa chính xác về đại lượng tỉ lệ nghịch: $y = a/x$ hoặc $xy = a$."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Cho công thức $xy = 15$. Hệ số tỉ lệ nghịch $a$ của $y$ đối với $x$ là:",
+                options: ["15", "-15", "1/15", "x/y"],
+                correct: 0,
+                rationale: "Trong đại lượng tỉ lệ nghịch, tích của hai giá trị tương ứng $xy = a$. Vậy $a = 15$."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Nếu $y$ tỉ lệ nghịch với $x$ theo hệ số tỉ lệ $a$ thì $x$ tỉ lệ nghịch với $y$ theo hệ số:",
+                options: ["1/a", "-a", "a", "a²"],
+                correct: 2,
+                rationale: "Quan hệ tỉ lệ nghịch là đối xứng: nếu $y = a/x$ thì $x = a/y$."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Tính chất nào sau đây là của đại lượng tỉ lệ nghịch?",
+                options: ["$y_1/x_1 = y_2/x_2$", "$x_1/x_2 = y_1/y_2$", "$x_1 \\cdot y_1 = x_2 \\cdot y_2$", "$x_1+y_1 = x_2+y_2$"],
+                correct: 2,
+                rationale: "Tỉ lệ nghịch có đặc điểm là tích của hai giá trị tương ứng không đổi ($x_1y_1 = x_2y_2 = a$)."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Cặp đại lượng nào sau đây tỉ lệ nghịch với nhau?",
+                options: [
+                    "Vận tốc và quãng đường (với thời gian cố định)",
+                    "Thời gian và quãng đường (với vận tốc cố định)",
+                    "Vận tốc và thời gian (với quãng đường cố định)",
+                    "Chiều dài và chu vi hình chữ nhật"
+                ],
+                correct: 2,
+                rationale: "Vì $v \cdot t = s$. Khi quãng đường $s$ không đổi, vận tốc tăng thì thời gian giảm và ngược lại."
+            },
+            {
+                lvl: "Nhận biết",
+                q: "Cho bảng giá trị của $x$ và $y$. Nếu $x \cdot y = 24$ thì $x$ và $y$ là:",
+                options: ["Tỉ lệ thuận", "Tỉ lệ nghịch", "Không tỉ lệ", "Bằng nhau"],
+                correct: 1,
+                rationale: "Khi tích của hai đại lượng luôn bằng một số không đổi thì chúng tỉ lệ nghịch."
+            },
+            // THÔNG HIỂU (5 câu)
+            {
+                lvl: "Thông hiểu",
+                q: "Cho $x$ và $y$ tỉ lệ nghịch. Khi $x = 4$ thì $y = 5$. Tìm hệ số tỉ lệ $a$.",
+                options: ["a = 1,25", "a = 9", "a = 20", "a = 1"],
+                correct: 2,
+                rationale: "Hệ số $a = x \cdot y = 4 \\cdot 5 = 20$."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Cho $y$ tỉ lệ nghịch với $x$ theo hệ số $a = 12$. Khi $x = -3$ thì giá trị của $y$ là:",
+                options: ["-4", "4", "36", "-36"],
+                correct: 0,
+                rationale: "$y = a/x = 12/(-3) = -4$."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Biết $x_1/x_2 = y_2/y_1$. Nếu $x_1 = 2, x_2 = 4, y_1 = 10$ thì $y_2$ bằng:",
+                options: ["20", "5", "8", "40"],
+                correct: 1,
+                rationale: "Từ tỉ lệ thức: $2/4 = y_2/10 \\implies y_2 = (2 \\cdot 10) / 4 = 5$."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Cho $y$ tỉ lệ nghịch với $x$. Khi $x$ tăng lên 3 lần thì $y$ sẽ:",
+                options: ["Tăng 3 lần", "Giảm 3 lần", "Không đổi", "Tăng 9 lần"],
+                correct: 1,
+                rationale: "Đặc trưng của tỉ lệ nghịch: đại lượng này tăng bao nhiêu lần thì đại lượng kia giảm bấy nhiêu lần."
+            },
+            {
+                lvl: "Thông hiểu",
+                q: "Cho $x$ tỉ lệ nghịch với $y$ theo hệ số $a=2$, $y$ tỉ lệ thuận với $z$ theo hệ số $k=4$. $x$ liên hệ với $z$ như thế nào?",
+                options: ["$x = 8z$", "$x = 0,5/z$", "$x = 2/z$", "$x = 1/(2z)$"],
+                correct: 3,
+                rationale: "$x = 2/y$ và $y = 4z \\implies x = 2/(4z) = 1/(2z)$. Vậy $x$ tỉ lệ nghịch với $z$ hệ số 0,5."
+            },
+            // VẬN DỤNG (3 câu)
+            {
+                lvl: "Vận dụng",
+                q: "Một đội công nhân gồm 12 người xây xong một bức tường trong 10 ngày. Nếu có 15 người (cùng năng suất) thì xây xong trong mấy ngày?",
+                options: ["12,5 ngày", "8 ngày", "18 ngày", "6 ngày"],
+                correct: 1,
+                rationale: "Số người và thời gian tỉ lệ nghịch. $12 \\cdot 10 = 15 \\cdot t \\implies t = 120 / 15 = 8$ ngày."
+            },
+            {
+                lvl: "Vận dụng",
+                q: "Chia số 310 thành 3 phần tỉ lệ nghịch với 2; 3; 5. Phần bé nhất là:",
+                options: ["150", "100", "60", "30"],
+                correct: 2,
+                rationale: "Phần tỉ lệ nghịch với 2; 3; 5 là tỉ lệ thuận với $1/2; 1/3; 1/5$. Tổng phần: $31/30$. Phần bé nhất tương ứng với số lớn nhất (5): $310 / (31/30) \\cdot (1/5) = 300 \\cdot 1/5 = 60$."
+            },
+            {
+                lvl: "Vận dụng thực tế",
+                q: "(Thực tế) Một vòi nước chảy đầy bể trong 6 giờ. Nếu mở thêm 2 vòi cùng loại như thế (tổng 3 vòi) thì bể sẽ đầy trong bao lâu?",
+                options: ["2 giờ", "3 giờ", "18 giờ", "4 giờ"],
+                correct: 0,
+                rationale: "Số vòi nước và thời gian tỉ lệ nghịch. 1 vòi hết 6h, nên 3 vòi hết $6 : 3 = 2$ giờ."
+            },
+            // VẬN DỤNG CAO (1 câu)
+            {
+                lvl: "Vận dụng cao",
+                q: "Cho $x$ và $y$ tỉ lệ nghịch. Gọi $x_1, x_2$ là hai giá trị của $x$ và $y_1, y_2$ là hai giá trị tương ứng của $y$. Biết $x_1 - x_2 = 5$ và $y_1 = 4, y_2 = 9$. Tìm hệ số tỉ lệ $a$.",
+                options: ["a = 13", "a = 36", "a = 45", "a = 20"],
+                correct: 1,
+                rationale: "$x_1y_1 = x_2y_2 \\implies 4x_1 = 9x_2$. Kết hợp $x_1 - x_2 = 5 \\implies x_1 = 9, x_2 = 4$. Vậy $a = 9 \\cdot 4 = 36$."
+            }
+        ];
 
-/* ===== RANDOM ===== */
 questions.sort(()=>Math.random()-0.5);
 
-let i=0,score=0;
+let index=0, score=0;
 
-document.getElementById("total").innerText=questions.length;
-document.getElementById("total2").innerText=questions.length;
-
+/* ========= START ========= */
 function startGame(){
- start.classList.add("hidden");
- quiz.classList.remove("hidden");
- showQ();
+ document.getElementById("start-screen").classList.add("hidden");
+ document.getElementById("game-screen").classList.remove("hidden");
+ showQuestion();
 }
 
-function showQ(){
- const q=questions[i];
- qnum.innerText=i+1;
- scoreEl.innerText=score;
- level.innerText=q.lvl;
- question.innerHTML=q.q;
- bar.style.width=`${i/questions.length*100}%`;
+/* ========= SHOW ========= */
+function showQuestion(){
+ const q = questions[index];
+ document.getElementById("current").innerText = index+1;
+ document.getElementById("score").innerText = score;
+ document.getElementById("progress").style.width =
+   `${(index/questions.length)*100}%`;
 
- answers.innerHTML="";
- let arr=q.options.map((t,idx)=>({t,idx}))
-                 .sort(()=>Math.random()-0.5);
+ document.getElementById("question").innerHTML = q.q;
 
- arr.forEach(o=>{
-  const d=document.createElement("div");
-  d.className="choice-card border p-4 rounded-xl font-semibold";
-  d.innerHTML=o.t;
-  d.onclick=()=>check(o.idx);
-  answers.appendChild(d);
+ const box = document.getElementById("answers");
+ box.innerHTML="";
+
+ q.options.forEach((op,i)=>{
+  const b=document.createElement("button");
+  b.className="option p-4 rounded-xl text-lg font-bold";
+  b.innerHTML=`${String.fromCharCode(65+i)}. ${op}`;
+  b.onclick=()=>check(i);
+  box.appendChild(b);
  });
 
  MathJax.typesetPromise();
 }
 
-function check(idx){
- const q=questions[i];
- if(idx===q.correct){
-  score++;
-  fbIcon.innerText="🥳";
-  fbTitle.innerText="CHÍNH XÁC!";
-  confetti();
- }else{
-  fbIcon.innerText="😅";
-  fbTitle.innerText="CHƯA ĐÚNG!";
- }
- fbText.innerHTML="Giải thích: "+q.rationale;
- fb.classList.remove("hidden");
- MathJax.typesetPromise();
-}
-
-function nextQ(){
- fb.classList.add("hidden");
- i++;
- if(i<questions.length) showQ();
- else{
-  quiz.classList.add("hidden");
-  end.classList.remove("hidden");
-  final.innerText=score;
-  comment.innerText=score===questions.length
-   ?"Xuất sắc! 🏆"
-   :"Cố gắng thêm nhé 💪";
-  confetti({particleCount:200});
- }
+/* ========= CHECK ========= */
+function check(i){
+ if(i===questions[index].correct) score++;
+ index++;
+ if(index<questions.length) showQuestion();
+ else alert("Hoàn thành! Điểm: "+score);
 }
 </script>
+
 </body>
 </html>
