@@ -509,7 +509,148 @@ const grades = [
       },
       { id: "lop7-thong-ke-xac-suat", name: "Thống kê và Xác suất", description: "Các game về bảng thống kê, biểu đồ, số trung bình cộng và các tình huống xác suất đơn giản.", games: [] },
       { id: "lop7-bieu-thuc-dai-so", name: "Biểu thức đại số", description: "Các game rèn kĩ năng thu gọn, biến đổi, thế số vào biểu thức đại số.", games: [] },
-      { id: "lop7-tam-giac", name: "Tam giác", description: "Các game về tính chất tam giác, đường cao, trung tuyến, phân giác và áp dụng vào bài toán.", games: [] },
+      { id: "lop7-tam-giac", name: "Tam giác", description: "Các game về tính chất tam giác, đường cao, trung tuyến, phân giác và áp dụng vào bài toán.", games: [
+        {
+  id: "toan7-vuong-quoc-tam-noi-tiep",
+  name: "Vương Quốc Tâm Nội Tiếp",
+  path: "vuongquoctamnoitiep/index.html",
+  icon: "🏰",
+  color: "emerald",
+  label: "Khám phá",
+  grade: "Toán 7 – Chương 3",
+  description:
+    "Game khám phá tâm nội tiếp tam giác: điều kiện đồng quy, tính chất đường phân giác và ứng dụng hình học.",
+  topics: [
+    "Khái niệm tâm nội tiếp",
+    "Đường phân giác trong tam giác",
+    "Tính chất tâm nội tiếp",
+    "Xác định tâm nội tiếp",
+    "Bài toán vận dụng"
+  ],
+  difficulty: "Nhận biết → Thông hiểu"
+},
+
+{
+  id: "toan7-sieu-cap-truc-tam",
+  name: "Siêu Cấp Trực Tâm",
+  path: "sieucaptructam/index.html",
+  icon: "⚡",
+  color: "red",
+  label: "Thử thách",
+  grade: "Toán 7 – Chương 3",
+  description:
+    "Thử thách kiến thức về trực tâm tam giác: đường cao, vị trí trực tâm và các trường hợp đặc biệt.",
+  topics: [
+    "Khái niệm trực tâm",
+    "Đường cao trong tam giác",
+    "Vị trí trực tâm",
+    "Trực tâm tam giác vuông – tù – nhọn",
+    "Bài toán tổng hợp"
+  ],
+  difficulty: "Thông hiểu → Vận dụng"
+},
+
+{
+  id: "toan7-trung-tuyen-tam-giac",
+  name: "Tính Chất Ba Đường Trung Tuyến",
+  path: "dautruongtrongtam/index.html",
+  icon: "📐",
+  color: "blue",
+  label: "Cốt lõi",
+  grade: "Toán 7 – Chương 3",
+  description:
+    "Game luyện tập tính chất ba đường trung tuyến, trọng tâm và các bài toán đi kèm.",
+  topics: [
+    "Định nghĩa trung tuyến",
+    "Trọng tâm tam giác",
+    "Tính chất đồng quy",
+    "Tỉ lệ đoạn thẳng",
+    "Bài toán chứng minh"
+  ],
+  difficulty: "Nhận biết → Thông hiểu"
+},
+
+{
+  id: "toan7-vuong-quoc-vong-tron-ngoai-tiep",
+  name: "Vương Quốc Vòng Tròn Ngoại Tiếp",
+  path: "vuongquocvongtronngoaitiep/index.html",
+  icon: "🌍",
+  color: "indigo",
+  label: "Khám phá",
+  grade: "Toán 7 – Chương 3",
+  description:
+    "Khám phá tâm đường tròn ngoại tiếp tam giác, trung trực và các tính chất quan trọng.",
+  topics: [
+    "Vòng tròn ngoại tiếp tam giác",
+    "Tâm đường tròn ngoại tiếp",
+    "Đường trung trực",
+    "Vị trí tâm ngoại tiếp",
+    "Bài toán ứng dụng"
+  ],
+  difficulty: "Nhận biết → Thông hiểu"
+},
+
+{
+  id: "toan7-sieu-cap-trung-truc",
+  name: "Siêu Cấp Trung Trực",
+  path: "sieucaptrungtruc/index.html",
+  icon: "🛡️",
+  color: "cyan",
+  label: "Thử thách",
+  grade: "Toán 7 – Chương 3",
+  description:
+    "Game nâng cao về đường trung trực, quỹ tích điểm và các bài toán hình học suy luận.",
+  topics: [
+    "Đường trung trực đoạn thẳng",
+    "Tính chất trung trực",
+    "Xác định tâm ngoại tiếp",
+    "Quỹ tích điểm",
+    "Bài toán nâng cao"
+  ],
+  difficulty: "Thông hiểu → Vận dụng cao"
+},
+
+{
+  id: "toan7-dau-truong-duong-xien",
+  name: "Đấu Trường Đường Xiên",
+  path: "dautruongduongxien/index.html",
+  icon: "⚔️",
+  color: "orange",
+  label: "Luyện tập",
+  grade: "Toán 7 – Chương 3",
+  description:
+    "Luyện tập và so sánh đường xiên – đường vuông góc, bất đẳng thức trong tam giác.",
+  topics: [
+    "Đường xiên và đường vuông góc",
+    "So sánh độ dài",
+    "Bất đẳng thức tam giác",
+    "Suy luận hình học",
+    "Bài toán thực tế"
+  ],
+  difficulty: "Nhận biết → Vận dụng"
+},
+
+{
+  id: "toan7-tho-san-tam-giac",
+  name: "Thợ Săn Tam Giác",
+  path: "thosantamgiac/index.html",
+  icon: "🏹",
+  color: "green",
+  label: "Tổng hợp",
+  grade: "Toán 7 – Chương 3",
+  description:
+    "Game tổng hợp kiến thức tam giác: đường cao, trung tuyến, phân giác, trung trực và ứng dụng.",
+  topics: [
+    "Các đường đặc biệt trong tam giác",
+    "So sánh và phân biệt",
+    "Xác định tâm tam giác",
+    "Bài toán tổng hợp",
+    "Ôn tập cuối chương"
+  ],
+  difficulty: "Tổng hợp (NB → VDC)"
+}
+      ] 
+      },
       {
     id: "lop7-on-tap-kiem-tra",
     name: "Ôn tập – Kiểm tra",
