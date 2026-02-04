@@ -1,80 +1,73 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Đường đua Tỉ lệ nghịch – Toán 7</title>
+<meta charset="UTF-8" />
+<title>Game Toán 7 – Đại lượng tỉ lệ nghịch</title>
+
+<!-- Tailwind CDN (chạy offline vẫn OK nếu đã tải, còn online thì càng tốt) -->
+<script src="https://cdn.tailwindcss.com"></script>
 
 <!-- MathJax -->
 <script>
 window.MathJax = {
-  tex: { inlineMath: [['\\(','\\)']] },
-  svg: { fontCache: 'global' }
+  tex: { inlineMath: [['\\(', '\\)']] }
 };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<!-- Confetti -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
-body{
-  font-family: 'Quicksand', sans-serif;
-  background: linear-gradient(135deg,#1e3a8a,#4c1d95);
-  min-height:100vh;
+body {
+  background: linear-gradient(135deg,#1e3a8a,#6d28d9);
 }
-.card{
-  background:#0f172a;
-  border-radius:2rem;
-  color:white;
-  box-shadow:0 25px 60px rgba(0,0,0,.5);
-}
-.option{
-  background:#1e293b;
-  border:1px solid #334155;
-  transition:.25s;
-}
-.option:hover{
-  border-color:#f97316;
-  transform:scale(1.03);
+.glass {
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(12px);
 }
 </style>
 </head>
 
-<body class="flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center text-white">
 
-<div class="max-w-3xl w-full card p-8">
+<div class="glass rounded-3xl p-10 w-full max-w-3xl">
 
-<!-- START -->
-<div id="start-screen" class="text-center">
-  <h1 class="text-4xl font-bold text-cyan-400 mb-4">🏁 ĐƯỜNG ĐUA TỈ LỆ NGHỊCH</h1>
-  <p class="text-gray-300 mb-6">Toán 7 – 15 câu trắc nghiệm</p>
-  <button onclick="startGame()"
-    class="bg-cyan-500 hover:bg-cyan-400 text-black px-10 py-4 rounded-full font-bold text-xl">
-    START 🚀
-  </button>
-</div>
-
-<!-- GAME -->
-<div id="game-screen" class="hidden">
-  <div class="flex justify-between mb-4 font-bold">
-    <div>Câu <span id="current">1</span>/3</div>
+  <!-- Header -->
+  <div class="flex justify-between mb-4">
+    <div id="progress">Câu 1/?</div>
     <div>Điểm: <span id="score">0</span></div>
   </div>
 
-  <div class="bg-slate-700 h-3 rounded mb-6">
-    <div id="progress" class="bg-orange-400 h-3 rounded"></div>
+  <!-- Progress bar -->
+  <div class="w-full bg-gray-700 h-3 rounded mb-6">
+    <div id="bar" class="bg-orange-400 h-3 rounded" style="width:0%"></div>
   </div>
 
-  <div id="question" class="text-xl text-center mb-8"></div>
+  <!-- Question -->
+  <div id="question" class="text-xl mb-8"></div>
 
-  <div id="answers" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  <!-- Options -->
+  <div id="options" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
 </div>
 
+<!-- FEEDBACK MODAL -->
+<div id="feedback" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+  <div class="glass rounded-2xl p-8 max-w-md w-full text-center">
+    <div id="fb-icon" class="text-5xl mb-3"></div>
+    <div id="fb-title" class="text-2xl font-bold mb-3"></div>
+    <div id="fb-rationale" class="mb-6 text-gray-200"></div>
+    <button onclick="nextQuestion()"
+      class="bg-blue-500 hover:bg-blue-400 px-6 py-3 rounded-xl font-bold">
+      CÂU TIẾP THEO →
+    </button>
+  </div>
 </div>
 
 <script>
-/* ========= DATA ========= */
-let questions = [
-     // ================== TỈ LỆ NGHỊCH – ĐÃ CHUẨN HOÁ LATEX ==================
+
+// ================== TỈ LỆ NGHỊCH – ĐÃ CHUẨN HOÁ LATEX ==================
 
 let questions = [
 
@@ -212,50 +205,76 @@ let questions = [
 }
 
 ];
-
-questions.sort(()=>Math.random()-0.5);
-
-let index=0, score=0;
-
-/* ========= START ========= */
-function startGame(){
- document.getElementById("start-screen").classList.add("hidden");
- document.getElementById("game-screen").classList.remove("hidden");
- showQuestion();
+// ================== RANDOM ==================
+function shuffle(arr){
+for(let i=arr.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[arr[i],arr[j]]=[arr[j],arr[i]];
+}
 }
 
-/* ========= SHOW ========= */
-function showQuestion(){
- const q = questions[index];
- document.getElementById("current").innerText = index+1;
- document.getElementById("score").innerText = score;
- document.getElementById("progress").style.width =
-   `${(index/questions.length)*100}%`;
+questions.forEach(q=>{
+const correctOpt=q.options[q.correct];
+shuffle(q.options);
+q.correct=q.options.indexOf(correctOpt);
+});
+shuffle(questions);
 
- document.getElementById("question").innerHTML = q.q;
+// ================== GAME LOGIC ==================
+let i=0, score=0;
 
- const box = document.getElementById("answers");
- box.innerHTML="";
+const qEl=document.getElementById("question");
+const optEl=document.getElementById("options");
+const progEl=document.getElementById("progress");
+const barEl=document.getElementById("bar");
+const scoreEl=document.getElementById("score");
 
- q.options.forEach((op,i)=>{
-  const b=document.createElement("button");
-  b.className="option p-4 rounded-xl text-lg font-bold";
-  b.innerHTML=`${String.fromCharCode(65+i)}. ${op}`;
-  b.onclick=()=>check(i);
-  box.appendChild(b);
- });
-
- MathJax.typesetPromise();
+function loadQuestion(){
+const q=questions[i];
+progEl.innerText=`Câu ${i+1}/${questions.length}`;
+barEl.style.width=`${(i/questions.length)*100}%`;
+qEl.innerHTML=q.q;
+optEl.innerHTML="";
+q.options.forEach((opt,idx)=>{
+const btn=document.createElement("button");
+btn.className="glass p-4 rounded-xl hover:bg-orange-500 transition";
+btn.innerHTML=String.fromCharCode(65+idx)+". "+opt;
+btn.onclick=()=>checkAnswer(idx);
+optEl.appendChild(btn);
+});
+MathJax.typesetPromise();
 }
 
-/* ========= CHECK ========= */
-function check(i){
- if(i===questions[index].correct) score++;
- index++;
- if(index<questions.length) showQuestion();
- else alert("Hoàn thành! Điểm: "+score);
+function checkAnswer(idx){
+const q=questions[i];
+document.getElementById("feedback").classList.remove("hidden");
+if(idx===q.correct){
+score++;
+document.getElementById("fb-icon").innerText="🎉";
+document.getElementById("fb-title").innerText="CHÍNH XÁC!";
+confetti({particleCount:120,spread:70});
+}else{
+document.getElementById("fb-icon").innerText="❌";
+document.getElementById("fb-title").innerText="CHƯA ĐÚNG!";
 }
+scoreEl.innerText=score;
+document.getElementById("fb-rationale").innerHTML="<b>Giải thích:</b><br>"+q.rationale;
+MathJax.typesetPromise();
+}
+
+function nextQuestion(){
+document.getElementById("feedback").classList.add("hidden");
+i++;
+if(i>=questions.length){
+qEl.innerHTML="🎯 <b>HOÀN THÀNH!</b>";
+optEl.innerHTML=`Điểm của em: <b>${score}/${questions.length}</b>`;
+barEl.style.width="100%";
+return;
+}
+loadQuestion();
+}
+
+loadQuestion();
 </script>
-
 </body>
 </html>
