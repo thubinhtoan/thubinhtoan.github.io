@@ -106,124 +106,120 @@ body{
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
 
 const questions = [
-/* ================= NHẬN BIẾT (6) ================= */
+/* ================== NHẬN BIẾT (6 câu) ================== */
 {
-lvl:"Nhận biết",
-q:"Tổng số đo ba góc trong một tam giác bất kì bằng:",
-opts:["\\(90^\\circ\\)","\\(180^\\circ\\)","\\(270^\\circ\\)","\\(360^\\circ\\)"],
-ans:1,
-rat:"Theo định lí, tổng ba góc của một tam giác bằng \\(180^\\circ\\)."
+  lvl:"Nhận biết",
+  q:"Tổng số đo ba góc trong một tam giác bất kì bằng bao nhiêu?",
+  opts:["90°","180°","270°","360°"],
+  ans:1,
+  rat:"Theo định lí, tổng ba góc của một tam giác bằng \\(180^\\circ\\)."
 },
 {
-lvl:"Nhận biết",
-q:"Tam giác có một góc bằng \\(90^\\circ\\) gọi là:",
-opts:["Tam giác nhọn","Tam giác vuông","Tam giác tù","Tam giác cân"],
-ans:1,
-rat:"Tam giác có một góc vuông gọi là tam giác vuông."
+  lvl:"Nhận biết",
+  q:"Tam giác có một góc vuông được gọi là:",
+  opts:["Tam giác nhọn","Tam giác tù","Tam giác vuông","Tam giác cân"],
+  ans:2,
+  rat:"Tam giác có một góc bằng \\(90^\\circ\\) gọi là tam giác vuông."
 },
 {
-lvl:"Nhận biết",
-q:"Trong tam giác vuông, tổng hai góc nhọn bằng:",
-opts:["\\(45^\\circ\\)","\\(60^\\circ\\)","\\(90^\\circ\\)","\\(180^\\circ\\)"],
-ans:2,
-rat:"Vì tổng ba góc là \\(180^\\circ\\), trong đó góc vuông là \\(90^\\circ\\)."
+  lvl:"Nhận biết",
+  q:"Trong một tam giác vuông, tổng hai góc nhọn bằng:",
+  opts:["45°","90°","180°","60°"],
+  ans:1,
+  rat:"Tổng ba góc là \\(180^\\circ\\), trừ góc vuông \\(90^\\circ\\) còn \\(90^\\circ\\)."
 },
 {
-lvl:"Nhận biết",
-q:"Tam giác nhọn là tam giác có:",
-opts:[
-"Có một góc nhọn",
-"Có hai góc nhọn",
-"Cả ba góc đều nhọn",
-"Có một góc vuông"
-],
-ans:2,
-rat:"Tam giác nhọn là tam giác có cả ba góc đều nhỏ hơn \\(90^\\circ\\)."
+  lvl:"Nhận biết",
+  q:"Tam giác nhọn là tam giác có:",
+  opts:["Một góc nhọn","Hai góc nhọn","Ba góc đều nhọn","Một góc vuông"],
+  ans:2,
+  rat:"Tam giác nhọn là tam giác có cả ba góc đều nhỏ hơn \\(90^\\circ\\)."
 },
 {
-lvl:"Nhận biết",
-q:"Một tam giác có thể có tối đa bao nhiêu góc tù?",
-opts:["1 góc","2 góc","3 góc","0 góc"],
-ans:0,
-rat:"Nếu có 2 góc tù thì tổng số đo vượt quá \\(180^\\circ\\), điều này không thể."
+  lvl:"Nhận biết",
+  q:"Một tam giác có thể có tối đa bao nhiêu góc tù?",
+  opts:["1 góc","2 góc","3 góc","0 góc"],
+  ans:0,
+  rat:"Nếu có hai góc tù thì tổng góc sẽ lớn hơn \\(180^\\circ\\), điều này không thể."
 },
 {
-lvl:"Nhận biết",
-q:"Cho \\(\\triangle ABC\\) có \\(\\widehat{A}=50^\\circ\\), \\(\\widehat{B}=70^\\circ\\). Khi đó \\(\\widehat{C}\\) bằng:",
-opts:["\\(50^\\circ\\)","\\(60^\\circ\\)","\\(70^\\circ\\)","\\(80^\\circ\\)"],
-ans:1,
-rat:"\\(\\widehat{C}=180^\\circ-(50^\\circ+70^\\circ)=60^\\circ\\)."
+  lvl:"Nhận biết",
+  q:"Cho \\(\\triangle ABC\\) có \\(\\widehat{A}=50^\\circ\\), \\(\\widehat{B}=70^\\circ\\). Số đo \\(\\widehat{C}\\) là:",
+  opts:["50°","60°","70°","180°"],
+  ans:1,
+  rat:"\\(\\widehat{C}=180^\\circ-(50^\\circ+70^\\circ)=60^\\circ\\)."
 },
 
-/* ================= THÔNG HIỂU (5) ================= */
+/* ================== THÔNG HIỂU (5 câu) ================== */
 {
-lvl:"Thông hiểu",
-q:"Cho \\(\\triangle ABC\\) vuông tại \\(A\\). Nếu \\(\\widehat{B}=40^\\circ\\) thì \\(\\widehat{C}\\) bằng:",
-opts:["\\(40^\\circ\\)","\\(50^\\circ\\)","\\(90^\\circ\\)","\\(140^\\circ\\)"],
-ans:1,
-rat:"Trong tam giác vuông: \\(\\widehat{B}+\\widehat{C}=90^\\circ\\)."
+  lvl:"Thông hiểu",
+  q:"Cho \\(\\triangle ABC\\) vuông tại \\(A\\). Nếu \\(\\widehat{B}=40^\\circ\\) thì \\(\\widehat{C}\\) bằng:",
+  opts:["40°","50°","90°","140°"],
+  ans:1,
+  rat:"Hai góc nhọn trong tam giác vuông phụ nhau: \\(90^\\circ-40^\\circ=50^\\circ\\)."
 },
 {
-lvl:"Thông hiểu",
-q:"Cho \\(\\triangle MNP\\) có \\(\\widehat{M}=100^\\circ\\) và \\(\\widehat{N}=\\widehat{P}\\). Khi đó \\(\\widehat{N}\\) bằng:",
-opts:["\\(40^\\circ\\)","\\(50^\\circ\\)","\\(80^\\circ\\)","\\(100^\\circ\\)"],
-ans:0,
-rat:"Hai góc còn lại có tổng \\(80^\\circ\\), mỗi góc bằng \\(40^\\circ\\)."
+  lvl:"Thông hiểu",
+  q:"Cho \\(\\triangle MNP\\) có \\(\\widehat{M}=100^\\circ\\) và \\(\\widehat{N}=\\widehat{P}\\). Số đo \\(\\widehat{N}\\) là:",
+  opts:["40°","80°","100°","50°"],
+  ans:0,
+  rat:"\\(\\widehat{N}+\\widehat{P}=80^\\circ\\), mỗi góc bằng \\(40^\\circ\\)."
 },
 {
-lvl:"Thông hiểu",
-q:"Một tam giác có ba góc bằng nhau thì mỗi góc bằng:",
-opts:["\\(45^\\circ\\)","\\(60^\\circ\\)","\\(90^\\circ\\)","\\(120^\\circ\\)"],
-ans:1,
-rat:"\\(180^\\circ : 3 = 60^\\circ\\)."
+  lvl:"Thông hiểu",
+  q:"Một tam giác có ba góc bằng nhau thì mỗi góc bằng:",
+  opts:["45°","60°","90°","180°"],
+  ans:1,
+  rat:"\\(180^\\circ:3=60^\\circ\\)."
 },
 {
-lvl:"Thông hiểu",
-q:"Cho \\(\\triangle ABC\\) có \\(\\widehat{A}:\\widehat{B}:\\widehat{C}=1:2:3\\). Tam giác đó là:",
-opts:["Tam giác nhọn","Tam giác vuông","Tam giác tù","Tam giác cân"],
-ans:1,
-rat:"Góc lớn nhất bằng \\(90^\\circ\\) nên là tam giác vuông."
+  lvl:"Thông hiểu",
+  q:"Cho \\(\\triangle ABC\\) có \\(\\widehat{A}:\\widehat{B}:\\widehat{C}=1:2:3\\). Đây là tam giác gì?",
+  opts:["Tam giác nhọn","Tam giác vuông","Tam giác tù","Tam giác cân"],
+  ans:1,
+  rat:"Góc lớn nhất là \\(90^\\circ\\) nên là tam giác vuông."
 },
 {
-lvl:"Thông hiểu",
-q:"Cho \\(\\triangle ABC\\) vuông tại \\(A\\), biết \\(\\widehat{B}=2\\widehat{C}\\). Khi đó \\(\\widehat{B}\\) bằng:",
-opts:["\\(30^\\circ\\)","\\(60^\\circ\\)","\\(45^\\circ\\)","\\(20^\\circ\\)"],
-ans:1,
-rat:"\\(\\widehat{B}+\\widehat{C}=90^\\circ\\Rightarrow \\widehat{B}=60^\\circ\\)."
-},
-
-/* ================= VẬN DỤNG (3) ================= */
-{
-lvl:"Vận dụng",
-q:"Cho \\(\\triangle ABC\\) có \\(\\widehat{A}=70^\\circ\\). Tia phân giác của \\(\\widehat{B}\\) và \\(\\widehat{C}\\) cắt nhau tại \\(I\\). Tính \\(\\widehat{BIC}\\).",
-opts:["\\(110^\\circ\\)","\\(125^\\circ\\)","\\(140^\\circ\\)","\\(100^\\circ\\)"],
-ans:1,
-rat:"\\(\\widehat{BIC}=180^\\circ-\\dfrac{\\widehat{B}+\\widehat{C}}{2}=125^\\circ\\)."
-},
-{
-lvl:"Vận dụng",
-q:"Một chiếc thang dựa vào tường tạo thành tam giác vuông. Nếu góc giữa thang và mặt đất là \\(65^\\circ\\) thì góc giữa thang và tường là:",
-opts:["\\(25^\\circ\\)","\\(35^\\circ\\)","\\(65^\\circ\\)","\\(90^\\circ\\)"],
-ans:0,
-rat:"Hai góc nhọn trong tam giác vuông có tổng \\(90^\\circ\\)."
-},
-{
-lvl:"Vận dụng",
-q:"Cho \\(\\triangle ABC\\) có góc ngoài tại \\(C\\) bằng \\(120^\\circ\\) và \\(\\widehat{A}=50^\\circ\\). Tính \\(\\widehat{B}\\).",
-opts:["\\(50^\\circ\\)","\\(70^\\circ\\)","\\(60^\\circ\\)","\\(120^\\circ\\)"],
-ans:1,
-rat:"Góc ngoài bằng tổng hai góc trong không kề."
+  lvl:"Thông hiểu",
+  q:"Cho \\(\\triangle ABC\\) vuông tại \\(A\\) có \\(\\widehat{B}=2\\widehat{C}\\). Số đo \\(\\widehat{B}\\) là:",
+  opts:["30°","60°","45°","20°"],
+  ans:1,
+  rat:"\\(\\widehat{B}+\\widehat{C}=90^\\circ\\Rightarrow\\widehat{B}=60^\\circ\\)."
 },
 
-/* ================= VẬN DỤNG CAO (1) ================= */
+/* ================== VẬN DỤNG (3 câu) ================== */
 {
-lvl:"Vận dụng cao",
-q:"Cho \\(\\triangle ABC\\) có \\(\\widehat{B}-\\widehat{C}=20^\\circ\\). Tia phân giác của \\(\\widehat{A}\\) cắt \\(BC\\) tại \\(D\\). Tính \\(\\widehat{ADC}\\).",
-opts:["\\(80^\\circ\\)","\\(100^\\circ\\)","\\(90^\\circ\\)","\\(110^\\circ\\)"],
-ans:1,
-rat:"\\(\\widehat{ADC}=\\dfrac{180^\\circ+(\\widehat{B}-\\widehat{C})}{2}=100^\\circ\\)."
+  lvl:"Vận dụng",
+  q:"Cho \\(\\triangle ABC\\) có \\(\\widehat{A}=70^\\circ\\). Hai tia phân giác của \\(\\widehat{B}\\) và \\(\\widehat{C}\\) cắt nhau tại \\(I\\). Tính \\(\\widehat{BIC}\\).",
+  opts:["110°","125°","140°","100°"],
+  ans:1,
+  rat:"\\(\\widehat{BIC}=180^\\circ-\\frac{\\widehat{B}+\\widehat{C}}{2}=125^\\circ\\)."
+},
+{
+  lvl:"Vận dụng",
+  q:"Một cái thang dựa vào tường tạo thành tam giác vuông. Nếu góc giữa thang và mặt đất là \\(65^\\circ\\) thì góc giữa thang và tường là:",
+  opts:["25°","35°","65°","90°"],
+  ans:0,
+  rat:"Hai góc nhọn phụ nhau: \\(90^\\circ-65^\\circ=25^\\circ\\)."
+},
+{
+  lvl:"Vận dụng",
+  q:"Cho \\(\\triangle ABC\\), góc ngoài tại đỉnh \\(C\\) bằng \\(120^\\circ\\) và \\(\\widehat{A}=50^\\circ\\). Số đo \\(\\widehat{B}\\) là:",
+  opts:["50°","70°","60°","120°"],
+  ans:1,
+  rat:"Góc ngoài bằng tổng hai góc trong không kề: \\(120^\\circ-50^\\circ=70^\\circ\\)."
+},
+
+/* ================== VẬN DỤNG CAO (1 câu) ================== */
+{
+  lvl:"Vận dụng cao",
+  q:"Cho \\(\\triangle ABC\\) có \\(\\widehat{B}-\\widehat{C}=20^\\circ\\). Tia phân giác của \\(\\widehat{A}\\) cắt \\(BC\\) tại \\(D\\). Tính \\(\\widehat{ADC}\\).",
+  opts:["80°","100°","90°","110°"],
+  ans:1,
+  rat:"\\(\\widehat{ADC}=(180^\\circ+\\widehat{B}-\\widehat{C})/2=100^\\circ\\)."
 }
 ];
+
 /* đủ 15 câu – cô có thể thêm tiếp theo mẫu này */
 
 shuffle(questions);
