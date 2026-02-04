@@ -74,121 +74,144 @@ body{
 <script>
 /* ========= DATA ========= */
 let questions = [
-            // NHẬN BIẾT (6 câu)
-            {
-                lvl: "Nhận biết",
-                q: "Nếu đại lượng $y$ liên hệ với đại lượng $x$ theo công thức $y = a/x$ ($a \ne 0$) thì ta nói:",
-                options: ["y tỉ lệ thuận với x", "y tỉ lệ nghịch với x theo hệ số a", "x tỉ lệ nghịch với y theo hệ số 1/a", "y bằng a lần x"],
-                correct: 1,
-                rationale: "Đây là định nghĩa chính xác về đại lượng tỉ lệ nghịch: $y = a/x$ hoặc $xy = a$."
-            },
-            {
-                lvl: "Nhận biết",
-                q: "Cho công thức $xy = 15$. Hệ số tỉ lệ nghịch $a$ của $y$ đối với $x$ là:",
-                options: ["15", "-15", "1/15", "x/y"],
-                correct: 0,
-                rationale: "Trong đại lượng tỉ lệ nghịch, tích của hai giá trị tương ứng $xy = a$. Vậy $a = 15$."
-            },
-            {
-                lvl: "Nhận biết",
-                q: "Nếu $y$ tỉ lệ nghịch với $x$ theo hệ số tỉ lệ $a$ thì $x$ tỉ lệ nghịch với $y$ theo hệ số:",
-                options: ["1/a", "-a", "a", "a²"],
-                correct: 2,
-                rationale: "Quan hệ tỉ lệ nghịch là đối xứng: nếu $y = a/x$ thì $x = a/y$."
-            },
-            {
-                lvl: "Nhận biết",
-                q: "Tính chất nào sau đây là của đại lượng tỉ lệ nghịch?",
-                options: ["$y_1/x_1 = y_2/x_2$", "$x_1/x_2 = y_1/y_2$", "$x_1 \\cdot y_1 = x_2 \\cdot y_2$", "$x_1+y_1 = x_2+y_2$"],
-                correct: 2,
-                rationale: "Tỉ lệ nghịch có đặc điểm là tích của hai giá trị tương ứng không đổi ($x_1y_1 = x_2y_2 = a$)."
-            },
-            {
-                lvl: "Nhận biết",
-                q: "Cặp đại lượng nào sau đây tỉ lệ nghịch với nhau?",
-                options: [
-                    "Vận tốc và quãng đường (với thời gian cố định)",
-                    "Thời gian và quãng đường (với vận tốc cố định)",
-                    "Vận tốc và thời gian (với quãng đường cố định)",
-                    "Chiều dài và chu vi hình chữ nhật"
-                ],
-                correct: 2,
-                rationale: "Vì $v \cdot t = s$. Khi quãng đường $s$ không đổi, vận tốc tăng thì thời gian giảm và ngược lại."
-            },
-            {
-                lvl: "Nhận biết",
-                q: "Cho bảng giá trị của $x$ và $y$. Nếu $x \cdot y = 24$ thì $x$ và $y$ là:",
-                options: ["Tỉ lệ thuận", "Tỉ lệ nghịch", "Không tỉ lệ", "Bằng nhau"],
-                correct: 1,
-                rationale: "Khi tích của hai đại lượng luôn bằng một số không đổi thì chúng tỉ lệ nghịch."
-            },
-            // THÔNG HIỂU (5 câu)
-            {
-                lvl: "Thông hiểu",
-                q: "Cho $x$ và $y$ tỉ lệ nghịch. Khi $x = 4$ thì $y = 5$. Tìm hệ số tỉ lệ $a$.",
-                options: ["a = 1,25", "a = 9", "a = 20", "a = 1"],
-                correct: 2,
-                rationale: "Hệ số $a = x \cdot y = 4 \\cdot 5 = 20$."
-            },
-            {
-                lvl: "Thông hiểu",
-                q: "Cho $y$ tỉ lệ nghịch với $x$ theo hệ số $a = 12$. Khi $x = -3$ thì giá trị của $y$ là:",
-                options: ["-4", "4", "36", "-36"],
-                correct: 0,
-                rationale: "$y = a/x = 12/(-3) = -4$."
-            },
-            {
-                lvl: "Thông hiểu",
-                q: "Biết $x_1/x_2 = y_2/y_1$. Nếu $x_1 = 2, x_2 = 4, y_1 = 10$ thì $y_2$ bằng:",
-                options: ["20", "5", "8", "40"],
-                correct: 1,
-                rationale: "Từ tỉ lệ thức: $2/4 = y_2/10 \\implies y_2 = (2 \\cdot 10) / 4 = 5$."
-            },
-            {
-                lvl: "Thông hiểu",
-                q: "Cho $y$ tỉ lệ nghịch với $x$. Khi $x$ tăng lên 3 lần thì $y$ sẽ:",
-                options: ["Tăng 3 lần", "Giảm 3 lần", "Không đổi", "Tăng 9 lần"],
-                correct: 1,
-                rationale: "Đặc trưng của tỉ lệ nghịch: đại lượng này tăng bao nhiêu lần thì đại lượng kia giảm bấy nhiêu lần."
-            },
-            {
-                lvl: "Thông hiểu",
-                q: "Cho $x$ tỉ lệ nghịch với $y$ theo hệ số $a=2$, $y$ tỉ lệ thuận với $z$ theo hệ số $k=4$. $x$ liên hệ với $z$ như thế nào?",
-                options: ["$x = 8z$", "$x = 0,5/z$", "$x = 2/z$", "$x = 1/(2z)$"],
-                correct: 3,
-                rationale: "$x = 2/y$ và $y = 4z \\implies x = 2/(4z) = 1/(2z)$. Vậy $x$ tỉ lệ nghịch với $z$ hệ số 0,5."
-            },
-            // VẬN DỤNG (3 câu)
-            {
-                lvl: "Vận dụng",
-                q: "Một đội công nhân gồm 12 người xây xong một bức tường trong 10 ngày. Nếu có 15 người (cùng năng suất) thì xây xong trong mấy ngày?",
-                options: ["12,5 ngày", "8 ngày", "18 ngày", "6 ngày"],
-                correct: 1,
-                rationale: "Số người và thời gian tỉ lệ nghịch. $12 \\cdot 10 = 15 \\cdot t \\implies t = 120 / 15 = 8$ ngày."
-            },
-            {
-                lvl: "Vận dụng",
-                q: "Chia số 310 thành 3 phần tỉ lệ nghịch với 2; 3; 5. Phần bé nhất là:",
-                options: ["150", "100", "60", "30"],
-                correct: 2,
-                rationale: "Phần tỉ lệ nghịch với 2; 3; 5 là tỉ lệ thuận với $1/2; 1/3; 1/5$. Tổng phần: $31/30$. Phần bé nhất tương ứng với số lớn nhất (5): $310 / (31/30) \\cdot (1/5) = 300 \\cdot 1/5 = 60$."
-            },
-            {
-                lvl: "Vận dụng thực tế",
-                q: "(Thực tế) Một vòi nước chảy đầy bể trong 6 giờ. Nếu mở thêm 2 vòi cùng loại như thế (tổng 3 vòi) thì bể sẽ đầy trong bao lâu?",
-                options: ["2 giờ", "3 giờ", "18 giờ", "4 giờ"],
-                correct: 0,
-                rationale: "Số vòi nước và thời gian tỉ lệ nghịch. 1 vòi hết 6h, nên 3 vòi hết $6 : 3 = 2$ giờ."
-            },
-            // VẬN DỤNG CAO (1 câu)
-            {
-                lvl: "Vận dụng cao",
-                q: "Cho $x$ và $y$ tỉ lệ nghịch. Gọi $x_1, x_2$ là hai giá trị của $x$ và $y_1, y_2$ là hai giá trị tương ứng của $y$. Biết $x_1 - x_2 = 5$ và $y_1 = 4, y_2 = 9$. Tìm hệ số tỉ lệ $a$.",
-                options: ["a = 13", "a = 36", "a = 45", "a = 20"],
-                correct: 1,
-                rationale: "$x_1y_1 = x_2y_2 \\implies 4x_1 = 9x_2$. Kết hợp $x_1 - x_2 = 5 \\implies x_1 = 9, x_2 = 4$. Vậy $a = 9 \\cdot 4 = 36$."
-            }
-        ];
+     // ================== TỈ LỆ NGHỊCH – ĐÃ CHUẨN HOÁ LATEX ==================
+
+let questions = [
+
+/* ========= NHẬN BIẾT (6 câu) ========= */
+{
+  lvl: "Nhận biết",
+  q: "Nếu đại lượng \\(y\\) liên hệ với đại lượng \\(x\\) theo công thức \\(y = \\dfrac{a}{x}\\) (\\(a \\ne 0\\)) thì ta nói:",
+  options: [
+    "y tỉ lệ thuận với x",
+    "y tỉ lệ nghịch với x theo hệ số a",
+    "x tỉ lệ nghịch với y theo hệ số \\(1/a\\)",
+    "y bằng a lần x"
+  ],
+  correct: 1,
+  rationale: "Theo định nghĩa đại lượng tỉ lệ nghịch: \\(y = \\dfrac{a}{x}\\) hay \\(x \\cdot y = a\\)."
+},
+{
+  lvl: "Nhận biết",
+  q: "Cho công thức \\(x \\cdot y = 15\\). Hệ số tỉ lệ nghịch \\(a\\) của \\(y\\) đối với \\(x\\) là:",
+  options: ["15", "-15", "1/15", "x/y"],
+  correct: 0,
+  rationale: "Với đại lượng tỉ lệ nghịch, ta có \\(x \\cdot y = a\\). Do đó \\(a = 15\\)."
+},
+{
+  lvl: "Nhận biết",
+  q: "Nếu \\(y\\) tỉ lệ nghịch với \\(x\\) theo hệ số \\(a\\) thì \\(x\\) tỉ lệ nghịch với \\(y\\) theo hệ số:",
+  options: ["\\(1/a\\)", "-a", "a", "\\(a^2\\)"],
+  correct: 2,
+  rationale: "Vì \\(y = \\dfrac{a}{x}\\) nên \\(x = \\dfrac{a}{y}\\). Quan hệ tỉ lệ nghịch là đối xứng."
+},
+{
+  lvl: "Nhận biết",
+  q: "Tính chất nào sau đây là của đại lượng tỉ lệ nghịch?",
+  options: [
+    "\\(\\dfrac{y_1}{x_1} = \\dfrac{y_2}{x_2}\\)",
+    "\\(\\dfrac{x_1}{x_2} = \\dfrac{y_1}{y_2}\\)",
+    "\\(x_1 \\cdot y_1 = x_2 \\cdot y_2\\)",
+    "\\(x_1 + y_1 = x_2 + y_2\\)"
+  ],
+  correct: 2,
+  rationale: "Đặc trưng của tỉ lệ nghịch là tích của hai giá trị tương ứng không đổi."
+},
+{
+  lvl: "Nhận biết",
+  q: "Cặp đại lượng nào sau đây tỉ lệ nghịch với nhau?",
+  options: [
+    "Vận tốc và quãng đường (thời gian không đổi)",
+    "Thời gian và quãng đường (vận tốc không đổi)",
+    "Vận tốc và thời gian (quãng đường không đổi)",
+    "Chiều dài và chu vi hình chữ nhật"
+  ],
+  correct: 2,
+  rationale: "Vì \\(v \\cdot t = s\\). Khi \\(s\\) không đổi, vận tốc tăng thì thời gian giảm."
+},
+{
+  lvl: "Nhận biết",
+  q: "Nếu \\(x \\cdot y = 24\\) thì \\(x\\) và \\(y\\) là:",
+  options: ["Tỉ lệ thuận", "Tỉ lệ nghịch", "Không tỉ lệ", "Bằng nhau"],
+  correct: 1,
+  rationale: "Khi tích của hai đại lượng luôn bằng một số không đổi thì chúng tỉ lệ nghịch."
+},
+
+/* ========= THÔNG HIỂU (5 câu) ========= */
+{
+  lvl: "Thông hiểu",
+  q: "Cho \\(x\\) và \\(y\\) tỉ lệ nghịch. Khi \\(x = 4\\) thì \\(y = 5\\). Hệ số tỉ lệ \\(a\\) là:",
+  options: ["1,25", "9", "20", "1"],
+  correct: 2,
+  rationale: "Hệ số \\(a = x \\cdot y = 4 \\cdot 5 = 20\\)."
+},
+{
+  lvl: "Thông hiểu",
+  q: "Cho \\(y\\) tỉ lệ nghịch với \\(x\\) theo hệ số \\(a = 12\\). Khi \\(x = -3\\) thì \\(y\\) bằng:",
+  options: ["-4", "4", "36", "-36"],
+  correct: 0,
+  rationale: "Ta có \\(y = \\dfrac{12}{-3} = -4\\)."
+},
+{
+  lvl: "Thông hiểu",
+  q: "Biết \\(\\dfrac{x_1}{x_2} = \\dfrac{y_2}{y_1}\\). Nếu \\(x_1 = 2, x_2 = 4, y_1 = 10\\) thì \\(y_2\\) bằng:",
+  options: ["20", "5", "8", "40"],
+  correct: 1,
+  rationale: "Từ \\(\\dfrac{2}{4} = \\dfrac{y_2}{10}\\) suy ra \\(y_2 = 5\\)."
+},
+{
+  lvl: "Thông hiểu",
+  q: "Cho \\(y\\) tỉ lệ nghịch với \\(x\\). Khi \\(x\\) tăng lên 3 lần thì \\(y\\) sẽ:",
+  options: ["Tăng 3 lần", "Giảm 3 lần", "Không đổi", "Tăng 9 lần"],
+  correct: 1,
+  rationale: "Trong tỉ lệ nghịch, một đại lượng tăng bao nhiêu lần thì đại lượng kia giảm bấy nhiêu lần."
+},
+{
+  lvl: "Thông hiểu",
+  q: "Cho \\(x\\) tỉ lệ nghịch với \\(y\\) theo hệ số \\(a=2\\), \\(y\\) tỉ lệ thuận với \\(z\\) theo hệ số \\(k=4\\). Quan hệ giữa \\(x\\) và \\(z\\) là:",
+  options: [
+    "\\(x = 8z\\)",
+    "\\(x = \\dfrac{1}{2z}\\)",
+    "\\(x = \\dfrac{2}{z}\\)",
+    "\\(x = \\dfrac{1}{2z}\\)"
+  ],
+  correct: 3,
+  rationale: "Ta có \\(x = \\dfrac{2}{y}\\), \\(y = 4z\\) nên \\(x = \\dfrac{1}{2z}\\)."
+},
+
+/* ========= VẬN DỤNG (3 câu) ========= */
+{
+  lvl: "Vận dụng",
+  q: "Một đội 12 công nhân làm xong công việc trong 10 ngày. Nếu có 15 công nhân (năng suất như nhau) thì cần:",
+  options: ["12,5 ngày", "8 ngày", "18 ngày", "6 ngày"],
+  correct: 1,
+  rationale: "Số công nhân và thời gian tỉ lệ nghịch: \\(12 \\cdot 10 = 15 \\cdot t \\Rightarrow t = 8\\) ngày."
+},
+{
+  lvl: "Vận dụng",
+  q: "Chia số 310 thành 3 phần tỉ lệ nghịch với 2; 3; 5. Phần bé nhất là:",
+  options: ["150", "100", "60", "30"],
+  correct: 2,
+  rationale: "Phần tỉ lệ nghịch với 2;3;5 tức tỉ lệ thuận với \\(\\frac12,\\frac13,\\frac15\\). Phần nhỏ nhất là 60."
+},
+{
+  lvl: "Vận dụng thực tế",
+  q: "Một vòi nước chảy đầy bể trong 6 giờ. Nếu mở thêm 2 vòi cùng loại thì bể đầy sau:",
+  options: ["2 giờ", "3 giờ", "18 giờ", "4 giờ"],
+  correct: 0,
+  rationale: "Số vòi và thời gian tỉ lệ nghịch. 3 vòi thì thời gian là \\(6 : 3 = 2\\) giờ."
+},
+
+/* ========= VẬN DỤNG CAO (1 câu) ========= */
+{
+  lvl: "Vận dụng cao",
+  q: "Cho \\(x\\) và \\(y\\) tỉ lệ nghịch. Biết \\(x_1 - x_2 = 5\\), \\(y_1 = 4\\), \\(y_2 = 9\\). Hệ số tỉ lệ \\(a\\) là:",
+  options: ["13", "36", "45", "20"],
+  correct: 1,
+  rationale: "Từ \\(4x_1 = 9x_2\\) và \\(x_1 - x_2 = 5\\) suy ra \\(x_1 = 9, x_2 = 4\\). Do đó \\(a = 36\\)."
+}
+
+];
 
 questions.sort(()=>Math.random()-0.5);
 
