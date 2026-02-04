@@ -1,338 +1,300 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thợ Săn Tam Giác - Toán 7</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Quicksand', sans-serif;
-            background: linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%);
-            min-height: 100vh;
-        }
-        .title-font {
-            font-family: 'Fredoka One', cursive;
-        }
-        .game-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 2rem;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            border: 6px solid #ffffff;
-        }
-        .option-btn {
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .option-btn:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        .animate-bounce-slow {
-            animation: bounce 2s infinite;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thợ Săn Tam Giác – Toán 7</title>
+
+<!-- ===== MathJax CHUẨN THỢ SĂN KHO BÁU ===== -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']]
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+  font-family:'Quicksand',sans-serif;
+  background:linear-gradient(135deg,#a8ff78,#78ffd6);
+  min-height:100vh;
+}
+.title-font{font-family:'Fredoka One',cursive}
+.card{
+  background:#fff;
+  border-radius:2rem;
+  box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+.option:hover{transform:scale(1.02)}
+</style>
 </head>
+
 <body class="p-4 flex items-center justify-center">
 
-    <div id="game-container" class="max-w-3xl w-full game-card p-6 md:p-10 relative overflow-hidden">
-        
-        <!-- Màn hình chào mừng -->
-        <div id="start-screen" class="text-center">
-            <div class="text-7xl mb-6 animate-bounce-slow">📐</div>
-            <h1 class="text-4xl md:text-6xl title-font text-emerald-600 mb-4 drop-shadow-sm">THỢ SĂN<br>TAM GIÁC</h1>
-            <p class="text-gray-600 text-lg mb-8 font-semibold">Chào mừng các em đến với lớp học của cô <b>Thu Bình</b>!<br>Các em đã sẵn sàng truy tìm các góc ẩn giấu chưa?</p>
-            <button onclick="startGame()" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold py-4 px-12 rounded-full text-2xl shadow-lg hover:scale-110 transition-transform">
-                BẮT ĐẦU NGAY! 🚀
-            </button>
-        </div>
+<div class="max-w-3xl w-full card p-8">
 
-        <!-- Màn hình câu hỏi -->
-        <div id="quiz-screen" class="hidden">
-            <div class="flex justify-between items-center mb-6">
-                <div class="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-2xl font-bold">
-                    Câu: <span id="q-current">1</span>/15
-                </div>
-                <div class="bg-amber-100 text-amber-700 px-4 py-2 rounded-2xl font-bold">
-                    Điểm: <span id="score">0</span>
-                </div>
-            </div>
+<!-- START -->
+<div id="start" class="text-center">
+  <div class="text-7xl mb-4">📐</div>
+  <h1 class="title-font text-4xl text-emerald-600 mb-4">
+    THỢ SĂN<br>TAM GIÁC
+  </h1>
+  <p class="text-gray-600 mb-8">
+    Chào mừng các em đến với lớp học của cô <b>Thu Bình</b>!
+  </p>
+  <button onclick="startGame()"
+    class="bg-emerald-500 text-white px-10 py-4 rounded-full text-xl font-bold">
+    BẮT ĐẦU 🚀
+  </button>
+</div>
 
-            <div class="w-full bg-gray-200 rounded-full h-3 mb-8">
-                <div id="progress" class="bg-emerald-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
-            </div>
+<!-- QUIZ -->
+<div id="quiz" class="hidden">
+  <div class="flex justify-between mb-4 font-bold">
+    <div>Câu <span id="cur">1</span>/15</div>
+    <div>Điểm: <span id="score">0</span></div>
+  </div>
 
-            <div id="question-area" class="mb-10">
-                <div id="level-tag" class="text-xs font-bold uppercase tracking-widest text-emerald-400 mb-2"></div>
-                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800 leading-relaxed"></h2>
-            </div>
+  <div class="bg-gray-200 h-3 rounded-full mb-6">
+    <div id="bar" class="bg-emerald-500 h-3 rounded-full"></div>
+  </div>
 
-            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Đáp án sẽ hiển thị ở đây -->
-            </div>
-        </div>
+  <div id="level" class="text-sm text-emerald-500 font-bold mb-2"></div>
+  <div id="qtext" class="text-xl font-bold mb-6"></div>
 
-        <!-- Modal Phản hồi -->
-        <div id="feedback-modal" class="hidden fixed inset-0 flex items-center justify-center z-50 p-4">
-            <div class="absolute inset-0 bg-emerald-900/40 backdrop-blur-sm"></div>
-            <div class="bg-white rounded-[2.5rem] p-8 max-w-md w-full relative shadow-2xl text-center">
-                <div id="fb-icon" class="text-6xl mb-4"></div>
-                <h3 id="fb-title" class="text-3xl font-bold mb-4"></h3>
-                <div class="bg-emerald-50 p-4 rounded-2xl mb-6 text-left border-l-4 border-emerald-500">
-                    <p id="fb-rationale" class="text-gray-700 text-sm italic leading-relaxed"></p>
-                </div>
-                <button onclick="nextStep()" class="w-full bg-emerald-500 text-white font-bold py-4 rounded-2xl hover:bg-emerald-600 transition-colors shadow-lg">
-                    TIẾP TỤC ➔
-                </button>
-            </div>
-        </div>
+  <div id="opts" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+</div>
 
-        <!-- Màn hình kết thúc -->
-        <div id="end-screen" class="hidden text-center">
-            <div class="text-8xl mb-6">👑</div>
-            <h2 class="text-4xl font-bold text-emerald-600 mb-2">HOÀN THÀNH!</h2>
-            <p class="text-xl text-gray-600 mb-8 font-semibold">Tuyệt vời! Em đã ghi được: <span id="final-score" class="text-emerald-500 text-3xl font-black">0</span>/15 điểm</p>
-            <div id="rank-msg" class="text-gray-500 mb-10 italic"></div>
-            <button onclick="location.reload()" class="bg-gray-800 text-white font-bold py-4 px-10 rounded-2xl hover:bg-black transition-colors shadow-lg">
-                CHƠI LẠI NÈ 🔄
-            </button>
-        </div>
-    </div>
+<!-- FEEDBACK -->
+<div id="fb" class="hidden fixed inset-0 flex items-center justify-center bg-black/40">
+  <div class="card p-8 text-center max-w-md w-full">
+    <div id="fb-icon" class="text-6xl mb-3"></div>
+    <div id="fb-title" class="text-2xl font-bold mb-3"></div>
+    <div id="fb-rat" class="bg-emerald-50 p-4 rounded-xl text-left italic"></div>
+    <button onclick="nextQ()"
+      class="mt-6 bg-emerald-500 text-white px-8 py-3 rounded-xl font-bold">
+      TIẾP TỤC →
+    </button>
+  </div>
+</div>
 
-   <script>
-/* ================== TIỆN ÍCH RANDOM ================== */
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
+<!-- END -->
+<div id="end" class="hidden text-center">
+  <div class="text-7xl mb-4">👑</div>
+  <h2 class="text-3xl font-bold text-emerald-600 mb-4">HOÀN THÀNH</h2>
+  <p class="text-xl mb-6">Số câu đúng: <b><span id="final">0</span>/15</b></p>
+  <p id="rank" class="italic mb-8"></p>
+  <button onclick="location.reload()"
+    class="bg-gray-800 text-white px-8 py-3 rounded-xl font-bold">
+    CHƠI LẠI
+  </button>
+</div>
+
+</div>
+
+<script>
+/* ===== RANDOM ===== */
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
+
+const questions = [
+/* ================= NHẬN BIẾT (6) ================= */
+{
+lvl:"Nhận biết",
+q:"Tổng số đo ba góc trong một tam giác bất kì bằng:",
+opts:["\\(90^\\circ\\)","\\(180^\\circ\\)","\\(270^\\circ\\)","\\(360^\\circ\\)"],
+ans:1,
+rat:"Theo định lí, tổng ba góc của một tam giác bằng \\(180^\\circ\\)."
+},
+{
+lvl:"Nhận biết",
+q:"Tam giác có một góc bằng \\(90^\\circ\\) gọi là:",
+opts:["Tam giác nhọn","Tam giác vuông","Tam giác tù","Tam giác cân"],
+ans:1,
+rat:"Tam giác có một góc vuông gọi là tam giác vuông."
+},
+{
+lvl:"Nhận biết",
+q:"Trong tam giác vuông, tổng hai góc nhọn bằng:",
+opts:["\\(45^\\circ\\)","\\(60^\\circ\\)","\\(90^\\circ\\)","\\(180^\\circ\\)"],
+ans:2,
+rat:"Vì tổng ba góc là \\(180^\\circ\\), trong đó góc vuông là \\(90^\\circ\\)."
+},
+{
+lvl:"Nhận biết",
+q:"Tam giác nhọn là tam giác có:",
+opts:[
+"Có một góc nhọn",
+"Có hai góc nhọn",
+"Cả ba góc đều nhọn",
+"Có một góc vuông"
+],
+ans:2,
+rat:"Tam giác nhọn là tam giác có cả ba góc đều nhỏ hơn \\(90^\\circ\\)."
+},
+{
+lvl:"Nhận biết",
+q:"Một tam giác có thể có tối đa bao nhiêu góc tù?",
+opts:["1 góc","2 góc","3 góc","0 góc"],
+ans:0,
+rat:"Nếu có 2 góc tù thì tổng số đo vượt quá \\(180^\\circ\\), điều này không thể."
+},
+{
+lvl:"Nhận biết",
+q:"Cho \\(\\triangle ABC\\) có \\(\\widehat{A}=50^\\circ\\), \\(\\widehat{B}=70^\\circ\\). Khi đó \\(\\widehat{C}\\) bằng:",
+opts:["\\(50^\\circ\\)","\\(60^\\circ\\)","\\(70^\\circ\\)","\\(80^\\circ\\)"],
+ans:1,
+rat:"\\(\\widehat{C}=180^\\circ-(50^\\circ+70^\\circ)=60^\\circ\\)."
+},
+
+/* ================= THÔNG HIỂU (5) ================= */
+{
+lvl:"Thông hiểu",
+q:"Cho \\(\\triangle ABC\\) vuông tại \\(A\\). Nếu \\(\\widehat{B}=40^\\circ\\) thì \\(\\widehat{C}\\) bằng:",
+opts:["\\(40^\\circ\\)","\\(50^\\circ\\)","\\(90^\\circ\\)","\\(140^\\circ\\)"],
+ans:1,
+rat:"Trong tam giác vuông: \\(\\widehat{B}+\\widehat{C}=90^\\circ\\)."
+},
+{
+lvl:"Thông hiểu",
+q:"Cho \\(\\triangle MNP\\) có \\(\\widehat{M}=100^\\circ\\) và \\(\\widehat{N}=\\widehat{P}\\). Khi đó \\(\\widehat{N}\\) bằng:",
+opts:["\\(40^\\circ\\)","\\(50^\\circ\\)","\\(80^\\circ\\)","\\(100^\\circ\\)"],
+ans:0,
+rat:"Hai góc còn lại có tổng \\(80^\\circ\\), mỗi góc bằng \\(40^\\circ\\)."
+},
+{
+lvl:"Thông hiểu",
+q:"Một tam giác có ba góc bằng nhau thì mỗi góc bằng:",
+opts:["\\(45^\\circ\\)","\\(60^\\circ\\)","\\(90^\\circ\\)","\\(120^\\circ\\)"],
+ans:1,
+rat:"\\(180^\\circ : 3 = 60^\\circ\\)."
+},
+{
+lvl:"Thông hiểu",
+q:"Cho \\(\\triangle ABC\\) có \\(\\widehat{A}:\\widehat{B}:\\widehat{C}=1:2:3\\). Tam giác đó là:",
+opts:["Tam giác nhọn","Tam giác vuông","Tam giác tù","Tam giác cân"],
+ans:1,
+rat:"Góc lớn nhất bằng \\(90^\\circ\\) nên là tam giác vuông."
+},
+{
+lvl:"Thông hiểu",
+q:"Cho \\(\\triangle ABC\\) vuông tại \\(A\\), biết \\(\\widehat{B}=2\\widehat{C}\\). Khi đó \\(\\widehat{B}\\) bằng:",
+opts:["\\(30^\\circ\\)","\\(60^\\circ\\)","\\(45^\\circ\\)","\\(20^\\circ\\)"],
+ans:1,
+rat:"\\(\\widehat{B}+\\widehat{C}=90^\\circ\\Rightarrow \\widehat{B}=60^\\circ\\)."
+},
+
+/* ================= VẬN DỤNG (3) ================= */
+{
+lvl:"Vận dụng",
+q:"Cho \\(\\triangle ABC\\) có \\(\\widehat{A}=70^\\circ\\). Tia phân giác của \\(\\widehat{B}\\) và \\(\\widehat{C}\\) cắt nhau tại \\(I\\). Tính \\(\\widehat{BIC}\\).",
+opts:["\\(110^\\circ\\)","\\(125^\\circ\\)","\\(140^\\circ\\)","\\(100^\\circ\\)"],
+ans:1,
+rat:"\\(\\widehat{BIC}=180^\\circ-\\dfrac{\\widehat{B}+\\widehat{C}}{2}=125^\\circ\\)."
+},
+{
+lvl:"Vận dụng",
+q:"Một chiếc thang dựa vào tường tạo thành tam giác vuông. Nếu góc giữa thang và mặt đất là \\(65^\\circ\\) thì góc giữa thang và tường là:",
+opts:["\\(25^\\circ\\)","\\(35^\\circ\\)","\\(65^\\circ\\)","\\(90^\\circ\\)"],
+ans:0,
+rat:"Hai góc nhọn trong tam giác vuông có tổng \\(90^\\circ\\)."
+},
+{
+lvl:"Vận dụng",
+q:"Cho \\(\\triangle ABC\\) có góc ngoài tại \\(C\\) bằng \\(120^\\circ\\) và \\(\\widehat{A}=50^\\circ\\). Tính \\(\\widehat{B}\\).",
+opts:["\\(50^\\circ\\)","\\(70^\\circ\\)","\\(60^\\circ\\)","\\(120^\\circ\\)"],
+ans:1,
+rat:"Góc ngoài bằng tổng hai góc trong không kề."
+},
+
+/* ================= VẬN DỤNG CAO (1) ================= */
+{
+lvl:"Vận dụng cao",
+q:"Cho \\(\\triangle ABC\\) có \\(\\widehat{B}-\\widehat{C}=20^\\circ\\). Tia phân giác của \\(\\widehat{A}\\) cắt \\(BC\\) tại \\(D\\). Tính \\(\\widehat{ADC}\\).",
+opts:["\\(80^\\circ\\)","\\(100^\\circ\\)","\\(90^\\circ\\)","\\(110^\\circ\\)"],
+ans:1,
+rat:"\\(\\widehat{ADC}=\\dfrac{180^\\circ+(\\widehat{B}-\\widehat{C})}{2}=100^\\circ\\)."
 }
+];
+/* đủ 15 câu – cô có thể thêm tiếp theo mẫu này */
 
-/* ================== ÂM THANH ================== */
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playTone(freq, type, dur) {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + dur);
-}
-        const questions = [
-            // NHẬN BIẾT (6 câu)
-            {
-                lvl: "Nhận biết",
-                q: "Tổng số đo ba góc trong một tam giác bất kì bằng bao nhiêu?",
-                opts: ["90°", "180°", "270°", "360°"],
-                ans: 1,
-                rat: "Định lí: Tổng ba góc của một tam giác bằng $180^\\circ$."
-            },
-            {
-                lvl: "Nhận biết",
-                q: "Tam giác có một góc vuông được gọi là:",
-                opts: ["Tam giác nhọn", "Tam giác tù", "Tam giác vuông", "Tam giác cân"],
-                ans: 2,
-                rat: "Tam giác có một góc bằng $90^\\circ$ gọi là tam giác vuông."
-            },
-            {
-                lvl: "Nhận biết",
-                q: "Trong một tam giác vuông, tổng hai góc nhọn bằng:",
-                opts: ["45°", "90°", "180°", "60°"],
-                ans: 1,
-                rat: "Vì tổng 3 góc là $180^\\circ$, góc vuông là $90^\\circ$, nên 2 góc còn lại có tổng là $180 - 90 = 90^\\circ$."
-            },
-            {
-                lvl: "Nhận biết",
-                q: "Tam giác nhọn là tam giác có:",
-                opts: ["Có một góc nhọn", "Có hai góc nhọn", "Cả ba góc đều nhọn", "Có góc lớn nhất bằng 90°"],
-                ans: 2,
-                rat: "Định nghĩa: Tam giác nhọn là tam giác có cả ba góc đều là góc nhọn (nhỏ hơn $90^\\circ$)."
-            },
-            {
-                lvl: "Nhận biết",
-                q: "Một tam giác có thể có tối đa bao nhiêu góc tù?",
-                opts: ["1 góc", "2 góc", "3 góc", "Không có góc nào"],
-                ans: 0,
-                rat: "Nếu có 2 góc tù (mỗi góc > $90^\\circ$), tổng 2 góc đã lớn hơn $180^\\circ$, vi phạm định lí tổng 3 góc."
-            },
-            {
-                lvl: "Nhận biết",
-                q: "Cho $\\triangle ABC$ có $\\hat{A} = 50^\\circ, \\hat{B} = 70^\\circ$. Số đo góc $C$ là:",
-                opts: ["50°", "60°", "70°", "180°"],
-                ans: 1,
-                rat: "$\\hat{C} = 180^\\circ - (50^\\circ + 70^\\circ) = 180^\\circ - 120^\\circ = 60^\\circ$."
-            },
-            // THÔNG HIỂU (5 câu)
-            {
-                lvl: "Thông hiểu",
-                q: "Cho $\\triangle ABC$ vuông tại $A$. Nếu $\\hat{B} = 40^\\circ$ thì $\\hat{C}$ bằng:",
-                opts: ["40°", "50°", "90°", "140°"],
-                ans: 1,
-                rat: "Trong tam giác vuông, 2 góc nhọn phụ nhau: $\\hat{C} = 90^\\circ - 40^\\circ = 50^\\circ$."
-            },
-            {
-                lvl: "Thông hiểu",
-                q: "Cho $\\triangle MNP$ có $\\hat{M} = 100^\\circ$ và $\\hat{N} = \\hat{P}$. Số đo góc $N$ là:",
-                opts: ["40°", "80°", "100°", "50°"],
-                ans: 0,
-                rat: "$\\hat{N} + \\hat{P} = 180^\\circ - 100^\\circ = 80^\\circ$. Vì $\\hat{N} = \\hat{P}$ nên $\\hat{N} = 80^\\circ : 2 = 40^\\circ$."
-            },
-            {
-                lvl: "Thông hiểu",
-                q: "Một tam giác có ba góc bằng nhau. Số đo mỗi góc là:",
-                opts: ["45°", "60°", "90°", "180°"],
-                ans: 1,
-                rat: "Tổng 3 góc là $180^\\circ$, nếu 3 góc bằng nhau thì mỗi góc bằng $180^\\circ : 3 = 60^\\circ$."
-            },
-            {
-                lvl: "Thông hiểu",
-                q: "Cho $\\triangle ABC$ có $\\hat{A} : \\hat{B} : \\hat{C} = 1 : 2 : 3$. Đây là tam giác gì?",
-                opts: ["Tam giác nhọn", "Tam giác vuông", "Tam giác tù", "Tam giác cân"],
-                ans: 1,
-                rat: "Tổng số phần: $1+2+3=6$. Một phần là $180:6=30^\\circ$. Góc lớn nhất là $30 \\cdot 3 = 90^\\circ$. Vậy là tam giác vuông."
-            },
-            {
-                lvl: "Thông hiểu",
-                q: "Cho $\\triangle ABC$ vuông tại $A$ có $\\hat{B} = 2\\hat{C}$. Số đo góc $B$ là:",
-                opts: ["30°", "60°", "45°", "20°"],
-                ans: 1,
-                rat: "$\\hat{B} + \\hat{C} = 90^\\circ$. Thay $\\hat{B} = 2\\hat{C}$ vào ta có $3\\hat{C} = 90^\\circ \\implies \\hat{C} = 30^\\circ, \\hat{B} = 60^\\circ$."
-            },
-            // VẬN DỤNG (3 câu)
-            {
-                lvl: "Vận dụng",
-                q: "Cho $\\triangle ABC$ có $\\hat{A} = 70^\\circ$. Tia phân giác của góc $B$ và góc $C$ cắt nhau tại $I$. Tính số đo góc $BIC$.",
-                opts: ["110°", "125°", "140°", "100°"],
-                ans: 1,
-                rat: "$\\hat{B} + \\hat{C} = 110^\\circ \\implies \\hat{B}/2 + \\hat{C}/2 = 55^\\circ$. Trong $\\triangle BIC$: $\\hat{BIC} = 180^\\circ - 55^\\circ = 125^\\circ$."
-            },
-            {
-                lvl: "Vận dụng",
-                q: "(Thực tế) Một cái thang dựa vào tường tạo thành một tam giác vuông. Nếu góc tạo bởi cái thang và mặt đất là $65^\\circ$ thì góc tạo bởi cái thang và bức tường là:",
-                opts: ["25°", "35°", "65°", "90°"],
-                ans: 0,
-                rat: "Thang, tường và đất tạo thành tam giác vuông. Góc cần tìm là góc nhọn còn lại: $90^\\circ - 65^\\circ = 25^\\circ$."
-            },
-            {
-                lvl: "Vận dụng",
-                q: "Cho $\\triangle ABC$, góc ngoài tại đỉnh $C$ bằng $120^\\circ$ và $\\hat{A} = 50^\\circ$. Số đo góc $B$ là:",
-                opts: ["50°", "70°", "60°", "120°"],
-                ans: 1,
-                rat: "Góc ngoài bằng tổng hai góc trong không kề với nó: $120^\\circ = \\hat{A} + \\hat{B} \\implies \\hat{B} = 120^\\circ - 50^\\circ = 70^\\circ$."
-            },
-            // VẬN DỤNG CAO (1 câu)
-            {
-                lvl: "Vận dụng cao",
-                q: "Cho $\\triangle ABC$ có $\\hat{B} - \\hat{C} = 20^\\circ$. Tia phân giác của góc $A$ cắt $BC$ tại $D$. Tính số đo góc $ADC$.",
-                opts: ["80°", "100°", "90°", "110°"],
-                ans: 1,
-                rat: "$\\hat{ADC} = \\hat{B} + \\hat{A}/2 = \\hat{B} + (180-\\hat{B}-\\hat{C})/2 = (2\\hat{B} + 180 - \\hat{B} - \\hat{C})/2 = (180 + \\hat{B} - \\hat{C})/2 = (180+20)/2 = 100^\\circ$."
-            }
-        ];
-
-      /* ================== RANDOM CÂU HỎI ================== */
 shuffle(questions);
 
-/* ================== BIẾN TRẠNG THÁI ================== */
-let currentIdx = 0;
-let score = 0;
-let currentOptions = [];
+/* ===== STATE ===== */
+let i=0, score=0, curOpts=[];
 
-/* ================== BẮT ĐẦU GAME ================== */
-function startGame() {
-    document.getElementById('start-screen').classList.add('hidden');
-    document.getElementById('quiz-screen').classList.remove('hidden');
-    showQuestion();
+/* ===== START ===== */
+function startGame(){
+document.getElementById("start").classList.add("hidden");
+document.getElementById("quiz").classList.remove("hidden");
+showQ();
 }
 
-/* ================== HIỂN THỊ CÂU HỎI ================== */
-function showQuestion() {
-    const q = questions[currentIdx];
+/* ===== SHOW ===== */
+function showQ(){
+const q=questions[i];
+document.getElementById("cur").innerText=i+1;
+document.getElementById("score").innerText=score;
+document.getElementById("level").innerText="Mức độ: "+q.lvl;
+document.getElementById("qtext").innerHTML=q.q;
+document.getElementById("bar").style.width=`${i/questions.length*100}%`;
 
-    document.getElementById('q-current').innerText = currentIdx + 1;
-    document.getElementById('score').innerText = score;
-    document.getElementById('level-tag').innerText = `Mức độ: ${q.lvl}`;
-    document.getElementById('question-text').innerHTML = q.q;
-    document.getElementById('progress').style.width =
-        `${(currentIdx / questions.length) * 100}%`;
+curOpts=q.opts.map((t,idx)=>({t,ok:idx===q.ans}));
+shuffle(curOpts);
 
-    /* Chuẩn hoá & random đáp án */
-    currentOptions = q.opts.map((text, idx) => ({
-        text,
-        isCorrect: idx === q.ans
-    }));
-    shuffle(currentOptions);
+const box=document.getElementById("opts");
+box.innerHTML="";
+curOpts.forEach((o,k)=>{
+const b=document.createElement("button");
+b.className="option bg-white border p-4 rounded-xl font-bold";
+b.innerHTML=`${String.fromCharCode(65+k)}. ${o.t}`;
+b.onclick=()=>check(k);
+box.appendChild(b);
+});
 
-    const container = document.getElementById('options-container');
-    container.innerHTML = "";
-
-    currentOptions.forEach((opt, i) => {
-        const btn = document.createElement('button');
-        btn.className =
-            "option-btn bg-white border-2 border-emerald-100 p-4 rounded-2xl text-left hover:border-emerald-400 hover:bg-emerald-50 text-gray-700 font-bold shadow-sm";
-        btn.innerHTML = `<b>${String.fromCharCode(65 + i)}.</b> ${opt.text}`;
-        btn.onclick = () => checkAnswer(i);
-        container.appendChild(btn);
-    });
+MathJax.typesetPromise();
 }
 
-/* ================== KIỂM TRA ĐÁP ÁN ================== */
-function checkAnswer(i) {
-    const q = questions[currentIdx];
-    const isCorrect = currentOptions[i].isCorrect;
+/* ===== CHECK ===== */
+function check(k){
+const ok=curOpts[k].ok;
+document.getElementById("fb").classList.remove("hidden");
 
-    if (isCorrect) {
-        score++;
-        playTone(600, 'sine', 0.2);
-        confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
-        fb("😇", "Quá giỏi luôn!", "emerald");
-    } else {
-        playTone(150, 'sawtooth', 0.3);
-        fb("🥺", "Cố lên nha!", "red");
-    }
-
-    document.getElementById('fb-rationale').innerHTML =
-        `<b>Giải thích:</b> ${q.rat}`;
-    document.getElementById('feedback-modal').classList.remove('hidden');
+if(ok){
+score++; confetti({particleCount:120,spread:70});
+document.getElementById("fb-icon").innerText="😇";
+document.getElementById("fb-title").innerText="Quá giỏi!";
+}else{
+document.getElementById("fb-icon").innerText="🥺";
+document.getElementById("fb-title").innerText="Chưa đúng!";
 }
 
-function fb(icon, text, color) {
-    document.getElementById('fb-icon').innerText = icon;
-    document.getElementById('fb-title').innerText = text;
-    document.getElementById('fb-title').className =
-        `text-3xl font-bold mb-4 text-${color}-500`;
+document.getElementById("fb-rat").innerHTML="<b>Giải thích:</b> "+questions[i].rat;
+MathJax.typesetPromise();
 }
 
-/* ================== CHUYỂN CÂU ================== */
-function nextStep() {
-    document.getElementById('feedback-modal').classList.add('hidden');
-    currentIdx++;
-    currentIdx < questions.length ? showQuestion() : showEnd();
+/* ===== NEXT ===== */
+function nextQ(){
+document.getElementById("fb").classList.add("hidden");
+i++;
+i<questions.length?showQ():endGame();
 }
 
-/* ================== KẾT THÚC ================== */
-function showEnd() {
-    document.getElementById('quiz-screen').classList.add('hidden');
-    document.getElementById('end-screen').classList.remove('hidden');
-    document.getElementById('final-score').innerText = score;
-
-    let msg =
-        score === 15 ? "Đỉnh của chóp! 🏆" :
-        score >= 12 ? "Rất xuất sắc! ✨" :
-        score >= 8  ? "Khá tốt! 💪" :
-                      "Ôn lại và thử lại nhé ❤️";
-
-    document.getElementById('rank-msg').innerText = msg;
-    confetti({ particleCount: 250, spread: 160, origin: { y: 0.6 } });
+/* ===== END ===== */
+function endGame(){
+document.getElementById("quiz").classList.add("hidden");
+document.getElementById("end").classList.remove("hidden");
+document.getElementById("final").innerText=score;
+document.getElementById("rank").innerText=
+score>=12?"Xuất sắc! 🌟":score>=8?"Khá tốt!":"Cố gắng thêm nhé!";
 }
 </script>
 </body>
