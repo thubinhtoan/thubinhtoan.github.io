@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vượt Ải Đa Thức - Cùng cô Bình</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            min-height: 100vh;
+        }
+        /* Custom Animations */
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .bounce-slight { animation: bounceSlight 2s infinite; }
+        @keyframes bounceSlight {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Custom Radio Button Styles */
+        .custom-radio {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .custom-radio:checked { border-color: #3b82f6; }
+        .custom-radio:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px; height: 10px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+        }
+
+        /* Confetti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Level Badges Gradient */
+        .level-1 { background: linear-gradient(135deg, #4ade80, #16a34a); }
+        .level-2 { background: linear-gradient(135deg, #facc15, #ca8a04); }
+        .level-3 { background: linear-gradient(135deg, #f87171, #dc2626); }
+        
+        /* Math formatting helper */
+        .math { font-style: italic; font-family: "Times New Roman", Times, serif; font-size: 1.1em; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased relative">
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="hidden"></canvas>
+
+    <div id="app" class="max-w-3xl mx-auto px-4 py-8 flex flex-col min-h-screen">
+        
+        <!-- ======================= 
+             SCREEN 1: WELCOME 
+        ======================== -->
+        <div id="screen-welcome" class="flex flex-col items-center justify-center flex-1 fade-in">
+            <div class="bg-white rounded-3xl shadow-xl p-8 md:p-12 w-full text-center border-t-8 border-blue-500 relative overflow-hidden">
+                <div class="absolute -top-10 -left-10 text-6xl opacity-20">🎮</div>
+                <div class="absolute -bottom-10 -right-10 text-6xl opacity-20">🚀</div>
+                
+                <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4 uppercase tracking-wider bounce-slight">
+                    Vượt Ải Đa Thức
+                </h1>
+                <p class="text-lg md:text-xl font-semibold text-slate-700 mb-2">Chinh phục 10 điểm cùng cô</p>
+                <p class="text-2xl md:text-3xl font-bold text-blue-600 mb-6 bg-blue-50 inline-block px-4 py-2 rounded-xl shadow-sm">PHẠM THỊ THU BÌNH</p>
+                
+                <p class="text-slate-600 italic mb-8 max-w-lg mx-auto">
+                    "Hôm nay em không làm bài kiểm tra, em đang bước vào hành trình chinh phục các cửa ải Đa thức! Em hãy bình tĩnh, chọn đáp án đúng nhất và tích lũy điểm qua từng cửa ải. Sai cũng không sao, mỗi lần làm là một lần tiến bộ!"
+                </p>
+
+                <div class="space-y-4 max-w-sm mx-auto mb-8 text-left">
+                    <div id="error-msg" class="hidden bg-red-100 text-red-600 text-sm font-medium px-4 py-2 rounded-lg text-center">
+                        Em hãy nhập tên và lớp trước khi bắt đầu hành trình nhé! ⭐
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Họ và tên anh hùng:</label>
+                        <input type="text" id="input-name" placeholder="Ví dụ: Nguyễn Văn A" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Lớp:</label>
+                        <input type="text" id="input-class" placeholder="Ví dụ: 8A1" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                    </div>
+                </div>
+
+                <button onclick="startGame()" class="w-full max-w-sm bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold text-lg py-4 px-8 rounded-2xl shadow-lg transform hover:scale-105 transition duration-300 flex items-center justify-center gap-2 mx-auto">
+                    Bắt đầu vượt ải 🚀
+                </button>
+            </div>
+        </div>
+
+        <!-- ======================= 
+             SCREEN 2: GAME SCREEN 
+        ======================== -->
+        <div id="screen-game" class="hidden flex-col flex-1 fade-in">
+            <!-- Header Info -->
+            <div class="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl">👤</div>
+                    <div>
+                        <p id="display-name" class="font-bold text-slate-800 leading-tight">Name</p>
+                        <p id="display-class" class="text-xs text-slate-500 font-semibold">Class</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Cửa ải hiện tại</p>
+                    <div id="level-badge" class="level-1 text-white text-sm font-bold px-3 py-1 rounded-full inline-block shadow-sm">
+                        1 - Khởi Động
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mb-6">
+                <div class="flex justify-between text-xs font-semibold text-slate-500 mb-2">
+                    <span>Tiến trình</span>
+                    <span id="progress-text">1/15</span>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-3">
+                    <div id="progress-bar" class="bg-blue-500 h-3 rounded-full transition-all duration-500" style="width: 6.66%"></div>
+                </div>
+            </div>
+
+            <!-- Question Container -->
+            <div class="bg-white rounded-3xl shadow-lg p-6 md:p-8 flex-1 border-t-4 border-blue-500 mb-6 relative">
+                
+                <!-- Level Transition Toast -->
+                <div id="level-toast" class="hidden absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-yellow-400 text-yellow-900 font-bold px-6 py-2 rounded-full shadow-lg z-10 whitespace-nowrap">
+                    🎉 Tuyệt vời! Em đã sang cửa ải mới!
+                </div>
+
+                <div id="question-content">
+                    <!-- Question injected by JS -->
+                </div>
+
+                <div id="game-error-msg" class="hidden mt-4 text-red-500 text-sm font-semibold text-center bg-red-50 py-2 rounded-lg">
+                    Em hãy chọn đầy đủ đáp án trước khi đi tiếp nhé! 🎯
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex justify-end mt-auto pb-4">
+                <button onclick="nextQuestion()" id="btn-next" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-md transition duration-200 flex items-center gap-2">
+                    Câu tiếp theo <span>➜</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ======================= 
+             SCREEN 3: RESULT 
+        ======================== -->
+        <div id="screen-result" class="hidden flex-col items-center justify-center flex-1 fade-in">
+            <div class="bg-white rounded-3xl shadow-xl w-full p-8 md:p-12 text-center relative border-t-8 border-green-500">
+                <div class="text-6xl mb-4" id="result-icon">🏆</div>
+                <h2 class="text-3xl font-extrabold text-slate-800 mb-2 uppercase">Tổng Kết Hành Trình</h2>
+                
+                <div class="bg-slate-50 rounded-2xl p-4 my-6 inline-block w-full max-w-sm border border-slate-100">
+                    <p class="font-bold text-lg text-blue-600 mb-1" id="res-name"></p>
+                    <p class="text-sm text-slate-500 mb-4" id="res-class"></p>
+                    
+                    <p class="text-sm font-semibold text-slate-500 uppercase tracking-widest">Điểm số của em</p>
+                    <p class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-green-500 my-2" id="res-score">10</p>
+                    <p class="text-sm font-semibold text-slate-500">/ 10 điểm</p>
+                </div>
+
+                <div id="res-message" class="text-lg font-medium text-slate-700 mb-8 max-w-md mx-auto leading-relaxed">
+                    <!-- Custom message injected by JS -->
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="resetGame()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-xl transition flex items-center justify-center gap-2">
+                        🔄 Làm lại từ đầu
+                    </button>
+                    <button onclick="showAnswers()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                        📖 Xem đáp án & ôn tập
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= 
+             SCREEN 4: ANSWERS 
+        ======================== -->
+        <div id="screen-answers" class="hidden flex-col flex-1 fade-in">
+            <div class="bg-white rounded-3xl shadow-xl p-6 md:p-8 flex-1 mb-6">
+                <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                    <h2 class="text-2xl font-bold text-slate-800">📖 Gợi ý ôn tập</h2>
+                    <button onclick="backToResult()" class="text-blue-500 hover:text-blue-700 font-semibold px-4 py-2 bg-blue-50 rounded-lg">Quay lại</button>
+                </div>
+                <div id="answers-list" class="space-y-8 overflow-y-auto max-h-[60vh] pr-2 custom-scrollbar">
+                    <!-- Answers injected here -->
+                </div>
+            </div>
+            <div class="text-center pb-4">
+                <button onclick="resetGame()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-8 rounded-xl shadow-md transition">
+                    Về trang chủ 🏠
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // DATA: Question Bank
+        const questions = [
+            // Cửa ải 1: Khởi động (MCQ) - 0.5đ/câu
+            {
+                id: 1, level: 1, type: 'mcq', points: 0.5,
+                text: 'Trong các biểu thức sau, biểu thức nào <span class="text-red-500 font-bold">KHÔNG</span> phải là đa thức?',
+                options: [
+                    'A. <span class="math">x<sup>2</sup> + y</span>',
+                    'B. <span class="math"><sup>2</sup>&frasl;<sub>x</sub> + 1</span>',
+                    'C. <span class="math">x<sup>2</sup> - 3x + 5</span>',
+                    'D. <span class="math">xy + &frac12;x</span>'
+                ],
+                correctIndex: 1,
+                explanation: 'Biểu thức B có chứa biến x ở dưới mẫu số, do đó theo định nghĩa, nó không phải là đa thức.'
+            },
+            {
+                id: 2, level: 1, type: 'mcq', points: 0.5,
+                text: 'Các hạng tử của đa thức <span class="math">3x<sup>2</sup>y - 2x + 5</span> là:',
+                options: [
+                    'A. <span class="math">3x<sup>2</sup>y</span> ; <span class="math">2x</span> ; <span class="math">5</span>',
+                    'B. <span class="math">3x<sup>2</sup>y</span> ; <span class="math">-2x</span> ; <span class="math">-5</span>',
+                    'C. <span class="math">3x<sup>2</sup>y</span> ; <span class="math">-2x</span> ; <span class="math">5</span>',
+                    'D. <span class="math">3x<sup>2</sup>y</span> ; <span class="math">2x</span> ; <span class="math">-5</span>'
+                ],
+                correctIndex: 2,
+                explanation: 'Khi xác định hạng tử, ta cần mang theo cả dấu đứng trước đơn thức đó.'
+            },
+            {
+                id: 3, level: 1, type: 'mcq', points: 0.5,
+                text: 'Khẳng định nào sau đây là <strong>đúng nhất</strong>?',
+                options: [
+                    'A. Đa thức là một tổng của những đơn thức.',
+                    'B. Đa thức là một tích của những đơn thức.',
+                    'C. Đa thức chỉ gồm các chữ cái.',
+                    'D. Đa thức không thể là một số.'
+                ],
+                correctIndex: 0,
+                explanation: 'Theo đúng định nghĩa trong sách giáo khoa Toán 8: Đa thức là một tổng của những đơn thức.'
+            },
+            {
+                id: 4, level: 1, type: 'mcq', points: 0.5,
+                text: 'Số <span class="math">7</span> có phải là một đa thức không?',
+                options: [
+                    'A. Không, vì nó không có biến x, y.',
+                    'B. Không, vì nó là một số tự nhiên.',
+                    'C. Có, nhưng nó là đa thức bậc 1.',
+                    'D. Có, mỗi số thực được coi là một đa thức.'
+                ],
+                correctIndex: 3,
+                explanation: 'Mỗi số thực đều được coi là một đa thức. Số khác 0 được coi là đa thức bậc 0.'
+            },
+            {
+                id: 5, level: 1, type: 'mcq', points: 0.5,
+                text: 'Đa thức nào sau đây là đa thức <strong class="text-blue-600">ĐÃ THU GỌN</strong>?',
+                options: [
+                    'A. <span class="math">x<sup>2</sup> + 2y - 3</span>',
+                    'B. <span class="math">x<sup>2</sup> + x<sup>2</sup> - y</span>',
+                    'C. <span class="math">2xy - 3xy + 1</span>',
+                    'D. <span class="math">x<sup>2</sup>y + x + x<sup>2</sup>y</span>'
+                ],
+                correctIndex: 0,
+                explanation: 'Đa thức A không còn hạng tử nào đồng dạng. Các đa thức còn lại đều có các hạng tử có thể gộp chung.'
+            },
+
+            // Cửa ải 2: Tăng tốc (True/False Matrix) - 1đ/câu (0.25đ/ý)
+            {
+                id: 6, level: 2, type: 'tf', points: 1.0,
+                text: 'Cho đa thức <span class="math">A = 2x<sup>2</sup> + 3x<sup>2</sup> - 5y</span>. Em hãy xác định tính Đúng/Sai của các phát biểu sau:',
+                statements: [
+                    { label: 'a', text: 'Đa thức A chưa được thu gọn.', correctIs: 'true' },
+                    { label: 'b', text: 'Hai hạng tử <span class="math">2x<sup>2</sup></span> và <span class="math">3x<sup>2</sup></span> là hai hạng tử đồng dạng.', correctIs: 'true' },
+                    { label: 'c', text: 'Dạng thu gọn của A là <span class="math">5x<sup>2</sup> - 5y</span>.', correctIs: 'true' },
+                    { label: 'd', text: 'Bậc của đa thức A là 4.', correctIs: 'false' }
+                ],
+                explanation: 'A chưa thu gọn vì còn hạng tử đồng dạng. Thu gọn: A = 5x² - 5y. Bậc cao nhất là của 5x² (bậc 2), nên bậc của A là 2, không phải 4.'
+            },
+            {
+                id: 7, level: 2, type: 'tf', points: 1.0,
+                text: 'Xét đa thức <span class="math">B = 4xy<sup>2</sup> - 2xy<sup>2</sup> + xy</span>.',
+                statements: [
+                    { label: 'a', text: 'Đa thức B có 3 hạng tử đồng dạng với nhau.', correctIs: 'false' },
+                    { label: 'b', text: 'Hạng tử <span class="math">4xy<sup>2</sup></span> và <span class="math">-2xy<sup>2</sup></span> đồng dạng với nhau.', correctIs: 'true' },
+                    { label: 'c', text: 'Dạng thu gọn của đa thức B là <span class="math">2xy<sup>2</sup> + xy</span>.', correctIs: 'true' },
+                    { label: 'd', text: 'Bậc của đa thức B (sau khi thu gọn) là 2.', correctIs: 'false' }
+                ],
+                explanation: 'B chỉ có 2 hạng tử đầu đồng dạng. Sau khi thu gọn B = 2xy² + xy, hạng tử 2xy² có bậc 3 (1+2), nên bậc của đa thức B là 3.'
+            },
+            {
+                id: 8, level: 2, type: 'tf', points: 1.0,
+                text: 'Về quy tắc tìm bậc của đa thức:',
+                statements: [
+                    { label: 'a', text: 'Bậc của đa thức <span class="math">M = x<sup>3</sup> + y - x<sup>3</sup></span> là 3.', correctIs: 'false' },
+                    { label: 'b', text: 'Bậc của đa thức thu gọn là bậc của hạng tử có bậc cao nhất trong dạng thu gọn đó.', correctIs: 'true' },
+                    { label: 'c', text: 'Số 0 là đa thức không có bậc.', correctIs: 'true' },
+                    { label: 'd', text: 'Đa thức <span class="math">N = 5x<sup>2</sup>y + 1</span> có bậc là 2.', correctIs: 'false' }
+                ],
+                explanation: 'Câu a sai vì sau khi thu gọn M = y (bậc 1). Câu d sai vì hạng tử 5x²y có bậc là 2+1=3.'
+            },
+            {
+                id: 9, level: 2, type: 'tf', points: 1.0,
+                text: 'Nhận định các phép tính thu gọn sau đây:',
+                statements: [
+                    { label: 'a', text: '<span class="math">2x + 3x = 5x<sup>2</sup></span>', correctIs: 'false' },
+                    { label: 'b', text: '<span class="math">4x<sup>2</sup>y - x<sup>2</sup>y = 3x<sup>2</sup>y</span>', correctIs: 'true' },
+                    { label: 'c', text: '<span class="math">-xy + xy = 0</span>', correctIs: 'true' },
+                    { label: 'd', text: '<span class="math">x<sup>2</sup> + y<sup>2</sup> = (xy)<sup>2</sup></span>', correctIs: 'false' }
+                ],
+                explanation: 'Khi thu gọn, ta cộng/trừ hệ số và giữ nguyên phần biến. Câu a sai (phải bằng 5x). Câu d sai hoàn toàn vì hai hạng tử không đồng dạng không thể gộp.'
+            },
+            {
+                id: 10, level: 2, type: 'tf', points: 1.0,
+                text: '🛒 <strong>Tình huống:</strong> Bạn An mua <span class="math">x</span> quyển vở (10k/quyển) và <span class="math">y</span> chiếc bút (5k/chiếc). Biểu thức tính tổng tiền là <span class="math">T = 10x + 5y</span>.',
+                statements: [
+                    { label: 'a', text: 'Biểu thức T là một đa thức.', correctIs: 'true' },
+                    { label: 'b', text: 'Biểu thức T là đa thức bậc 2.', correctIs: 'false' },
+                    { label: 'c', text: 'Nếu mua 2 vở và 3 bút, An phải trả 35 nghìn.', correctIs: 'true' },
+                    { label: 'd', text: 'Trong đa thức T, hạng tử <span class="math">10x</span> và <span class="math">5y</span> là hai hạng tử đồng dạng.', correctIs: 'false' }
+                ],
+                explanation: 'T là đa thức bậc 1. Thay x=2, y=3 vào ta được 10*2 + 5*3 = 35. Các hạng tử 10x và 5y có phần biến khác nhau nên không đồng dạng.'
+            },
+
+            // Cửa ải 3: Về đích (MCQ) - 0.5đ/câu
+            {
+                id: 11, level: 3, type: 'mcq', points: 0.5,
+                text: 'Thu gọn đa thức <span class="math">P = 2x<sup>2</sup>y + 4x<sup>2</sup>y - 3</span>, ta được kết quả:',
+                options: [
+                    'A. <span class="math">6x<sup>4</sup>y<sup>2</sup> - 3</span>',
+                    'B. <span class="math">6x<sup>2</sup>y - 3</span>',
+                    'C. <span class="math">8x<sup>2</sup>y - 3</span>',
+                    'D. <span class="math">2x<sup>2</sup>y - 3</span>'
+                ],
+                correctIndex: 1,
+                explanation: 'Cộng hệ số: 2 + 4 = 6. Giữ nguyên phần biến x²y. Kết quả: 6x²y - 3.'
+            },
+            {
+                id: 12, level: 3, type: 'mcq', points: 0.5,
+                text: 'Bậc của đa thức <span class="math">Q = 3x<sup>3</sup> - 2x<sup>2</sup> + x<sup>3</sup> - 4x<sup>3</sup> + 5</span> là bao nhiêu?',
+                options: [ 'A. 3', 'B. 0', 'C. 2', 'D. 4' ],
+                correctIndex: 2,
+                explanation: 'Thu gọn Q: (3 + 1 - 4)x³ - 2x² + 5 = 0x³ - 2x² + 5 = -2x² + 5. Hạng tử có bậc cao nhất lúc này là -2x², có bậc 2.'
+            },
+            {
+                id: 13, level: 3, type: 'mcq', points: 0.5,
+                text: 'Tính giá trị của đa thức <span class="math">M = x<sup>2</sup> + 3y</span> tại <span class="math">x = 2, y = 1</span>.',
+                options: [ 'A. 7', 'B. 5', 'C. 8', 'D. 10' ],
+                correctIndex: 0,
+                explanation: 'Thay x=2, y=1 vào M ta được: 2² + 3*1 = 4 + 3 = 7.'
+            },
+            {
+                id: 14, level: 3, type: 'mcq', points: 0.5,
+                text: '🔐 <strong>Tình huống:</strong> Để mở cổng, em cần tìm "chìa khóa" là giá trị của đa thức <span class="math">N = 2xy - x</span> tại <span class="math">x = -1, y = 3</span>. Chìa khóa đó là số mấy?',
+                options: [ 'A. -7', 'B. 5', 'C. -5', 'D. 7' ],
+                correctIndex: 2,
+                explanation: 'Thay x = -1, y = 3 vào N: 2*(-1)*3 - (-1) = -6 + 1 = -5.'
+            },
+            {
+                id: 15, level: 3, type: 'mcq', points: 0.5,
+                text: 'Cho đa thức <span class="math">H = 2x<sup>2</sup>y<sup>2</sup> - 5x<sup>2</sup>y<sup>2</sup> + 4</span>. Bậc của đa thức H là:',
+                options: [ 'A. 2', 'B. 8', 'C. 0', 'D. 4' ],
+                correctIndex: 3,
+                explanation: 'Thu gọn H = -3x²y² + 4. Bậc của hạng tử -3x²y² là 2 + 2 = 4, do đó bậc của đa thức là 4.'
+            }
+        ];
+
+        // GAME STATE
+        let currentIndex = 0;
+        let score = 0;
+        let studentName = "";
+        let studentClass = "";
+        let userAnswers = []; // Store answers to review later
+        let currentLevel = 1;
+
+        // DOM Elements
+        const screenWelcome = document.getElementById('screen-welcome');
+        const screenGame = document.getElementById('screen-game');
+        const screenResult = document.getElementById('screen-result');
+        const screenAnswers = document.getElementById('screen-answers');
+
+        // Level config info
+        const levelData = {
+            1: { title: "1 - Khởi Động", class: "level-1", icon: "🎮" },
+            2: { title: "2 - Tăng Tốc", class: "level-2", icon: "🚀" },
+            3: { title: "3 - Về Đích", class: "level-3", icon: "🎯" }
+        };
+
+        function startGame() {
+            studentName = document.getElementById('input-name').value.trim();
+            studentClass = document.getElementById('input-class').value.trim();
+            const errorMsg = document.getElementById('error-msg');
+
+            if (!studentName || !studentClass) {
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            errorMsg.classList.add('hidden');
+            document.getElementById('display-name').textContent = studentName;
+            document.getElementById('display-class').textContent = studentClass;
+
+            // Reset state
+            currentIndex = 0;
+            score = 0;
+            userAnswers = [];
+            currentLevel = 1;
+
+            switchScreen(screenWelcome, screenGame);
+            renderQuestion();
+        }
+
+        function switchScreen(fromScreen, toScreen) {
+            fromScreen.classList.add('hidden');
+            fromScreen.classList.remove('flex');
+            toScreen.classList.remove('hidden');
+            toScreen.classList.add('flex');
+            window.scrollTo(0,0);
+        }
+
+        function renderQuestion() {
+            const q = questions[currentIndex];
+            const container = document.getElementById('question-content');
+            document.getElementById('game-error-msg').classList.add('hidden');
+
+            // Update Progress
+            document.getElementById('progress-text').textContent = `${currentIndex + 1}/${questions.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / questions.length) * 100}%`;
+
+            // Check level change
+            if (q.level !== currentLevel) {
+                showLevelToast();
+                currentLevel = q.level;
+                const badge = document.getElementById('level-badge');
+                badge.className = `${levelData[currentLevel].class} text-white text-sm font-bold px-3 py-1 rounded-full inline-block shadow-sm transition-all`;
+                badge.innerHTML = `${levelData[currentLevel].icon} Cửa ải ${levelData[currentLevel].title}`;
+            }
+
+            // Build HTML based on question type
+            let html = `
+                <div class="mb-6 fade-in">
+                    <span class="text-sm font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-lg uppercase tracking-wider mb-3 inline-block">Câu ${currentIndex + 1}</span>
+                    <h3 class="text-xl md:text-2xl font-bold text-slate-800 leading-snug">${q.text}</h3>
+                </div>
+            `;
+
+            if (q.type === 'mcq') {
+                html += `<div class="space-y-3 fade-in" id="options-container">`;
+                q.options.forEach((opt, index) => {
+                    html += `
+                        <label class="flex items-center p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 hover:border-blue-300 transition group">
+                            <input type="radio" name="q_answer" value="${index}" class="custom-radio mr-4">
+                            <span class="text-lg text-slate-700 group-hover:text-blue-700">${opt}</span>
+                        </label>
+                    `;
+                });
+                html += `</div>`;
+            } else if (q.type === 'tf') {
+                html += `<div class="space-y-4 fade-in" id="tf-container">`;
+                q.statements.forEach((stmt, idx) => {
+                    html += `
+                        <div class="p-4 border-2 border-slate-200 rounded-xl bg-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="flex-1">
+                                <span class="font-bold text-blue-600 mr-2">${stmt.label})</span>
+                                <span class="text-lg text-slate-700">${stmt.text}</span>
+                            </div>
+                            <div class="flex gap-4 shrink-0">
+                                <label class="flex items-center cursor-pointer bg-white px-4 py-2 rounded-lg border border-slate-200 hover:border-green-400 transition shadow-sm">
+                                    <input type="radio" name="tf_${idx}" value="true" class="custom-radio mr-2 border-green-500 checked:bg-green-500">
+                                    <span class="font-semibold text-green-600">ĐÚNG</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer bg-white px-4 py-2 rounded-lg border border-slate-200 hover:border-red-400 transition shadow-sm">
+                                    <input type="radio" name="tf_${idx}" value="false" class="custom-radio mr-2 border-red-500 checked:bg-red-500">
+                                    <span class="font-semibold text-red-600">SAI</span>
+                                </label>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            container.innerHTML = html;
+
+            // Change button text on last question
+            const btnNext = document.getElementById('btn-next');
+            if (currentIndex === questions.length - 1) {
+                btnNext.innerHTML = `Hoàn thành & Xem điểm 🏆`;
+                btnNext.className = "bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-xl shadow-md transition duration-200 flex items-center gap-2";
+            } else {
+                btnNext.innerHTML = `Câu tiếp theo <span>➜</span>`;
+                btnNext.className = "bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-md transition duration-200 flex items-center gap-2";
+            }
+        }
+
+        function nextQuestion() {
+            const q = questions[currentIndex];
+            let isAnswered = false;
+            let questionScore = 0;
+            let userAnswerData = null;
+
+            if (q.type === 'mcq') {
+                const selected = document.querySelector('input[name="q_answer"]:checked');
+                if (selected) {
+                    isAnswered = true;
+                    userAnswerData = parseInt(selected.value);
+                    if (userAnswerData === q.correctIndex) {
+                        questionScore = q.points;
+                    }
+                }
+            } else if (q.type === 'tf') {
+                let allAnswered = true;
+                let tfAnswers = [];
+                for (let i = 0; i < q.statements.length; i++) {
+                    const selected = document.querySelector(`input[name="tf_${i}"]:checked`);
+                    if (!selected) { allAnswered = false; break; }
+                    
+                    const val = selected.value;
+                    tfAnswers.push(val);
+                    if (val === q.statements[i].correctIs) {
+                        questionScore += (q.points / q.statements.length); // 0.25 per row
+                    }
+                }
+                if (allAnswered) {
+                    isAnswered = true;
+                    userAnswerData = tfAnswers;
+                }
+            }
+
+            if (!isAnswered) {
+                document.getElementById('game-error-msg').classList.remove('hidden');
+                return;
+            }
+
+            // Save data
+            score += questionScore;
+            userAnswers.push({
+                questionId: q.id,
+                userAnswer: userAnswerData,
+                earnedPoints: questionScore
+            });
+
+            // Move next or finish
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                finishGame();
+            }
+        }
+
+        function showLevelToast() {
+            const toast = document.getElementById('level-toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2000);
+        }
+
+        function finishGame() {
+            switchScreen(screenGame, screenResult);
+            
+            document.getElementById('res-name').textContent = studentName;
+            document.getElementById('res-class').textContent = `Lớp: ${studentClass}`;
+            
+            // Format score to avoid weird JS decimals
+            const finalScore = Math.round(score * 100) / 100;
+            document.getElementById('res-score').textContent = finalScore;
+
+            const msgEl = document.getElementById('res-message');
+            const iconEl = document.getElementById('result-icon');
+            
+            if (finalScore >= 8) {
+                iconEl.textContent = "🎉";
+                msgEl.innerHTML = `<span class="text-green-600 font-bold">Xuất sắc!</span> Cô PHẠM THỊ THU BÌNH rất tự hào về em. Em đã vượt ải Đa thức rất tốt. Hãy tiếp tục giữ tinh thần học Toán tự tin và vui vẻ nhé!`;
+                triggerConfetti();
+            } else if (finalScore >= 6.5) {
+                iconEl.textContent = "🌟";
+                msgEl.innerHTML = `<span class="text-blue-600 font-bold">Rất tốt!</span> Em đã nắm được phần lớn kiến thức bài Đa thức. Cô PHẠM THỊ THU BÌNH tin rằng chỉ cần luyện thêm một chút, em sẽ chinh phục điểm cao hơn.`;
+            } else if (finalScore >= 5) {
+                iconEl.textContent = "💪";
+                msgEl.innerHTML = `<span class="text-orange-500 font-bold">Em đã rất cố gắng rồi!</span> Một vài phần về thu gọn đa thức hoặc tìm bậc có thể cần ôn lại. Cô PHẠM THỊ THU BÌNH tin em sẽ tiến bộ ở lần làm tiếp theo.`;
+            } else {
+                iconEl.textContent = "🌱";
+                msgEl.innerHTML = `Không sao cả, đây là bước khởi đầu để em hiểu bài hơn. Cô PHẠM THỊ THU BÌNH luôn tin em có thể làm tốt hơn. Hãy bấm <strong>'Làm lại'</strong> và thử chinh phục từng cửa ải nhé!`;
+            }
+        }
+
+        function resetGame() {
+            document.getElementById('input-name').value = "";
+            document.getElementById('input-class').value = "";
+            document.getElementById('confetti-canvas').classList.add('hidden');
+            stopConfetti();
+            
+            screenResult.classList.add('hidden');
+            screenResult.classList.remove('flex');
+            screenAnswers.classList.add('hidden');
+            screenAnswers.classList.remove('flex');
+            
+            screenWelcome.classList.remove('hidden');
+            screenWelcome.classList.add('flex');
+            window.scrollTo(0,0);
+        }
+
+        function showAnswers() {
+            switchScreen(screenResult, screenAnswers);
+            const container = document.getElementById('answers-list');
+            let html = '';
+
+            questions.forEach((q, idx) => {
+                const ansData = userAnswers[idx];
+                const isPerfect = ansData.earnedPoints === q.points;
+                const statusColor = isPerfect ? 'text-green-600' : (ansData.earnedPoints > 0 ? 'text-orange-500' : 'text-red-500');
+                const statusIcon = isPerfect ? '✅' : '❌';
+
+                html += `
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 relative">
+                        <div class="absolute top-4 right-4 text-sm font-bold ${statusColor}">
+                            ${statusIcon} +${ansData.earnedPoints}đ
+                        </div>
+                        <p class="font-bold text-slate-800 mb-3">Câu ${idx + 1}: ${q.text}</p>
+                `;
+
+                if (q.type === 'mcq') {
+                    q.options.forEach((opt, oIdx) => {
+                        let styling = "text-slate-600";
+                        let mark = "";
+                        if (oIdx === q.correctIndex) {
+                            styling = "font-bold text-green-600 bg-green-100 px-2 rounded";
+                            mark = " (Đáp án đúng)";
+                        } else if (oIdx === ansData.userAnswer && oIdx !== q.correctIndex) {
+                            styling = "font-bold text-red-500 line-through";
+                            mark = " (Em chọn)";
+                        }
+                        html += `<p class="${styling} mb-1">${opt}${mark}</p>`;
+                    });
+                } else if (q.type === 'tf') {
+                    q.statements.forEach((stmt, sIdx) => {
+                        const uAns = ansData.userAnswer[sIdx];
+                        const isRowCorrect = uAns === stmt.correctIs;
+                        const rowIcon = isRowCorrect ? '✅' : '❌';
+                        const uAnsText = uAns === 'true' ? 'ĐÚNG' : 'SAI';
+                        const cAnsText = stmt.correctIs === 'true' ? 'ĐÚNG' : 'SAI';
+
+                        html += `
+                            <div class="flex flex-col sm:flex-row gap-2 sm:items-center justify-between p-2 border-b border-slate-200 last:border-0 text-sm">
+                                <span class="flex-1 text-slate-700"><span class="font-bold mr-1">${stmt.label})</span>${stmt.text}</span>
+                                <span class="whitespace-nowrap ${isRowCorrect ? 'text-green-600' : 'text-red-500'} font-semibold">
+                                    ${rowIcon} Em chọn: ${uAnsText} (Đ/án: ${cAnsText})
+                                </span>
+                            </div>
+                        `;
+                    });
+                }
+
+                html += `
+                        <div class="mt-4 bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg text-sm text-slate-700">
+                            <strong>💡 Giải thích:</strong> ${q.explanation}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function backToResult() {
+            switchScreen(screenAnswers, screenResult);
+        }
+
+        let confettiAnimId;
+        function triggerConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            canvas.classList.remove('hidden');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#fce18a', '#ff726d', '#b48def', '#f4306d', '#4ade80', '#3b82f6'];
+
+            for (let i = 0; i < 150; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    r: Math.random() * 6 + 2,
+                    dx: Math.random() * 4 - 2,
+                    dy: Math.random() * 4 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.floor(Math.random() * 10) - 10,
+                    tiltAngleInc: (Math.random() * 0.07) + 0.05,
+                    tiltAngle: 0
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    ctx.beginPath();
+                    ctx.lineWidth = p.r;
+                    ctx.strokeStyle = p.color;
+                    ctx.moveTo(p.x + p.tilt + p.r, p.y);
+                    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+                    ctx.stroke();
+                }
+                update();
+                confettiAnimId = requestAnimationFrame(draw);
+            }
+
+            function update() {
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    p.tiltAngle += p.tiltAngleInc;
+                    p.y += (Math.cos(p.tiltAngle) + p.dy + p.r / 2) / 2;
+                    p.x += Math.sin(p.tiltAngle) * 2;
+
+                    if (p.y > canvas.height) {
+                        particles[i] = {
+                            x: Math.random() * canvas.width,
+                            y: -20,
+                            r: p.r, dx: p.dx, dy: p.dy, color: p.color,
+                            tilt: p.tilt, tiltAngleInc: p.tiltAngleInc, tiltAngle: p.tiltAngle
+                        };
+                    }
+                }
+            }
+            draw();
+
+            // Auto stop after 5s
+            setTimeout(() => {
+                stopConfetti();
+                canvas.classList.add('hidden');
+            }, 5000);
+        }
+
+        function stopConfetti() {
+            if (confettiAnimId) {
+                cancelAnimationFrame(confettiAnimId);
+            }
+        }
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('confetti-canvas');
+            if(!canvas.classList.contains('hidden')){
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        });
+
+    </script>
+</body>
+</html>
