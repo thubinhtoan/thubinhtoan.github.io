@@ -29,8 +29,8 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             overflow: hidden;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            min-height: 100vh;
             background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
         }
 
@@ -40,7 +40,9 @@
             top: 0;
             left: 0;
             width: 100%;
+            min-height: 100vh;
             height: 100%;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -509,6 +511,23 @@
         }
         @media (max-width: 600px) {
             .answers-grid { grid-template-columns: 1fr; }
+            #screen-game { padding: 12px; }
+            .game-left { min-height: 620px; }
+            .top-bar { gap: 8px; }
+            .lifelines { gap: 6px; }
+            .lifeline-btn { width: 42px; }
+            .timer-container { width: min(34vw, 160px); }
+            .mc-container { flex-wrap: wrap; gap: 8px; }
+            .mc-avatar { font-size: 36px; margin-right: 4px; }
+            .speech-bubble { max-width: calc(100% - 55px); }
+            .stop-btn { margin-left: 0; }
+            .qa-container { margin-bottom: 16px; }
+            .hex-inner { padding: 12px 18px; }
+            #screen-result .result-container { width: 94%; padding: 20px 12px; }
+            .stats-grid { grid-template-columns: 1fr; gap: 8px; }
+            .stat-value { font-size: 20px; }
+            table { font-size: 12px; }
+            th, td { padding: 7px 5px; }
         }
 
         /* Mute Button */
@@ -683,7 +702,7 @@
             { q: "Chữ số 5 trong số 2358 có giá trị là bao nhiêu?", a: ["5", "50", "500", "5 000"], correct: 1 },
             { q: "Trong các số sau, số nào là bội của 5?", a: ["24", "16", "8", "5"], correct: 3 },
             { q: "Trong các số sau, số nào là ước của 25?", a: ["24", "15", "5", "3"], correct: 2 },
-            { q: "Hình nào sau đây KHÔNG có tất cả các cạnh bằng nhau?", a: ["Hình bình hành", "Hình tam giác đều", "Hình thoi", "Hình vuông"], correct: 0 },
+            { q: "Hình nào sau đây (trong trường hợp tổng quát) không có tất cả các cạnh bằng nhau?", a: ["Hình chữ nhật không phải hình vuông", "Hình tam giác đều", "Hình thoi", "Hình vuông"], correct: 0 },
             // Trung bình (6-10)
             { q: "Tập hợp các ước tự nhiên của 6 là gì?", a: ["Ư(6) = {1; 6}", "Ư(6) = {3; 6}", "Ư(6) = {2; 3; 6}", "Ư(6) = {1; 2; 3; 6}"], correct: 3 },
             { q: "Kết quả phép tính 3³ . 3⁴ là:", a: ["3¹²", "3⁷", "3¹", "9¹²"], correct: 1 },
@@ -692,7 +711,7 @@
             { q: "Tập hợp nào sau đây CHỈ gồm các số nguyên tố?", a: ["{1; 2; 3; 4; 5}", "{1; 2; 4; 6; 8}", "{2; 13; 5; 7; 31}", "{2; 3; 9; 7; 13}"], correct: 2 },
             // Khó (11-15)
             { q: "Kết quả phép tính: 7 . 3² + 36 : 3²", a: ["17", "29", "67", "23"], correct: 2 },
-            { q: "Trong hình bình hành, hai đường chéo...", a: ["Bằng nhau", "Vuông góc với nhau", "Cắt nhau tại trung điểm và vuông góc", "Cắt nhau tại trung điểm mỗi đường"], correct: 3 },
+            { q: "Trong hình bình hành, hai đường chéo...", a: ["Cắt nhau tại trung điểm mỗi đường", "Bằng nhau", "Vuông góc với nhau", "Cắt nhau tại trung điểm và vuông góc"], correct: 0 },
             { q: "Khẳng định nào sau đây là SAI?", a: ["Hai đường chéo của hình chữ nhật vuông góc", "Hai đường chéo của hình vuông bằng nhau", "Hai góc kề một đáy hình thang cân bằng nhau", "Trong hình thoi các cạnh đối song song"], correct: 0 },
             { q: "Nếu 60 chia hết cho 10 thì:", a: ["60 là bội của 14", "60 là ước của 10", "10 là bội của 60", "10 là ước của 60"], correct: 3 },
             { q: "Tổng của hai số La Mã XIV và XIX viết trong hệ thập phân là:", a: ["23", "33", "34", "24"], correct: 1 }
@@ -713,21 +732,31 @@
             timer: 30,
             interval: null,
             isAnswering: false,
+            gameEnded: false,
             startTime: 0,
             totalTime: 0,
-            history: [] // To store local records for the table
+            history: (() => {
+                try { return JSON.parse(localStorage.getItem('aiTrieuPhuToan6History') || '[]'); }
+                catch (error) { return []; }
+            })() // Lưu lịch sử trên trình duyệt của thiết bị hiện tại
         };
 
         let isMuted = false;
 
         // --- 3. AUDIO SYSTEM (Web Audio API) ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let audioCtx = null;
+        try {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) audioCtx = new AudioContextClass();
+        } catch (error) {
+            console.warn("Âm thanh không khả dụng trên trình duyệt này:", error);
+        }
         let bgmOsc = null;
         let bgmGain = null;
         let bgmInterval = null;
 
         const playTone = (freq, type, duration, vol=0.5) => {
-            if (isMuted || audioCtx.state === 'suspended') return;
+            if (isMuted || !audioCtx || audioCtx.state === 'suspended') return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = type;
@@ -751,7 +780,7 @@
         };
         const playWrong = () => playTone(150, 'sawtooth', 1.0, 0.5);
         const playSciFi = () => {
-            if (isMuted) return;
+            if (isMuted || !audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
@@ -824,7 +853,7 @@
 
         // --- 5. GAME LOGIC ---
         ui.btnStart.addEventListener('click', () => {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
+            if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             playClick();
             state.player = {
                 name: ui.regName.value.trim(),
@@ -833,6 +862,9 @@
             };
             state.currentQ = 0;
             state.guaranteedPrize = "0";
+            state.currentPrize = "0";
+            state.gameEnded = false;
+            state.isAnswering = false;
             state.startTime = Date.now();
             
             // Reset Lifelines
@@ -887,11 +919,13 @@
             startTimer();
         };
 
-        const startTimer = () => {
+        const startTimer = (seconds = 30) => {
             clearInterval(state.interval);
-            state.timer = 30;
-            ui.timerBar.style.width = '100%';
-            ui.timerBar.style.background = 'var(--correct-neon)';
+            state.timer = Math.max(0, seconds);
+            ui.timerBar.style.width = `${(state.timer / 30) * 100}%`;
+            ui.timerBar.style.background = state.timer <= 5
+                ? 'var(--wrong-neon)'
+                : state.timer <= 15 ? 'var(--gold-neon)' : 'var(--correct-neon)';
             
             state.interval = setInterval(() => {
                 state.timer--;
@@ -913,7 +947,7 @@
         };
 
         const handleAnswer = (selectedIndex, boxEl) => {
-            if (state.isAnswering) return;
+            if (state.isAnswering || state.gameEnded) return;
             state.isAnswering = true;
             clearInterval(state.interval);
             playClick();
@@ -922,6 +956,7 @@
             boxEl.classList.add('selected', 'blink');
 
             setTimeout(() => {
+                if (state.gameEnded) return;
                 boxEl.classList.remove('blink');
                 const correctIndex = questionsData[state.currentQ].correct;
                 const correctBox = ui.answers[correctIndex];
@@ -960,16 +995,10 @@
             playSciFi();
             this.classList.add('used');
             const correctIndex = questionsData[state.currentQ].correct;
-            let hidden = 0;
-            ui.answers.forEach((box, i) => {
-                if (i !== correctIndex && hidden < 2) {
-                    // 50% chance to hide if not correct, guarantee 2 are hidden
-                    if (Math.random() > 0.3 || hidden === 1) {
-                        box.classList.add('hidden');
-                        hidden++;
-                    }
-                }
-            });
+            const wrongIndexes = [0, 1, 2, 3].filter(i => i !== correctIndex);
+            // Xáo trộn các phương án sai, sau đó ẩn đúng 2 phương án.
+            wrongIndexes.sort(() => Math.random() - 0.5);
+            wrongIndexes.slice(0, 2).forEach(i => ui.answers[i].classList.add('hidden'));
             speakMC("Máy tính đã loại bỏ 2 phương án sai.");
         });
 
@@ -994,26 +1023,27 @@
             this.classList.add('used');
             
             const correctIndex = questionsData[state.currentQ].correct;
-            let total = 100;
-            let percents = [0,0,0,0];
-            
-            // Generate logical stats based on difficulty
-            if(state.currentQ < 5) {
-                percents[correctIndex] = Math.floor(Math.random() * 20 + 70); // 70-90%
+            const percents = [0, 0, 0, 0];
+            // Tỉ lệ đáp án đúng phụ thuộc độ khó; phần còn lại chia ngẫu nhiên
+            // cho 3 phương án sai và luôn bảo đảm tổng bằng 100%.
+            let correctPercent;
+            if (state.currentQ < 5) {
+                correctPercent = Math.floor(Math.random() * 21 + 70); // 70–90%
             } else if (state.currentQ < 10) {
-                percents[correctIndex] = Math.floor(Math.random() * 20 + 50); // 50-70%
+                correctPercent = Math.floor(Math.random() * 21 + 50); // 50–70%
             } else {
-                percents[correctIndex] = Math.floor(Math.random() * 15 + 35); // 35-50%
+                correctPercent = Math.floor(Math.random() * 16 + 35); // 35–50%
             }
-            
-            total -= percents[correctIndex];
-            for(let i=0; i<4; i++) {
-                if(i !== correctIndex) {
-                    let share = i===3 ? total : Math.floor(Math.random() * (total*0.7));
-                    percents[i] = share;
-                    total -= share;
-                }
+            percents[correctIndex] = correctPercent;
+
+            const wrongIndexes = [0, 1, 2, 3].filter(i => i !== correctIndex);
+            let remaining = 100 - correctPercent;
+            for (let j = 0; j < wrongIndexes.length - 1; j++) {
+                const share = Math.floor(Math.random() * (remaining + 1));
+                percents[wrongIndexes[j]] = share;
+                remaining -= share;
             }
+            percents[wrongIndexes[3 - 1]] = remaining;
 
             const bars = document.querySelectorAll('#chart-container .bar');
             const texts = document.querySelectorAll('#chart-container .bar-percent');
@@ -1030,11 +1060,13 @@
 
         // --- STOP BUTTON ---
         document.getElementById('btn-stop').addEventListener('click', () => {
-            if(state.isAnswering) return;
+            if (state.isAnswering || state.gameEnded) return;
+            clearInterval(state.interval);
             document.getElementById('modal-confirm').classList.add('active');
         });
         document.getElementById('btn-cancel-stop').addEventListener('click', () => {
             document.getElementById('modal-confirm').classList.remove('active');
+            if (!state.gameEnded && !state.isAnswering) startTimer(state.timer);
         });
         document.getElementById('btn-confirm-stop').addEventListener('click', () => {
             document.getElementById('modal-confirm').classList.remove('active');
@@ -1044,8 +1076,12 @@
 
         // --- 7. END GAME & RESULTS ---
         const endGame = (isWin, isStopped = false) => {
+            if (state.gameEnded) return;
+            state.gameEnded = true;
+            state.isAnswering = true;
             stopBGM();
             clearInterval(state.interval);
+            document.querySelectorAll('.modal-overlay').forEach(modal => modal.classList.remove('active'));
             state.totalTime = Math.floor((Date.now() - state.startTime) / 1000);
             
             let finalPrize = isWin ? prizeTree[14] : (isStopped ? state.currentPrize : state.guaranteedPrize);
@@ -1073,6 +1109,8 @@
                 date: new Date().toLocaleString('vi-VN')
             };
             state.history.push(record);
+            try { localStorage.setItem('aiTrieuPhuToan6History', JSON.stringify(state.history)); }
+            catch (error) { console.warn("Không thể lưu lịch sử trên trình duyệt:", error); }
             updateTable();
 
             if (isWin) { playCorrect(); fireworks(); }
@@ -1083,15 +1121,15 @@
 
         const updateTable = () => {
             const tbody = document.getElementById('history-body');
-            tbody.innerHTML = '';
+            tbody.replaceChildren();
             state.history.forEach(r => {
-                tbody.innerHTML += `<tr>
-                    <td>${r.name}</td>
-                    <td>${r.class}</td>
-                    <td>${r.correct}</td>
-                    <td>${r.prize}</td>
-                    <td>${r.date}</td>
-                </tr>`;
+                const tr = document.createElement('tr');
+                [r.name, r.class, r.correct, `${r.prize} ₫`, r.date].forEach(value => {
+                    const td = document.createElement('td');
+                    td.textContent = String(value ?? '');
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
             });
         };
 
@@ -1102,10 +1140,14 @@
             let csvContent = "\uFEFF"; // UTF-8 BOM
             csvContent += "Họ và Tên,Lớp,Mã HS,Số câu đúng,Tiền thưởng,Thời gian(s),Ngày giờ\n";
             
+            const csvCell = value => `"${String(value ?? '').replace(/"/g, '""')}"`;
             state.history.forEach(r => {
-                // Escape quotes if any
-                let row = `"${r.name}","${r.class}","${r.id}",${r.correct},"${r.prize}",${r.time},"${r.date}"`;
-                csvContent += row + "\n";
+                const row = [
+                    csvCell(r.name), csvCell(r.class), csvCell(r.id),
+                    Number(r.correct) || 0, csvCell(r.prize),
+                    Number(r.time) || 0, csvCell(r.date)
+                ].join(',');
+                csvContent += row + "\r\n";
             });
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -1116,7 +1158,11 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
         });
+
+        // Hiển thị lịch sử đã lưu từ những lượt chơi trước trên cùng trình duyệt.
+        updateTable();
 
         // Restart
         document.getElementById('btn-restart').addEventListener('click', () => {
@@ -1124,6 +1170,9 @@
             ui.regClass.value = '';
             ui.regId.value = '';
             ui.btnStart.disabled = true;
+            clearInterval(state.interval);
+            stopBGM();
+            document.querySelectorAll('.modal-overlay').forEach(modal => modal.classList.remove('active'));
             showScreen('screen-register');
         });
 
